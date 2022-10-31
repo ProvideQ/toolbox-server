@@ -18,6 +18,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+jar {
+    // avoid creation of plain jar, spring boot will create a fat jar anyways
+    enabled = false
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
