@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.validation.Valid;
+
+import edu.kit.provideq.toolbox.sat.convert.SATSolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +26,13 @@ public class SatController {
     var id = nextId.incrementAndGet();
     var status = SolutionStatus.COMPUTING;
     solutionStatuses.put(id, status);
-    return new SolutionHandle(id, status);
+
+    SolutionHandle solutionHandle = new SolutionHandle(id, status);
+
+    SATSolver satSolver = new SATSolver();
+    satSolver.Solve(request.formula(), solutionHandle);
+
+    return solutionHandle;
   }
 
   @GetMapping("/solve/sat")
