@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.meta;
 
 /**
  * The type of problem to solve.

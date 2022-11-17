@@ -1,9 +1,14 @@
 package edu.kit.provideq.toolbox.sat;
 
+import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.MetaSolverSAT;
+import edu.kit.provideq.toolbox.meta.Problem;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.validation.Valid;
 
@@ -19,36 +24,41 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class SatController {
   private final AtomicLong nextId = new AtomicLong();
-  private final ConcurrentMap<Long, SolutionStatus> solutionStatuses = new ConcurrentHashMap<>();
+  private final List<Solution<String>> solutions = new LinkedList<>();
+
+  private final MetaSolver<SATSolver> metaSolver = new MetaSolverSAT();
 
   @PostMapping("/solve/sat")
   public SolutionHandle solveSat(@RequestBody @Valid SolveSatRequest request) {
     var id = nextId.incrementAndGet();
     var status = SolutionStatus.COMPUTING;
-    solutionStatuses.put(id, status);
+    Solution<String> solution = new Solution<>(id);
+    solutions.add(solution);
 
     SolutionHandle solutionHandle = new SolutionHandle(id, status);
 
-    SATSolver satSolver = new SATSolver();
-    satSolver.Solve(request.formula(), solutionHandle);
+    Problem<String> problem = new Problem<>(request.formula(), ProblemType.SAT);
+
+    SATSolver satSolver = metaSolver.findSolver(problem);
+    satSolver.solve(problem, solution);
 
     return solutionHandle;
   }
 
   @GetMapping("/solve/sat")
   public SolutionHandle getSolution(@RequestParam(name = "id", required = true) long id) {
-    var currentStatus = solutionStatuses.get(id);
-    if (currentStatus == null) {
+    var solution = solutions.stream()
+        .filter(s -> s.getId() == id)
+        .findFirst()
+        .orElse(null);
+    if (solution == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,
           String.format("Unable to find solution process with id %d", id));
     }
 
     // for demonstration purposes, jobs are marked as solved once a request goes in here
-    if (currentStatus == SolutionStatus.COMPUTING) {
-      currentStatus = SolutionStatus.SOLVED;
-      solutionStatuses.put(id, currentStatus);
-    }
+    if (solution.getStatus() == SolutionStatus.COMPUTING) solution.complete();
 
-    return new SolutionHandle(id, currentStatus);
+    return new SolutionHandle(id, solution.getStatus());
   }
 }
