@@ -9,41 +9,42 @@ import java.util.Objects;
  * the current status of the process, as well as the eventually generated solution data
  * @param <S> the type of the generated solution data
  */
-public class Solution<S> {
+public class Solution<S> implements SolutionHandle{
   private final long ID;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
   private S solutionData;
   private String debugData;
 
-  private boolean completed = false;
-
   public Solution(long ID) {
     this.ID = ID;
   }
 
-  public long getId() {
+  public long id() {
     return this.ID;
   }
 
-  public SolutionStatus getStatus() {
+  public SolutionStatus status() {
     return this.status;
+  }
+
+  @Override
+  public void setStatus(SolutionStatus newStatus) {
+    this.status = newStatus;
   }
 
   /**
    * sets the status to 'invalid'. irreversible
    */
   public void abort() {
-    if (!completed) this.status = SolutionStatus.INVALID;
-    this.completed = true;
+    if (!this.status.isCompleted()) this.status = SolutionStatus.INVALID;
   }
 
   /**
    * Sets the status to 'solved'. irreversible
    */
   public void complete() {
-    if (!completed) this.status = SolutionStatus.SOLVED;
-    this.completed = true;
+    if (!this.status.isCompleted()) this.status = SolutionStatus.SOLVED;
   }
 
   public String getMetaData() {

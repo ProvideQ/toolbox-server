@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.validation.Valid;
 
-import edu.kit.provideq.toolbox.sat.convert.SATSolver;
+import edu.kit.provideq.toolbox.sat.convert.GamsSATSolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +26,7 @@ public class SatController {
   private final AtomicLong nextId = new AtomicLong();
   private final List<Solution<String>> solutions = new LinkedList<>();
 
-  private final MetaSolver<SATSolver> metaSolver = new MetaSolverSAT();
+  private final MetaSolver<GamsSATSolver> metaSolver = new MetaSolverSAT();
 
   @PostMapping("/solve/sat")
   public SolutionHandle solveSat(@RequestBody @Valid SolveSatRequest request) {
@@ -35,20 +35,18 @@ public class SatController {
     Solution<String> solution = new Solution<>(id);
     solutions.add(solution);
 
-    SolutionHandle solutionHandle = new SolutionHandle(id, status);
-
     Problem<String> problem = new Problem<>(request.formula(), ProblemType.SAT);
 
-    SATSolver satSolver = metaSolver.findSolver(problem);
-    satSolver.solve(problem, solution);
+    GamsSATSolver gamsSatSolver = metaSolver.findSolver(problem);
+    gamsSatSolver.solve(problem, solution);
 
-    return solutionHandle;
+    return solution;
   }
 
   @GetMapping("/solve/sat")
   public SolutionHandle getSolution(@RequestParam(name = "id", required = true) long id) {
     var solution = solutions.stream()
-        .filter(s -> s.getId() == id)
+        .filter(s -> s.id() == id)
         .findFirst()
         .orElse(null);
     if (solution == null) {
@@ -57,8 +55,8 @@ public class SatController {
     }
 
     // for demonstration purposes, jobs are marked as solved once a request goes in here
-    if (solution.getStatus() == SolutionStatus.COMPUTING) solution.complete();
+    if (solution.status() == SolutionStatus.COMPUTING) solution.complete();
 
-    return new SolutionHandle(id, solution.getStatus());
+    return solution;
   }
 }

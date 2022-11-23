@@ -4,16 +4,27 @@ package edu.kit.provideq.toolbox;
  * Describes the state of a solution process.
  */
 public enum SolutionStatus {
+
   /**
    * The problem cannot be solved because the input is invalid.
    */
-  INVALID,
-  /**
-   * The solution is currently being computed.
-   */
-  COMPUTING,
+  INVALID(true),
+
+  COMPUTING(false),
   /**
    * The problem has been solved and the solution is attached.
    */
-  SOLVED;
+  SOLVED(true);
+  /**
+   * The solution is currently being computed.
+   */
+  private final boolean isCompleted;
+
+  private SolutionStatus (boolean isCompleted) {
+    this.isCompleted = isCompleted;
+  }
+
+  public boolean isCompleted() {
+    return this.isCompleted;
+  }
 }

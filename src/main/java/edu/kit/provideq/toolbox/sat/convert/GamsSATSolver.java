@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class SATSolver implements ProblemSolver<String, String> {
+public class GamsSATSolver implements ProblemSolver<String, String> {
     private final File gamsDirectory = new File(System.getProperty("user.dir"), "gams");
     private final File satDirectory = new File(gamsDirectory, "sat");
     private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
@@ -33,7 +33,7 @@ public class SATSolver implements ProblemSolver<String, String> {
     public void solve(Problem<String> problem, Solution<String> solution) {
         String dimacsCNF = BoolExprToDimacsCNF.Convert(problem.problemData());
 
-        Path dir = Paths.get(workingDirectory.toString(), "sat", String.valueOf(solution.getId()));
+        Path dir = Paths.get(workingDirectory.toString(), "sat", String.valueOf(solution.id()));
         Path problemFile = Paths.get(dir.toString(), "problem.cnf");
         Path solutionFile = Paths.get(dir.toString(), "problem.sol");
 
