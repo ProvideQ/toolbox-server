@@ -44,6 +44,7 @@ public class GamsSATSolver implements ProblemSolver<String, String> {
         } catch (IOException e) {
             solution.setDebugData("Creation of problem file caught exception: " + e.getMessage());
             solution.abort();
+            return;
         }
 
         //Run SAT with GAMS via console
