@@ -7,6 +7,12 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Abstract Controller, offers generic post and get methods
+ * @param <ProblemFormatType> the type in which problem input is expected to arrive
+ * @param <SolutionFormatType> the type in which a solution will be formatted
+ * @param <SolverType> the type of solver that is to be used to solve a problem
+ */
 public abstract class ProblemController<ProblemFormatType, SolutionFormatType, SolverType extends ProblemSolver<ProblemFormatType, SolutionFormatType>> {
 
   public SolutionHandle solve(SolveRequest<ProblemFormatType> request, MetaSolver<SolverType> metaSolver) {
