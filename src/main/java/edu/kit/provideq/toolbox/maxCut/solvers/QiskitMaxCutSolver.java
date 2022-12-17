@@ -14,6 +14,9 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
   private final File maxCutDirectory = new File(qiskitDirectory, "maxCut");
   private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
 
+  private final String problemPath = "problem.gml";
+
+  private final String solutionPath = "problem.sol";
 
   @Override
   public boolean canSolve(Problem<String> problem) {
@@ -31,8 +34,8 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
   public void solve(Problem<String> problem, Solution<String> solution) {
 
     Path dir = Paths.get(workingDirectory.toString(), "qiskit", String.valueOf(solution.id()));
-    Path problemFile = Paths.get(dir.toString(), "problem.gml");
-    Path solutionFile = Paths.get(dir.toString(), "problem.sol");
+    Path problemFile = Paths.get(dir.toString(), problemPath);
+    Path solutionFile = Paths.get(dir.toString(), solutionPath);
 
     //Write problem file
     try {
@@ -47,7 +50,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
     //Run Qiskit solver via console
     try {
       Runtime rt = Runtime.getRuntime();
-      Process exec = null; //TODO: add command line execution
+      Process exec = rt.exec("python maxCut_qiskit.py %s %s".formatted(problemPath, solutionPath), null, maxCutDirectory); //TODO: find location for python scripts
 
       if (exec.waitFor() == 0) {
         solution.complete();
