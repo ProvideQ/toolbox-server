@@ -1,12 +1,13 @@
 package edu.kit.provideq.toolbox.sat;
 
-import javax.validation.constraints.NotNull;
+import edu.kit.provideq.toolbox.SolveRequest;
 
 /**
  * POST Requests to /solve/sat should have a response body of this form.
- * @param formula the SAT formula to solve in the DIMACS SAT format.
+ * The needed formula is the SAT formula to solve in the DIMACS SAT format.
  */
-public record SolveSatRequest(
-    @NotNull String formula
-) {
+public class SolveSatRequest extends SolveRequest<String> {
+  public SolveSatRequest(String formula) {
+    super(formula);
+  }
 }
