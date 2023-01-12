@@ -1,17 +1,17 @@
-package edu.kit.provideq.toolbox.sat.convert;
+package edu.kit.provideq.toolbox.sat.solvers;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.Solution;
 
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.sat.convert.BoolExprToDimacsCNF;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class GamsSATSolver implements ProblemSolver<String, String> {
+public class GamsSATSolver extends SATSolver {
     private final File gamsDirectory = new File(System.getProperty("user.dir"), "gams");
     private final File satDirectory = new File(gamsDirectory, "sat");
     private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
