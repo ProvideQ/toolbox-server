@@ -55,6 +55,7 @@ public class GamsSATSolver extends SATSolver {
             if (exec.waitFor() == 0) {
                 solution.complete();
                 solution.setSolutionData(Files.readString(solutionFile));
+                return;
             }
 
             solution.setDebugData("GAMS didn't complete solving SAT successfully");
