@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.sat;
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
 import javax.validation.Valid;
 
@@ -17,6 +18,11 @@ public class SatController extends ProblemController<String, String, SATSolver> 
   @PostMapping("/solve/sat")
   public SolutionHandle solveSat(@RequestBody @Valid SolveSatRequest request) {
     return super.solve(request, metaSolver);
+  }
+
+  @Override
+  public ProblemType getProblemType() {
+    return ProblemType.SAT;
   }
 
   @GetMapping("/solve/sat")
