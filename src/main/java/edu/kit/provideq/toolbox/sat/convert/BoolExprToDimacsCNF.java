@@ -6,6 +6,8 @@ import com.bpodgursky.jbool_expressions.parsers.ExprParser;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.function.Function;
 
 public class BoolExprToDimacsCNF {
     static String lineSeparator = System.getProperty("line.separator");
@@ -22,37 +24,51 @@ public class BoolExprToDimacsCNF {
         var builder = new StringBuilder();
 
         var varNameMap = new HashMap<String, Integer>();
-        var nextVarNumber = 1;
-        var varCount = 0;
+        var ref = new Object() {
+            int nextVarNumber = 1;
+            int varCount = 0;
+        };
         var exprCount = 0;
+
+        Function<Expression<String>, String> GetAtomicCNFExpression = expression -> {
+            var isNegated = false;
+
+            //Handle negated variables
+            String varName;
+            if (expression instanceof Variable<String>) {
+                varName = ((Variable<String>) expression).getValue();
+            } else {
+                isNegated = true;
+                varName = ((Variable<String>) expression.getChildren().get(0)).getValue();
+            }
+
+            //Cache variable number
+            Integer varNumber = varNameMap.get(varName);
+            if (varNumber == null) {
+                varNumber = ref.nextVarNumber;
+                ref.nextVarNumber++;
+                ref.varCount++;
+
+                varNameMap.put(varName, varNumber);
+            }
+
+            var x = new StringBuilder();
+            if (isNegated) x.append(negationPrefix);
+            x.append(varNumber);
+            return x.toString();
+        };
 
         //Add clauses
         for (Expression<String> orExpression : cnfExpression.getChildren()) {
-            for (Expression<String> atomicExpression : orExpression.getChildren()) {
-                var isNegated = false;
-
-                //Handle negated variables
-                String varName;
-                if (atomicExpression instanceof Variable<String>) {
-                    varName = ((Variable<String>) atomicExpression).getValue();
-                } else {
-                    isNegated = true;
-                    varName = ((Variable<String>) atomicExpression.getChildren().get(0)).getValue();
-                }
-
-                //Cache variable number
-                Integer varNumber = varNameMap.get(varName);
-                if (varNumber == null) {
-                    varNumber = nextVarNumber;
-                    nextVarNumber++;
-                    varCount++;
-
-                    varNameMap.put(varName, varNumber);
-                }
-
-                if (isNegated) builder.append(negationPrefix);
-                builder.append(varNumber);
+            List<Expression<String>> children = orExpression.getChildren();
+            if (children.size() == 0) {
+                builder.append(GetAtomicCNFExpression.apply(orExpression));
                 builder.append(" ");
+            } else {
+                for (Expression<String> atomicExpression : children) {
+                    builder.append(GetAtomicCNFExpression.apply(atomicExpression));
+                    builder.append(" ");
+                }
             }
 
             exprCount++;
@@ -61,7 +77,7 @@ public class BoolExprToDimacsCNF {
         }
 
         //Add preamble problem line
-        builder.insert(0, "p cnf %d %d%s".formatted(varCount, exprCount, lineSeparator));
+        builder.insert(0, "p cnf %d %d%s".formatted(ref.varCount, exprCount, lineSeparator));
 
         return builder.toString();
     }
