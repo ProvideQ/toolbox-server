@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.maxCut;
 
+import edu.kit.provideq.toolbox.maxCut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 
@@ -10,6 +11,6 @@ public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {
 
   public MetaSolverMaxCut() {
     super();
-    //TODO: register MaxCut Solvers
+    this.registerSolver(new GamsMaxCutSolver());
   }
 }
