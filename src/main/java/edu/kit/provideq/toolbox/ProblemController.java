@@ -14,10 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
  * @param <SolverType> the type of solver that is to be used to solve a problem
  */
 public abstract class ProblemController<ProblemFormatType, SolutionFormatType, SolverType extends ProblemSolver<ProblemFormatType, SolutionFormatType>> {
+  public abstract ProblemType getProblemType();
 
   public SolutionHandle solve(SolveRequest<ProblemFormatType> request, MetaSolver<SolverType> metaSolver) {
     Solution<SolutionFormatType> solution = SolutionManager.createSolution();
-    Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, ProblemType.SAT);
+    Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, getProblemType());
     SolverType solver = metaSolver.findSolver(problem);
 
 
