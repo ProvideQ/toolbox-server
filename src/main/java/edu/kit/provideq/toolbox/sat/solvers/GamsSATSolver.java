@@ -31,7 +31,13 @@ public class GamsSATSolver extends SATSolver {
 
     @Override
     public void solve(Problem<String> problem, Solution<String> solution) {
-        String dimacsCNF = BoolExprToDimacsCNF.Convert(problem.problemData());
+        String dimacsCNF;
+        try {
+            dimacsCNF = BoolExprToDimacsCNF.Convert(problem.problemData());
+        } catch (RuntimeException e) {
+            solution.setDebugData("Parsing error: " + e.getMessage());
+            return;
+        }
 
         Path dir = Paths.get(workingDirectory.toString(), "sat", String.valueOf(solution.id()));
         Path problemFile = Paths.get(dir.toString(), "problem.cnf");
