@@ -14,6 +14,13 @@ public class BoolExprToDimacsCNF {
     static String negationPrefix = "-";
 
     public static String Convert(String boolExpr) {
+        // Streamline bool expr format
+        if (boolExpr.startsWith("not ")) boolExpr = "!" + boolExpr.substring(4);
+        boolExpr = boolExpr
+                .replaceAll(" not ", " !")
+                .replaceAll(" and ", " & ")
+                .replaceAll(" or ", " | ");
+
         Expression<String> parsedExpression = ExprParser.parse(boolExpr);
         Expression<String> cnfExpression = RuleSet.toCNF(parsedExpression);
 
