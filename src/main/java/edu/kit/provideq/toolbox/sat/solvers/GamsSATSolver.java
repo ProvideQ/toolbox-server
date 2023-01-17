@@ -58,6 +58,11 @@ public class GamsSATSolver extends SATSolver {
             Runtime rt = Runtime.getRuntime();
             Process exec = rt.exec("gams sat.gms --CNFINPUT=\"%s\"".formatted(problemFile), null, satDirectory);
 
+            // Inputs needs to be consumed, otherwise the process won't progress
+            var input = exec.inputReader();
+            while (input.readLine() != null) {}
+            input.close();
+
             if (exec.waitFor() == 0) {
                 solution.complete();
                 solution.setSolutionData(Files.readString(solutionFile));
