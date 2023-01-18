@@ -15,11 +15,10 @@ public class BoolExprToDimacsCNF {
 
     public static String Convert(String boolExpr) {
         // Streamline bool expr format
-        if (boolExpr.startsWith("not ")) boolExpr = "!" + boolExpr.substring(4);
         boolExpr = boolExpr
-                .replaceAll(" not ", " !")
-                .replaceAll(" and ", " & ")
-                .replaceAll(" or ", " | ");
+                .replaceAll("\\b(?:not|NOT) ", " !")
+                .replaceAll(" (?:and|AND) ", " & ")
+                .replaceAll(" (?:or|OR) ", " | ");
 
         Expression<String> parsedExpression = ExprParser.parse(boolExpr);
         Expression<String> cnfExpression = RuleSet.toCNF(parsedExpression);
