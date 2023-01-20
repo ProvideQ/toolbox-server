@@ -7,7 +7,7 @@ import edu.kit.provideq.toolbox.SolveRequest;
  * The needed formula is the SAT formula to solve in the DIMACS SAT format.
  */
 public class SolveSatRequest extends SolveRequest<String> {
-  public SolveSatRequest(String formula) {
-    super(formula);
+  public SolveSatRequest() {
+    super();
   }
 }

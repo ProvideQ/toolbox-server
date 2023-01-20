@@ -1,0 +1,208 @@
+GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+   1  *input can be set through --CNFINPUT=<myfile.cnf>
+   2  *if no input is provided, use default input for demo
+   4   
+   5  set c             'clauses'
+   6      pn            'positive/negative' / '+', '-' /,
+   7      l             'literals'
+   8      cnf(c<,l,pn)  'clauses to literals mapping'
+   9  ;
+  10   
+  11  * read cnf file and load content into GAMS data structures
+  44   
+  45  * Simplest SAT Model
+  46  Binary variables
+  47      b(l)         'encodes yes (1) or no (0) for literal'
+  48  ;
+  49  Variable
+  50      obj          'dummy objective variable'
+  51  ;
+  52  Equation
+  53      defclause(c) 'define clauses'
+  54      defobj       'defined dummy objective'
+  55  ;
+  56   
+  57  defclause(c).. sum(cnf(c,l,'+'), b(l)) + sum(cnf(c,l,'-'), 1-b(l)) =g= 1;
+  58   
+  59  defobj..       obj =e= sum(l, b(l));
+  60   
+  61  model sat / all /;
+  62   
+  63  * set absolute termination criterion to a value satisfied by any feasible solution
+  64  sat.optca = card(l)+1;
+  65   
+  66  * solve SAT problem as MIP
+  67  solve sat max obj using mip;
+  68   
+  69  * write solution file
+  72  file fr / "D:\TVA\toolbox-server\jobs\sat\1\problem.sol" /; put fr;
+  73  put 'c Solution D:\TVA\toolbox-server\jobs\sat\1\problem.cnf';
+  74  if(sat.modelstat=1 or sat.modelstat=8,
+  75     put / 's cnf 1 ' card(l):0:0 ' ' card(c):0:0;
+  76     loop(l,
+  77       put$(b.l(l)<0.5) / 'v -' l.tl:0;
+  78       put$(b.l(l)>=0.5) / 'v ' l.tl:0;
+  79     );
+  80  elseif sat.solvestat=1,
+  81     put / 's cnf 0 ' card(l):0:0 ' ' card(c):0:0;
+  82  else
+  83     put / 's cnf -1 ' card(l):0:0 ' ' card(c):0:0;
+  84  );
+  85   
+
+
+COMPILATION TIME     =        3.015 SECONDS      3 MB  41.5.0 2a5a4ddc WEX-WEI
+GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE sat Using MIP From line 67
+
+
+---- defclause  =G=  define clauses
+
+defclause(c0)..  b(1) =G= 1 ; (LHS = 0, INFES = 1 ****)
+     
+
+---- defobj  =E=  defined dummy objective
+
+defobj..  - b(1) + obj =E= 0 ; (LHS = 0)
+     
+GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE sat Using MIP From line 67
+
+
+---- b  encodes yes (1) or no (0) for literal
+
+b(1)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+        1       defclause(c0)
+       -1       defobj
+
+
+---- obj  dummy objective variable
+
+obj
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       defobj
+
+GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE sat Using MIP From line 67
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 1.000E+00, 1.000E+00] - Zero values observed as well
+Bound     [min, max] : [ 1.000E+00, 1.000E+00] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 1.000E+00]
+
+GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE sat Using MIP From line 67
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            2
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            2
+NON ZERO ELEMENTS             3     DISCRETE VARIABLES          1
+
+
+GENERATION TIME      =        0.063 SECONDS      4 MB  41.5.0 2a5a4ddc WEX-WEI
+GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE sat Using MIP From line 67
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   sat                 OBJECTIVE  obj
+     TYPE    MIP                 DIRECTION  MAXIMIZE
+     SOLVER  CPLEX               FROM LINE  67
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE                1.0000
+
+ RESOURCE USAGE, LIMIT          0.000 10000000000.000
+ ITERATION COUNT, LIMIT         0    2147483647
+--- GAMS/Cplex Link licensed for continuous and discrete problems.
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.0.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- MIP status (101): integer optimal solution.
+--- Cplex Time: 0.00sec (det. 0.00 ticks)
+
+--- Fixing integer variables and solving final LP...
+
+
+--- Fixed MIP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.00 ticks)
+
+
+Proven optimal solution
+MIP Solution:            1.000000    (0 iterations, 0 nodes)
+Final Solve:             1.000000    (0 iterations)
+
+Best possible:           1.000000
+Absolute gap:            0.000000
+Relative gap:            0.000000
+
+
+---- EQU defclause  define clauses
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+c0         1.0000         1.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU defobj              .              .              .             1.0000      
+
+  defobj  defined dummy objective
+
+---- VAR b  encodes yes (1) or no (0) for literal
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1          .             1.0000         1.0000         1.0000      
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR obj               -INF            1.0000        +INF             .          
+
+  obj  dummy objective variable
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 7
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+E x e c u t i o n
+
+
+**** REPORT FILE SUMMARY
+
+fr D:\TVA\toolbox-server\jobs\sat\1\problem.sol
+
+
+EXECUTION TIME       =        0.313 SECONDS      4 MB  41.5.0 2a5a4ddc WEX-WEI
+
+
+USER: ProvideQ Project License                       S220922|0002CO-GEN
+      GAMS Software GmbH, Braunschweig Office                   DCE2398
+
+
+**** FILE SUMMARY
+
+Input      D:\TVA\toolbox-server\gams\sat\sat.gms
+Output     D:\TVA\toolbox-server\gams\sat\sat.lst
