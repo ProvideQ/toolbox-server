@@ -10,12 +10,24 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 public class GamsSATSolver extends SATSolver {
     private final File gamsDirectory = new File(System.getProperty("user.dir"), "gams");
     private final File satDirectory = new File(gamsDirectory, "sat");
     private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
 
+    private final UUID Id = UUID.randomUUID();
+
+    @Override
+    public UUID getId() {
+        return Id;
+    }
+
+    @Override
+    public String getName() {
+        return "Gams MaxCut";
+    }
 
     @Override
     public boolean canSolve(Problem<String> problem) {
