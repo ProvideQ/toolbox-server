@@ -1,10 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Decides which known {@link ProblemSolver} is suited best for a given problem,
@@ -55,6 +51,14 @@ public class MetaSolver<T extends ProblemSolver> {
         .filter(s -> s.canSolve(problem))
         .max(Comparator.comparing(s -> s.getSuitability(problem)));
     return solver.orElse(null);
+  }
+
+  /**
+   * provides a list of all solvers registered on this meta solver
+   * @return list of all solvers
+   */
+  public Set<T> getAllSolvers() {
+    return new HashSet<>(solvers);
   }
 
   @Override
