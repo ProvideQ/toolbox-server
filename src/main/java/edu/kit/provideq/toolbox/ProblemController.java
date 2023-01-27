@@ -21,8 +21,10 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
   public SolutionHandle solve(SolveRequest<ProblemFormatType> request) {
     Solution<SolutionFormatType> solution = SolutionManager.createSolution();
     Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, getProblemType());
-    SolverType solver = getMetaSolver().findSolver(problem);
 
+    SolverType solver = getMetaSolver()
+            .getSolver(request.requestedSolverId)
+            .orElseGet(() -> getMetaSolver().findSolver(problem));
 
     solver.solve(problem, solution);
     return solution;

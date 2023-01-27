@@ -53,6 +53,14 @@ public class MetaSolver<T extends ProblemSolver> {
     return solver.orElse(null);
   }
 
+  public Optional<T> getSolver(UUID uuid) {
+    if (uuid == null) return Optional.empty();
+
+    return solvers.stream()
+            .filter(solver -> solver.getId().equals(uuid))
+            .findFirst();
+  }
+
   /**
    * provides a list of all solvers registered on this meta solver
    * @return list of all solvers
