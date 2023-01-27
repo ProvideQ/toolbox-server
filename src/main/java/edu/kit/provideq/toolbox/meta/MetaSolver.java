@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class MetaSolver<T extends ProblemSolver> {
 
-  Set<T> solvers = new HashSet<>();
+  protected Set<T> solvers = new HashSet<>();
 
   public MetaSolver() {
   }
