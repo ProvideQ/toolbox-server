@@ -26,7 +26,7 @@ public class GamsSATSolver extends SATSolver {
 
     @Override
     public String getName() {
-        return "Gams MaxCut";
+        return "GAMS MaxCut";
     }
 
     @Override

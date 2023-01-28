@@ -25,7 +25,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
     @Override
     public String getName() {
-        return "Gams MaxCut";
+        return "GAMS MaxCut";
     }
 
     @Override
