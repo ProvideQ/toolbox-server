@@ -17,11 +17,11 @@ public class GamsSATSolver extends SATSolver {
     private final File satDirectory = new File(gamsDirectory, "sat");
     private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
 
-    private final UUID Id = UUID.randomUUID();
+    private final UUID id = UUID.randomUUID();
 
     @Override
     public UUID getId() {
-        return Id;
+        return id;
     }
 
     @Override

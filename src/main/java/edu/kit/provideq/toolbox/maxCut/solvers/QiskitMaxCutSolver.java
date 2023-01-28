@@ -19,11 +19,11 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
 
   private final String solutionPath = "problem.sol";
 
-  private final UUID Id = UUID.randomUUID();
+  private final UUID id = UUID.randomUUID();
 
   @Override
   public UUID getId() {
-    return Id;
+    return id;
   }
 
   @Override
