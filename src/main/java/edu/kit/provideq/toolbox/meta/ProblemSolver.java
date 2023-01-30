@@ -10,12 +10,6 @@ import java.util.UUID;
  */
 public interface ProblemSolver<ProblemFormatType, SolutionDataType> {
   /**
-   * returns an id which is unique to the solver
-   * @return id of the solver
-   */
-  UUID getId();
-
-  /**
    * returns the name of the solver
    * @return name of the solver
    */

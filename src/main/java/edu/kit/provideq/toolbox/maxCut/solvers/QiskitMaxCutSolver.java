@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 public class QiskitMaxCutSolver extends MaxCutSolver{
   private final File qiskitDirectory = new File(System.getProperty("user.dir"), "qiskit");
@@ -18,13 +17,6 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
   private final String problemPath = "problem.gml";
 
   private final String solutionPath = "problem.sol";
-
-  private final UUID id = UUID.randomUUID();
-
-  @Override
-  public UUID getId() {
-    return id;
-  }
 
   @Override
   public String getName() {

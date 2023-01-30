@@ -9,19 +9,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 public class GamsMaxCutSolver extends MaxCutSolver {
     private final File gamsDirectory = new File(System.getProperty("user.dir"), "gams");
     private final File maxCutDirectory = new File(gamsDirectory, "maxcut");
     private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
-
-    private final UUID id = UUID.randomUUID();
-
-    @Override
-    public UUID getId() {
-        return id;
-    }
 
     @Override
     public String getName() {
