@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.maxCut;
 
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.SolutionHandle;
+import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import javax.validation.Valid;
@@ -38,7 +39,7 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
 
   @CrossOrigin
   @GetMapping("/solvers/maxCut")
-  public Set<MaxCutSolver> getSolvers() {
+  public Set<ProblemSolverInfo> getSolvers() {
     return super.getSolvers();
   }
 }

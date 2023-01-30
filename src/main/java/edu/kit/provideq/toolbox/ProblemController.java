@@ -6,7 +6,9 @@ import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Abstract Controller, offers generic post and get methods
@@ -45,8 +47,11 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
     return solution;
   }
 
-  public Set<SolverType> getSolvers() {
+  public Set<ProblemSolverInfo> getSolvers() {
     return getMetaSolver()
-            .getAllSolvers();
+            .getAllSolvers()
+            .stream()
+            .map(s -> new ProblemSolverInfo(s.getId(), s.getName()))
+            .collect(Collectors.toSet());
   }
 }

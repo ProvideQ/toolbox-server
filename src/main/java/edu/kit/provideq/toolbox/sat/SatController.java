@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.sat;
 
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.SolutionHandle;
+import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
@@ -39,7 +40,7 @@ public class SatController extends ProblemController<String, String, SATSolver> 
 
   @CrossOrigin
   @GetMapping("/solvers/sat")
-  public Set<SATSolver> getSolvers() {
+  public Set<ProblemSolverInfo> getSolvers() {
     return super.getSolvers();
   }
 }
