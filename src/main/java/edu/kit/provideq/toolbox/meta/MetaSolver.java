@@ -57,7 +57,7 @@ public class MetaSolver<T extends ProblemSolver> {
     if (id == null) return Optional.empty();
 
     return solvers.stream()
-            .filter(solver -> solver.getClass().getName().equals(id))
+            .filter(solver -> solver.getId().equals(id))
             .findFirst();
   }
 

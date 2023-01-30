@@ -8,6 +8,14 @@ import edu.kit.provideq.toolbox.Solution;
  */
 public interface ProblemSolver<ProblemFormatType, SolutionDataType> {
   /**
+   * returns an id which is unique to the solver
+   * @return id of the solver
+   */
+  default String getId() {
+    return getClass().getName();
+  }
+
+  /**
    * returns the name of the solver
    * @return name of the solver
    */
