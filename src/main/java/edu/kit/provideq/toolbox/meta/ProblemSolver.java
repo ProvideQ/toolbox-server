@@ -2,8 +2,6 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
 
-import java.util.UUID;
-
 /**
  * A problem solver provides information about its own suitability to solve a given problem.
  * It can solve problems and write the resulting data in a provided {@link Solution} object.

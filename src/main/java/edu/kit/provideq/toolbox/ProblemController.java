@@ -26,6 +26,8 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
             .getSolver(request.requestedSolverId)
             .orElseGet(() -> getMetaSolver().findSolver(problem));
 
+    solution.setSolverName(solver.getName());
+
     solver.solve(problem, solution);
     return solution;
   }
