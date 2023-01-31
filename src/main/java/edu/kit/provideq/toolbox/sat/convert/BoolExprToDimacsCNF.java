@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.sat.convert;
 
 import com.bpodgursky.jbool_expressions.Expression;
+import com.bpodgursky.jbool_expressions.Not;
 import com.bpodgursky.jbool_expressions.Variable;
 import com.bpodgursky.jbool_expressions.parsers.ExprParser;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
@@ -67,7 +68,7 @@ public final class BoolExprToDimacsCNF {
         //Add clauses
         for (Expression<String> orExpression : cnfExpression.getChildren()) {
             List<Expression<String>> children = orExpression.getChildren();
-            if (children.size() == 0) {
+            if (children.size() == 0 || orExpression instanceof Not<String>) {
                 builder.append(GetAtomicCNFExpression.apply(orExpression));
                 builder.append(" ");
             } else {
