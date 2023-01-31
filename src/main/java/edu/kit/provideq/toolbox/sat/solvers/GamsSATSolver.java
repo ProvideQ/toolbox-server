@@ -16,6 +16,10 @@ public class GamsSATSolver extends SATSolver {
     private final File satDirectory = new File(gamsDirectory, "sat");
     private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
 
+    @Override
+    public String getName() {
+        return "GAMS SAT";
+    }
 
     @Override
     public boolean canSolve(Problem<String> problem) {

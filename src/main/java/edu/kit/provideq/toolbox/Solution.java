@@ -9,12 +9,13 @@ import java.util.Objects;
  * the current status of the process, as well as the eventually generated solution data
  * @param <S> the type of the generated solution data
  */
-public class Solution<S> implements SolutionHandle{
+public class Solution<S> implements SolutionHandle {
   private final long ID;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
   private S solutionData;
   private String debugData;
+  private String solverName;
 
   public Solution(long ID) {
     this.ID = ID;
@@ -71,6 +72,14 @@ public class Solution<S> implements SolutionHandle{
     this.debugData = debugData;
   }
 
+  public String getSolverName() {
+    return solverName;
+  }
+
+  public void setSolverName(String solverName) {
+    this.solverName = solverName;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == this) return true;
@@ -93,5 +102,4 @@ public class Solution<S> implements SolutionHandle{
         "metaData=" + metaData + ", " +
         "solutionData" + solutionData + ']';
   }
-
 }

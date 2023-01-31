@@ -19,6 +19,11 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
   private final String solutionPath = "problem.sol";
 
   @Override
+  public String getName() {
+    return "Qiskit MaxCut";
+  }
+
+  @Override
   public boolean canSolve(Problem<String> problem) {
     //TODO: assess problemData
     return problem.type() == ProblemType.MAX_CUT;

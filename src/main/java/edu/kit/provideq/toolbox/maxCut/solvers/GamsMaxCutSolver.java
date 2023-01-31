@@ -15,6 +15,10 @@ public class GamsMaxCutSolver extends MaxCutSolver {
     private final File maxCutDirectory = new File(gamsDirectory, "maxcut");
     private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
 
+    @Override
+    public String getName() {
+        return "GAMS MaxCut";
+    }
 
     @Override
     public boolean canSolve(Problem<String> problem) {

@@ -7,6 +7,19 @@ import edu.kit.provideq.toolbox.Solution;
  * It can solve problems and write the resulting data in a provided {@link Solution} object.
  */
 public interface ProblemSolver<ProblemFormatType, SolutionDataType> {
+  /**
+   * returns an id which is unique to the solver
+   * @return id of the solver
+   */
+  default String getId() {
+    return getClass().getName();
+  }
+
+  /**
+   * returns the name of the solver
+   * @return name of the solver
+   */
+  String getName();
 
   /**
    * simple true-false-check, true: given {@link Problem} can be solved with this solver, false: it cannot

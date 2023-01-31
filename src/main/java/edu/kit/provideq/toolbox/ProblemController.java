@@ -7,6 +7,9 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Abstract Controller, offers generic post and get methods
  * @param <ProblemFormatType> the type in which problem input is expected to arrive
@@ -15,12 +18,17 @@ import org.springframework.web.server.ResponseStatusException;
  */
 public abstract class ProblemController<ProblemFormatType, SolutionFormatType, SolverType extends ProblemSolver<ProblemFormatType, SolutionFormatType>> {
   public abstract ProblemType getProblemType();
+  public abstract MetaSolver<SolverType> getMetaSolver();
 
-  public SolutionHandle solve(SolveRequest<ProblemFormatType> request, MetaSolver<SolverType> metaSolver) {
+  public SolutionHandle solve(SolveRequest<ProblemFormatType> request) {
     Solution<SolutionFormatType> solution = SolutionManager.createSolution();
     Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, getProblemType());
-    SolverType solver = metaSolver.findSolver(problem);
 
+    SolverType solver = getMetaSolver()
+            .getSolver(request.requestedSolverId)
+            .orElseGet(() -> getMetaSolver().findSolver(problem));
+
+    solution.setSolverName(solver.getName());
 
     solver.solve(problem, solution);
     return solution;
@@ -37,5 +45,13 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
     if (solution.status() == SolutionStatus.COMPUTING) solution.complete();
 
     return solution;
+  }
+
+  public Set<ProblemSolverInfo> getSolvers() {
+    return getMetaSolver()
+            .getAllSolvers()
+            .stream()
+            .map(s -> new ProblemSolverInfo(s.getId(), s.getName()))
+            .collect(Collectors.toSet());
   }
 }
