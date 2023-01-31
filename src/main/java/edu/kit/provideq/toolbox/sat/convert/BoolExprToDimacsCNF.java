@@ -16,9 +16,9 @@ public final class BoolExprToDimacsCNF {
     public static String convert(String boolExpr) {
         // Streamline bool expr format
         boolExpr = boolExpr
-                .replaceAll("\\b(?:not|NOT) ", " !")
-                .replaceAll(" (?:and|AND) ", " & ")
-                .replaceAll(" (?:or|OR) ", " | ");
+                .replaceAll("\\b(?:not|NOT)\\b", "!")
+                .replaceAll("\\b(?:and|AND)\\b", "&")
+                .replaceAll("\\b(?:or|OR)\\b", "|");
 
         Expression<String> parsedExpression = ExprParser.parse(boolExpr);
         Expression<String> cnfExpression = RuleSet.toCNF(parsedExpression);
