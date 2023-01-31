@@ -13,7 +13,7 @@ public final class BoolExprToDimacsCNF {
     private final static String lineSeparator = System.getProperty("line.separator");
     private final static String negationPrefix = "-";
 
-    public static String Convert(String boolExpr) {
+    public static String convert(String boolExpr) {
         // Streamline bool expr format
         boolExpr = boolExpr
                 .replaceAll("\\b(?:not|NOT) ", " !")
@@ -23,10 +23,10 @@ public final class BoolExprToDimacsCNF {
         Expression<String> parsedExpression = ExprParser.parse(boolExpr);
         Expression<String> cnfExpression = RuleSet.toCNF(parsedExpression);
 
-        return GetDimacsCNF(cnfExpression);
+        return getDimacsCNF(cnfExpression);
     }
 
-    public static String GetDimacsCNF(Expression<String> cnfExpression) {
+    public static String getDimacsCNF(Expression<String> cnfExpression) {
         var builder = new StringBuilder();
 
         var varNameMap = new HashMap<String, Integer>();

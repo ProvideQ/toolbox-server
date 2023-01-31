@@ -33,7 +33,7 @@ public class GamsSATSolver extends SATSolver {
     public void solve(Problem<String> problem, Solution<String> solution) {
         String dimacsCNF;
         try {
-            dimacsCNF = BoolExprToDimacsCNF.Convert(problem.problemData());
+            dimacsCNF = BoolExprToDimacsCNF.convert(problem.problemData());
         } catch (RuntimeException e) {
             solution.setDebugData("Parsing error: " + e.getMessage());
             return;
