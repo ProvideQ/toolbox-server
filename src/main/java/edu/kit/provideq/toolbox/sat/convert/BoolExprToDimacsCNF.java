@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-public class BoolExprToDimacsCNF {
-    static String lineSeparator = System.getProperty("line.separator");
-    static String negationPrefix = "-";
+public final class BoolExprToDimacsCNF {
+    private final static String lineSeparator = System.getProperty("line.separator");
+    private final static String negationPrefix = "-";
 
     public static String Convert(String boolExpr) {
         // Streamline bool expr format
