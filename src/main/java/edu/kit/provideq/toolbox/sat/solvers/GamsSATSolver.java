@@ -35,7 +35,14 @@ public class GamsSATSolver extends SATSolver {
 
     @Override
     public void solve(Problem<String> problem, Solution<String> solution) {
-        String dimacsCNF = BoolExprToDimacsCNF.Convert(problem.problemData());
+        String dimacsCNF;
+        try {
+            dimacsCNF = BoolExprToDimacsCNF.convert(problem.problemData());
+            solution.setDebugData("Using cnf input: " + dimacsCNF);
+        } catch (RuntimeException e) {
+            solution.setDebugData("Parsing error: " + e.getMessage());
+            return;
+        }
 
         Path dir = Paths.get(workingDirectory.toString(), "sat", String.valueOf(solution.id()));
         Path problemFile = Paths.get(dir.toString(), "problem.cnf");
@@ -55,6 +62,11 @@ public class GamsSATSolver extends SATSolver {
         try {
             Runtime rt = Runtime.getRuntime();
             Process exec = rt.exec("gams sat.gms --CNFINPUT=\"%s\"".formatted(problemFile), null, satDirectory);
+
+            // Inputs needs to be consumed, otherwise the process won't progress
+            var input = exec.inputReader();
+            while (input.readLine() != null) {}
+            input.close();
 
             if (exec.waitFor() == 0) {
                 solution.complete();
