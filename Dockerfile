@@ -25,6 +25,10 @@ WORKDIR /app
 RUN apt update
 RUN apt-get install python-is-python3 --yes
 
+# GAMS Installation script is based on the official installation guide
+# (https://www.gams.com/latest/docs/UG_UNIX_INSTALL.html) and adapts some lines from
+# iisaa/gams-docker (https://github.com/iiasa/gams-docker/blob/master/Dockerfile, GPL-3.0 licensed)
+
 # Download GAMS
 RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/41.5.0/linux/linux_x64_64_sfx.exe"
 
@@ -42,7 +46,7 @@ RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
     cd $GAMS_PATH &&\
     ./gamsinst -a
 
-# Install the toolbox server and its GAMS scripts
+# Install the toolbox server and its solver scripts
 COPY gams gams
 COPY qiskit qiskit
 COPY --from=builder /app/build/libs/toolbox-server-0.0.1-SNAPSHOT.jar toolbox-server.jar
