@@ -21,7 +21,10 @@ RUN ./gradlew bootJar
 FROM eclipse-temurin:17-jdk-jammy AS runner
 WORKDIR /app
 
-# TODO: Install GAMS + Python
+# Install python (with python -> python3 alias)
+RUN apt update
+RUN apt-get install python-is-python3 --yes
+
 # Download GAMS
 RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/41.5.0/linux/linux_x64_64_sfx.exe"
 
