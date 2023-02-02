@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 public class QiskitMaxCutSolver extends MaxCutSolver{
   private final File qiskitDirectory = new File(System.getProperty("user.dir"), "qiskit");
-  private final File maxCutDirectory = new File(qiskitDirectory, "maxCut");
+  private final File maxCutDirectory = new File(qiskitDirectory, "maxcut");
   private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
 
   private final String problemPath = "problem.gml";

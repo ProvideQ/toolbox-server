@@ -44,6 +44,7 @@ RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
 
 # Install the toolbox server and its GAMS scripts
 COPY gams gams
+COPY qiskit qiskit
 COPY --from=builder /app/build/libs/toolbox-server-0.0.1-SNAPSHOT.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port
