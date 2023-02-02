@@ -11,6 +11,9 @@ build/
 # ProvideQ jobs
 jobs/
 
+# Local GAMS license
+gamslice.txt
+
 # Docker config
 .dockerignore
 Dockerfile
