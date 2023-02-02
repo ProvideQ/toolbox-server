@@ -1,0 +1,24 @@
+# GitHub scripts
+.github/
+
+# IntelliJ config
+.idea/
+
+# Java artifacts
+.gradle/
+build/
+
+# ProvideQ jobs
+jobs/
+
+# Docker config
+.dockerignore
+Dockerfile
+
+# Git data and config
+.git/
+.gitignore
+
+# Documentation
+HELP.md
+README.md
