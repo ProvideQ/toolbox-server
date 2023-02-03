@@ -73,7 +73,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
                     .command(
                             "gams",
                             "maxcut.gms",
-                            "--INPUT=\"%s\"".formatted("G:/Studium/TVA/ProvideQ/toolbox-server/src/main/resources/gams/maxCut/problem.gml").replace('\\', '/'))
+                            "--INPUT=\"%s\"".formatted(problemFile.toAbsolutePath().toString().replace('\\', '/')))
                     .directory(maxCutDirectory);
 
             var processResult = new ProcessRunner(processBuilder).run();
