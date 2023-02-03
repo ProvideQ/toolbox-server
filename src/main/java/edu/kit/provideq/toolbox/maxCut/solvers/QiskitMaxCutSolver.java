@@ -3,12 +3,15 @@ package edu.kit.provideq.toolbox.maxCut.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Component
 public class QiskitMaxCutSolver extends MaxCutSolver{
   private final File qiskitDirectory = new File(System.getProperty("user.dir"), "qiskit");
   private final File maxCutDirectory = new File(qiskitDirectory, "maxCut");

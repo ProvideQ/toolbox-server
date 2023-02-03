@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class MaxCutController extends ProblemController<String, String, MaxCutSolver> {
 
-  private final MetaSolver<MaxCutSolver> metaSolver = new MetaSolverMaxCut();
+  private final MetaSolver<MaxCutSolver> metaSolver;
+
+  public MaxCutController(MetaSolver<MaxCutSolver> metaSolver) {
+    this.metaSolver = metaSolver;
+  }
 
   @Override
   public ProblemType getProblemType() {

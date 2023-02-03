@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Component
 public class GamsMaxCutSolver extends MaxCutSolver {
     private final File gamsDirectory = new File(System.getProperty("user.dir"), "gams");
     private final File maxCutDirectory = new File(gamsDirectory, "maxcut");
