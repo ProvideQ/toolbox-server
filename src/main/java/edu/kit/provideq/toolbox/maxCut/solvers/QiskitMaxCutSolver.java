@@ -66,14 +66,22 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
       return;
     }
 
-    //Run Qiskit solver via console
+    // Run Qiskit solver via console
     try {
-      Runtime rt = Runtime.getRuntime();
-      Process exec = rt.exec("python maxCut_qiskit.py %s %s".formatted(problemPath, solutionPath), null, maxCutDirectory); //TODO: find location for python scripts
+      var processBuilder = new ProcessBuilder()
+              .command(
+                      "python",
+                      "maxCut_qiskit.py",
+                      problemFile.toAbsolutePath().toString(),
+                      solutionFile.toAbsolutePath().toString().replace('\\', '/'))
+              .directory(maxCutDirectory);
 
-      if (exec.waitFor() == 0) {
+      var processResult = new ProcessRunner(processBuilder).run();
+
+      if (processResult.success()) {
         solution.complete();
         solution.setSolutionData(Files.readString(solutionFile));
+        return;
       }
 
       solution.setDebugData("Qiskit didn't complete solving MaxCut successfully");

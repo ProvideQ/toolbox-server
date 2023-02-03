@@ -77,18 +77,25 @@ public class GamsSATSolver extends SATSolver {
             return;
         }
 
-        //Run SAT with GAMS via console
+        // Run SAT with GAMS via console
         try {
-            Runtime rt = Runtime.getRuntime();
-            Process exec = rt.exec("gams sat.gms --CNFINPUT=\"%s\"".formatted(problemFile), null, satDirectory);
+            var processBuilder = new ProcessBuilder()
+                    // Problem file path can't use '\' characters, and no '/'
+                    .command(
+                            "gams",
+                            "sat.gms",
+                            "--CNFINPUT=\"%s\"".formatted(problemFile))
+                    .directory(satDirectory);
 
-            if (exec.waitFor() == 0) {
+            var processResult = new ProcessRunner(processBuilder).run();
+
+            if (processResult.success()) {
                 solution.complete();
                 solution.setSolutionData(Files.readString(solutionFile));
                 return;
             }
 
-            solution.setDebugData("GAMS didn't complete solving SAT successfully");
+            solution.setDebugData("GAMS didn't complete solving SAT successfully" + processResult.output());
             solution.abort();
         } catch (IOException | InterruptedException e) {
             solution.setDebugData("Solving SAT problem via GAMS resulted in exception: " + e.getMessage());

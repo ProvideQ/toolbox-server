@@ -66,25 +66,25 @@ public class GamsMaxCutSolver extends MaxCutSolver {
             return;
         }
 
-        //Run MaxCut with GAMS via console
+        // Run MaxCut with GAMS via console
         try {
-            Runtime rt = Runtime.getRuntime();
-            // problem file path can't use '\' characters, and no '/'
-            Process exec = rt.exec("gams maxcut.gms --INPUT=\"%s\"".formatted(problemFile).replace('\\', '/'), null, maxCutDirectory);
+            var processBuilder = new ProcessBuilder()
+                    // Problem file path can't use '\' characters, just '/'
+                    .command(
+                            "gams",
+                            "maxcut.gms",
+                            "--INPUT=\"%s\"".formatted("G:/Studium/TVA/ProvideQ/toolbox-server/src/main/resources/gams/maxCut/problem.gml").replace('\\', '/'))
+                    .directory(maxCutDirectory);
 
-            // Inputs needs to be consumed, otherwise the process won't progress
-            var input = exec.inputReader();
-            while (input.readLine() != null) {}
-            input.close();
+            var processResult = new ProcessRunner(processBuilder).run();
 
-            int i = exec.waitFor();
-            if (i == 0) {
+            if (processResult.success()) {
                 solution.complete();
                 solution.setSolutionData(Files.readString(solutionFile));
                 return;
             }
 
-            solution.setDebugData("GAMS didn't complete solving MaxCut successfully");
+            solution.setDebugData("GAMS didn't complete solving MaxCut successfully" + processResult.output());
             solution.abort();
         } catch (IOException | InterruptedException e) {
             solution.setDebugData("Solving MaxCut problem via GAMS resulted in exception: " + e.getMessage());
