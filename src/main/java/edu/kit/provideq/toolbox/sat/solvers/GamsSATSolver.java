@@ -1,10 +1,14 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
+import edu.kit.provideq.toolbox.ProcessRunner;
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.Solution;
 
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.sat.convert.BoolExprToDimacsCNF;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -15,9 +19,18 @@ import java.nio.file.Paths;
 
 @Component
 public class GamsSATSolver extends SATSolver {
-    private final File gamsDirectory = new File(System.getProperty("user.dir"), "gams");
-    private final File satDirectory = new File(gamsDirectory, "sat");
-    private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
+    private final File satDirectory;
+
+    private final ResourceProvider resourceProvider;
+
+    @Autowired
+    public GamsSATSolver(
+            @Value("${gams.directory.sat}") String satPath,
+            ResourceProvider resourceProvider) throws IOException {
+        this.resourceProvider = resourceProvider;
+
+        satDirectory = resourceProvider.getResource(satPath);
+    }
 
     @Override
     public String getName() {
@@ -47,13 +60,16 @@ public class GamsSATSolver extends SATSolver {
             return;
         }
 
-        Path dir = Paths.get(workingDirectory.toString(), "sat", String.valueOf(solution.id()));
-        Path problemFile = Paths.get(dir.toString(), "problem.cnf");
-        Path solutionFile = Paths.get(dir.toString(), "problem.sol");
+        Path problemFile;
+        Path solutionFile;
 
-        //Write problem file
+        // Write problem file
         try {
-            Files.createDirectories(dir);
+            File problemDirectory = resourceProvider.getProblemDirectory(problem, solution);
+
+            problemFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.cnf");
+            solutionFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.sol");
+
             Files.writeString(problemFile, dimacsCNF);
         } catch (IOException e) {
             solution.setDebugData("Creation of problem file caught exception: " + e.getMessage());
@@ -65,11 +81,6 @@ public class GamsSATSolver extends SATSolver {
         try {
             Runtime rt = Runtime.getRuntime();
             Process exec = rt.exec("gams sat.gms --CNFINPUT=\"%s\"".formatted(problemFile), null, satDirectory);
-
-            // Inputs needs to be consumed, otherwise the process won't progress
-            var input = exec.inputReader();
-            while (input.readLine() != null) {}
-            input.close();
 
             if (exec.waitFor() == 0) {
                 solution.complete();

@@ -1,8 +1,12 @@
 package edu.kit.provideq.toolbox.maxCut.solvers;
 
+import edu.kit.provideq.toolbox.ProcessRunner;
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -13,13 +17,18 @@ import java.nio.file.Paths;
 
 @Component
 public class QiskitMaxCutSolver extends MaxCutSolver{
-  private final File qiskitDirectory = new File(System.getProperty("user.dir"), "qiskit");
-  private final File maxCutDirectory = new File(qiskitDirectory, "maxCut");
-  private final File workingDirectory = new File(System.getProperty("user.dir"), "jobs");//todo move working directory to config
+  private final File maxCutDirectory;
 
-  private final String problemPath = "problem.gml";
+  private final ResourceProvider resourceProvider;
 
-  private final String solutionPath = "problem.sol";
+  @Autowired
+  public QiskitMaxCutSolver(
+          @Value("${qiskit.directory.maxCut}") String maxCutPath,
+          ResourceProvider resourceProvider) throws IOException {
+    this.resourceProvider = resourceProvider;
+
+    maxCutDirectory = resourceProvider.getResource(maxCutPath);
+  }
 
   @Override
   public String getName() {
@@ -40,14 +49,16 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution) {
+    Path problemFile;
+    Path solutionFile;
 
-    Path dir = Paths.get(workingDirectory.toString(), "qiskit", String.valueOf(solution.id()));
-    Path problemFile = Paths.get(dir.toString(), problemPath);
-    Path solutionFile = Paths.get(dir.toString(), solutionPath);
-
-    //Write problem file
+    // Write problem file
     try {
-      Files.createDirectories(dir);
+      File problemDirectory = resourceProvider.getProblemDirectory(problem, solution);
+
+      problemFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.gml");
+      solutionFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.sol");
+
       Files.writeString(problemFile, problem.problemData());
     } catch (IOException e) {
       solution.setDebugData("Creation of problem file caught exception: " + e.getMessage());
