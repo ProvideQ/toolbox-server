@@ -42,7 +42,7 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
     }
 
     // for demonstration purposes, jobs are marked as solved once a request goes in here
-    if (solution.status() == SolutionStatus.COMPUTING) solution.complete();
+    if (solution.getStatus() == SolutionStatus.COMPUTING) solution.complete();
 
     return solution;
   }

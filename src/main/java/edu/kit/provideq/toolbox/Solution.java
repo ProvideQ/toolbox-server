@@ -21,11 +21,11 @@ public class Solution<S> implements SolutionHandle {
     this.ID = ID;
   }
 
-  public long id() {
+  public long getId() {
     return this.ID;
   }
 
-  public SolutionStatus status() {
+  public SolutionStatus getStatus() {
     return this.status;
   }
 

@@ -21,7 +21,7 @@ public abstract class SolutionManager {
 
   public static Solution<?> getSolution(long id) {
     return SOLUTIONS.stream()
-        .filter(s -> s.id() == id)
+        .filter(s -> s.getId() == id)
         .findFirst()
         .orElse(null);
   }

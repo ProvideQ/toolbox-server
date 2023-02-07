@@ -53,7 +53,7 @@ public class ResourceProvider {
     public File getProblemDirectory(Problem<?> problem, Solution<?> solution) throws IOException {
         File workingDirectory = getWorkingDirectory();
 
-        Path dir = Paths.get(workingDirectory.toString(), problem.type().toString(), String.valueOf(solution.id()));
+        Path dir = Paths.get(workingDirectory.toString(), problem.type().toString(), String.valueOf(solution.getId()));
         Files.createDirectories(dir);
 
         return dir.toFile();
