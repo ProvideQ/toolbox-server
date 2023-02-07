@@ -30,7 +30,12 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
 
     solution.setSolverName(solver.getName());
 
+    long start = System.currentTimeMillis();
     solver.solve(problem, solution);
+    long finish = System.currentTimeMillis();
+
+    solution.setExecutionMilliseconds(finish - start);
+
     return solution;
   }
 
