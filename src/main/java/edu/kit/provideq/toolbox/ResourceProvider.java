@@ -63,10 +63,27 @@ public class ResourceProvider {
      * Returns the resource at the specified resource path
      * @param resourcePath path that points to the requested resource
      * @return File object of the resource
-     * @throws IOException  when the resource is not available
+     * @throws IOException when the resource is not available
      */
     public File getResource(String resourcePath) throws IOException {
+        return getRootFile(resourcePath);
+
+        /* removed as long as we're not using resources directly
         Resource resource = resourceLoader.getResource("classpath:" + resourcePath);
-        return resource.getFile();
+        return resource.getFile();*/
+    }
+
+    /**
+     * Returns the file at the path relative to the root directory
+     * @param path path that points to a file relative to the root directory
+     * @return File object of the path
+     * @throws IOException when the file is not available
+     */
+    public File getRootFile(String path) throws IOException {
+        // Create directories
+        Files.createDirectories(Paths.get(path));
+
+        // Return File
+        return new File(path);
     }
 }
