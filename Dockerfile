@@ -21,9 +21,9 @@ RUN ./gradlew bootJar
 FROM eclipse-temurin:17-jdk-jammy AS runner
 WORKDIR /app
 
-# Install python (with python -> python3 alias)
+# Install python (with python -> python3 alias) and pip
 RUN apt update
-RUN apt-get install python-is-python3 --yes
+RUN apt-get install python-is-python3 python3-pip --yes
 
 # GAMS Installation script is based on the official installation guide
 # (https://www.gams.com/latest/docs/UG_UNIX_INSTALL.html) and adapts some lines from
@@ -49,6 +49,7 @@ RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
 # Install the toolbox server and its solver scripts
 COPY gams gams
 COPY qiskit qiskit
+RUN pip install -r ./qiskit/requirements.txt
 COPY --from=builder /app/build/libs/toolbox-server-0.0.1-SNAPSHOT.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port
