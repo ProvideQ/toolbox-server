@@ -41,7 +41,7 @@ public class ProcessRunner {
         var inputBuilder = new StringBuilder();
         var line = reader.readLine();
         while (line != null) {
-            inputBuilder.append(line);
+            inputBuilder.append(line).append('\n');
             line = reader.readLine();
         }
         reader.close();
