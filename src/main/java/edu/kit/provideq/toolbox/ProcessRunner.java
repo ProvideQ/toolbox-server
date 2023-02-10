@@ -23,24 +23,28 @@ public class ProcessRunner {
     public ProcessResult run() throws IOException, InterruptedException {
         Process process = processBuilder.start();
 
-        String input = readInput(process.inputReader());
+        StringBuilder sb = new StringBuilder();
+        sb.append(readStream(process.inputReader()));
+        sb.append(readStream(process.errorReader()));
+
+        String output = sb.toString();
 
         int i = process.waitFor();
         if (i == 0) {
-            return new ProcessResult(true, input);
+            return new ProcessResult(true, output);
         }
 
-        return new ProcessResult(false, input);
+        return new ProcessResult(false, output);
     }
 
-    private String readInput(BufferedReader inputReader) throws IOException {
+    private String readStream(BufferedReader reader) throws IOException {
         var inputBuilder = new StringBuilder();
-        var line = inputReader.readLine();
+        var line = reader.readLine();
         while (line != null) {
             inputBuilder.append(line);
-            line = inputReader.readLine();
+            line = reader.readLine();
         }
-        inputReader.close();
+        reader.close();
 
         return inputBuilder.toString();
     }
