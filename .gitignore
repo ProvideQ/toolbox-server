@@ -40,3 +40,4 @@ out/
 ### Toolbox ###
 /jobs/
 gamslice.txt
+*.lst
