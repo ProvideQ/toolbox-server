@@ -8,6 +8,14 @@ A web-based user interface can be found in our
 2. Clone this repository
 3. Run the server using `./gradlew bootRun`
 
+## Deployment
+This repository is designed to be deployed with [Dokku](https://dokku.com/) but you can also run 
+the Java application directly or inside a docker container (`Dockerfile` is included!).
+The docker container can be built as follows:
+```shell
+docker build --tag provideq-toolbox-backend --build-arg GAMS_LICENSE=$(base64 -w 0 ./gamslice.txt) .
+```
+
 ## License
 Copyright (c) 2022 - 2023 ProvideQ
 

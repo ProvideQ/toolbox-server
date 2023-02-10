@@ -1,0 +1,27 @@
+# GitHub scripts
+.github/
+
+# IntelliJ config
+.idea/
+
+# Java artifacts
+.gradle/
+build/
+
+# ProvideQ jobs
+jobs/
+
+# Local GAMS license
+gamslice.txt
+
+# Docker config
+.dockerignore
+Dockerfile
+
+# Git data and config
+.git/
+.gitignore
+
+# Documentation
+HELP.md
+README.md
