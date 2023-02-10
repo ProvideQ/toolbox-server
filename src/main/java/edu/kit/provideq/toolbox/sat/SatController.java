@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class SatController extends ProblemController<String, String, SATSolver> {
 
-  private final MetaSolver<SATSolver> metaSolver = new MetaSolverSAT();
+  private final MetaSolver<SATSolver> metaSolver;
+
+  public SatController(MetaSolver<SATSolver> metaSolver) {
+    this.metaSolver = metaSolver;
+  }
 
   @Override
   public ProblemType getProblemType() {

@@ -5,16 +5,21 @@ import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.maxCut.solvers.QiskitMaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 /**
  * Simple {@link MetaSolver} for MaxCut problems
  */
+@Component
 public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {
 
-  public MetaSolverMaxCut() {
-    super(new QiskitMaxCutSolver(), new GamsMaxCutSolver());
+  @Autowired
+  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver, GamsMaxCutSolver gamsMaxCutSolver) {
+    super(qiskitMaxCutSolver, gamsMaxCutSolver);
   }
 
   @Override

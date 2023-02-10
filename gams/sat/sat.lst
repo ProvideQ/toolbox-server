@@ -1,4 +1,4 @@
-GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 1
+GAMS 42.0.0  3dcbfd09 Jan 13, 2023   (BETA) WEX-WEI x86 64bit/MS Windows - 02/10/23 11:10:48 Page 1
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 C o m p i l a t i o n
 
@@ -39,8 +39,8 @@ C o m p i l a t i o n
   67  solve sat max obj using mip;
   68   
   69  * write solution file
-  72  file fr / "D:\TVA\toolbox-server\jobs\sat\1\problem.sol" /; put fr;
-  73  put 'c Solution D:\TVA\toolbox-server\jobs\sat\1\problem.cnf';
+  72  file fr / "G:\Studium\TVA\ProvideQ\toolbox-server\jobs\SAT\3\problem.sol" /; put fr;
+  73  put 'c Solution G:\Studium\TVA\ProvideQ\toolbox-server\jobs\SAT\3\problem.cnf';
   74  if(sat.modelstat=1 or sat.modelstat=8,
   75     put / 's cnf 1 ' card(l):0:0 ' ' card(c):0:0;
   76     loop(l,
@@ -55,8 +55,8 @@ C o m p i l a t i o n
   85   
 
 
-COMPILATION TIME     =        3.015 SECONDS      3 MB  41.5.0 2a5a4ddc WEX-WEI
-GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 2
+COMPILATION TIME     =        0.062 SECONDS      3 MB  42.0.0 3dcbfd09 WEX-WEI
+GAMS 42.0.0  3dcbfd09 Jan 13, 2023   (BETA) WEX-WEI x86 64bit/MS Windows - 02/10/23 11:10:48 Page 2
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 Equation Listing    SOLVE sat Using MIP From line 67
 
@@ -65,12 +65,14 @@ Equation Listing    SOLVE sat Using MIP From line 67
 
 defclause(c0)..  b(1) =G= 1 ; (LHS = 0, INFES = 1 ****)
      
+defclause(c1)..  b(2) =G= 1 ; (LHS = 0, INFES = 1 ****)
+     
 
 ---- defobj  =E=  defined dummy objective
 
-defobj..  - b(1) + obj =E= 0 ; (LHS = 0)
+defobj..  - b(1) - b(2) + obj =E= 0 ; (LHS = 0)
      
-GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 3
+GAMS 42.0.0  3dcbfd09 Jan 13, 2023   (BETA) WEX-WEI x86 64bit/MS Windows - 02/10/23 11:10:48 Page 3
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 Column Listing      SOLVE sat Using MIP From line 67
 
@@ -82,6 +84,11 @@ b(1)
         1       defclause(c0)
        -1       defobj
 
+b(2)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+        1       defclause(c1)
+       -1       defobj
+
 
 ---- obj  dummy objective variable
 
@@ -89,7 +96,7 @@ obj
                 (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
         1       defobj
 
-GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 4
+GAMS 42.0.0  3dcbfd09 Jan 13, 2023   (BETA) WEX-WEI x86 64bit/MS Windows - 02/10/23 11:10:48 Page 4
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 Range Statistics    SOLVE sat Using MIP From line 67
 
@@ -100,20 +107,20 @@ RHS       [min, max] : [ 1.000E+00, 1.000E+00] - Zero values observed as well
 Bound     [min, max] : [ 1.000E+00, 1.000E+00] - Zero values observed as well
 Matrix    [min, max] : [ 1.000E+00, 1.000E+00]
 
-GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 5
+GAMS 42.0.0  3dcbfd09 Jan 13, 2023   (BETA) WEX-WEI x86 64bit/MS Windows - 02/10/23 11:10:48 Page 5
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 Model Statistics    SOLVE sat Using MIP From line 67
 
 
 MODEL STATISTICS
 
-BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            2
-BLOCKS OF VARIABLES           2     SINGLE VARIABLES            2
-NON ZERO ELEMENTS             3     DISCRETE VARIABLES          1
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            3
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            3
+NON ZERO ELEMENTS             5     DISCRETE VARIABLES          2
 
 
-GENERATION TIME      =        0.063 SECONDS      4 MB  41.5.0 2a5a4ddc WEX-WEI
-GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 6
+GENERATION TIME      =        0.000 SECONDS      4 MB  42.0.0 3dcbfd09 WEX-WEI
+GAMS 42.0.0  3dcbfd09 Jan 13, 2023   (BETA) WEX-WEI x86 64bit/MS Windows - 02/10/23 11:10:48 Page 6
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 Solution Report     SOLVE sat Using MIP From line 67
 
@@ -126,7 +133,7 @@ Solution Report     SOLVE sat Using MIP From line 67
 
 **** SOLVER STATUS     1 Normal Completion
 **** MODEL STATUS      1 Optimal
-**** OBJECTIVE VALUE                1.0000
+**** OBJECTIVE VALUE                2.0000
 
  RESOURCE USAGE, LIMIT          0.000 10000000000.000
  ITERATION COUNT, LIMIT         0    2147483647
@@ -134,7 +141,7 @@ Solution Report     SOLVE sat Using MIP From line 67
 --- GMO setup time: 0.00s
 --- GMO memory 0.50 Mb (peak 0.50 Mb)
 --- Dictionary memory 0.00 Mb
---- Cplex 22.1.0.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Cplex 22.1.1.0 link memory 0.00 Mb (peak 0.00 Mb)
 --- Starting Cplex
 
 
@@ -149,10 +156,10 @@ Solution Report     SOLVE sat Using MIP From line 67
 
 
 Proven optimal solution
-MIP Solution:            1.000000    (0 iterations, 0 nodes)
-Final Solve:             1.000000    (0 iterations)
+MIP Solution:            2.000000    (0 iterations, 0 nodes)
+Final Solve:             2.000000    (0 iterations)
 
-Best possible:           1.000000
+Best possible:           2.000000
 Absolute gap:            0.000000
 Relative gap:            0.000000
 
@@ -162,6 +169,7 @@ Relative gap:            0.000000
           LOWER          LEVEL          UPPER         MARGINAL
 
 c0         1.0000         1.0000        +INF             .          
+c1         1.0000         1.0000        +INF             .          
 
                            LOWER          LEVEL          UPPER         MARGINAL
 
@@ -174,10 +182,11 @@ c0         1.0000         1.0000        +INF             .
          LOWER          LEVEL          UPPER         MARGINAL
 
 1          .             1.0000         1.0000         1.0000      
+2          .             1.0000         1.0000         1.0000      
 
                            LOWER          LEVEL          UPPER         MARGINAL
 
----- VAR obj               -INF            1.0000        +INF             .          
+---- VAR obj               -INF            2.0000        +INF             .          
 
   obj  dummy objective variable
 
@@ -185,24 +194,28 @@ c0         1.0000         1.0000        +INF             .
 **** REPORT SUMMARY :        0     NONOPT
                              0 INFEASIBLE
                              0  UNBOUNDED
-GAMS 41.5.0  2a5a4ddc Jan 3, 2023           WEX-WEI x86 64bit/MS Windows - 01/13/23 15:07:57 Page 7
+GAMS 42.0.0  3dcbfd09 Jan 13, 2023   (BETA) WEX-WEI x86 64bit/MS Windows - 02/10/23 11:10:48 Page 7
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 E x e c u t i o n
 
 
 **** REPORT FILE SUMMARY
 
-fr D:\TVA\toolbox-server\jobs\sat\1\problem.sol
+fr G:\Studium\TVA\ProvideQ\toolbox-server\jobs\SAT\3\problem.sol
 
 
-EXECUTION TIME       =        0.313 SECONDS      4 MB  41.5.0 2a5a4ddc WEX-WEI
+EXECUTION TIME       =        0.032 SECONDS      4 MB  42.0.0 3dcbfd09 WEX-WEI
 
 
 USER: ProvideQ Project License                       S220922|0002CO-GEN
       GAMS Software GmbH, Braunschweig Office                   DCE2398
 
+**** ************* BETA release
+**** GAMS Base Module 42.0.0 3dcbfd09 Jan 13, 2023   (BETA) WEI x86 64bit/MS Window
+**** ************* BETA release
+
 
 **** FILE SUMMARY
 
-Input      D:\TVA\toolbox-server\gams\sat\sat.gms
-Output     D:\TVA\toolbox-server\gams\sat\sat.lst
+Input      G:\Studium\TVA\ProvideQ\toolbox-server\gams\sat\sat.gms
+Output     G:\Studium\TVA\ProvideQ\toolbox-server\gams\sat\sat.lst

@@ -16,16 +16,17 @@ public class Solution<S> implements SolutionHandle {
   private S solutionData;
   private String debugData;
   private String solverName;
+  private long executionMilliseconds;
 
   public Solution(long ID) {
     this.ID = ID;
   }
 
-  public long id() {
+  public long getId() {
     return this.ID;
   }
 
-  public SolutionStatus status() {
+  public SolutionStatus getStatus() {
     return this.status;
   }
 
@@ -78,6 +79,14 @@ public class Solution<S> implements SolutionHandle {
 
   public void setSolverName(String solverName) {
     this.solverName = solverName;
+  }
+
+  public long getExecutionMilliseconds() {
+    return executionMilliseconds;
+  }
+
+  public void setExecutionMilliseconds(long executionMilliseconds) {
+    this.executionMilliseconds = executionMilliseconds;
   }
 
   @Override
