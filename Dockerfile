@@ -21,23 +21,21 @@ RUN ./gradlew bootJar
 FROM eclipse-temurin:17-jdk-jammy AS runner
 WORKDIR /app
 
-# Install python (with python -> python3 alias)
-RUN apt update
-RUN apt-get install python-is-python3 --yes
-
 # GAMS Installation script is based on the official installation guide
 # (https://www.gams.com/latest/docs/UG_UNIX_INSTALL.html) and adapts some lines from
 # iisaa/gams-docker (https://github.com/iiasa/gams-docker/blob/master/Dockerfile, GPL-3.0 licensed)
 
 # Download GAMS
-RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/41.5.0/linux/linux_x64_64_sfx.exe"
+ENV GAMS_VERSION_REALEASE_MAJOR=42.1
+ENV GAMS_VERSION_HOTFIX=0
+RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/${GAMS_VERSION_REALEASE_MAJOR}.${GAMS_VERSION_HOTFIX}/linux/linux_x64_64_sfx.exe"
 
 # Extract GAMS files
 RUN cd /opt/gams && chmod +x gams.exe; sync && ./gams.exe && rm -rf gams.exe
 
 # Install GAMS license
 ARG GAMS_LICENSE
-RUN echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams41.5_linux_x64_64_sfx/gamslice.txt
+RUN echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams${GAMS_VERSION_REALEASE_MAJOR}_linux_x64_64_sfx/gamslice.txt
 
 # Add Path and run GAMS Installer
 RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
@@ -46,11 +44,25 @@ RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
     cd $GAMS_PATH &&\
     ./gamsinst -a
 
+# Install python from anaconda (with python -> python3 alias) and pip
+RUN curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh"
+# note: "-b" = non-interactive batch mode, "-p /opt/conda" = installation directory
+RUN cd /opt/conda-installer && chmod +x ./install.sh && ./install.sh -b -p /opt/conda
+ENV PATH="${PATH}:/opt/conda/bin"
+RUN conda create --name gams python=3.10 --yes
+ENV GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so
+SHELL ["conda", "run", "-n", "gams", "/bin/bash", "-c"]
+RUN pip install gams[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_REALEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+
 # Install the toolbox server and its solver scripts
 COPY gams gams
+RUN pip install -r ./gams/requirements.txt
 COPY qiskit qiskit
+RUN pip install -r ./qiskit/requirements.txt
 COPY --from=builder /app/build/libs/toolbox-server-0.0.1-SNAPSHOT.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port
 EXPOSE 5000
-CMD ["java", "-jar", "toolbox-server.jar", "--server.port=5000"]
+RUN echo "java -jar toolbox-server.jar --server.port=5000" > start.sh
+RUN chmod +x start.sh
+CMD ["conda", "run", "--no-capture-output", "-n", "gams", "/bin/bash", "-c", "./start.sh"]

@@ -37,6 +37,13 @@ out/
 .vscode/
 
 
-### Toolbox ###
+
+### ProvideQ toolbox-server ###
+# input, output and temporary files for solving problems with our solvers
 /jobs/
+
+# Software license key for GAMS, used for a docker container with GAMS included
 gamslice.txt
+
+# Listing files compiled from our GAMS scripts
+*.lst
