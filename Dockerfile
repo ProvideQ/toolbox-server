@@ -45,11 +45,14 @@ RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
     ./gamsinst -a
 
 # Install python from miniconda (with python -> python3 alias) and pip
-RUN curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh"
-RUN cd /opt/conda-installer && echo "32d73e1bc33fda089d7cd9ef4c1be542616bd8e437d1f77afeeaf7afdb019787 install.sh" | sha256sum --check
-
-# note: "-b" = non-interactive batch mode, "-p /opt/conda" = installation directory
-RUN cd /opt/conda-installer && chmod +x ./install.sh && ./install.sh -b -p /opt/conda
+# note about install.sh: "-b" = non-interactive batch mode, "-p /opt/conda" = installation directory
+RUN curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh" &&\
+    cd /opt/conda-installer &&\
+    echo "32d73e1bc33fda089d7cd9ef4c1be542616bd8e437d1f77afeeaf7afdb019787 install.sh" | sha256sum --check &&\
+    chmod +x ./install.sh &&\
+    ./install.sh -b -p /opt/conda &&\
+    cd /app &&\
+    rm --recursive /opt/conda-installer
 ENV PATH="${PATH}:/opt/conda/bin"
 RUN conda create --name gams python=3.10 --yes
 ENV GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so
