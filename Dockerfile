@@ -26,16 +26,16 @@ WORKDIR /app
 # iisaa/gams-docker (https://github.com/iiasa/gams-docker/blob/master/Dockerfile, GPL-3.0 licensed)
 
 # Download GAMS
-ENV GAMS_VERSION_REALEASE_MAJOR=42.1
+ENV GAMS_VERSION_RELEASE_MAJOR=42.1
 ENV GAMS_VERSION_HOTFIX=0
-RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/${GAMS_VERSION_REALEASE_MAJOR}.${GAMS_VERSION_HOTFIX}/linux/linux_x64_64_sfx.exe"
+RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}/linux/linux_x64_64_sfx.exe"
 
 # Extract GAMS files
 RUN cd /opt/gams && chmod +x gams.exe; sync && ./gams.exe && rm -rf gams.exe
 
 # Install GAMS license
 ARG GAMS_LICENSE
-RUN echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams${GAMS_VERSION_REALEASE_MAJOR}_linux_x64_64_sfx/gamslice.txt
+RUN echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/gamslice.txt
 
 # Add Path and run GAMS Installer
 RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
@@ -54,7 +54,7 @@ ENV PATH="${PATH}:/opt/conda/bin"
 RUN conda create --name gams python=3.10 --yes
 ENV GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so
 SHELL ["conda", "run", "-n", "gams", "/bin/bash", "-c"]
-RUN pip install gams[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_REALEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+RUN pip install gams[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
 
 # Install the toolbox server and its solver scripts
 COPY gams gams
