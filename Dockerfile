@@ -26,19 +26,20 @@ WORKDIR /app
 # iisaa/gams-docker (https://github.com/iiasa/gams-docker/blob/master/Dockerfile, GPL-3.0 licensed)
 
 # Download GAMS
+ARG GAMS_LICENSE
 ENV GAMS_VERSION_RELEASE_MAJOR=42.1
 ENV GAMS_VERSION_HOTFIX=0
-RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}/linux/linux_x64_64_sfx.exe"
-
-# Extract GAMS files
-RUN cd /opt/gams && chmod +x gams.exe; sync && ./gams.exe && rm -rf gams.exe
-
-# Install GAMS license
-ARG GAMS_LICENSE
-RUN echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/gamslice.txt
-
-# Add Path and run GAMS Installer
-RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
+RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}/linux/linux_x64_64_sfx.exe" &&\
+    # Extract GAMS files
+    cd /opt/gams &&\
+    chmod +x gams.exe &&\
+    sync &&\
+    ./gams.exe &&\
+    rm -rf gams.exe &&\
+    # Install GAMS license
+    echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/gamslice.txt &&\
+    # Add Path and run GAMS Installer
+    GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
     ln -s $GAMS_PATH/gams /usr/local/bin/gams &&\
     echo "export PATH=\$PATH:$GAMS_PATH" >> ~/.bashrc &&\
     cd $GAMS_PATH &&\
