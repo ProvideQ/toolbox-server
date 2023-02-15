@@ -1,5 +1,5 @@
 # This file describes the python package requirements for all Qiskit scripts
-# suppored by ProvideQ
+# supported by ProvideQ
 
 # required for Qiskit MaxCut solver
 numpy
