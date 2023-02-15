@@ -44,8 +44,10 @@ RUN GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print)) &&\
     cd $GAMS_PATH &&\
     ./gamsinst -a
 
-# Install python from anaconda (with python -> python3 alias) and pip
-RUN curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh"
+# Install python from miniconda (with python -> python3 alias) and pip
+RUN curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh"
+RUN cd /opt/conda-installer && echo "32d73e1bc33fda089d7cd9ef4c1be542616bd8e437d1f77afeeaf7afdb019787 install.sh" | sha256sum --check
+
 # note: "-b" = non-interactive batch mode, "-p /opt/conda" = installation directory
 RUN cd /opt/conda-installer && chmod +x ./install.sh && ./install.sh -b -p /opt/conda
 ENV PATH="${PATH}:/opt/conda/bin"
