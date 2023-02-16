@@ -15,11 +15,23 @@ COPY src src
 COPY settings.gradle settings.gradle
 COPY system.properties system.properties
 
+# build application JAR
 RUN ./gradlew bootJar
+# build justom JRE (use "jdeps -summary ./build/libs/toolbox-server-*.jar" to
+# find module dependencies)
+RUN jlink \
+    --output build/jre \
+    --add-modules java.base,java.logging,java.desktop,java.management,java.naming,java.security.jgss,java.instrument \
+    --strip-debug \
+    --no-man-pages \
+    --no-header-files \
+    --compress=2
 
 # Step 2: Install the toolbox + external dependencies to a runner container
-FROM eclipse-temurin:17-jdk-jammy AS runner
+FROM debian:bullseye-slim AS runner
 WORKDIR /app
+
+RUN apt-get update && apt-get install curl --yes
 
 # GAMS Installation script is based on the official installation guide
 # (https://www.gams.com/latest/docs/UG_UNIX_INSTALL.html) and adapts some lines from
@@ -59,6 +71,10 @@ RUN conda create --name gams python=3.10 --yes
 ENV GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so
 SHELL ["conda", "run", "-n", "gams", "/bin/bash", "-c"]
 RUN pip install gams[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+
+# Install custom JRE
+COPY --from=builder /app/build/jre /opt/java
+ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
 COPY gams gams
