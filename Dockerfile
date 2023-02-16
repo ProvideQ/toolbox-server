@@ -46,7 +46,8 @@ RUN curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4
     cd /opt/gams &&\
     chmod +x gams.exe &&\
     sync &&\
-    ./gams.exe &&\
+    # -q = quietly, see https://linux.die.net/man/1/unzipsfx
+    ./gams.exe -q &&\
     rm -rf gams.exe &&\
     # Install GAMS license
     echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/gamslice.txt &&\
