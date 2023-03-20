@@ -15,6 +15,8 @@ public final class BoolExprToDimacsCNF {
     private final static String negationPrefix = "-";
 
     public static String convert(String boolExpr) {
+        if (boolExpr.contains("p cnf")) return boolExpr;
+
         // Streamline bool expr format
         boolExpr = boolExpr
                 .replaceAll("\\b(?:not|NOT)\\b", "!")

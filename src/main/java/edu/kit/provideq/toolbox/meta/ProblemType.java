@@ -14,5 +14,12 @@ public enum ProblemType {
    * An optimization problem:
    * For a given graph, find the optimal separation of vertices that maximises the cut crossing edge weight sum.
    */
-  MAX_CUT
+  MAX_CUT,
+
+  /**
+   * A searching problem:
+   * For a given feature model, check for Void Feature Model & Dead Features.
+   * <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">More information</a>
+   */
+  FEATURE_MODEL_ANOMALY,
 }
