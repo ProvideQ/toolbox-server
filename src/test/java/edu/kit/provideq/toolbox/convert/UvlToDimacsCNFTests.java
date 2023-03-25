@@ -1,7 +1,6 @@
-package edu.kit.provideq.toolbox.featureModel;
+package edu.kit.provideq.toolbox.convert;
 
 import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.featureModel.convert.UvlToDimacsCNF;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

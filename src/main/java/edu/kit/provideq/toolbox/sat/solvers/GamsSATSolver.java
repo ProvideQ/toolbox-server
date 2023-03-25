@@ -7,7 +7,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.Solution;
 
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.sat.convert.BoolExprToDimacsCNF;
+import edu.kit.provideq.toolbox.convert.BoolExprToDimacsCNF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.featureModel.convert;
+package edu.kit.provideq.toolbox.convert;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;

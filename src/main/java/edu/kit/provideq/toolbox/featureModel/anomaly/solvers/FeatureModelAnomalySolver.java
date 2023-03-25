@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.featureModel.anomaly.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.featureModel.convert.UvlToDimacsCNF;
+import edu.kit.provideq.toolbox.convert.UvlToDimacsCNF;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSATSolver;

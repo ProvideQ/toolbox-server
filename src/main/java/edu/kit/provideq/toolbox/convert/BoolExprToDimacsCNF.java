@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.sat.convert;
+package edu.kit.provideq.toolbox.convert;
 
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.Not;
