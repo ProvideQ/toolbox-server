@@ -7,7 +7,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.Solution;
 
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.convert.BoolExprToDimacsCNF;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -52,9 +52,9 @@ public class GamsSATSolver extends SATSolver {
 
     @Override
     public void solve(Problem<String> problem, Solution<String> solution) {
-        String dimacsCNF;
+        DimacsCNF dimacsCNF;
         try {
-            dimacsCNF = BoolExprToDimacsCNF.convert(problem.problemData());
+            dimacsCNF = DimacsCNF.fromString(problem.problemData());
             solution.setDebugData("Using cnf input: " + dimacsCNF);
         } catch (RuntimeException e) {
             solution.setDebugData("Parsing error: " + e.getMessage());
@@ -71,7 +71,7 @@ public class GamsSATSolver extends SATSolver {
             problemFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.cnf");
             solutionFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.sol");
 
-            Files.writeString(problemFile, dimacsCNF);
+            Files.writeString(problemFile, dimacsCNF.toString());
         } catch (IOException e) {
             solution.setDebugData("Creation of problem file caught exception: " + e.getMessage());
             solution.abort();
