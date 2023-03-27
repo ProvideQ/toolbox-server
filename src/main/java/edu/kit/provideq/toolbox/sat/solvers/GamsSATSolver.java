@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
+import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.ProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -79,15 +80,10 @@ public class GamsSATSolver extends SATSolver {
 
         // Run SAT with GAMS via console
         try {
-            var processBuilder = new ProcessBuilder()
-                    // Problem file path can't use '\' characters, and no '/'
-                    .command(
-                            "gams",
-                            "sat.gms",
-                            "--CNFINPUT=\"%s\"".formatted(problemFile))
-                    .directory(satDirectory);
-
-            var processResult = new ProcessRunner(processBuilder).run();
+            var processResult = new GamsProcessRunner(
+                satDirectory,
+                "sat.gms", "--CNFINPUT=\"%s\"".formatted(problemFile)
+            ).run();
 
             if (processResult.success()) {
                 solution.complete();
@@ -95,7 +91,8 @@ public class GamsSATSolver extends SATSolver {
                 return;
             }
 
-            solution.setDebugData("GAMS didn't complete solving SAT successfully" + processResult.output());
+            solution.setDebugData("GAMS didn't complete solving SAT successfully!\n" +
+                    processResult.output());
             solution.abort();
         } catch (IOException | InterruptedException e) {
             solution.setDebugData("Solving SAT problem via GAMS resulted in exception: " + e.getMessage());
