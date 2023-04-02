@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.maxCut.solvers;
 
+import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.ProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.ResourceProvider;
@@ -68,15 +69,11 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
         // Run MaxCut with GAMS via console
         try {
-            var processBuilder = new ProcessBuilder()
-                    // Problem file path can't use '\' characters, just '/'
-                    .command(
-                            "gams",
-                            "maxcut.gms",
-                            "--INPUT=\"%s\"".formatted(problemFile.toAbsolutePath().toString().replace('\\', '/')))
-                    .directory(maxCutDirectory);
-
-            var processResult = new ProcessRunner(processBuilder).run();
+            var processResult = new GamsProcessRunner(
+                maxCutDirectory,
+                "maxcut.gms",
+                "--INPUT=\"%s\"".formatted(problemFile.toAbsolutePath().toString().replace('\\', '/'))
+            ).run();
 
             if (processResult.success()) {
                 solution.complete();
@@ -84,7 +81,8 @@ public class GamsMaxCutSolver extends MaxCutSolver {
                 return;
             }
 
-            solution.setDebugData("GAMS didn't complete solving MaxCut successfully" + processResult.output());
+            solution.setDebugData("GAMS didn't complete solving MaxCut successfully!\n" +
+                processResult.output());
             solution.abort();
         } catch (IOException | InterruptedException e) {
             solution.setDebugData("Solving MaxCut problem via GAMS resulted in exception: " + e.getMessage());
