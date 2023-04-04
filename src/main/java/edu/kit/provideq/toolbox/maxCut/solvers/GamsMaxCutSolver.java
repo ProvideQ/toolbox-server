@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.maxCut.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
-import edu.kit.provideq.toolbox.ProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -24,7 +23,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
     @Autowired
     public GamsMaxCutSolver(
-            @Value("${gams.directory.maxCut}") String maxCutPath,
+            @Value("${gams.directory.max-cut}") String maxCutPath,
             ResourceProvider resourceProvider) throws IOException {
         this.resourceProvider = resourceProvider;
 

@@ -31,18 +31,18 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
   }
 
   @CrossOrigin
-  @PostMapping("/solve/maxCut")
+  @PostMapping("/solve/max-cut")
   public SolutionHandle solveMaxCut(@RequestBody @Valid SolveMaxCutRequest request) {
     return super.solve(request);
   }
 
-  @GetMapping("/solve/maxCut")
+  @GetMapping("/solve/max-cut")
   public SolutionHandle getSolution(@RequestParam(name = "id", required = true) long id) {
     return super.getSolution(id);
   }
 
   @CrossOrigin
-  @GetMapping("/solvers/maxCut")
+  @GetMapping("/solvers/max-cut")
   public Set<ProblemSolverInfo> getSolvers() {
     return super.getSolvers();
   }

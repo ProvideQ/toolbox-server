@@ -23,7 +23,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
 
   @Autowired
   public QiskitMaxCutSolver(
-          @Value("${qiskit.directory.maxCut}") String maxCutPath,
+          @Value("${qiskit.directory.max-cut}") String maxCutPath,
           ResourceProvider resourceProvider) throws IOException {
     this.resourceProvider = resourceProvider;
 
