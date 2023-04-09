@@ -1,0 +1,98 @@
+package edu.kit.provideq.toolbox.format.cnf.dimacs;
+
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF.*;
+
+public class DimacsCNFSolution {
+    public final static char SOLUTION_START = 's';
+    public final static char VARIABLE_DECLARATION = 'v';
+
+    private final DimacsCNF dimacsCNF;
+    private final Map<Variable, Boolean> variableMap;
+
+    public DimacsCNFSolution(DimacsCNF dimacsCNF, Map<Variable, Boolean> variableMap) {
+        this.dimacsCNF = dimacsCNF;
+        this.variableMap = variableMap;
+    }
+
+    public static DimacsCNFSolution fromString(DimacsCNF dimacsCNF, String solutionString) {
+        var parser = new StringToDimacsCNFSolution();
+        Map<Integer, Boolean> variableMap = parser.parse(solutionString);
+
+        Map<Variable, Boolean> namedVariableMap = dimacsCNF
+                .getVariables()
+                .stream()
+                .filter(v -> variableMap.containsKey(v.getNumber()))
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        variable -> variableMap.get(variable.getNumber())
+                ));
+
+        return new DimacsCNFSolution(dimacsCNF, namedVariableMap);
+    }
+
+    /**
+     * Return a mapping from a variable to its boolean state.
+     *
+     * @return map from a variable to the boolean state of the variable
+     */
+    public Map<Variable, Boolean> getVariableMapping() {
+        return variableMap;
+    }
+
+    public boolean isVoid() {
+        return variableMap.size() == 0;
+    }
+
+    @Override
+    public String toString() {
+        var builder = new StringBuilder();
+
+        // Add variable names as comment
+        addVariableComments(builder, variableMap.keySet());
+
+        // Add preamble
+        builder.append(SOLUTION_START)
+                .append(SEPARATOR)
+                .append(CNF_IDENTIFIER)
+                .append(SEPARATOR)
+                .append("1")
+                .append(SEPARATOR)
+                .append(variableMap.size())
+                .append(SEPARATOR)
+                .append(dimacsCNF.getOrClauses().size())
+                .append(LINE_SEPARATOR);
+
+        // Add variable declarations
+        for (Map.Entry<Variable, Boolean> variableBooleanEntry : variableMap.entrySet()) {
+
+            var number = variableBooleanEntry.getKey().getNumber();
+            var variable = variableBooleanEntry.getValue()
+                    ? number
+                    : NEGATION_PREFIX + number;
+
+            builder.append(VARIABLE_DECLARATION)
+                    .append(SEPARATOR)
+                    .append(variable)
+                    .append(LINE_SEPARATOR);
+        }
+
+        return builder.toString();
+    }
+
+    public String toHumanReadableString() {
+        var builder = new StringBuilder();
+
+        for (Map.Entry<Variable, Boolean> variableBooleanEntry : variableMap.entrySet()) {
+            builder.append(variableBooleanEntry.getKey().getName())
+                    .append(": ")
+                    .append(variableBooleanEntry.getValue())
+                    .append(LINE_SEPARATOR);
+        }
+
+        return builder.toString();
+    }
+}
