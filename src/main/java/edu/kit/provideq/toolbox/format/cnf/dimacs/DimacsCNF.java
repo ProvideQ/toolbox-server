@@ -6,8 +6,8 @@ import com.bpodgursky.jbool_expressions.rules.RuleSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DimacsCNF {
     final static String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -26,15 +26,15 @@ public class DimacsCNF {
     }
 
     public DimacsCNF(DimacsCNF cnf) {
-        this.orClauses = cnf.orClauses;
-        this.variables = cnf.variables;
+        this.orClauses = new ArrayList<>(cnf.orClauses);
+        this.variables = new ArrayList<>(cnf.variables);
     }
 
     public DimacsCNF(ArrayList<ArrayList<Variable>> orClauses) {
         this(orClauses, orClauses.stream()
                 .flatMap(Collection::stream)
                 .distinct()
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     public DimacsCNF(ArrayList<ArrayList<Variable>> orClauses, List<Variable> variables) {
@@ -42,6 +42,11 @@ public class DimacsCNF {
         this.orClauses = orClauses;
     }
 
+    /**
+     * Create a dimacs cnf structure from a logical expression or string in format of dimacs cnf
+     * @param string logical expression or dimacs cnf string
+     * @return dimacs cnf structure
+     */
     public static DimacsCNF fromString(String string) {
         var x = String.valueOf(DimacsCNF.PREAMBLE_START) + DimacsCNF.SEPARATOR + DimacsCNF.CNF_IDENTIFIER;
 
@@ -50,11 +55,21 @@ public class DimacsCNF {
                 : fromLogicalExpressionString(string);
     }
 
+    /**
+     * Create a dimacs cnf structure from a string in format of dimacs cnf
+     * @param dimacsCNF dimacs cnf string
+     * @return dimacs cnf structure
+     */
     public static DimacsCNF fromDimacsCNFString(String dimacsCNF) {
-        StringToDimacsCNF dimacsCNFReader = new StringToDimacsCNF();
-        return dimacsCNFReader.parse(dimacsCNF);
+        var parser = new StringToDimacsCNF();
+        return parser.parse(dimacsCNF);
     }
 
+    /**
+     * Create a dimacs cnf structure from a logical expression
+     * @param expression logical expression
+     * @return dimacs cnf structure
+     */
     public static DimacsCNF fromLogicalExpressionString(String expression) {
         // Streamline bool expr format
         expression = expression
@@ -68,19 +83,31 @@ public class DimacsCNF {
         return new DimacsCNF(cnfExpression);
     }
 
+    public Collection<Variable> getVariables() {
+        return Collections.unmodifiableCollection(variables);
+    }
+
+    /**
+     * Returns a list of or clauses
+     * @return list of or clauses where the inner lists is an or clauses of variables
+     */
+    public ArrayList<ArrayList<Variable>> getOrClauses() {
+        return orClauses;
+    }
+
+    public DimacsCNF addOrClause(ArrayList<Variable> orClause) {
+        var newOrClauses = new ArrayList<>(orClauses);
+        newOrClauses.add(orClause);
+
+        return new DimacsCNF(newOrClauses, Collections.unmodifiableList(variables));
+    }
+
     @Override
     public String toString() {
         var builder = new StringBuilder();
 
         // Add variable names as comment
-        for (Variable variable : variables) {
-            builder.append(COMMENT_START)
-                    .append(SEPARATOR)
-                    .append(variable.name)
-                    .append(SEPARATOR)
-                    .append(variable.number)
-                    .append(LINE_SEPARATOR);
-        }
+        addVariableComments(builder, variables);
 
         // Add preamble problem line
         // Example for 3 clauses with 4 variables
@@ -107,5 +134,18 @@ public class DimacsCNF {
         }
 
         return builder.toString();
+    }
+
+    static void addVariableComments(StringBuilder builder, Collection<Variable> variables) {
+        // Add variable names comments like this
+        // c 42 apple
+        for (Variable variable : variables) {
+            builder.append(COMMENT_START)
+                    .append(SEPARATOR)
+                    .append(variable.getNumber())
+                    .append(SEPARATOR)
+                    .append(variable.getName())
+                    .append(LINE_SEPARATOR);
+        }
     }
 }

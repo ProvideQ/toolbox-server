@@ -15,8 +15,8 @@ class StringToDimacsCNF {
                     switch (lineSegment[0].charAt(0)) {
                         case DimacsCNF.COMMENT_START -> {
                             // Parse comment
-                            String name = lineSegment[1];
-                            Integer number = Integer.parseInt(lineSegment[2]);
+                            Integer number = Integer.parseInt(lineSegment[1]);
+                            String name = lineSegment[2];
                             variableMap.put(number, name);
                         }
                         case DimacsCNF.PREAMBLE_START -> {
