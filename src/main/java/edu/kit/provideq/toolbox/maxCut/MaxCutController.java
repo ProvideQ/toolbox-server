@@ -6,8 +6,10 @@ import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
+import edu.kit.provideq.toolbox.meta.ProblemDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +38,16 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
     return super.solve(request);
   }
 
+  @CrossOrigin
   @GetMapping("/solve/max-cut")
-  public SolutionHandle getSolution(@RequestParam(name = "id", required = true) long id) {
+  public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
     return super.getSolution(id);
+  }
+
+  @CrossOrigin
+  @GetMapping("/sub-routines/max-cut")
+  public List<ProblemDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
+    return super.getSubRoutines(solverId);
   }
 
   @CrossOrigin

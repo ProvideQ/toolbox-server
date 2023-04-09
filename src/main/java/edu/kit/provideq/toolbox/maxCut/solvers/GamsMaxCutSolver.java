@@ -1,9 +1,11 @@
 package edu.kit.provideq.toolbox.maxCut.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
-import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Component
 public class GamsMaxCutSolver extends MaxCutSolver {
@@ -28,6 +31,12 @@ public class GamsMaxCutSolver extends MaxCutSolver {
         this.resourceProvider = resourceProvider;
 
         maxCutDirectory = resourceProvider.getResource(maxCutPath);
+    }
+
+    @Override
+    public List<ProblemDefinition> getSubRoutines() {
+        return List.of(
+                new ProblemDefinition(ProblemType.SAT, "sat"));
     }
 
     @Override
@@ -48,7 +57,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution) {
+    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
         Path problemFile;
         Path solutionFile;
 

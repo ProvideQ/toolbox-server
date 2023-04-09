@@ -4,9 +4,11 @@ import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.ProblemDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +40,14 @@ public class SatController extends ProblemController<String, String, SATSolver> 
 
   @CrossOrigin
   @GetMapping("/solve/sat")
-  public SolutionHandle getSolution(@RequestParam(name = "id", required = true) long id) {
+  public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
     return super.getSolution(id);
+  }
+
+  @CrossOrigin
+  @GetMapping("/sub-routines/sat")
+  public List<ProblemDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
+    return super.getSubRoutines(solverId);
   }
 
   @CrossOrigin

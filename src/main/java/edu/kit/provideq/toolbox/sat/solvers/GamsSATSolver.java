@@ -1,13 +1,13 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
-import edu.kit.provideq.toolbox.ProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.Solution;
-
-import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
+import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemDefinition;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Component
 public class GamsSATSolver extends SATSolver {
@@ -31,6 +32,13 @@ public class GamsSATSolver extends SATSolver {
         this.resourceProvider = resourceProvider;
 
         satDirectory = resourceProvider.getResource(satPath);
+    }
+
+    @Override
+    public List<ProblemDefinition> getSubRoutines() {
+        return List.of(
+                new ProblemDefinition(ProblemType.MAX_CUT, "max-cut"),
+                new ProblemDefinition(ProblemType.SAT, "sat"));
     }
 
     @Override
@@ -51,7 +59,7 @@ public class GamsSATSolver extends SATSolver {
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution) {
+    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
         DimacsCNF dimacsCNF;
         try {
             dimacsCNF = DimacsCNF.fromString(problem.problemData());
