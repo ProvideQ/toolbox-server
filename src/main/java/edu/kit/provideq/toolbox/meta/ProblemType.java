@@ -18,7 +18,7 @@ public enum ProblemType {
 
   /**
    * A searching problem:
-   * For a given feature model, check for Void Feature Model & Dead Features.
+   * For a given feature model, check for Void Feature Model, Dead Features, False-Optional Features, Redundant Constraints.
    * <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">More information</a>
    */
   FEATURE_MODEL_ANOMALY,

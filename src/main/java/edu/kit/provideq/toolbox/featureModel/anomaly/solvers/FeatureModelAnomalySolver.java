@@ -2,69 +2,125 @@ package edu.kit.provideq.toolbox.featureModel.anomaly.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.exception.ConversionException;
+import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.convert.UvlToDimacsCNF;
+import edu.kit.provideq.toolbox.exception.ConversionException;
+import edu.kit.provideq.toolbox.featureModel.anomaly.FeatureModelAnomalyProblem;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.sat.solvers.GamsSATSolver;
-import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 @Component
 public class FeatureModelAnomalySolver extends FeatureModelSolver {
-    private final SATSolver satSolver;
-
-    @Autowired
-    public FeatureModelAnomalySolver(
-            GamsSATSolver satSolver) {
-        this.satSolver = satSolver;
-    }
-
     @Override
     public String getName() {
-        return "Feature Model Anomaly via GAMS SAT";
+        return "Feature Model Anomaly";
     }
 
     @Override
-    public boolean canSolve(Problem<String> problem) {
+    public List<ProblemDefinition> getSubRoutines() {
+        return List.of(
+                new ProblemDefinition(ProblemType.SAT, "sat"));
+    }
+
+    @Override
+    public boolean canSolve(Problem<FeatureModelAnomalyProblem> problem) {
         //TODO: assess problemData
         return problem.type() == ProblemType.MAX_CUT;
     }
 
     @Override
-    public float getSuitability(Problem<String> problem) {
+    public float getSuitability(Problem<FeatureModelAnomalyProblem> problem) {
         //TODO: implement algorithm for suitability calculation
         return 1;
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution) {
+    public void solve(Problem<FeatureModelAnomalyProblem> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
         // Convert uvl to cnf
         String cnf;
         try {
-            cnf = UvlToDimacsCNF.convert(problem.problemData());
+            cnf = UvlToDimacsCNF.convert(problem.problemData().featureModel());
         } catch (ConversionException e) {
             solution.setDebugData("Conversion error: " + e.getMessage());
             return;
         }
 
-        // todo Add a real solution collection which handles part solutions and still saves solvers and meta data for each
-        var solutionBuilder = new StringBuilder();
+        Function<Object, Solution> satSolve = subRoutinePool.getSubRoutine(ProblemType.SAT);
+        switch (problem.problemData().anomaly()) {
+            case VOID -> checkVoidFeatureModel(solution, cnf, satSolve);
+            case DEAD -> checkDeadFeatures(solution, cnf, satSolve);
+            case FALSE_OPTIONAL -> {
 
-        // Check if the FM is a Void Feature Model
-        var voidSolution = new Solution<String>(-1);
-        satSolver.solve(new Problem<>(cnf, ProblemType.SAT), voidSolution);
-        if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
-            solutionBuilder.append(voidSolution.getSolutionData());
-        } else {
-            solutionBuilder.append(voidSolution.getDebugData());
+            }
+            case REDUNDANT_CONSTRAINTS -> {
+
+            }
+        }
+    }
+
+    private static void checkDeadFeatures(Solution<String> solution, String cnf, Function<Object, Solution> satSolve) {
+        // Check if there are any Dead Features
+        DimacsCNF dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
+
+        var builder = new StringBuilder();
+        var errorBuilder = new StringBuilder();
+
+        for (Variable variable : dimacsCNF.getVariables()) {
+            var orClause = new ArrayList<Variable>();
+            orClause.add(variable);
+            var variableCNF = dimacsCNF.addOrClause(orClause);
+
+            var variableSolution = satSolve.apply(variableCNF.toString());
+
+            if (variableSolution.getStatus() == SolutionStatus.SOLVED) {
+                var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, variableSolution.getSolutionData().toString());
+
+                if (dimacsCNFSolution.isVoid()) {
+                    builder.append(variable.getName())
+                            .append(System.lineSeparator());
+                }
+            } else {
+                errorBuilder.append(variableSolution.getDebugData())
+                        .append(System.lineSeparator());
+            }
         }
 
-        // Check if there are any Dead Features
-        var deadSolution = new Solution<String>(-1);
-        satSolver.solve(new Problem<>(cnf, ProblemType.SAT), deadSolution);
+        if (builder.isEmpty()) {
+            builder.append("No features are dead features!\n");
+        } else {
+            builder.insert(0, "The following features are dead features:\n");
+        }
 
-        solution.setSolutionData(solutionBuilder.toString());
+        if (!errorBuilder.isEmpty()) {
+            builder.append("Following errors occurred:\n")
+                    .append(errorBuilder);
+        }
+
+        solution.setSolutionData(builder.toString());
+    }
+
+    private static void checkVoidFeatureModel(Solution<String> solution, String cnf, Function<Object, Solution> satSolve) {
+        // Check if the FM is a Void Feature Model
+        var voidSolution = satSolve.apply(cnf);
+        DimacsCNF dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
+
+        if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
+            var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, voidSolution.getSolutionData().toString());
+
+            solution.setSolutionData(dimacsCNFSolution.isVoid()
+                    ? "The feature model is a void feature model. The configuration is never valid."
+                    : "The feature model has valid configurations, for example: \n" + dimacsCNFSolution.toHumanReadableString());
+        } else {
+            solution.setSolutionData(voidSolution.getDebugData());
+        }
     }
 }
