@@ -8,7 +8,7 @@ import java.util.*;
  *
  * @param <T> the type of {@link ProblemSolver} this metasolver is to manage
  */
-public class MetaSolver<T extends ProblemSolver> {
+public abstract class MetaSolver<T extends ProblemSolver> {
 
   protected Set<T> solvers = new HashSet<>();
 
