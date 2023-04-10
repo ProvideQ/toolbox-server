@@ -6,7 +6,6 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 @Component
 public class GamsSATSolver extends SATSolver {
@@ -32,13 +30,6 @@ public class GamsSATSolver extends SATSolver {
         this.resourceProvider = resourceProvider;
 
         satDirectory = resourceProvider.getResource(satPath);
-    }
-
-    @Override
-    public List<ProblemDefinition> getSubRoutines() {
-        return List.of(
-                new ProblemDefinition(ProblemType.MAX_CUT, "max-cut"),
-                new ProblemDefinition(ProblemType.SAT, "sat"));
     }
 
     @Override
