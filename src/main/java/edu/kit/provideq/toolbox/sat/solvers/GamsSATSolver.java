@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +86,11 @@ public class GamsSATSolver extends SATSolver {
             ).run();
 
             if (processResult.success()) {
+                var solutionText = Files.readString(solutionFile);
+                var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, solutionText);
+
                 solution.complete();
-                solution.setSolutionData(Files.readString(solutionFile));
+                solution.setSolutionData(dimacsCNFSolution.toHumanReadableString());
                 return;
             }
 
