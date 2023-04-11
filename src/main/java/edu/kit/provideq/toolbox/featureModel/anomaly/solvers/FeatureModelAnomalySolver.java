@@ -113,7 +113,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         var voidSolution = satSolve.apply(cnf);
         DimacsCNF dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
 
-        solution.setDebugData(cnf);
+        solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
         if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
             var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, voidSolution.getSolutionData().toString());
 
