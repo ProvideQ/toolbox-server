@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.format.cnf.dimacs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 class StringToDimacsCNF {
@@ -16,7 +17,7 @@ class StringToDimacsCNF {
                         case DimacsCNF.COMMENT_START -> {
                             // Parse comment
                             Integer number = Integer.parseInt(lineSegment[1]);
-                            String name = lineSegment[2];
+                            String name = String.join(" ", Arrays.copyOfRange(lineSegment, 2, lineSegment.length));
                             variableMap.put(number, name);
                         }
                         case DimacsCNF.PREAMBLE_START -> {
