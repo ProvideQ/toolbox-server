@@ -37,7 +37,7 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
 
     public abstract MetaSolver<SolverType> getMetaSolver();
 
-    public SolutionHandle solve(SolveRequest<ProblemFormatType> request) {
+    public Solution<SolutionFormatType> solve(SolveRequest<ProblemFormatType> request) {
         Solution<SolutionFormatType> solution = SolutionManager.createSolution();
         Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, getProblemType());
 
@@ -72,14 +72,14 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
         return solution;
     }
 
-    public SolutionHandle getSolution(long id) {
+    public Solution<SolutionFormatType> findSolution(long id) {
         var solution = SolutionManager.getSolution(id);
         if (solution == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format("Unable to find solution process with id %d", id));
         }
 
-        return solution;
+        return (Solution<SolutionFormatType>) solution;
     }
 
     public SolverType getSolver(String id) {

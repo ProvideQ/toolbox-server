@@ -41,7 +41,7 @@ public class SatController extends ProblemController<String, String, SATSolver> 
   @CrossOrigin
   @GetMapping("/solve/sat")
   public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
-    return super.getSolution(id);
+    return super.findSolution(id);
   }
 
   @CrossOrigin

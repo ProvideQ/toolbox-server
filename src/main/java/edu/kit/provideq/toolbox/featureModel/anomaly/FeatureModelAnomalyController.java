@@ -67,7 +67,7 @@ public class FeatureModelAnomalyController extends ProblemController<FeatureMode
   @CrossOrigin
   @GetMapping("/solve/feature-model/anomaly/")
   public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
-    return super.getSolution(id);
+    return super.findSolution(id);
   }
 
   @CrossOrigin
