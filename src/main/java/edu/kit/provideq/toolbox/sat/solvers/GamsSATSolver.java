@@ -51,7 +51,7 @@ public class GamsSATSolver extends SATSolver {
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
+    public void solve(Problem<String> problem, Solution<DimacsCNFSolution> solution, SubRoutinePool subRoutinePool) {
         DimacsCNF dimacsCNF;
         try {
             dimacsCNF = DimacsCNF.fromString(problem.problemData());
@@ -90,7 +90,7 @@ public class GamsSATSolver extends SATSolver {
                 var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, solutionText);
 
                 solution.complete();
-                solution.setSolutionData(dimacsCNFSolution.toHumanReadableString());
+                solution.setSolutionData(dimacsCNFSolution);
                 return;
             }
 
