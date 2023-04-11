@@ -4,7 +4,7 @@ import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
-import edu.kit.provideq.toolbox.meta.ProblemDefinition;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
 import javax.validation.Valid;
@@ -46,7 +46,7 @@ public class SatController extends ProblemController<String, String, SATSolver> 
 
   @CrossOrigin
   @GetMapping("/sub-routines/sat")
-  public List<ProblemDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
+  public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
     return super.getSubRoutines(solverId);
   }
 

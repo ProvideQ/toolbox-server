@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -106,7 +105,7 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
                 .collect(Collectors.toSet());
     }
 
-    public List<ProblemDefinition> getSubRoutines(String id) {
+    public List<SubRoutineDefinition> getSubRoutines(String id) {
         SolverType solver = getSolver(id);
         return solver.getSubRoutines();
     }

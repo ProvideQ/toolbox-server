@@ -9,7 +9,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
-import edu.kit.provideq.toolbox.meta.ProblemDefinition;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +46,7 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
 
   @CrossOrigin
   @GetMapping("/sub-routines/max-cut")
-  public List<ProblemDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
+  public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
     return super.getSubRoutines(solverId);
   }
 

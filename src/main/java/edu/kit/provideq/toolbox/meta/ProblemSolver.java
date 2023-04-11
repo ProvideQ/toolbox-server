@@ -29,7 +29,7 @@ public interface ProblemSolver<ProblemFormatType, SolutionDataType> {
    * returns the sub problems used to solver this problem
    * @return list of sub problems
    */
-  default List<ProblemDefinition> getSubRoutines() {
+  default List<SubRoutineDefinition> getSubRoutines() {
     return Collections.emptyList();
   }
 

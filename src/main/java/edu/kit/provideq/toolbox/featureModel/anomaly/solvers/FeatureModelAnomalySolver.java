@@ -10,7 +10,7 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemDefinition;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +26,9 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
     }
 
     @Override
-    public List<ProblemDefinition> getSubRoutines() {
+    public List<SubRoutineDefinition> getSubRoutines() {
         return List.of(
-                new ProblemDefinition(ProblemType.SAT, "sat"));
+                new SubRoutineDefinition(ProblemType.SAT, "sat", "Used to find valid configurations in the Feature Model"));
     }
 
     @Override
@@ -113,6 +113,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         var voidSolution = satSolve.apply(cnf);
         DimacsCNF dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
 
+        solution.setDebugData(cnf);
         if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
             var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, voidSolution.getSolutionData().toString());
 
