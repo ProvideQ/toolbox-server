@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.featureModel.anomaly;
 
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
+import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.featureModel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.featureModel.anomaly.solvers.*;
@@ -58,7 +59,9 @@ public class FeatureModelAnomalyController extends ProblemController<FeatureMode
   }
 
   private SolutionHandle solveAnomaly(SolveFeatureModelRequest request, FeatureModelAnomaly anomaly) {
-    return super.solve(request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
+    var solution = (Solution) super.solve(request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
+    solution.setSolverName(solution.getSolverName()  + ": " + anomaly.toString());
+    return solution;
   }
 
   @CrossOrigin
