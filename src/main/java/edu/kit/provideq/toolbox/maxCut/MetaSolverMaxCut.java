@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.maxCut;
 
+import edu.kit.provideq.toolbox.maxCut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxCut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.maxCut.solvers.QiskitMaxCutSolver;
@@ -18,8 +19,10 @@ import java.util.Random;
 public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {
 
   @Autowired
-  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver, GamsMaxCutSolver gamsMaxCutSolver) {
-    super(qiskitMaxCutSolver, gamsMaxCutSolver);
+  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver,
+                          GamsMaxCutSolver gamsMaxCutSolver,
+                          CirqMaxCutSolver cirqMaxCutSolver) {
+    super(qiskitMaxCutSolver, gamsMaxCutSolver, cirqMaxCutSolver);
   }
 
   @Override
