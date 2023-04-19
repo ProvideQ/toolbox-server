@@ -58,12 +58,8 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         switch (problem.problemData().anomaly()) {
             case VOID -> checkVoidFeatureModel(solution, cnf, satSolve);
             case DEAD -> checkDeadFeatures(solution, cnf, satSolve);
-            case FALSE_OPTIONAL -> {
-
-            }
-            case REDUNDANT_CONSTRAINTS -> {
-
-            }
+            case FALSE_OPTIONAL -> solution.setSolutionData("Not implemented yet");
+            case REDUNDANT_CONSTRAINTS -> solution.setSolutionData("Not implemented yet");
         }
     }
 
