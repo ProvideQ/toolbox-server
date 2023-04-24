@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
@@ -49,6 +50,12 @@ public class SatController extends ProblemController<String, DimacsCNFSolution, 
   @GetMapping("/sub-routines/sat")
   public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
     return super.getSubRoutines(solverId);
+  }
+
+  @CrossOrigin
+  @GetMapping("/meta-solver/settings/sat")
+  public List<MetaSolverSetting> getMetaSolverSettings() {
+    return metaSolver.getSettings();
   }
 
   @CrossOrigin
