@@ -1,5 +1,7 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
 import java.util.*;
 
 /**
@@ -67,6 +69,10 @@ public abstract class MetaSolver<T extends ProblemSolver> {
    */
   public Set<T> getAllSolvers() {
     return new HashSet<>(solvers);
+  }
+
+  public List<MetaSolverSetting> getSettings() {
+    return List.of();
   }
 
   @Override
