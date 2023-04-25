@@ -1,10 +1,10 @@
 # adapted from https://github.com/dokku/github-action/blob/db5e3b84461e5e73c56d8b0f6a67aab0df25256c/example-workflows/simple.yml
-name: 'deploy-main'
+name: 'deploy-develop'
 
 on:
   push:
     branches:
-    - main
+    - develop
 
 jobs:
   deploy:
@@ -18,7 +18,7 @@ jobs:
       - name: Push to dokku
         uses: dokku/github-action@master
         with:
-          branch: main
+          branch: develop
           # only extracting the server address to a secret avoids leaking it in the logs
-          git_remote_url: ssh://dokku@${{ secrets.DOKKU_SERVER_ADDRESS }}/toolbox-backend
+          git_remote_url: ssh://dokku@${{ secrets.DOKKU_SERVER_ADDRESS }}/toolbox-backend-staging
           ssh_private_key: ${{ secrets.DOKKU_DEPLOYMENT_KEY }}
