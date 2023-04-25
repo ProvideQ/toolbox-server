@@ -7,6 +7,12 @@ A web-based user interface can be found in our
 1. Install Java 17 (check with `java -version`)
 2. Clone this repository
 3. Run the server using `./gradlew bootRun`
+4. To be able to run all solvers, you'll have to install required packages:
+   ```shell
+   pip install -r ./gams/requirements.txt
+   pip install -r ./qiskit/requirements.txt
+   pip install -r ./cirq/requirements.txt
+   ```
 
 ## Deployment
 This repository is designed to be deployed with [Dokku](https://dokku.com/) but you can also run 
