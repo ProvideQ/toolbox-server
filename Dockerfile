@@ -82,6 +82,8 @@ COPY gams gams
 RUN pip install -r ./gams/requirements.txt
 COPY qiskit qiskit
 RUN pip install -r ./qiskit/requirements.txt
+COPY cirq cirq
+RUN pip install -r ./cirq/requirements.txt
 COPY --from=builder /app/build/libs/toolbox-server-0.0.1-SNAPSHOT.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port
