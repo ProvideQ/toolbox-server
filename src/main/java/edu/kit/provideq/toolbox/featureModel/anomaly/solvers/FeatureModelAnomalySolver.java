@@ -34,7 +34,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
     @Override
     public boolean canSolve(Problem<FeatureModelAnomalyProblem> problem) {
         //TODO: assess problemData
-        return problem.type() == ProblemType.MAX_CUT;
+        return problem.type() == ProblemType.FEATURE_MODEL_ANOMALY;
     }
 
     @Override
