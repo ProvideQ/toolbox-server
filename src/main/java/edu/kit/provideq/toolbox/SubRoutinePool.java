@@ -20,7 +20,7 @@ public class SubRoutinePool {
     }
 
     public SubRoutinePool(Map<ProblemType, Function<Object, Solution>> subRoutineCalls) {
-        this.subRoutineCalls = subRoutineCalls;
+        this.subRoutineCalls = Map.copyOf(subRoutineCalls);
     }
 
     /**
