@@ -23,7 +23,7 @@ public class MetaSolverSettingDeserializer extends JsonDeserializer<MetaSolverSe
         // Create subclass based on the type
         switch (type) {
             case CHECKBOX -> {
-                return new Checkbox(
+                return new BooleanState(
                         node.get("name").asText(),
                         node.get("state").asBoolean());
             }
