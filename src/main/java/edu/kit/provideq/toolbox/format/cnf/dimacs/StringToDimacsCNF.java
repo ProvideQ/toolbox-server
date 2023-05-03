@@ -1,17 +1,24 @@
 package edu.kit.provideq.toolbox.format.cnf.dimacs;
 
+import edu.kit.provideq.toolbox.exception.ConversionException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class StringToDimacsCNF {
-    public static DimacsCNF parse(String dimacsCNFString) {
+    public static DimacsCNF parse(String dimacsCNFString) throws ConversionException {
         var variableMap = new HashMap<Integer, String>();
         var clauses = new ArrayList<ArrayList<Variable>>();
+
+        var variableCount = new AtomicInteger(-1);
+        var clauseCount = new AtomicInteger(-1);
 
         dimacsCNFString
                 .lines()
                 .map(line -> line.split(String.valueOf(DimacsCNF.SEPARATOR)))
+                .toList()
                 .forEach(lineSegment -> {
                     switch (lineSegment[0].charAt(0)) {
                         case DimacsCNF.COMMENT_START -> {
@@ -24,6 +31,12 @@ class StringToDimacsCNF {
                         }
                         case DimacsCNF.PREAMBLE_START -> {
                             // Parse preamble
+                            if (!DimacsCNF.CNF_IDENTIFIER.equals(lineSegment[1])) {
+                                throw new RuntimeException("Excepted Dimacs CNF identifier %s in header, but found %s".formatted(DimacsCNF.CNF_IDENTIFIER, lineSegment[1]));
+                            }
+
+                            variableCount.set(Integer.parseInt(lineSegment[2]));
+                            clauseCount.set(Integer.parseInt(lineSegment[3]));
                         }
                         default -> {
                             // Parse clause
@@ -39,6 +52,14 @@ class StringToDimacsCNF {
                         }
                     }
                 });
+
+        if (variableCount.get() != variableMap.size()) {
+            throw new ConversionException("Count of variables in the header is %d, but the actual count is %d".formatted(variableCount.get(), variableMap.size()));
+        }
+
+        if (clauseCount.get() != clauses.size()) {
+            throw new ConversionException("Count of clauses in the header is %d, but the actual count is %d".formatted(clauseCount.get(), clauses.size()));
+        }
 
         return new DimacsCNF(clauses);
     }

@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.format.cnf.dimacs;
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.parsers.ExprParser;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
+import edu.kit.provideq.toolbox.exception.ConversionException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +48,7 @@ public class DimacsCNF {
      * @param string logical expression or dimacs cnf string
      * @return dimacs cnf structure
      */
-    public static DimacsCNF fromString(String string) {
+    public static DimacsCNF fromString(String string) throws ConversionException {
         var x = String.valueOf(DimacsCNF.PREAMBLE_START) + DimacsCNF.SEPARATOR + DimacsCNF.CNF_IDENTIFIER;
 
         return string.contains(x)
@@ -60,7 +61,7 @@ public class DimacsCNF {
      * @param dimacsCNF dimacs cnf string
      * @return dimacs cnf structure
      */
-    public static DimacsCNF fromDimacsCNFString(String dimacsCNF) {
+    public static DimacsCNF fromDimacsCNFString(String dimacsCNF) throws ConversionException {
         return StringToDimacsCNF.parse(dimacsCNF);
     }
 

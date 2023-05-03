@@ -65,7 +65,13 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
 
     private static void checkDeadFeatures(Solution<String> solution, String cnf, Function<String, Solution<DimacsCNFSolution>> satSolve) {
         // Check if there are any Dead Features
-        DimacsCNF dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
+        DimacsCNF dimacsCNF;
+        try {
+            dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
+        } catch (ConversionException e) {
+            solution.setDebugData("Conversion error: " + e.getMessage());
+            return;
+        }
 
         var builder = new StringBuilder();
         var errorBuilder = new StringBuilder();

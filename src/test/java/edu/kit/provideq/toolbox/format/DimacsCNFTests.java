@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.format;
 
+import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DimacsCNFTests {
     @ParameterizedTest
     @MethodSource("testToStringParameters")
-    public void testToString(String expression, String result) {
+    public void testToString(String expression, String result) throws ConversionException {
         result = result.replace("\n", System.lineSeparator());
 
         var dimacsCNF = DimacsCNF.fromString(expression);

@@ -4,6 +4,7 @@ import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
+import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -56,7 +57,7 @@ public class GamsSATSolver extends SATSolver {
         try {
             dimacsCNF = DimacsCNF.fromString(problem.problemData());
             solution.setDebugData("Using cnf input: " + dimacsCNF);
-        } catch (RuntimeException e) {
+        } catch (ConversionException | RuntimeException e) {
             solution.setDebugData("Parsing error: " + e.getMessage());
             return;
         }
