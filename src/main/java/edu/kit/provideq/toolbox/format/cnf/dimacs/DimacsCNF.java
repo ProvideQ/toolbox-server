@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class DimacsCNF {
-    final static String LINE_SEPARATOR = System.getProperty("line.separator");
+    final static String LINE_SEPARATOR = System.lineSeparator();
     final static char SEPARATOR = ' ';
     final static char NEGATION_PREFIX = '-';
     final static char COMMENT_START = 'c';
