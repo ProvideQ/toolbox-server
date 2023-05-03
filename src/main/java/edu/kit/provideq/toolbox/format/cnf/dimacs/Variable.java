@@ -2,25 +2,11 @@ package edu.kit.provideq.toolbox.format.cnf.dimacs;
 
 import java.util.Objects;
 
-public class Variable {
-    private final int number;
-    private final String name;
-
-    Variable(int number, String name) {
-        this.number = number;
-        this.name = name;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public String getName() {
-        return name;
-    }
-
+public record Variable(int number, String name, boolean isNegated) {
     @Override
     public String toString() {
+        if (isNegated) return DimacsCNF.NEGATION_PREFIX + String.valueOf(number);
+
         return String.valueOf(number);
     }
 

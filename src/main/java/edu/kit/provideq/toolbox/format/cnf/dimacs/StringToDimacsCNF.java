@@ -30,9 +30,8 @@ class StringToDimacsCNF {
                                 var number = Math.abs(Integer.parseInt(lineSegment[i]));
                                 var name = variableMap.get(number);
 
-                                clause.add(lineSegment[i].charAt(0) == DimacsCNF.NEGATION_PREFIX
-                                        ? new NegatedVariable(number, name)
-                                        : new Variable(number, name));
+                                var isNegated = lineSegment[i].charAt(0) == DimacsCNF.NEGATION_PREFIX;
+                                clause.add(new Variable(number, name, isNegated));
                             }
                             clauses.add(clause);
                         }

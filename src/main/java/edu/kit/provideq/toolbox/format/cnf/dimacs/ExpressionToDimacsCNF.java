@@ -60,7 +60,7 @@ class ExpressionToDimacsCNF {
     Variable getNegatedVariable(String name) {
         Variable var = parsedVariables.get(name);
         if (var == null) {
-            var = new NegatedVariable(Math.abs(nextVariable), name);
+            var = new Variable(Math.abs(nextVariable), name, true);
             nextVariable++;
 
             parsedVariables.put(name, var);
@@ -72,7 +72,7 @@ class ExpressionToDimacsCNF {
     Variable getVariable(String name) {
         Variable var = parsedVariables.get(name);
         if (var == null) {
-            var = new Variable(nextVariable, name);
+            var = new Variable(nextVariable, name, false);
             nextVariable++;
 
             parsedVariables.put(name, var);

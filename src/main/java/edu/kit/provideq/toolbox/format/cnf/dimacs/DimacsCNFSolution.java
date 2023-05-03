@@ -24,10 +24,10 @@ public class DimacsCNFSolution {
         Map<Variable, Boolean> namedVariableMap = dimacsCNF
                 .getVariables()
                 .stream()
-                .filter(v -> variableMap.containsKey(v.getNumber()))
+                .filter(v -> variableMap.containsKey(v.number()))
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        variable -> variableMap.get(variable.getNumber())
+                        variable -> variableMap.get(variable.number())
                 ));
 
         return new DimacsCNFSolution(dimacsCNF, namedVariableMap);
@@ -68,7 +68,7 @@ public class DimacsCNFSolution {
         // Add variable declarations
         for (Map.Entry<Variable, Boolean> variableBooleanEntry : variableMap.entrySet()) {
 
-            var number = variableBooleanEntry.getKey().getNumber();
+            var number = variableBooleanEntry.getKey().number();
             var variable = variableBooleanEntry.getValue()
                     ? number
                     : NEGATION_PREFIX + number;
@@ -86,7 +86,7 @@ public class DimacsCNFSolution {
         var builder = new StringBuilder();
 
         for (Map.Entry<Variable, Boolean> variableBooleanEntry : variableMap.entrySet()) {
-            builder.append(variableBooleanEntry.getKey().getName())
+            builder.append(variableBooleanEntry.getKey().name())
                     .append(": ")
                     .append(variableBooleanEntry.getValue())
                     .append(LINE_SEPARATOR);

@@ -141,9 +141,9 @@ public class DimacsCNF {
         for (Variable variable : variables) {
             builder.append(COMMENT_START)
                     .append(SEPARATOR)
-                    .append(variable.getNumber())
+                    .append(variable.number())
                     .append(SEPARATOR)
-                    .append(variable.getName())
+                    .append(variable.name())
                     .append(LINE_SEPARATOR);
         }
     }

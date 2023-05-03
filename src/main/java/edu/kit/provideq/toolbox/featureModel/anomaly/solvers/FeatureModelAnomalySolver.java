@@ -81,7 +81,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
                 var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, variableSolution.getSolutionData().toString());
 
                 if (dimacsCNFSolution.isVoid()) {
-                    builder.append(variable.getName())
+                    builder.append(variable.name())
                             .append(System.lineSeparator());
                 }
             } else {
