@@ -15,7 +15,6 @@ import java.util.function.Function;
 public class SubRoutinePool {
     private final Map<ProblemType, SolveRequest> subRoutineCalls;
 
-    @Autowired
     private ProblemControllerProvider problemControllerProvider;
 
     public SubRoutinePool() {
@@ -28,6 +27,11 @@ public class SubRoutinePool {
      */
     public SubRoutinePool(Map<ProblemType, SolveRequest> requestedSubRoutines) {
         this.subRoutineCalls = Map.copyOf(requestedSubRoutines);
+    }
+
+    @Autowired
+    public void setProblemControllerProvider(ProblemControllerProvider problemControllerProvider) {
+        this.problemControllerProvider = problemControllerProvider;
     }
 
     /**

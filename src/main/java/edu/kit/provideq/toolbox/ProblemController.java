@@ -24,12 +24,16 @@ import java.util.stream.Collectors;
 @Component
 @RestController
 public abstract class ProblemController<ProblemFormatType, SolutionFormatType, SolverType extends ProblemSolver<ProblemFormatType, SolutionFormatType>> {
-    @Autowired
     private ApplicationContext context;
 
     public abstract ProblemType getProblemType();
 
     public abstract MetaSolver<SolverType> getMetaSolver();
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext context) {
+        this.context = context;
+    }
 
     public Solution<SolutionFormatType> solve(SolveRequest<ProblemFormatType> request) {
         Solution<SolutionFormatType> solution = SolutionManager.createSolution();
