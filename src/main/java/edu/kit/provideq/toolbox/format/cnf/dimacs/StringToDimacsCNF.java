@@ -15,6 +15,8 @@ class StringToDimacsCNF {
                 .forEach(lineSegment -> {
                     switch (lineSegment[0].charAt(0)) {
                         case DimacsCNF.COMMENT_START -> {
+                            if (lineSegment.length < 3) break;
+
                             // Parse comment
                             Integer number = Integer.parseInt(lineSegment[1]);
                             String name = String.join(" ", Arrays.copyOfRange(lineSegment, 2, lineSegment.length));
