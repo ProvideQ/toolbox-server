@@ -91,11 +91,11 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
 
                 if (dimacsCNFSolution.isVoid()) {
                     builder.append(variable.name())
-                            .append(System.lineSeparator());
+                            .append("\n");
                 }
             } else {
                 errorBuilder.append(variableSolution.getDebugData())
-                        .append(System.lineSeparator());
+                        .append("\n");
             }
         }
 
