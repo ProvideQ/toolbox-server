@@ -40,12 +40,6 @@ public class UvlToDimacsCNF {
         FeatureModelFormula featureModelFormula = new FeatureModelFormula(fm);
         var cnf = featureModelFormula.getCNF();
 
-//        TseitinConverter tseitinConverter = new TseitinConverter();
-//        var nodes = new ArrayList<Node>();
-//        nodes.add(featureModelFormula.getCNFNode());
-//        var convertedFM = tseitinConverter.convert(fm, nodes, false);
-//        System.out.println(new DIMACSFormatCNF().write(new FeatureModelFormula(convertedFM).getCNF()));
-
         return new DIMACSFormatCNF().write(cnf);
     }
 }
