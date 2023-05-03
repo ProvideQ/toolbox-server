@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -26,10 +24,6 @@ import java.util.stream.Collectors;
 @Component
 @RestController
 public abstract class ProblemController<ProblemFormatType, SolutionFormatType, SolverType extends ProblemSolver<ProblemFormatType, SolutionFormatType>> {
-    @Lazy
-    @Autowired
-    private ProblemControllerProvider problemControllerProvider;
-
     @Autowired
     private ApplicationContext context;
 
@@ -50,18 +44,7 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
         SubRoutinePool subRoutinePool =
                 request.requestedSubSolveRequests == null
                         ? context.getBean(SubRoutinePool.class)
-                        : context.getBean(SubRoutinePool.class,
-                        request.requestedSubSolveRequests
-                                .entrySet()
-                                .stream()
-                                .collect(Collectors.toMap(
-                                        Map.Entry::getKey,
-                                        e -> (Function<Object, Solution>) (content -> {
-                                            ProblemController problemController = problemControllerProvider.getProblemController(e.getKey());
-                                            SolveRequest solveRequest = e.getValue();
-                                            solveRequest.requestContent = content;
-                                            return (Solution) problemController.solve(solveRequest);
-                                        }))));
+                        : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
 
         long start = System.currentTimeMillis();
         solver.solve(problem, solution, subRoutinePool);

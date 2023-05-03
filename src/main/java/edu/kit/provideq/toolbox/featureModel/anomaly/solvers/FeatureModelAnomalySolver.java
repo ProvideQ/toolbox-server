@@ -54,7 +54,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
             return;
         }
 
-        Function<Object, Solution> satSolve = subRoutinePool.getSubRoutine(ProblemType.SAT);
+        var satSolve = subRoutinePool.<String, DimacsCNFSolution>getSubRoutine(ProblemType.SAT);
         switch (problem.problemData().anomaly()) {
             case VOID -> checkVoidFeatureModel(solution, cnf, satSolve);
             case DEAD -> checkDeadFeatures(solution, cnf, satSolve);
@@ -63,7 +63,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         }
     }
 
-    private static void checkDeadFeatures(Solution<String> solution, String cnf, Function<Object, Solution> satSolve) {
+    private static void checkDeadFeatures(Solution<String> solution, String cnf, Function<String, Solution<DimacsCNFSolution>> satSolve) {
         // Check if there are any Dead Features
         DimacsCNF dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
 
@@ -104,16 +104,15 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         solution.setSolutionData(builder.toString());
     }
 
-    private static void checkVoidFeatureModel(Solution<String> solution, String cnf, Function<Object, Solution> satSolve) {
+    private static void checkVoidFeatureModel(Solution<String> solution, String cnf, Function<String, Solution<DimacsCNFSolution>> satSolve) {
         // Check if the FM is a Void Feature Model
         var voidSolution = satSolve.apply(cnf);
-        DimacsCNF dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
 
         solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
         if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
-            var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, voidSolution.getSolutionData().toString());
+            var dimacsCNFSolution = voidSolution.getSolutionData();
 
-            solution.setSolutionData(dimacsCNFSolution.isVoid()
+            solution.setSolutionData(voidSolution.getSolutionData().isVoid()
                     ? "The feature model is a void feature model. The configuration is never valid."
                     : "The feature model has valid configurations, for example: \n" + dimacsCNFSolution.toHumanReadableString());
         } else {

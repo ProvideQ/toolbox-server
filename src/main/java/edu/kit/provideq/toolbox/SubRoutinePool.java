@@ -2,6 +2,8 @@ package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -10,7 +12,7 @@ import java.util.function.Function;
 
 @Component
 public class SubRoutinePool {
-    private final Map<ProblemType, Function<Object, Solution>> subRoutineCalls;
+    private final Map<ProblemType, SolveRequest> subRoutineCalls;
 
     @Autowired
     private ProblemControllerProvider problemControllerProvider;
@@ -19,8 +21,12 @@ public class SubRoutinePool {
         subRoutineCalls = Collections.emptyMap();
     }
 
-    public SubRoutinePool(Map<ProblemType, Function<Object, Solution>> subRoutineCalls) {
-        this.subRoutineCalls = Map.copyOf(subRoutineCalls);
+    /**
+     * Use this to explicitly define which solver to use for a problem type
+     * @param requestedSubRoutines problem types mapped to a solve requests
+     */
+    public SubRoutinePool(Map<ProblemType, SolveRequest> requestedSubRoutines) {
+        this.subRoutineCalls = Map.copyOf(requestedSubRoutines);
     }
 
     /**
@@ -29,16 +35,15 @@ public class SubRoutinePool {
      * @param problemType problem type to solve
      * @return function to solve a problem of type problemType
      */
-    public Function<Object, Solution> getSubRoutine(ProblemType problemType) {
-        var subRoutine = subRoutineCalls.get(problemType);
-        if (subRoutine != null) return subRoutine;
-
+    public <ProblemFormatType, SolutionDataType> Function<ProblemFormatType, Solution<SolutionDataType>> getSubRoutine(ProblemType problemType) {
         return content -> {
-            var solveRequest = new SolveRequest();
-            solveRequest.requestContent = content;
+            SolveRequest<ProblemFormatType> subRoutine = subRoutineCalls.get(problemType);
+            if (subRoutine == null) subRoutine = new SolveRequest<>();
+
+            var newSolveRequest = subRoutine.replaceContent(content);
 
             var problemController = problemControllerProvider.getProblemController(problemType);
-            return (Solution) problemController.solve(solveRequest);
+            return problemController.solve(newSolveRequest);
         };
     }
 }
