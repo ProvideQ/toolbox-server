@@ -28,7 +28,7 @@ public class MetaSolverSettingDeserializer extends JsonDeserializer<MetaSolverSe
                         node.get("state").asBoolean());
             }
             case RANGE -> {
-                return new Range(
+                return new BoundedInteger(
                         node.get("name").asText(),
                         node.get("min").asDouble(),
                         node.get("max").asDouble(),
