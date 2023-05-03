@@ -4,37 +4,23 @@ public enum FeatureModelAnomaly {
     /**
      * Occurs when no configuration of the feature model is ever valid
      */
-    VOID {
-        @Override
-        public String toString() {
-            return "Void Feature Model";
-        }
-    },
+    VOID("Void Feature Model"),
     /**
      * Occurs when a feature is never true in any configuration
      */
-    DEAD {
-        @Override
-        public String toString() {
-            return "Dead Features";
-        }
-    },
+    DEAD("Dead Features"),
     /**
      * Occurs when a feature is flagged as optional, but in reality is mandatory and exists in all configurations
      */
-    FALSE_OPTIONAL {
-        @Override
-        public String toString() {
-            return "False-optional Features";
-        }
-    },
+    FALSE_OPTIONAL("False-optional Features"),
     /**
      * Constraints that don't have an impact on the valid configurations
      */
-    REDUNDANT_CONSTRAINTS {
-        @Override
-        public String toString() {
-            return "Redundant Constraints";
-        }
+    REDUNDANT_CONSTRAINTS("Redundant Constraints");
+
+    public final String name;
+
+    FeatureModelAnomaly(String name) {
+        this.name = name;
     }
 }

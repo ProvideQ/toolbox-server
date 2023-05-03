@@ -27,4 +27,9 @@ public class MetaSolverSAT extends MetaSolver<SATSolver> {
     // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
+
+  @Override
+  public List<MetaSolverSetting> getSettings() {
+    return List.of(new Select<String>("Options:", List.of("asdfsd","ddfasdf","ZZZZZZZ","XXXXXX","SDFSDF","asdfsdXXX"), "ZZZZZZZ"), new Checkbox("SeLECT ME", true), new Checkbox("DONT SeLECT ME", false));
+  }
 }

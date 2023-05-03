@@ -60,7 +60,7 @@ public class FeatureModelAnomalyController extends ProblemController<FeatureMode
 
   private SolutionHandle solveAnomaly(SolveFeatureModelRequest request, FeatureModelAnomaly anomaly) {
     var solution = (Solution) super.solve(request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
-    solution.setSolverName(solution.getSolverName()  + ": " + anomaly.toString());
+    solution.setSolverName(solution.getSolverName()  + ": " + anomaly.name);
     return solution;
   }
 
