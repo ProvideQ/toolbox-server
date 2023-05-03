@@ -105,6 +105,8 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         if (!errorBuilder.isEmpty()) {
             builder.append("Following errors occurred:\n")
                     .append(errorBuilder);
+
+            solution.abort();
         }
 
         solution.setSolutionData(builder.toString());
@@ -123,6 +125,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
                     : "The feature model has valid configurations, for example: \n" + dimacsCNFSolution.toHumanReadableString());
         } else {
             solution.setSolutionData(voidSolution.getDebugData());
+            solution.abort();
         }
     }
 }
