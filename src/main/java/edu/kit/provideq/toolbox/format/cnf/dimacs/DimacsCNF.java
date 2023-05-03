@@ -83,6 +83,11 @@ public class DimacsCNF {
         return new DimacsCNF(cnfExpression);
     }
 
+    /**
+     * Returns a list of variables.
+     * The negation state of the variables doesn't have any meaning.
+     * @return list of variables
+     */
     public Collection<Variable> getVariables() {
         return Collections.unmodifiableCollection(variables);
     }
