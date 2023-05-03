@@ -61,8 +61,7 @@ public class DimacsCNF {
      * @return dimacs cnf structure
      */
     public static DimacsCNF fromDimacsCNFString(String dimacsCNF) {
-        var parser = new StringToDimacsCNF();
-        return parser.parse(dimacsCNF);
+        return StringToDimacsCNF.parse(dimacsCNF);
     }
 
     /**

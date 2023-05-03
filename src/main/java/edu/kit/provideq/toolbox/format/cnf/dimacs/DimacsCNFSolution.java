@@ -19,8 +19,7 @@ public class DimacsCNFSolution {
     }
 
     public static DimacsCNFSolution fromString(DimacsCNF dimacsCNF, String solutionString) {
-        var parser = new StringToDimacsCNFSolution();
-        Map<Integer, Boolean> variableMap = parser.parse(solutionString);
+        Map<Integer, Boolean> variableMap = StringToDimacsCNFSolution.parse(solutionString);
 
         Map<Variable, Boolean> namedVariableMap = dimacsCNF
                 .getVariables()

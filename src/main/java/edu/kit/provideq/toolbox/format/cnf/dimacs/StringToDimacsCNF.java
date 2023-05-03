@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 class StringToDimacsCNF {
-    public DimacsCNF parse(String dimacsCNFString) {
+    public static DimacsCNF parse(String dimacsCNFString) {
         var variableMap = new HashMap<Integer, String>();
         var clauses = new ArrayList<ArrayList<Variable>>();
 

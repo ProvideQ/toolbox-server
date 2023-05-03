@@ -3,8 +3,8 @@ package edu.kit.provideq.toolbox.format.cnf.dimacs;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StringToDimacsCNFSolution {
-    public Map<Integer, Boolean> parse(String solutionString) {
+class StringToDimacsCNFSolution {
+    public static Map<Integer, Boolean> parse(String solutionString) {
         var variableMap = new HashMap<Integer, Boolean>();
 
         solutionString
