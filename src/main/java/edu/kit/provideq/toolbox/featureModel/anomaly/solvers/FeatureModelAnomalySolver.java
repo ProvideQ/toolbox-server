@@ -77,6 +77,9 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         var errorBuilder = new StringBuilder();
 
         for (Variable variable : dimacsCNF.getVariables()) {
+            // Use formula: ¬SAT (FM ∧ f) to check for a dead feature
+            // So add variable to the cnf of the feature model and check if there is a solution
+            // If there is a solution, the feature is not dead
             var orClause = new ArrayList<Variable>();
             orClause.add(variable);
             var variableCNF = dimacsCNF.addOrClause(orClause);
@@ -113,11 +116,12 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
     }
 
     private static void checkVoidFeatureModel(Solution<String> solution, String cnf, Function<String, Solution<DimacsCNFSolution>> satSolve) {
-        // Check if the FM is a Void Feature Model
+        // Check if the feature model is not a void feature model
         var voidSolution = satSolve.apply(cnf);
 
         solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
         if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
+            // If there is a valid configuration, the feature model is not a void feature model
             var dimacsCNFSolution = voidSolution.getSolutionData();
 
             solution.setSolutionData(voidSolution.getSolutionData().isVoid()
