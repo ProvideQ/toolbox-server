@@ -15,7 +15,7 @@ public class DimacsCNFSolution {
 
     public DimacsCNFSolution(DimacsCNF dimacsCNF, Map<Variable, Boolean> variableMap) {
         this.dimacsCNF = dimacsCNF;
-        this.variableMap = variableMap;
+        this.variableMap = Map.copyOf(variableMap);
     }
 
     public static DimacsCNFSolution fromString(DimacsCNF dimacsCNF, String solutionString) {

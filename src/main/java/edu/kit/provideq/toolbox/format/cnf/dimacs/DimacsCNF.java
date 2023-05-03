@@ -39,8 +39,8 @@ public class DimacsCNF {
     }
 
     public DimacsCNF(ArrayList<ArrayList<Variable>> orClauses, List<Variable> variables) {
-        this.variables = variables;
-        this.orClauses = orClauses;
+        this.variables = List.copyOf(variables);
+        this.orClauses = new ArrayList<>(orClauses);
     }
 
     /**
