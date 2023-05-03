@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SubRoutinePool {
     private final Map<ProblemType, SolveRequest> subRoutineCalls;
 
