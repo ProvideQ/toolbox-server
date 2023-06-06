@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.format.cnf.dimacs;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -11,6 +12,10 @@ public class DimacsCNFSolution {
     public final static char VARIABLE_DECLARATION = 'v';
 
     private final DimacsCNF dimacsCNF;
+
+    /**
+     * Unmodifiable mapping from a variable to its boolean state.
+     */
     private final Map<Variable, Boolean> variableMap;
 
     public DimacsCNFSolution(DimacsCNF dimacsCNF, Map<Variable, Boolean> variableMap) {
@@ -34,9 +39,9 @@ public class DimacsCNFSolution {
     }
 
     /**
-     * Return a mapping from a variable to its boolean state.
+     * Return an unmodifiable mapping from a variable to its boolean state.
      *
-     * @return map from a variable to the boolean state of the variable
+     * @return unmodifiable map from a variable to the boolean state of the variable
      */
     public Map<Variable, Boolean> getVariableMapping() {
         return variableMap;
