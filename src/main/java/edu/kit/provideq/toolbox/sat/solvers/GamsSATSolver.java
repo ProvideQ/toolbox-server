@@ -1,13 +1,14 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
-import edu.kit.provideq.toolbox.ProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.Solution;
-
+import edu.kit.provideq.toolbox.SubRoutinePool;
+import edu.kit.provideq.toolbox.exception.ConversionException;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.sat.convert.BoolExprToDimacsCNF;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -51,12 +52,12 @@ public class GamsSATSolver extends SATSolver {
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution) {
-        String dimacsCNF;
+    public void solve(Problem<String> problem, Solution<DimacsCNFSolution> solution, SubRoutinePool subRoutinePool) {
+        DimacsCNF dimacsCNF;
         try {
-            dimacsCNF = BoolExprToDimacsCNF.convert(problem.problemData());
+            dimacsCNF = DimacsCNF.fromString(problem.problemData());
             solution.setDebugData("Using cnf input: " + dimacsCNF);
-        } catch (RuntimeException e) {
+        } catch (ConversionException | RuntimeException e) {
             solution.setDebugData("Parsing error: " + e.getMessage());
             return;
         }
@@ -71,7 +72,7 @@ public class GamsSATSolver extends SATSolver {
             problemFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.cnf");
             solutionFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.sol");
 
-            Files.writeString(problemFile, dimacsCNF);
+            Files.writeString(problemFile, dimacsCNF.toString());
         } catch (IOException e) {
             solution.setDebugData("Creation of problem file caught exception: " + e.getMessage());
             solution.abort();
@@ -86,8 +87,11 @@ public class GamsSATSolver extends SATSolver {
             ).run();
 
             if (processResult.success()) {
+                var solutionText = Files.readString(solutionFile);
+                var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, solutionText);
+
                 solution.complete();
-                solution.setSolutionData(Files.readString(solutionFile));
+                solution.setSolutionData(dimacsCNFSolution);
                 return;
             }
 

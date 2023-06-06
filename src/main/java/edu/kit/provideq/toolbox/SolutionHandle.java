@@ -9,4 +9,6 @@ public interface SolutionHandle {
     SolutionStatus getStatus();
 
     void setStatus(SolutionStatus newStatus);
+
+    SolutionHandle toStringSolution();
 }

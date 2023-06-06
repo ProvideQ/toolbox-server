@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.maxCut.solvers;
 import edu.kit.provideq.toolbox.ProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
 
   @Autowired
   public QiskitMaxCutSolver(
-          @Value("${qiskit.directory.maxCut}") String maxCutPath,
+          @Value("${qiskit.directory.max-cut}") String maxCutPath,
           ResourceProvider resourceProvider) throws IOException {
     this.resourceProvider = resourceProvider;
 
@@ -48,7 +49,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution) {
+  public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
     Path problemFile;
     Path solutionFile;
 

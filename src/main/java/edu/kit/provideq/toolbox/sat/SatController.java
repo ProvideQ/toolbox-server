@@ -3,16 +3,19 @@ package edu.kit.provideq.toolbox.sat;
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class SatController extends ProblemController<String, String, SATSolver> {
+public class SatController extends ProblemController<String, DimacsCNFSolution, SATSolver> {
 
   private final MetaSolver<SATSolver> metaSolver;
 
@@ -33,13 +36,19 @@ public class SatController extends ProblemController<String, String, SATSolver> 
   @CrossOrigin
   @PostMapping("/solve/sat")
   public SolutionHandle solveSat(@RequestBody @Valid SolveSatRequest request) {
-    return super.solve(request);
+    return super.solve(request).toStringSolution(DimacsCNFSolution::toHumanReadableString);
   }
 
   @CrossOrigin
   @GetMapping("/solve/sat")
-  public SolutionHandle getSolution(@RequestParam(name = "id", required = true) long id) {
-    return super.getSolution(id);
+  public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
+    return super.findSolution(id).toStringSolution(DimacsCNFSolution::toHumanReadableString);
+  }
+
+  @CrossOrigin
+  @GetMapping("/sub-routines/sat")
+  public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
+    return super.getSubRoutines(solverId);
   }
 
   @CrossOrigin

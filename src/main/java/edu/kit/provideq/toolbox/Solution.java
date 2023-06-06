@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * A solution holds all information concerning a specific
@@ -33,6 +34,22 @@ public class Solution<S> implements SolutionHandle {
   @Override
   public void setStatus(SolutionStatus newStatus) {
     this.status = newStatus;
+  }
+
+  @Override
+  public SolutionHandle toStringSolution() {
+    return toStringSolution(Object::toString);
+  }
+
+  public SolutionHandle toStringSolution(Function<S, String> stringSelector) {
+    var stringSolution = new Solution<String>(getId());
+    stringSolution.status = status;
+    stringSolution.metaData = metaData;
+    stringSolution.solutionData = stringSelector.apply(solutionData);
+    stringSolution.debugData = debugData;
+    stringSolution.solverName = solverName;
+    stringSolution.executionMilliseconds = executionMilliseconds;
+    return stringSolution;
   }
 
   /**
