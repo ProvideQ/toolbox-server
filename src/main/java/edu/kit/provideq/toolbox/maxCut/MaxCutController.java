@@ -5,7 +5,7 @@ import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
