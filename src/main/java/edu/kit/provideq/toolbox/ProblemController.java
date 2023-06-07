@@ -41,7 +41,7 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
 
         SolverType solver = getMetaSolver()
                 .getSolver(request.requestedSolverId)
-                .orElseGet(() -> getMetaSolver().findSolver(problem));
+                .orElseGet(() -> getMetaSolver().findSolver(problem, request.requestedMetaSolverSettings));
 
         solution.setSolverName(solver.getName());
 

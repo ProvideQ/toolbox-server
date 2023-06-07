@@ -9,6 +9,7 @@ import edu.kit.provideq.toolbox.featureModel.anomaly.solvers.*;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -74,6 +75,12 @@ public class FeatureModelAnomalyController extends ProblemController<FeatureMode
   @GetMapping("/sub-routines/feature-model/anomaly")
   public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
     return super.getSubRoutines(solverId);
+  }
+
+  @CrossOrigin
+  @GetMapping("/meta-solver/settings/feature-model/anomaly")
+  public List<MetaSolverSetting> getMetaSolverSettings() {
+    return metaSolver.getSettings();
   }
 
   @CrossOrigin
