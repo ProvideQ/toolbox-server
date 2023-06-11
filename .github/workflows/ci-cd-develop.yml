@@ -1,0 +1,36 @@
+name: 'CI/CD'
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo (shallow)
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Run unit tests
+        run: ./gradlew build
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/develop' }}
+    steps:
+      - name: Clone repo (shallow)
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          branch: develop
+          # only extracting the server address to a secret avoids leaking it in the logs
+          git_remote_url: ssh://dokku@${{ secrets.DOKKU_SERVER_ADDRESS }}/toolbox-backend-staging
+          ssh_private_key: ${{ secrets.DOKKU_DEPLOYMENT_KEY }}
