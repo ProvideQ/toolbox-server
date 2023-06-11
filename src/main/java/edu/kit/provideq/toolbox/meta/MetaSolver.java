@@ -1,5 +1,7 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.meta.setting.*;
+
 import java.util.*;
 
 /**
@@ -8,7 +10,7 @@ import java.util.*;
  *
  * @param <T> the type of {@link ProblemSolver} this metasolver is to manage
  */
-public class MetaSolver<T extends ProblemSolver> {
+public abstract class MetaSolver<T extends ProblemSolver> {
 
   protected Set<T> solvers = new HashSet<>();
 
@@ -46,7 +48,7 @@ public class MetaSolver<T extends ProblemSolver> {
    * @param problem the problem the meta solver is to check its solvers by
    * @return the best suited solver, null in case no suitable solver was found
    */
-  public T findSolver(Problem problem) {
+  public T findSolver(Problem problem, List<MetaSolverSetting> metaSolverSettings) {
     Optional<T> solver = solvers.stream()
         .filter(s -> s.canSolve(problem))
         .max(Comparator.comparing(s -> s.getSuitability(problem)));
@@ -67,6 +69,10 @@ public class MetaSolver<T extends ProblemSolver> {
    */
   public Set<T> getAllSolvers() {
     return new HashSet<>(solvers);
+  }
+
+  public List<MetaSolverSetting> getSettings() {
+    return List.of();
   }
 
   @Override

@@ -12,6 +12,7 @@ RUN ./gradlew dependencies
 
 # Then, build the application
 COPY src src
+COPY lib lib
 COPY settings.gradle settings.gradle
 COPY system.properties system.properties
 

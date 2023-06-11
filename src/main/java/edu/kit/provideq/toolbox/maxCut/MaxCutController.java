@@ -5,10 +5,13 @@ import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,18 +34,31 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
   }
 
   @CrossOrigin
-  @PostMapping("/solve/maxCut")
+  @PostMapping("/solve/max-cut")
   public SolutionHandle solveMaxCut(@RequestBody @Valid SolveMaxCutRequest request) {
     return super.solve(request);
   }
 
-  @GetMapping("/solve/maxCut")
-  public SolutionHandle getSolution(@RequestParam(name = "id", required = true) long id) {
-    return super.getSolution(id);
+  @CrossOrigin
+  @GetMapping("/solve/max-cut")
+  public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
+    return super.findSolution(id);
   }
 
   @CrossOrigin
-  @GetMapping("/solvers/maxCut")
+  @GetMapping("/sub-routines/max-cut")
+  public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
+    return super.getSubRoutines(solverId);
+  }
+
+  @CrossOrigin
+  @GetMapping("/meta-solver/settings/max-cut")
+  public List<MetaSolverSetting> getMetaSolverSettings() {
+    return metaSolver.getSettings();
+  }
+
+  @CrossOrigin
+  @GetMapping("/solvers/max-cut")
   public Set<ProblemSolverInfo> getSolvers() {
     return super.getSolvers();
   }
