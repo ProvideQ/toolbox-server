@@ -17,6 +17,20 @@ docker build --tag provideq-toolbox-backend --build-arg GAMS_LICENSE=$(base64 -w
 docker run --publish 8080:5000 provideq-toolbox-backend
 ```
 
+## Releasing a new version
+1. Create a release branch from develop: `git checkout -b release/x.y.z`.
+2. Bump the version number in the `build.gradle` file to the new version number and commit it to the release branch.
+3. Push to GitHub and create a pull request to merge the release branch into `main`.
+4. Make sure to test your new version!
+5. Write a changelog.
+   The PR can help you identify differences between the last release (`main`) and the next one (your release branch).
+6. Merge the PR into main.
+7. [Create a new GitHub release](https://github.com/ProvideQ/toolbox-server/releases/new) with a new tag named like your
+   version number `x.y.z` and use the changelog as the description.
+8. Pull the main branch (`git checkout main && git pull`),
+   merge it into the develop branch (`git checkout develop && git pull && git merge main`)
+   and push it (`git push`).
+
 ## License
 Copyright (c) 2022 - 2023 ProvideQ
 
