@@ -25,52 +25,52 @@ public class DimacsCNFTests {
     static Stream<Arguments> testToStringParameters() {
         return Stream.of(
                 Arguments.arguments("(!A | B)", """
-                        c A 2
-                        c B 1
+                        c 2 A
+                        c 1 B
                         p cnf 2 1
                         1 -2 0
                         """),
                 Arguments.arguments("!A | B", """
-                        c A 2
-                        c B 1
+                        c 2 A
+                        c 1 B
                         p cnf 2 1
                         1 -2 0
                         """),
                 Arguments.arguments("not A or B", """
-                        c A 2
-                        c B 1
+                        c 2 A
+                        c 1 B
                         p cnf 2 1
                         1 -2 0
                         """),
                 Arguments.arguments("(!A | B) & !C & D", """
-                        c A 4
-                        c B 3
-                        c C 2
-                        c D 1
+                        c 4 A
+                        c 3 B
+                        c 2 C
+                        c 1 D
                         p cnf 4 3
                         1 0
                         -2 0
                         3 -4 0
                         """),
                 Arguments.arguments("(A | B) & C", """
-                        c A 2
-                        c B 3
-                        c C 1
+                        c 2 A
+                        c 3 B
+                        c 1 C
                         p cnf 3 2
                         1 0
                         2 3 0
                         """),
                 Arguments.arguments("""
-                        c C 1
-                        c A 2
-                        c B 3
+                        c 1 C
+                        c 2 A
+                        c 3 B
                         p cnf 3 2
                         1 0
                         2 -3 0
                         """, """
-                        c C 1
-                        c A 2
-                        c B 3
+                        c 1 C
+                        c 2 A
+                        c 3 B
                         p cnf 3 2
                         1 0
                         2 -3 0
