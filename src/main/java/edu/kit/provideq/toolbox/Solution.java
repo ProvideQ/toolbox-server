@@ -19,6 +19,13 @@ public class Solution<S> implements SolutionHandle {
   private String solverName;
   private long executionMilliseconds;
 
+  /**
+   * Internal constructor, used for de-serialization.
+   */
+  private Solution() {
+    this.ID = Long.MIN_VALUE;
+  }
+
   public Solution(long ID) {
     this.ID = ID;
   }
