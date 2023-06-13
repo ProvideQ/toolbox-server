@@ -6,7 +6,20 @@ A web-based user interface can be found in our
 ## Development setup
 1. Install Java 17 (check with `java -version`)
 2. Clone this repository
-3. Run the server using `./gradlew bootRun`
+3. Install a python env that works with GAMS (skip this step if you don't need GAMS)
+   1. Install GAMS.
+   2. Install miniconda (or anaconda, if you prefer that):
+      https://conda.io/projects/conda/en/stable/user-guide/install/index.html
+   3. Create a GAMS conda environment: `conda create --name gams python=3.10 --yes`
+   4. Activate your conda environment: `conda activate gams`.
+   5. Make GAMS use that python environment by setting the `GMSPYTHONLIB=<path-to-conda>/envs/gams/lib/libpython3.10.so`
+      environment variable.
+   6. Install GAMS packages to the GAMS conda env:
+      `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
+      * If you get an error building `psycopg2`, try to install these postgres packages:
+        `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
+   7. Install the python dependencies we use in our python packages: `pip install -r gams/requirements.txt`
+4. Run the server using `./gradlew bootRun`
 
 ## Deployment
 This repository is designed to be deployed with [Dokku](https://dokku.com/) but you can also run 

@@ -47,3 +47,4 @@ gamslice.txt
 
 # Listing files compiled from our GAMS scripts
 *.lst
+*.op2
