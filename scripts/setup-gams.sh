@@ -9,6 +9,10 @@
 # exit on error
 set -e
 
+# dependencies for this script
+apt-get update
+apt-get install curl --yes
+
 # === Install GAMS ===
 # GAMS Installation script is based on the official installation guide
 # (https://www.gams.com/latest/docs/UG_UNIX_INSTALL.html) and adapts some lines from
@@ -55,7 +59,7 @@ echo "export PATH=\$PATH:/opt/conda/bin" >> ~/.bashrc # for subsequent build ste
 conda init
 
 # Remove installer
-cd /app
+cd ~
 rm --recursive /opt/conda-installer
 
 

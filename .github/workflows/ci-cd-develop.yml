@@ -6,6 +6,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: debian:bullseye-slim
     steps:
       - name: Clone repo (shallow)
         uses: actions/checkout@v3
@@ -18,9 +20,12 @@ jobs:
           distribution: 'temurin'
       - name: Set up GAMS
         run: ./scripts/setup-gams.sh
+        env:
+          GAMS_LICENSE: ${{ secrets.GAMS_LICENSE }}
       - name: Run unit tests
         run: ./gradlew build
       - name: Archive test reports
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-report
