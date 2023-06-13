@@ -32,7 +32,6 @@ RUN jlink \
 FROM debian:bullseye-slim AS runner
 WORKDIR /app
 
-RUN apt-get update && apt-get install curl --yes
 COPY scripts scripts
 
 # Install GAMS with conda python environment
@@ -50,9 +49,8 @@ ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
 COPY gams gams
-RUN pip install -r ./gams/requirements.txt
 COPY qiskit qiskit
-RUN pip install -r ./qiskit/requirements.txt
+RUN scripts/install-solver-dependencies.sh
 COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port

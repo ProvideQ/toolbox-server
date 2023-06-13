@@ -7,7 +7,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: debian:bullseye-slim
+      image: debian:bullseye-slim # use the same image as our docker runner
     steps:
       - name: Clone repo (shallow)
         uses: actions/checkout@v3
@@ -19,11 +19,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Set up GAMS
-        run: ./scripts/setup-gams.sh
+        shell: bash # required for the source command
         env:
           GAMS_LICENSE: ${{ secrets.GAMS_LICENSE }}
+        run: |
+          source ./scripts/setup-gams.sh
+          echo "/opt/conda/bin" >> "$GITHUB_PATH"
+          echo "$GAMS_PATH" >> "$GITHUB_PATH"
+          echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
+      - name: Install solver dependencies
+        run: ./scripts/install-solver-dependencies.sh
       - name: Run unit tests
-        run: ./gradlew build
+        shell: bash # required for the source command
+        run: |
+          source /opt/conda/bin/activate gams
+          ./gradlew test
       - name: Archive test reports
         if: always()
         uses: actions/upload-artifact@v3
@@ -31,7 +41,7 @@ jobs:
           name: test-report
           path: build/reports/tests/test/
 
-  deploy:
+  deploy-staging:
     runs-on: ubuntu-latest
     needs: test
     if: ${{ github.ref == 'refs/heads/develop' }}
