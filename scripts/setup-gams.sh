@@ -27,10 +27,10 @@ sync
 rm -rf gams.exe
 
 # Install GAMS license
-echo "${GAMS_LICENSE}" | base64 --decode > /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/gamslice.txt
+GAMS_PATH=/opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx
+echo "${GAMS_LICENSE}" | base64 --decode > "$GAMS_PATH/gamslice.txt"
 
 # Add GAMS to PATH
-GAMS_PATH=$(dirname $(find / -name gams -type f -executable -print))
 ln -s "$GAMS_PATH/gams" /usr/local/bin/gams
 echo "export PATH=\$PATH:$GAMS_PATH" >> ~/.bashrc
 
