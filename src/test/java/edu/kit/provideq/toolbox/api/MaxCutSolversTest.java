@@ -6,13 +6,20 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.maxCut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.maxCut.solvers.GamsMaxCutSolver;
+import edu.kit.provideq.toolbox.maxCut.solvers.QiskitMaxCutSolver;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,10 +33,18 @@ class MaxCutSolversTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @Test
-    void testGamsSolver() throws Exception {
+    public static Stream<String> provideMaxCutSolverIds() {
+        return Stream.of(
+                GamsMaxCutSolver.class.getName(),
+                QiskitMaxCutSolver.class.getName()
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideMaxCutSolverIds")
+    void testMaxCutSolver(String solverId) throws Exception {
         var req = new SolveMaxCutRequest();
-        req.requestedSolverId = GamsMaxCutSolver.class.getName();
+        req.requestedSolverId = solverId;
         req.requestContent = """
                 graph [
                     id 42
