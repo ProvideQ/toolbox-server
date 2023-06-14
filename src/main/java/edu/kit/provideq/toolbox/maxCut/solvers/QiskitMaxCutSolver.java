@@ -85,7 +85,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
         return;
       }
 
-      solution.setDebugData("Qiskit didn't complete solving MaxCut successfully" + processResult.output());
+      solution.setDebugData("Qiskit didn't complete solving MaxCut successfully:\n\n" + processResult.output());
       solution.abort();
     } catch (IOException | InterruptedException e) {
       solution.setDebugData("Solving MaxCut problem via Qiskit resulted in exception: " + e.getMessage());
