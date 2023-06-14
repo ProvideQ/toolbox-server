@@ -58,8 +58,10 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         switch (problem.problemData().anomaly()) {
             case VOID -> checkVoidFeatureModel(solution, cnf, satSolve);
             case DEAD -> checkDeadFeatures(solution, cnf, satSolve);
-            case FALSE_OPTIONAL -> solution.setSolutionData("Not implemented yet");
-            case REDUNDANT_CONSTRAINTS -> solution.setSolutionData("Not implemented yet");
+            case FALSE_OPTIONAL, REDUNDANT_CONSTRAINTS -> {
+                solution.setDebugData("Not implemented yet!");
+                solution.abort();
+            }
         }
     }
 
@@ -113,6 +115,7 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         }
 
         solution.setSolutionData(builder.toString());
+        solution.complete();
     }
 
     private static void checkVoidFeatureModel(Solution<String> solution, String cnf, Function<String, Solution<DimacsCNFSolution>> satSolve) {
@@ -127,8 +130,9 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
             solution.setSolutionData(voidSolution.getSolutionData().isVoid()
                     ? "The feature model is a void feature model. The configuration is never valid."
                     : "The feature model has valid configurations, for example: \n" + dimacsCNFSolution.toHumanReadableString());
+            solution.complete();
         } else {
-            solution.setSolutionData(voidSolution.getDebugData());
+            solution.setDebugData(voidSolution.getDebugData());
             solution.abort();
         }
     }
