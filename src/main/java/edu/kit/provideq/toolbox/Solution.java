@@ -1,5 +1,7 @@
 package edu.kit.provideq.toolbox;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -18,6 +20,13 @@ public class Solution<S> implements SolutionHandle {
   private String debugData;
   private String solverName;
   private long executionMilliseconds;
+
+  /**
+   * Internal constructor, used for de-serialization.
+   */
+  private Solution() {
+    this.ID = Long.MIN_VALUE;
+  }
 
   public Solution(long ID) {
     this.ID = ID;
@@ -41,11 +50,19 @@ public class Solution<S> implements SolutionHandle {
     return toStringSolution(Object::toString);
   }
 
-  public SolutionHandle toStringSolution(Function<S, String> stringSelector) {
+  /**
+   * Converts this {@link Solution}{@code <T>} to a {@link Solution}{@code <String>} by applying a given transformation
+   * function.
+   * @param stringSelector the function that transforms the {@link Solution#solutionData} of type T to a String.
+   * @return the solution with the stringified solution data.
+   */
+  public SolutionHandle toStringSolution(@NotNull Function<S, String> stringSelector) {
+    Objects.requireNonNull(stringSelector, "Missing String selector!");
+
     var stringSolution = new Solution<String>(getId());
     stringSolution.status = status;
     stringSolution.metaData = metaData;
-    stringSolution.solutionData = stringSelector.apply(solutionData);
+    stringSolution.solutionData = (solutionData == null) ? null : stringSelector.apply(solutionData);
     stringSolution.debugData = debugData;
     stringSolution.solverName = solverName;
     stringSolution.executionMilliseconds = executionMilliseconds;

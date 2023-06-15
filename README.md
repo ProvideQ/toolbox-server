@@ -19,7 +19,12 @@ A web-based user interface can be found in our
       * If you get an error building `psycopg2`, try to install these postgres packages:
         `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
    7. Install the python dependencies we use in our python packages: `pip install -r gams/requirements.txt`
-4. Run the server using `./gradlew bootRun`
+4. Install solver dependencies (skip this step if you don't want to use the solvers):
+   * Note that these dependencies must be installed to the gams conda env if you want to use GAMS and other solvers from
+     the same toolbox installation!
+   1. Install GAMS solver dependencies: `pip install -r gams/requirements.txt`
+   2. Install Qiskit solver dependencies: `pip install -r qiskit/requirements.txt` 
+5. Run the server using `./gradlew bootRun`
 
 ## Deployment
 This repository is designed to be deployed with [Dokku](https://dokku.com/) but you can also run 
