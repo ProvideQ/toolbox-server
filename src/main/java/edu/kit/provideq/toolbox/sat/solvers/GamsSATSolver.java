@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
-import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
@@ -11,27 +10,20 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Component
 public class GamsSATSolver extends SATSolver {
-    private final File satDirectory;
-
-    private final ResourceProvider resourceProvider;
+    private final String satPath;
+    private final ApplicationContext context;
 
     @Autowired
     public GamsSATSolver(
             @Value("${gams.directory.sat}") String satPath,
-            ResourceProvider resourceProvider) throws IOException {
-        this.resourceProvider = resourceProvider;
-
-        satDirectory = resourceProvider.getResource(satPath);
+            ApplicationContext context) {
+        this.satPath = satPath;
+        this.context = context;
     }
 
     @Override
@@ -62,44 +54,21 @@ public class GamsSATSolver extends SATSolver {
             return;
         }
 
-        Path problemFile;
-        Path solutionFile;
-
-        // Write problem file
-        try {
-            File problemDirectory = resourceProvider.getProblemDirectory(problem, solution);
-
-            problemFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.cnf");
-            solutionFile = Paths.get(problemDirectory.getAbsolutePath(), "problem.sol");
-
-            Files.writeString(problemFile, dimacsCNF.toString());
-        } catch (IOException e) {
-            solution.setDebugData("Creation of problem file caught exception: " + e.getMessage());
-            solution.abort();
-            return;
-        }
-
         // Run SAT with GAMS via console
-        try {
-            var processResult = new GamsProcessRunner(
-                satDirectory,
-                "sat.gms", "--CNFINPUT=\"%s\"".formatted(problemFile)
-            ).run();
+        var processResult = context
+                .getBean(
+                        GamsProcessRunner.class,
+                        satPath,
+                        "sat.gms")
+                .run(problem.type(), solution.getId(), dimacsCNF.toString());
 
-            if (processResult.success()) {
-                var solutionText = Files.readString(solutionFile);
-                var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, solutionText);
+        if (processResult.success()) {
+            var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, processResult.output());
 
-                solution.complete();
-                solution.setSolutionData(dimacsCNFSolution);
-                return;
-            }
-
-            solution.setDebugData("GAMS didn't complete solving SAT successfully!\n" +
-                    processResult.output());
-            solution.abort();
-        } catch (IOException | InterruptedException e) {
-            solution.setDebugData("Solving SAT problem via GAMS resulted in exception: " + e.getMessage());
+            solution.setSolutionData(dimacsCNFSolution);
+            solution.complete();
+        } else {
+            solution.setDebugData(processResult.output());
             solution.abort();
         }
     }

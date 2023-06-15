@@ -282,7 +282,7 @@ put_utility 'log' / '### Relative gap:              ' rep('relative gap'):0:16;
 
 *write solution
 $setNames "%INPUT%" fp fn fe
-$if not set OUTPUT $set OUTPUT %fp%%fn%_sol%fe%
+$if not set OUTPUT $set OUTPUT %fp%solution%fe%
 embeddedCode Python:
 import networkx as nx
 # read input graph
