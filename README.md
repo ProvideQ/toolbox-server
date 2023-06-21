@@ -1,3 +1,6 @@
+[![Build](https://img.shields.io/github/actions/workflow/status/ProvideQ/toolbox-server/deploy-main.yml?style=for-the-badge)](https://github.com/ProvideQ/toolbox-server/actions/workflows/deploy-main.yml)
+[![Release](https://img.shields.io/github/v/release/ProvideQ/toolbox-server?style=for-the-badge)](https://github.com/ProvideQ/toolbox-server/releases/)
+
 # ProvideQ Toolbox Server
 This repository contains the source code for the [ProvideQ](https://provideq.org) Toolbox server.
 A web-based user interface can be found in our
