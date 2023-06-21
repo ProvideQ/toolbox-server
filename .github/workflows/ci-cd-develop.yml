@@ -4,7 +4,7 @@ on:
   push:
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
     container:
       image: debian:bullseye-slim # use the same image as our docker runner
@@ -29,21 +29,27 @@ jobs:
           echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
       - name: Install solver dependencies
         run: ./scripts/install-solver-dependencies.sh
-      - name: Run unit tests
+      - name: Run checks
         shell: bash # required for the source command
         run: |
           source /opt/conda/bin/activate gams
-          ./gradlew test
+          ./gradlew check
       - name: Archive test reports
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-report
           path: build/reports/tests/test/
+      - name: Archive style reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: style-report
+          path: build/reports/checkstyle/
 
   deploy-staging:
     runs-on: ubuntu-latest
-    needs: test
+    needs: check
     if: ${{ github.ref == 'refs/heads/develop' }}
     steps:
       - name: Clone repo (shallow)
