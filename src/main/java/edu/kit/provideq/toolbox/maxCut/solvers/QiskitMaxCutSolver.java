@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.maxCut.solvers;
 
-import edu.kit.provideq.toolbox.QiskitProcessRunner;
+import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -45,7 +45,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
     // Run Qiskit solver via console
     var processResult = context
             .getBean(
-                    QiskitProcessRunner.class,
+                    PythonProcessRunner.class,
                     maxCutPath,
                     "maxCut_qiskit.py")
             .addProblemFilePathToProcessCommand()
