@@ -15,8 +15,8 @@ import java.util.List;
 
 /**
  * Runs a process to solve a problem.
- * Accepts a ProblemBuilder
- * Is meant to be expanded with the builder pattern.
+ * Accepts a ProcessBuilder to configure the process that should be run.
+ * Aspects about the process creation can be modified via builder pattern.
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
