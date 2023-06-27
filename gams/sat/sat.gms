@@ -1,6 +1,6 @@
-*input can be set through --CNFINPUT=<myfile.cnf>
+*input can be set through --INPUT=<myfile.cnf>
 *if no input is provided, use default input for demo
-$if not set CNFINPUT $set CNFINPUT uf50-01.cnf
+$if not set INPUT $set INPUT uf50-01.cnf
 
 set c             'clauses'
     pn            'positive/negative' / '+', '-' /,
@@ -14,7 +14,7 @@ cnf = list()
 cnf.append(list())
 maxvar = 0
 
-with open(r'%CNFINPUT%', 'r') as fcnf:
+with open(r'%INPUT%', 'r') as fcnf:
     for line in fcnf:
         tokens = line.split()
         if len(tokens) != 0 and tokens[0] not in ("p", "c", '%'):
@@ -67,10 +67,10 @@ sat.optca = card(l)+1;
 solve sat max obj using mip;
 
 * write solution file
-$setNames "%CNFINPUT%" fp fn fe
-$if not set SOLOUTPUT $set SOLOUTPUT %fp%%fn%.sol
+$setNames "%INPUT%" fp fn fe
+$if not set SOLOUTPUT $set SOLOUTPUT %fp%solution%fe%
 file fr / "%SOLOUTPUT%" /; put fr;
-put 'c Solution %CNFINPUT%';
+put 'c Solution %INPUT%';
 if(sat.modelstat=%modelStat.Optimal% or sat.modelstat=%modelStat.Integer Solution%,
    put / 's cnf 1 ' card(l):0:0 ' ' card(c):0:0;
    loop(l,

@@ -1,15 +1,16 @@
 package edu.kit.provideq.toolbox;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
- * Process runner with output post-processing specifically for invoking GAMS.
+ * Process runner with input & output post-processing specifically for invoking GAMS.
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class GamsProcessRunner extends ProcessRunner {
   /**
    * GAMS will print the following prefix in front of its license output.
@@ -31,15 +32,26 @@ public class GamsProcessRunner extends ProcessRunner {
    * Creates a process runner for a GAMS task.
    * @param directory the working directory to run GAMS in.
    * @param scriptFileName the filename of the GAMS script to run.
+   */
+  public GamsProcessRunner(String directory, String scriptFileName) {
+    this(directory, scriptFileName, new String[0]);
+  }
+
+  /**
+   * Creates a process runner for a GAMS task.
+   * @param directory the working directory to run GAMS in.
+   * @param scriptFileName the filename of the GAMS script to run.
    * @param arguments extra arguments to pass to GAMS. Use this to pass problem input to the solver.
    */
-  public GamsProcessRunner(File directory, String scriptFileName, String... arguments) {
-    super(buildGamsProcess(directory, scriptFileName, arguments));
+  public GamsProcessRunner(String directory, String scriptFileName, String... arguments) {
+    super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName, arguments));
+
+    addProblemFilePathToProcessCommand("--INPUT=\"%s\"");
   }
 
   @Override
-  public ProcessResult run() throws IOException, InterruptedException {
-    var result = super.run();
+  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+    var result = super.run(problemType, solutionId, problemData);
 
     var obfuscatedOutput = obfuscateGamsLicense(result.output());
     return new ProcessResult(result.success(), obfuscatedOutput);
@@ -71,17 +83,5 @@ public class GamsProcessRunner extends ProcessRunner {
    */
   private static String obfuscateLine(String line) {
     return Strings.repeat("*", line.length());
-  }
-
-  private static ProcessBuilder buildGamsProcess(File directory, String scriptFilename,
-                                                 String[] arguments) {
-    String[] command = new String[arguments.length + 2];
-    command[0] = GAMS_EXECUTABLE_NAME;
-    command[1] = scriptFilename;
-    System.arraycopy(arguments, 0, command, 2, arguments.length);
-
-    return new ProcessBuilder()
-        .directory(directory)
-        .command(command);
   }
 }

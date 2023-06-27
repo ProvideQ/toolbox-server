@@ -282,7 +282,7 @@ put_utility 'log' / '### Relative gap:              ' rep('relative gap'):0:16;
 
 *write solution
 $setNames "%INPUT%" fp fn fe
-$if not set OUTPUT $set OUTPUT %fp%%fn%_sol%fe%
+$if not set OUTPUT $set OUTPUT %fp%solution%fe%
 embeddedCode Python:
 import networkx as nx
 # read input graph
@@ -297,15 +297,15 @@ t = list(gams.get("T"))
 attr1 = {}
 for n in s:
     try:
-        attr1[int(n)] = {"Partition": 1}
+        attr1[int(n)] = {"partition": 1}
     except ValueError:
-        attr1[n] = {"Partition": 1}
+        attr1[n] = {"partition": 1}
 attr2 = {}
 for n in t:
     try:
-        attr2[int(n)] = {"Partition": 2}
+        attr2[int(n)] = {"partition": 2}
     except ValueError:
-        attr2[n] = {"Partition": 2}
+        attr2[n] = {"partition": 2}
 # make node partition a node attribute
 nx.set_node_attributes(g, attr1)
 nx.set_node_attributes(g, attr2)

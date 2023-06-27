@@ -1,9 +1,8 @@
 package edu.kit.provideq.toolbox;
 
-import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
@@ -45,15 +44,15 @@ public class ResourceProvider {
 
     /**
      * Returns the directory for a problem type and solution id
-     * @param problem problem to check type for
-     * @param solution solution to get an id from
+     * @param problemType problem type to build the directory path
+     * @param solutionId solution id to build the directory path
      * @return File object of the directory
      * @throws IOException when the directory couldn't be accessed or created
      */
-    public File getProblemDirectory(Problem<?> problem, Solution<?> solution) throws IOException {
+    public File getProblemDirectory(ProblemType problemType, long solutionId) throws IOException {
         File workingDirectory = getWorkingDirectory();
 
-        Path dir = Paths.get(workingDirectory.toString(), problem.type().toString(), String.valueOf(solution.getId()));
+        Path dir = Paths.get(workingDirectory.toString(), problemType.toString(), String.valueOf(solutionId));
         Files.createDirectories(dir);
 
         return dir.toFile();
