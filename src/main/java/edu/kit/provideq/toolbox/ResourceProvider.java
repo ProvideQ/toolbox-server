@@ -12,7 +12,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides streamlined access to resources
+ * Provides streamlined access to resources.
  */
 @Component
 public class ResourceProvider {
@@ -28,7 +28,7 @@ public class ResourceProvider {
   }
 
   /**
-   * Returns the working directory and creates it if non-existing
+   * Returns the working directory and creates it if non-existing.
    *
    * @return File object of the working directory
    * @throws IOException when the directory couldn't be created
@@ -43,7 +43,7 @@ public class ResourceProvider {
   }
 
   /**
-   * Returns the directory for a problem type and solution id
+   * Returns the directory for a problem type and solution id.
    *
    * @param problemType problem type to build the directory path
    * @param solutionId  solution id to build the directory path
@@ -61,7 +61,7 @@ public class ResourceProvider {
   }
 
   /**
-   * Returns the resource at the specified resource path
+   * Returns the resource at the specified resource path.
    *
    * @param resourcePath path that points to the requested resource
    * @return File object of the resource
@@ -70,13 +70,13 @@ public class ResourceProvider {
   public File getResource(String resourcePath) throws IOException {
     return getRootFile(resourcePath);
 
-        /* removed as long as we're not using resources directly
-        Resource resource = resourceLoader.getResource("classpath:" + resourcePath);
-        return resource.getFile();*/
+    /* removed as long as we're not using resources directly
+    Resource resource = resourceLoader.getResource("classpath:" + resourcePath);
+    return resource.getFile();*/
   }
 
   /**
-   * Returns the file at the path relative to the root directory
+   * Returns the file at the path relative to the root directory.
    *
    * @param path path that points to a file relative to the root directory
    * @return File object of the path

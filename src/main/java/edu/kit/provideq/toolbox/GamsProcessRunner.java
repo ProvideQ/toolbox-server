@@ -43,7 +43,8 @@ public class GamsProcessRunner extends ProcessRunner {
    *
    * @param directory      the working directory to run GAMS in.
    * @param scriptFileName the filename of the GAMS script to run.
-   * @param arguments      extra arguments to pass to GAMS. Use this to pass problem input to the solver.
+   * @param arguments      extra arguments to pass to GAMS. Use this to pass problem input to the
+   *                       solver.
    */
   public GamsProcessRunner(String directory, String scriptFileName, String... arguments) {
     super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName, arguments));

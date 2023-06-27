@@ -122,13 +122,13 @@ public class ProcessRunner {
   }
 
   /**
-   * Runs the process provided in the constructor
+   * Runs the process provided in the constructor.
    *
    * @param problemType The type of the problem that is run
    * @param solutionId  The id of the resulting solution
    * @param problemData The problem data that should be solved
    * @return Returns the process result, which contains the solution data
-   * or an error as output depending on the success of the process.
+   *     or an error as output depending on the success of the process.
    */
   public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
     // Retrieve the problem directory
@@ -178,8 +178,7 @@ public class ProcessRunner {
     try {
       Process process = processBuilder.start();
 
-      processOutput = readStream(process.inputReader()) +
-          readStream(process.errorReader());
+      processOutput = readStream(process.inputReader()) + readStream(process.errorReader());
 
       processExitCode = process.waitFor();
     } catch (IOException | InterruptedException e) {

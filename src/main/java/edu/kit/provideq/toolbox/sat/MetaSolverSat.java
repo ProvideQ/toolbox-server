@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Simple {@link MetaSolver} for SAT problems
+ * Simple {@link MetaSolver} for SAT problems.
  */
 @Component
 public class MetaSolverSat extends MetaSolver<SatSolver> {

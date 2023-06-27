@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface ProblemSolver<ProblemT, SolutionT> {
   /**
-   * returns an id which is unique to the solver
+   * Returns an id which is unique to the solver.
    *
    * @return id of the solver
    */
@@ -20,14 +20,14 @@ public interface ProblemSolver<ProblemT, SolutionT> {
   }
 
   /**
-   * returns the name of the solver
+   * Returns the name of the solver.
    *
    * @return name of the solver
    */
   String getName();
 
   /**
-   * returns the sub problems used to solver this problem
+   * Returns the sub problems used to solver this problem.
    *
    * @return list of sub problems
    */
@@ -36,7 +36,9 @@ public interface ProblemSolver<ProblemT, SolutionT> {
   }
 
   /**
-   * simple true-false-check, true: given {@link Problem} can be solved with this solver, false: it cannot
+   * Simple true-false-check,
+   * {@code true}: given {@link Problem} can be solved with this solver,
+   * {@code false}: it cannot.
    *
    * @param problem the {@link Problem} which is to be assessed
    * @return true: can be solved, false: can not be solved
@@ -52,8 +54,8 @@ public interface ProblemSolver<ProblemT, SolutionT> {
   float getSuitability(Problem<ProblemT> problem);
 
   /**
-   * solves a given {@link Problem}, current status and final results as well as debug information is
-   * stored in the provided {@link Solution} object
+   * Solves a given {@link Problem}, current status and final results as well as debug information
+   * is stored in the provided {@link Solution} object.
    *
    * @param problem        the {@link Problem} that is to be solved
    * @param solution       the {@link Solution} in which all resulting information is to be stored

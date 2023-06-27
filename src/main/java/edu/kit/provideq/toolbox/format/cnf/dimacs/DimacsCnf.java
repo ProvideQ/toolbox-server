@@ -43,7 +43,7 @@ public class DimacsCnf {
   }
 
   /**
-   * Create a dimacs cnf structure from a logical expression or string in format of dimacs cnf
+   * Create a dimacs cnf structure from a logical expression or string in format of dimacs cnf.
    *
    * @param string logical expression or dimacs cnf string
    * @return dimacs cnf structure
@@ -58,7 +58,7 @@ public class DimacsCnf {
   }
 
   /**
-   * Create a dimacs cnf structure from a string in format of dimacs cnf
+   * Create a dimacs cnf structure from a string in format of dimacs cnf.
    *
    * @param dimacsCnf dimacs cnf string
    * @return dimacs cnf structure
@@ -68,7 +68,7 @@ public class DimacsCnf {
   }
 
   /**
-   * Create a dimacs cnf structure from a logical expression
+   * Create a dimacs cnf structure from a logical expression.
    *
    * @param expression logical expression
    * @return dimacs cnf structure
@@ -97,7 +97,7 @@ public class DimacsCnf {
   }
 
   /**
-   * Returns a list of or clauses
+   * Returns a list of or clauses.
    *
    * @return list of or clauses where the inner lists is an or clauses of variables
    */

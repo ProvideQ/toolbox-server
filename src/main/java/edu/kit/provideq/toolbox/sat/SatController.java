@@ -12,7 +12,12 @@ import edu.kit.provideq.toolbox.sat.solvers.SatSolver;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SatController extends ProblemController<String, DimacsCnfSolution, SatSolver> {

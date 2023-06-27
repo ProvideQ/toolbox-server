@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Simple {@link MetaSolver} for FeatureModel problems
+ * Simple {@link MetaSolver} for FeatureModel problems.
  */
 @Component
 public class MetaSolverFeatureModelAnomaly extends MetaSolver<FeatureModelAnomalySolver> {

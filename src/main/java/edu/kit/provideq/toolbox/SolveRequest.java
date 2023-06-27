@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.lang.Nullable;
 
 /**
- * Solve request containing some request content
- * CANNOT be abstract, otherwise internal springboot initializer throws
+ * Solve request containing some request content.
+ * CANNOT be abstract, otherwise internal springboot initializer throws.
  */
 public class SolveRequest<RequestT> {
   @Nullable

@@ -29,7 +29,7 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   /**
-   * adds a new solver to this meta solvers list of known solvers
+   * Adds a new solver to this meta solvers list of known solvers.
    *
    * @param problemSolver the new problem solver
    * @return true in case the addition was successful, false otherwise
@@ -39,7 +39,7 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   /**
-   * removes a solver from this meta solvers list of known solvers
+   * Removes a solver from this meta solvers list of known solvers.
    *
    * @param problemSolver the solver
    * @return true in case the removal was successful, false otherwise
@@ -49,7 +49,7 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   /**
-   * provides the best suited known solver this meta solver is aware of for a given problem
+   * Provides the best suited known solver this meta solver is aware of for a given problem.
    *
    * @param problem the problem the meta solver is to check its solvers by
    * @return the best suited solver, null in case no suitable solver was found
@@ -72,7 +72,7 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   /**
-   * provides a list of all solvers registered on this meta solver
+   * Provides a list of all solvers registered on this meta solver.
    *
    * @return list of all solvers
    */

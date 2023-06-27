@@ -51,10 +51,11 @@ public class Solution<S> implements SolutionHandle {
   }
 
   /**
-   * Converts this {@link Solution}{@code <T>} to a {@link Solution}{@code <String>} by applying a given transformation
-   * function.
+   * Converts this {@link Solution}{@code <T>} to a {@link Solution}{@code <String>} by applying a
+   * given transformation function.
    *
-   * @param stringSelector the function that transforms the {@link Solution#solutionData} of type T to a String.
+   * @param stringSelector the function that transforms the {@link Solution#solutionData} of type T
+   *                       to a String.
    * @return the solution with the stringified solution data.
    */
   public SolutionHandle toStringSolution(@NotNull Function<S, String> stringSelector) {
@@ -138,8 +139,8 @@ public class Solution<S> implements SolutionHandle {
       return false;
     }
     var that = (Solution<S>) obj;
-    return this.id == that.id &&
-        Objects.equals(this.status, that.status);
+    return this.id == that.id
+        && Objects.equals(this.status, that.status);
   }
 
   @Override
@@ -149,10 +150,10 @@ public class Solution<S> implements SolutionHandle {
 
   @Override
   public String toString() {
-    return "Solution[" +
-        "id=" + id + ", " +
-        "status=" + status + ", " +
-        "metaData=" + metaData + ", " +
-        "solutionData" + solutionData + ']';
+    return "Solution["
+        + "id=" + id + ", "
+        + "status=" + status + ", "
+        + "metaData=" + metaData + ", "
+        + "solutionData" + solutionData + ']';
   }
 }

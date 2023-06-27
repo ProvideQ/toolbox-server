@@ -30,7 +30,8 @@ public class PythonProcessRunner extends ProcessRunner {
    *
    * @param directory      the working directory to run Python in.
    * @param scriptFileName the filename of the Python script to run.
-   * @param arguments      extra arguments to pass to Python. Use this to pass problem input to the solver.
+   * @param arguments      extra arguments to pass to Python. Use this to pass problem input to the
+   *                       solver.
    */
   public PythonProcessRunner(String directory, String scriptFileName, String... arguments) {
     super(

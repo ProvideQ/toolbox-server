@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Simple {@link MetaSolver} for MaxCut problems
+ * Simple {@link MetaSolver} for MaxCut problems.
  */
 @Component
 public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {

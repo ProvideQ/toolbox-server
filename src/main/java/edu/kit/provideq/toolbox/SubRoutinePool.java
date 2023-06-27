@@ -21,7 +21,7 @@ public class SubRoutinePool {
   }
 
   /**
-   * Use this to explicitly define which solver to use for a problem type
+   * Use this to explicitly define which solver to use for a problem type.
    *
    * @param requestedSubRoutines problem types mapped to a solve requests
    */
@@ -35,7 +35,8 @@ public class SubRoutinePool {
   }
 
   /**
-   * Request a subroutine for a problem type that invokes the solving process that was previously specified.
+   * Request a subroutine for a problem type that invokes the solving process that was previously
+   * specified.
    * If no subroutine is available, use the default meta solver strategy in the routine.
    *
    * @param problemType problem type to solve

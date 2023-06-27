@@ -121,8 +121,10 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
     solution.complete();
   }
 
-  private static void checkVoidFeatureModel(Solution<String> solution, String cnf,
-                                            Function<String, Solution<DimacsCnfSolution>> satSolve) {
+  private static void checkVoidFeatureModel(Solution<String> solution,
+                                            String cnf,
+                                            Function<String,
+                                            Solution<DimacsCnfSolution>> satSolve) {
     // Check if the feature model is not a void feature model
     var voidSolution = satSolve.apply(cnf);
 
@@ -133,8 +135,8 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
 
       solution.setSolutionData(voidSolution.getSolutionData().isVoid()
           ? "The feature model is a void feature model. The configuration is never valid."
-          : "The feature model has valid configurations, for example: \n" +
-          dimacsCnfSolution.toHumanReadableString());
+          : "The feature model has valid configurations, for example: \n"
+            + dimacsCnfSolution.toHumanReadableString());
       solution.complete();
     } else {
       solution.setDebugData(voidSolution.getDebugData());

@@ -12,19 +12,21 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Abstract Controller, offers generic post and get methods
+ * Abstract controller, offers generic post and get methods.
  *
  * @param <ProblemT>  the type in which problem input is expected to arrive
  * @param <SolutionT> the type in which a solution will be formatted
  * @param <SolverT>         the type of solver that is to be used to solve a problem
  */
-@ComponentSolverType
+@Component
 @RestController
-public abstract class ProblemController<ProblemT, SolutionT, SolverT extends ProblemSolver<ProblemT, SolutionT>> {
+public abstract class ProblemController<ProblemT, SolutionT, SolverT
+    extends ProblemSolver<ProblemT, SolutionT>> {
   private ApplicationContext context;
 
   public abstract ProblemType getProblemType();

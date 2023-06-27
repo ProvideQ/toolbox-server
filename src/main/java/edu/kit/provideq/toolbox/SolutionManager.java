@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Manages all solutions currently present in memory
+ * Manages all solutions currently present in memory.
  */
 public abstract class SolutionManager {
   private static final AtomicLong NEXT_ID = new AtomicLong();
