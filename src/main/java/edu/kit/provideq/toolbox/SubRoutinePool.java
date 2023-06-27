@@ -42,10 +42,10 @@ public class SubRoutinePool {
    * @param problemType problem type to solve
    * @return function to solve a problem of type problemType
    */
-  public <ProblemFormatType, SolutionDataType> Function<ProblemFormatType, Solution<SolutionDataType>> getSubRoutine(
+  public <ProblemT, SolutionT> Function<ProblemT, Solution<SolutionT>> getSubRoutine(
       ProblemType problemType) {
     return content -> {
-      SolveRequest<ProblemFormatType> subRoutine = subRoutineCalls.get(problemType);
+      SolveRequest<ProblemT> subRoutine = subRoutineCalls.get(problemType);
       if (subRoutine == null) {
         subRoutine = new SolveRequest<>();
       }

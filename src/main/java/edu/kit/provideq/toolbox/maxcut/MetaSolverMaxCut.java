@@ -1,8 +1,8 @@
-package edu.kit.provideq.toolbox.maxCut;
+package edu.kit.provideq.toolbox.maxcut;
 
-import edu.kit.provideq.toolbox.maxCut.solvers.GamsMaxCutSolver;
-import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
-import edu.kit.provideq.toolbox.maxCut.solvers.QiskitMaxCutSolver;
+import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
+import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
+import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;

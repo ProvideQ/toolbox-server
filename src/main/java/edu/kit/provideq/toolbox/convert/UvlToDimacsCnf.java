@@ -13,7 +13,7 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UvlToDimacsCNF {
+public class UvlToDimacsCnf {
   static {
     FMCoreLibrary.getInstance().install();
   }

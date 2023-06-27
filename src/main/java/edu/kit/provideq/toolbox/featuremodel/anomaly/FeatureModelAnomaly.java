@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.featureModel.anomaly;
+package edu.kit.provideq.toolbox.featuremodel.anomaly;
 
 public enum FeatureModelAnomaly {
   /**

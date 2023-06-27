@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class DimacsCNF {
+public class DimacsCnf {
   final static String LINE_SEPARATOR = System.lineSeparator();
   final static char SEPARATOR = ' ';
   final static char NEGATION_PREFIX = '-';
@@ -22,23 +22,23 @@ public class DimacsCNF {
   private final List<Variable> variables;
   private final ArrayList<ArrayList<Variable>> orClauses;
 
-  public DimacsCNF(Expression<String> expression) {
-    this(new ExpressionToDimacsCNF().parse(expression));
+  public DimacsCnf(Expression<String> expression) {
+    this(new ExpressionToDimacsCnf().parse(expression));
   }
 
-  public DimacsCNF(DimacsCNF cnf) {
+  public DimacsCnf(DimacsCnf cnf) {
     this.orClauses = new ArrayList<>(cnf.orClauses);
     this.variables = new ArrayList<>(cnf.variables);
   }
 
-  public DimacsCNF(ArrayList<ArrayList<Variable>> orClauses) {
+  public DimacsCnf(ArrayList<ArrayList<Variable>> orClauses) {
     this(orClauses, orClauses.stream()
         .flatMap(Collection::stream)
         .distinct()
         .toList());
   }
 
-  public DimacsCNF(ArrayList<ArrayList<Variable>> orClauses, List<Variable> variables) {
+  public DimacsCnf(ArrayList<ArrayList<Variable>> orClauses, List<Variable> variables) {
     this.variables = List.copyOf(variables);
     this.orClauses = new ArrayList<>(orClauses);
   }
@@ -49,23 +49,23 @@ public class DimacsCNF {
    * @param string logical expression or dimacs cnf string
    * @return dimacs cnf structure
    */
-  public static DimacsCNF fromString(String string) throws ConversionException {
+  public static DimacsCnf fromString(String string) throws ConversionException {
     var x =
-        String.valueOf(DimacsCNF.PREAMBLE_START) + DimacsCNF.SEPARATOR + DimacsCNF.CNF_IDENTIFIER;
+        String.valueOf(DimacsCnf.PREAMBLE_START) + DimacsCnf.SEPARATOR + DimacsCnf.CNF_IDENTIFIER;
 
     return string.contains(x)
-        ? fromDimacsCNFString(string)
+        ? fromDimacsCnfString(string)
         : fromLogicalExpressionString(string);
   }
 
   /**
    * Create a dimacs cnf structure from a string in format of dimacs cnf
    *
-   * @param dimacsCNF dimacs cnf string
+   * @param dimacsCnf dimacs cnf string
    * @return dimacs cnf structure
    */
-  public static DimacsCNF fromDimacsCNFString(String dimacsCNF) throws ConversionException {
-    return StringToDimacsCNF.parse(dimacsCNF);
+  public static DimacsCnf fromDimacsCnfString(String dimacsCnf) throws ConversionException {
+    return StringToDimacsCnf.parse(dimacsCnf);
   }
 
   /**
@@ -74,7 +74,7 @@ public class DimacsCNF {
    * @param expression logical expression
    * @return dimacs cnf structure
    */
-  public static DimacsCNF fromLogicalExpressionString(String expression) {
+  public static DimacsCnf fromLogicalExpressionString(String expression) {
     // Streamline bool expr format
     expression = expression
         .replaceAll("\\b(?:not|NOT)\\b", "!")
@@ -84,7 +84,7 @@ public class DimacsCNF {
     Expression<String> parsedExpression = ExprParser.parse(expression);
     Expression<String> cnfExpression = RuleSet.toCNF(parsedExpression);
 
-    return new DimacsCNF(cnfExpression);
+    return new DimacsCnf(cnfExpression);
   }
 
   /**
@@ -106,11 +106,11 @@ public class DimacsCNF {
     return orClauses;
   }
 
-  public DimacsCNF addOrClause(ArrayList<Variable> orClause) {
+  public DimacsCnf addOrClause(ArrayList<Variable> orClause) {
     var newOrClauses = new ArrayList<>(orClauses);
     newOrClauses.add(orClause);
 
-    return new DimacsCNF(newOrClauses, Collections.unmodifiableList(variables));
+    return new DimacsCnf(newOrClauses, Collections.unmodifiableList(variables));
   }
 
   @Override

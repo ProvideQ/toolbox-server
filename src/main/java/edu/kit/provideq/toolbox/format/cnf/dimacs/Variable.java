@@ -6,7 +6,7 @@ public record Variable(int number, String name, boolean isNegated) {
   @Override
   public String toString() {
     if (isNegated) {
-      return DimacsCNF.NEGATION_PREFIX + String.valueOf(number);
+      return DimacsCnf.NEGATION_PREFIX + String.valueOf(number);
     }
 
     return String.valueOf(number);

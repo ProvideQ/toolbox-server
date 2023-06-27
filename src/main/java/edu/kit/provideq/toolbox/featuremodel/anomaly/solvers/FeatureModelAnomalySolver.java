@@ -1,13 +1,13 @@
-package edu.kit.provideq.toolbox.featureModel.anomaly.solvers;
+package edu.kit.provideq.toolbox.featuremodel.anomaly.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.convert.UvlToDimacsCNF;
+import edu.kit.provideq.toolbox.convert.UvlToDimacsCnf;
 import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.featureModel.anomaly.FeatureModelAnomalyProblem;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.FeatureModelAnomalyProblem;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -50,13 +50,13 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
     // Convert uvl to cnf
     String cnf;
     try {
-      cnf = UvlToDimacsCNF.convert(problem.problemData().featureModel());
+      cnf = UvlToDimacsCnf.convert(problem.problemData().featureModel());
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
       return;
     }
 
-    var satSolve = subRoutinePool.<String, DimacsCNFSolution>getSubRoutine(ProblemType.SAT);
+    var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
     switch (problem.problemData().anomaly()) {
       case VOID -> checkVoidFeatureModel(solution, cnf, satSolve);
       case DEAD -> checkDeadFeatures(solution, cnf, satSolve);
@@ -68,11 +68,11 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
   }
 
   private static void checkDeadFeatures(Solution<String> solution, String cnf,
-                                        Function<String, Solution<DimacsCNFSolution>> satSolve) {
+                                        Function<String, Solution<DimacsCnfSolution>> satSolve) {
     // Check if there are any Dead Features
-    DimacsCNF dimacsCNF;
+    DimacsCnf dimacsCnf;
     try {
-      dimacsCNF = DimacsCNF.fromDimacsCNFString(cnf);
+      dimacsCnf = DimacsCnf.fromDimacsCnfString(cnf);
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
       return;
@@ -81,21 +81,21 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
     var builder = new StringBuilder();
     var errorBuilder = new StringBuilder();
 
-    for (Variable variable : dimacsCNF.getVariables()) {
+    for (Variable variable : dimacsCnf.getVariables()) {
       // Use formula: ¬SAT (FM ∧ f) to check for a dead feature
       // So add variable to the cnf of the feature model and check if there is a solution
       // If there is a solution, the feature is not dead
       var orClause = new ArrayList<Variable>();
       orClause.add(variable);
-      var variableCNF = dimacsCNF.addOrClause(orClause);
+      var variableCnf = dimacsCnf.addOrClause(orClause);
 
-      var variableSolution = satSolve.apply(variableCNF.toString());
+      var variableSolution = satSolve.apply(variableCnf.toString());
 
       if (variableSolution.getStatus() == SolutionStatus.SOLVED) {
-        var dimacsCNFSolution =
-            DimacsCNFSolution.fromString(dimacsCNF, variableSolution.getSolutionData().toString());
+        var dimacsCnfSolution =
+            DimacsCnfSolution.fromString(dimacsCnf, variableSolution.getSolutionData().toString());
 
-        if (dimacsCNFSolution.isVoid()) {
+        if (dimacsCnfSolution.isVoid()) {
           builder.append(variable.name())
               .append("\n");
         }
@@ -123,19 +123,19 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
   }
 
   private static void checkVoidFeatureModel(Solution<String> solution, String cnf,
-                                            Function<String, Solution<DimacsCNFSolution>> satSolve) {
+                                            Function<String, Solution<DimacsCnfSolution>> satSolve) {
     // Check if the feature model is not a void feature model
     var voidSolution = satSolve.apply(cnf);
 
     solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
     if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
       // If there is a valid configuration, the feature model is not a void feature model
-      var dimacsCNFSolution = voidSolution.getSolutionData();
+      var dimacsCnfSolution = voidSolution.getSolutionData();
 
       solution.setSolutionData(voidSolution.getSolutionData().isVoid()
           ? "The feature model is a void feature model. The configuration is never valid."
           : "The feature model has valid configurations, for example: \n" +
-          dimacsCNFSolution.toHumanReadableString());
+          dimacsCnfSolution.toHumanReadableString());
       solution.complete();
     } else {
       solution.setDebugData(voidSolution.getDebugData());

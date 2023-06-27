@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-class ExpressionToDimacsCNF {
+class ExpressionToDimacsCnf {
   private int nextVariable = 1;
   private final HashMap<String, Variable> parsedVariables = new HashMap<>();
 
-  public DimacsCNF parse(Expression<String> cnfExpression) {
+  public DimacsCnf parse(Expression<String> cnfExpression) {
     parsedVariables.clear();
     nextVariable = 1;
 
@@ -32,7 +32,7 @@ class ExpressionToDimacsCNF {
 
     var variables = parsedVariables.values().stream().toList();
 
-    return new DimacsCNF(clauses, variables);
+    return new DimacsCnf(clauses, variables);
   }
 
   ArrayList<Variable> parseClause(Expression<String> expression) {

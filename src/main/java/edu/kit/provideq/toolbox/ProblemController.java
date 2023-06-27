@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox;
 import edu.kit.provideq.toolbox.meta.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,29 +16,29 @@ import java.util.stream.Collectors;
 /**
  * Abstract Controller, offers generic post and get methods
  *
- * @param <ProblemFormatType>  the type in which problem input is expected to arrive
- * @param <SolutionFormatType> the type in which a solution will be formatted
- * @param <SolverType>         the type of solver that is to be used to solve a problem
+ * @param <ProblemT>  the type in which problem input is expected to arrive
+ * @param <SolutionT> the type in which a solution will be formatted
+ * @param <SolverT>         the type of solver that is to be used to solve a problem
  */
-@Component
+@ComponentSolverType
 @RestController
-public abstract class ProblemController<ProblemFormatType, SolutionFormatType, SolverType extends ProblemSolver<ProblemFormatType, SolutionFormatType>> {
+public abstract class ProblemController<ProblemT, SolutionT, SolverT extends ProblemSolver<ProblemT, SolutionT>> {
   private ApplicationContext context;
 
   public abstract ProblemType getProblemType();
 
-  public abstract MetaSolver<SolverType> getMetaSolver();
+  public abstract MetaSolver<SolverT> getMetaSolver();
 
   @Autowired
   public void setApplicationContext(ApplicationContext context) {
     this.context = context;
   }
 
-  public Solution<SolutionFormatType> solve(SolveRequest<ProblemFormatType> request) {
-    Solution<SolutionFormatType> solution = SolutionManager.createSolution();
-    Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, getProblemType());
+  public Solution<SolutionT> solve(SolveRequest<ProblemT> request) {
+    Solution<SolutionT> solution = SolutionManager.createSolution();
+    Problem<ProblemT> problem = new Problem<>(request.requestContent, getProblemType());
 
-    SolverType solver = getMetaSolver()
+    SolverT solver = getMetaSolver()
         .getSolver(request.requestedSolverId)
         .orElseGet(() -> getMetaSolver().findSolver(problem, request.requestedMetaSolverSettings));
 
@@ -59,18 +58,18 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
     return solution;
   }
 
-  public Solution<SolutionFormatType> findSolution(long id) {
+  public Solution<SolutionT> findSolution(long id) {
     var solution = SolutionManager.getSolution(id);
     if (solution == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,
           String.format("Unable to find solution process with id %d", id));
     }
 
-    return (Solution<SolutionFormatType>) solution;
+    return (Solution<SolutionT>) solution;
   }
 
-  public SolverType getSolver(String id) {
-    Optional<SolverType> solver = getMetaSolver()
+  public SolverT getSolver(String id) {
+    Optional<SolverT> solver = getMetaSolver()
         .getAllSolvers()
         .stream()
         .filter(s -> id.equals(s.getId()))
@@ -93,7 +92,7 @@ public abstract class ProblemController<ProblemFormatType, SolutionFormatType, S
   }
 
   public List<SubRoutineDefinition> getSubRoutines(String id) {
-    SolverType solver = getSolver(id);
+    SolverT solver = getSolver(id);
     return solver.getSubRoutines();
   }
 }

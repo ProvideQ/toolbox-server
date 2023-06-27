@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.featureModel;
+package edu.kit.provideq.toolbox.featuremodel;
 
 import edu.kit.provideq.toolbox.SolveRequest;
 

@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.maxCut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.sat.SolveSatRequest;
-import edu.kit.provideq.toolbox.sat.solvers.GamsSATSolver;
+import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ public class SatSolverTest {
 
   public static Stream<String> provideSatSolverIds() {
     return Stream.of(
-        GamsSATSolver.class.getName()
+        GamsSatSolver.class.getName()
     );
   }
 

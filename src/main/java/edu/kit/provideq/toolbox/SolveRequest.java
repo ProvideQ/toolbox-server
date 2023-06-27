@@ -11,9 +11,9 @@ import java.util.Map;
  * Solve request containing some request content
  * CANNOT be abstract, otherwise internal springboot initializer throws
  */
-public class SolveRequest<RequestType> {
+public class SolveRequest<RequestT> {
   @Nullable
-  public RequestType requestContent;
+  public RequestT requestContent;
 
   @Nullable
   public String requestedSolverId;

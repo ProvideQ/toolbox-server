@@ -1,10 +1,10 @@
-package edu.kit.provideq.toolbox.featureModel.anomaly;
+package edu.kit.provideq.toolbox.featuremodel.anomaly;
 
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.setting.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import edu.kit.provideq.toolbox.featureModel.anomaly.solvers.*;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.solvers.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

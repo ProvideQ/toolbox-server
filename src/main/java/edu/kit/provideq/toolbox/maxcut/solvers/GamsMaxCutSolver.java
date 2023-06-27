@@ -1,11 +1,8 @@
-package edu.kit.provideq.toolbox.sat.solvers;
+package edu.kit.provideq.toolbox.maxcut.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,27 +11,27 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GamsSATSolver extends SATSolver {
-  private final String satPath;
+public class GamsMaxCutSolver extends MaxCutSolver {
+  private final String maxCutPath;
   private final ApplicationContext context;
 
   @Autowired
-  public GamsSATSolver(
-      @Value("${gams.directory.sat}") String satPath,
+  public GamsMaxCutSolver(
+      @Value("${gams.directory.max-cut}") String maxCutPath,
       ApplicationContext context) {
-    this.satPath = satPath;
+    this.maxCutPath = maxCutPath;
     this.context = context;
   }
 
   @Override
   public String getName() {
-    return "GAMS SAT";
+    return "GAMS MaxCut";
   }
 
   @Override
   public boolean canSolve(Problem<String> problem) {
     //TODO: assess problemData
-    return problem.type() == ProblemType.SAT;
+    return problem.type() == ProblemType.MAX_CUT;
   }
 
   @Override
@@ -44,29 +41,18 @@ public class GamsSATSolver extends SATSolver {
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<DimacsCNFSolution> solution,
+  public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
-    DimacsCNF dimacsCNF;
-    try {
-      dimacsCNF = DimacsCNF.fromString(problem.problemData());
-      solution.setDebugData("Using cnf input: " + dimacsCNF);
-    } catch (ConversionException | RuntimeException e) {
-      solution.setDebugData("Parsing error: " + e.getMessage());
-      return;
-    }
-
-    // Run SAT with GAMS via console
+    // Run MaxCut with GAMS via console
     var processResult = context
         .getBean(
             GamsProcessRunner.class,
-            satPath,
-            "sat.gms")
-        .run(problem.type(), solution.getId(), dimacsCNF.toString());
+            maxCutPath,
+            "maxcut.gms")
+        .run(problem.type(), solution.getId(), problem.problemData());
 
     if (processResult.success()) {
-      var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, processResult.output());
-
-      solution.setSolutionData(dimacsCNFSolution);
+      solution.setSolutionData(processResult.output());
       solution.complete();
     } else {
       solution.setDebugData(processResult.output());

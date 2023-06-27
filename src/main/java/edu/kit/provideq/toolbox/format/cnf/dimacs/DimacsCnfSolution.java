@@ -1,32 +1,31 @@
 package edu.kit.provideq.toolbox.format.cnf.dimacs;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNF.*;
+import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf.*;
 
-public class DimacsCNFSolution {
+public class DimacsCnfSolution {
   public final static char SOLUTION_START = 's';
   public final static char VARIABLE_DECLARATION = 'v';
 
-  private final DimacsCNF dimacsCNF;
+  private final DimacsCnf dimacsCnf;
 
   /**
    * Unmodifiable mapping from a variable to its boolean state.
    */
   private final Map<Variable, Boolean> variableMap;
 
-  public DimacsCNFSolution(DimacsCNF dimacsCNF, Map<Variable, Boolean> variableMap) {
-    this.dimacsCNF = dimacsCNF;
+  public DimacsCnfSolution(DimacsCnf dimacsCnf, Map<Variable, Boolean> variableMap) {
+    this.dimacsCnf = dimacsCnf;
     this.variableMap = Map.copyOf(variableMap);
   }
 
-  public static DimacsCNFSolution fromString(DimacsCNF dimacsCNF, String solutionString) {
-    Map<Integer, Boolean> variableMap = StringToDimacsCNFSolution.parse(solutionString);
+  public static DimacsCnfSolution fromString(DimacsCnf dimacsCnf, String solutionString) {
+    Map<Integer, Boolean> variableMap = StringToDimacsCnfSolution.parse(solutionString);
 
-    Map<Variable, Boolean> namedVariableMap = dimacsCNF
+    Map<Variable, Boolean> namedVariableMap = dimacsCnf
         .getVariables()
         .stream()
         .filter(v -> variableMap.containsKey(v.number()))
@@ -35,7 +34,7 @@ public class DimacsCNFSolution {
             variable -> variableMap.get(variable.number())
         ));
 
-    return new DimacsCNFSolution(dimacsCNF, namedVariableMap);
+    return new DimacsCnfSolution(dimacsCnf, namedVariableMap);
   }
 
   /**
@@ -67,7 +66,7 @@ public class DimacsCNFSolution {
         .append(SEPARATOR)
         .append(variableMap.size())
         .append(SEPARATOR)
-        .append(dimacsCNF.getOrClauses().size())
+        .append(dimacsCnf.getOrClauses().size())
         .append(LINE_SEPARATOR);
 
     // Add variable declarations

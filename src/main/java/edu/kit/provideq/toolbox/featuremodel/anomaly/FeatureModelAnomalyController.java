@@ -1,11 +1,11 @@
-package edu.kit.provideq.toolbox.featureModel.anomaly;
+package edu.kit.provideq.toolbox.featuremodel.anomaly;
 
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionHandle;
-import edu.kit.provideq.toolbox.featureModel.SolveFeatureModelRequest;
-import edu.kit.provideq.toolbox.featureModel.anomaly.solvers.*;
+import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.solvers.*;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;

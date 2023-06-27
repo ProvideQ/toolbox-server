@@ -1,9 +1,9 @@
-package edu.kit.provideq.toolbox.maxCut;
+package edu.kit.provideq.toolbox.maxcut;
 
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
-import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
+import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import jakarta.validation.Valid;
 import java.util.List;

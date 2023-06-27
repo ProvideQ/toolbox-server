@@ -14,7 +14,7 @@ import java.util.function.Function;
  * @param <S> the type of the generated solution data
  */
 public class Solution<S> implements SolutionHandle {
-  private final long ID;
+  private final long id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
   private S solutionData;
@@ -26,15 +26,15 @@ public class Solution<S> implements SolutionHandle {
    * Internal constructor, used for de-serialization.
    */
   private Solution() {
-    this.ID = Long.MIN_VALUE;
+    this.id = Long.MIN_VALUE;
   }
 
-  public Solution(long ID) {
-    this.ID = ID;
+  public Solution(long id) {
+    this.id = id;
   }
 
   public long getId() {
-    return this.ID;
+    return this.id;
   }
 
   public SolutionStatus getStatus() {
@@ -139,19 +139,19 @@ public class Solution<S> implements SolutionHandle {
       return false;
     }
     var that = (Solution<S>) obj;
-    return this.ID == that.ID &&
+    return this.id == that.id &&
         Objects.equals(this.status, that.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(ID, status);
+    return Objects.hash(id, status);
   }
 
   @Override
   public String toString() {
     return "Solution[" +
-        "id=" + ID + ", " +
+        "id=" + id + ", " +
         "status=" + status + ", " +
         "metaData=" + metaData + ", " +
         "solutionData" + solutionData + ']';

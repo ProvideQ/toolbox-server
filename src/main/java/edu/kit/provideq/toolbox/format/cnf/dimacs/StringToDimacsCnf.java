@@ -7,21 +7,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class StringToDimacsCNF {
-  public static DimacsCNF parse(String dimacsCNFString) throws ConversionException {
+class StringToDimacsCnf {
+  public static DimacsCnf parse(String dimacsCnfString) throws ConversionException {
     var variableMap = new HashMap<Integer, String>();
     var clauses = new ArrayList<ArrayList<Variable>>();
 
     var variableCount = new AtomicInteger(-1);
     var clauseCount = new AtomicInteger(-1);
 
-    dimacsCNFString
+    dimacsCnfString
         .lines()
-        .map(line -> line.split(String.valueOf(DimacsCNF.SEPARATOR)))
+        .map(line -> line.split(String.valueOf(DimacsCnf.SEPARATOR)))
         .toList()
         .forEach(lineSegment -> {
           switch (lineSegment[0].charAt(0)) {
-            case DimacsCNF.COMMENT_START -> {
+            case DimacsCnf.COMMENT_START -> {
               if (lineSegment.length < 3) {
                 break;
               }
@@ -32,12 +32,12 @@ class StringToDimacsCNF {
                   String.join(" ", Arrays.copyOfRange(lineSegment, 2, lineSegment.length));
               variableMap.put(number, name);
             }
-            case DimacsCNF.PREAMBLE_START -> {
+            case DimacsCnf.PREAMBLE_START -> {
               // Parse preamble
-              if (!DimacsCNF.CNF_IDENTIFIER.equals(lineSegment[1])) {
+              if (!DimacsCnf.CNF_IDENTIFIER.equals(lineSegment[1])) {
                 throw new RuntimeException(
                     "Excepted Dimacs CNF identifier %s in header, but found %s".formatted(
-                        DimacsCNF.CNF_IDENTIFIER, lineSegment[1]));
+                        DimacsCnf.CNF_IDENTIFIER, lineSegment[1]));
               }
 
               variableCount.set(Integer.parseInt(lineSegment[2]));
@@ -50,7 +50,7 @@ class StringToDimacsCNF {
                 var number = Math.abs(Integer.parseInt(lineSegment[i]));
                 var name = variableMap.get(number);
 
-                var isNegated = lineSegment[i].charAt(0) == DimacsCNF.NEGATION_PREFIX;
+                var isNegated = lineSegment[i].charAt(0) == DimacsCnf.NEGATION_PREFIX;
                 clause.add(new Variable(number, name, isNegated));
               }
               clauses.add(clause);
@@ -70,6 +70,6 @@ class StringToDimacsCNF {
               clauseCount.get(), clauses.size()));
     }
 
-    return new DimacsCNF(clauses);
+    return new DimacsCnf(clauses);
   }
 }
