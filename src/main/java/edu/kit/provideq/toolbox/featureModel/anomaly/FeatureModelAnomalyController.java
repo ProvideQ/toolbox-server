@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-public class FeatureModelAnomalyController extends ProblemController<FeatureModelAnomalyProblem, String, FeatureModelAnomalySolver> {
+public class FeatureModelAnomalyController
+    extends ProblemController<FeatureModelAnomalyProblem, String, FeatureModelAnomalySolver> {
 
   private final MetaSolver<FeatureModelAnomalySolver> metaSolver;
 
@@ -49,19 +50,23 @@ public class FeatureModelAnomalyController extends ProblemController<FeatureMode
 
   @CrossOrigin
   @PostMapping("/solve/feature-model/anomaly/false-optional")
-  public SolutionHandle findFalseOptionalFeatures(@RequestBody @Valid SolveFeatureModelRequest request) {
+  public SolutionHandle findFalseOptionalFeatures(
+      @RequestBody @Valid SolveFeatureModelRequest request) {
     return solveAnomaly(request, FeatureModelAnomaly.FALSE_OPTIONAL);
   }
 
   @CrossOrigin
   @PostMapping("/solve/feature-model/anomaly/redundant-constraints")
-  public SolutionHandle findRedundantConstraints(@RequestBody @Valid SolveFeatureModelRequest request) {
+  public SolutionHandle findRedundantConstraints(
+      @RequestBody @Valid SolveFeatureModelRequest request) {
     return solveAnomaly(request, FeatureModelAnomaly.REDUNDANT_CONSTRAINTS);
   }
 
-  private SolutionHandle solveAnomaly(SolveFeatureModelRequest request, FeatureModelAnomaly anomaly) {
-    var solution = (Solution) super.solve(request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
-    solution.setSolverName(solution.getSolverName()  + ": " + anomaly.name);
+  private SolutionHandle solveAnomaly(SolveFeatureModelRequest request,
+                                      FeatureModelAnomaly anomaly) {
+    var solution = (Solution) super.solve(
+        request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
+    solution.setSolverName(solution.getSolverName() + ": " + anomaly.name);
     return solution;
   }
 

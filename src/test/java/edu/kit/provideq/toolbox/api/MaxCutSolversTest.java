@@ -27,68 +27,69 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class MaxCutSolversTest {
-    @Autowired
-    private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-    @Autowired
-    private ObjectMapper mapper;
+  @Autowired
+  private ObjectMapper mapper;
 
-    public static Stream<String> provideMaxCutSolverIds() {
-        return Stream.of(
-                GamsMaxCutSolver.class.getName(),
-                QiskitMaxCutSolver.class.getName()
-        );
-    }
+  public static Stream<String> provideMaxCutSolverIds() {
+    return Stream.of(
+        GamsMaxCutSolver.class.getName(),
+        QiskitMaxCutSolver.class.getName()
+    );
+  }
 
-    @ParameterizedTest
-    @MethodSource("provideMaxCutSolverIds")
-    void testMaxCutSolver(String solverId) throws Exception {
-        var req = new SolveMaxCutRequest();
-        req.requestedSolverId = solverId;
-        req.requestContent = """
-                graph [
-                    id 42
-                    node [
-                        id 1
-                        label "1"
-                    ]
-                    node [
-                        id 2
-                        label "2"
-                    ]
-                    node [
-                        id 3
-                        label "3"
-                    ]
-                    edge [
-                        source 1
-                        target 2
-                    ]
-                    edge [
-                        source 2
-                        target 3
-                    ]
-                    edge [
-                        source 3
-                        target 1
-                    ]
-                ]""";
+  @ParameterizedTest
+  @MethodSource("provideMaxCutSolverIds")
+  void testMaxCutSolver(String solverId) throws Exception {
+    var req = new SolveMaxCutRequest();
+    req.requestedSolverId = solverId;
+    req.requestContent = """
+        graph [
+            id 42
+            node [
+                id 1
+                label "1"
+            ]
+            node [
+                id 2
+                label "2"
+            ]
+            node [
+                id 3
+                label "3"
+            ]
+            edge [
+                source 1
+                target 2
+            ]
+            edge [
+                source 2
+                target 3
+            ]
+            edge [
+                source 3
+                target 1
+            ]
+        ]""";
 
-        var requestBuilder = MockMvcRequestBuilders
-                .post("/solve/max-cut")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(req));
+    var requestBuilder = MockMvcRequestBuilders
+        .post("/solve/max-cut")
+        .accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(mapper.writeValueAsString(req));
 
-        var result = mvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse().getContentAsString();
+    var result = mvc.perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse().getContentAsString();
 
-        JavaType solutionType = mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
-        Solution<String> solution = mapper.readValue(result, solutionType);
+    JavaType solutionType =
+        mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
+    Solution<String> solution = mapper.readValue(result, solutionType);
 
-        assertThat(solution.getStatus())
-                .isSameAs(SolutionStatus.SOLVED);
-    }
+    assertThat(solution.getStatus())
+        .isSameAs(SolutionStatus.SOLVED);
+  }
 }

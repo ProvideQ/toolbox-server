@@ -28,6 +28,8 @@ public abstract class SolutionManager {
 
   public static void removeSolution(long id) {
     var solution = getSolution(id);
-    if (solution != null) SOLUTIONS.remove(solution);
+    if (solution != null) {
+      SOLUTIONS.remove(solution);
+    }
   }
 }

@@ -11,14 +11,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class QiskitMaxCutSolver extends MaxCutSolver{
+public class QiskitMaxCutSolver extends MaxCutSolver {
   private final String maxCutPath;
   private final ApplicationContext context;
 
   @Autowired
   public QiskitMaxCutSolver(
-          @Value("${qiskit.directory.max-cut}") String maxCutPath,
-          ApplicationContext context) {
+      @Value("${qiskit.directory.max-cut}") String maxCutPath,
+      ApplicationContext context) {
     this.maxCutPath = maxCutPath;
     this.context = context;
   }
@@ -41,16 +41,17 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
+  public void solve(Problem<String> problem, Solution<String> solution,
+                    SubRoutinePool subRoutinePool) {
     // Run Qiskit solver via console
     var processResult = context
-            .getBean(
-                    PythonProcessRunner.class,
-                    maxCutPath,
-                    "maxCut_qiskit.py")
-            .addProblemFilePathToProcessCommand()
-            .addSolutionFilePathToProcessCommand()
-            .run(problem.type(), solution.getId(), problem.problemData());
+        .getBean(
+            PythonProcessRunner.class,
+            maxCutPath,
+            "maxCut_qiskit.py")
+        .addProblemFilePathToProcessCommand()
+        .addSolutionFilePathToProcessCommand()
+        .run(problem.type(), solution.getId(), problem.problemData());
 
     if (processResult.success()) {
       solution.setSolutionData(processResult.output());

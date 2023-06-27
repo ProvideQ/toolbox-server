@@ -25,40 +25,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class SatSolverTest {
-    @Autowired
-    private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-    @Autowired
-    private ObjectMapper mapper;
+  @Autowired
+  private ObjectMapper mapper;
 
-    public static Stream<String> provideSatSolverIds() {
-        return Stream.of(
-                GamsSATSolver.class.getName()
-        );
-    }
+  public static Stream<String> provideSatSolverIds() {
+    return Stream.of(
+        GamsSATSolver.class.getName()
+    );
+  }
 
-    @ParameterizedTest
-    @MethodSource("provideSatSolverIds")
-    void testSatSolver(String solverId) throws Exception {
-        var req = new SolveSatRequest();
-        req.requestedSolverId = solverId;
-        req.requestContent = "a and b";
+  @ParameterizedTest
+  @MethodSource("provideSatSolverIds")
+  void testSatSolver(String solverId) throws Exception {
+    var req = new SolveSatRequest();
+    req.requestedSolverId = solverId;
+    req.requestContent = "a and b";
 
-        var requestBuilder = MockMvcRequestBuilders
-                .post("/solve/sat")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(req));
+    var requestBuilder = MockMvcRequestBuilders
+        .post("/solve/sat")
+        .accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(mapper.writeValueAsString(req));
 
-        var result = mvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse().getContentAsString();
+    var result = mvc.perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse().getContentAsString();
 
-        JavaType solutionType = mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
-        Solution<String> solution = mapper.readValue(result, solutionType);
+    JavaType solutionType =
+        mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
+    Solution<String> solution = mapper.readValue(result, solutionType);
 
-        assertThat(solution.getStatus())
-                .isSameAs(SolutionStatus.SOLVED);
-    }
+    assertThat(solution.getStatus())
+        .isSameAs(SolutionStatus.SOLVED);
+  }
 }

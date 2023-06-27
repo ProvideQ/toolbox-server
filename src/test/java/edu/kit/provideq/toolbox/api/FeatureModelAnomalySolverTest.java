@@ -26,76 +26,78 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class FeatureModelAnomalySolverTest {
-    @Autowired
-    private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-    @Autowired
-    private ObjectMapper mapper;
+  @Autowired
+  private ObjectMapper mapper;
 
-    public static Stream<Arguments> provideAnomalySolverIds() {
-        String solverId = FeatureModelAnomalySolver.class.getName();
-        return Stream.of(
-                Arguments.of(solverId, "void", SolutionStatus.SOLVED),
-                Arguments.of(solverId, "dead", SolutionStatus.SOLVED),
+  public static Stream<Arguments> provideAnomalySolverIds() {
+    String solverId = FeatureModelAnomalySolver.class.getName();
+    return Stream.of(
+        Arguments.of(solverId, "void", SolutionStatus.SOLVED),
+        Arguments.of(solverId, "dead", SolutionStatus.SOLVED),
 
-                // not implemented yet, change to SOLVED when they have been implemented!
-                Arguments.of(solverId, "false-optional", SolutionStatus.INVALID),
-                Arguments.of(solverId, "redundant-constraints", SolutionStatus.INVALID)
-        );
-    }
+        // not implemented yet, change to SOLVED when they have been implemented!
+        Arguments.of(solverId, "false-optional", SolutionStatus.INVALID),
+        Arguments.of(solverId, "redundant-constraints", SolutionStatus.INVALID)
+    );
+  }
 
-    @ParameterizedTest
-    @MethodSource("provideAnomalySolverIds")
-    void testFeatureModelAnomalySolver(String solverId, String anomalyType, SolutionStatus expectedStatus) throws Exception {
-        var req = new SolveFeatureModelRequest();
-        req.requestedSolverId = solverId;
-        req.requestContent = """
-                namespace Sandwich
-                                
-                features
-                    Sandwich {extended__}   \s
-                        mandatory
-                            Bread   \s
-                                alternative
-                                    "Full Grain" {Calories 203, Price 1.99, Organic true}
-                                    Flatbread {Calories 90, Price 0.79, Organic true}
-                                    Toast {Calories 250, Price 0.99, Organic false}
+  @ParameterizedTest
+  @MethodSource("provideAnomalySolverIds")
+  void testFeatureModelAnomalySolver(String solverId, String anomalyType,
+                                     SolutionStatus expectedStatus) throws Exception {
+    var req = new SolveFeatureModelRequest();
+    req.requestedSolverId = solverId;
+    req.requestContent = """
+        namespace Sandwich
+                        
+        features
+            Sandwich {extended__}   \s
+                mandatory
+                    Bread   \s
+                        alternative
+                            "Full Grain" {Calories 203, Price 1.99, Organic true}
+                            Flatbread {Calories 90, Price 0.79, Organic true}
+                            Toast {Calories 250, Price 0.99, Organic false}
+                optional
+                    Cheese   \s
                         optional
-                            Cheese   \s
-                                optional
-                                    Gouda   \s
-                                        alternative
-                                            Sprinkled {Fat {value 35, unit "g"}}
-                                            Slice {Fat {value 35, unit "g"}}
-                                    Cheddar
-                                    "Cream Cheese"
-                            Meat   \s
-                                or
-                                    "Salami" {Producer "Farmer Bob"}
-                                    Ham {Producer "Farmer Sam"}
-                                    "Chicken Breast" {Producer "Farmer Sam"}
-                            Vegetables   \s
-                                optional
-                                    "Cucumber"
-                                    Tomatoes
-                                    Lettuce
-                """;
+                            Gouda   \s
+                                alternative
+                                    Sprinkled {Fat {value 35, unit "g"}}
+                                    Slice {Fat {value 35, unit "g"}}
+                            Cheddar
+                            "Cream Cheese"
+                    Meat   \s
+                        or
+                            "Salami" {Producer "Farmer Bob"}
+                            Ham {Producer "Farmer Sam"}
+                            "Chicken Breast" {Producer "Farmer Sam"}
+                    Vegetables   \s
+                        optional
+                            "Cucumber"
+                            Tomatoes
+                            Lettuce
+        """;
 
-        var requestBuilder = MockMvcRequestBuilders
-                .post("/solve/feature-model/anomaly/" + anomalyType)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(req));
+    var requestBuilder = MockMvcRequestBuilders
+        .post("/solve/feature-model/anomaly/" + anomalyType)
+        .accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(mapper.writeValueAsString(req));
 
-        var result = mvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse().getContentAsString();
+    var result = mvc.perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse().getContentAsString();
 
-        JavaType solutionType = mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
-        Solution<String> solution = mapper.readValue(result, solutionType);
+    JavaType solutionType =
+        mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
+    Solution<String> solution = mapper.readValue(result, solutionType);
 
-        assertThat(solution.getStatus())
-                .isSameAs(expectedStatus);
-    }
+    assertThat(solution.getStatus())
+        .isSameAs(expectedStatus);
+  }
 }

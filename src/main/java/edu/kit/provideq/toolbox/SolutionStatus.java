@@ -20,7 +20,7 @@ public enum SolutionStatus {
    */
   private final boolean isCompleted;
 
-  private SolutionStatus (boolean isCompleted) {
+  private SolutionStatus(boolean isCompleted) {
     this.isCompleted = isCompleted;
   }
 

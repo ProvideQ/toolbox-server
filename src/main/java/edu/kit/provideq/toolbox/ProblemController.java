@@ -24,76 +24,76 @@ import java.util.stream.Collectors;
 @Component
 @RestController
 public abstract class ProblemController<ProblemFormatType, SolutionFormatType, SolverType extends ProblemSolver<ProblemFormatType, SolutionFormatType>> {
-    private ApplicationContext context;
+  private ApplicationContext context;
 
-    public abstract ProblemType getProblemType();
+  public abstract ProblemType getProblemType();
 
-    public abstract MetaSolver<SolverType> getMetaSolver();
+  public abstract MetaSolver<SolverType> getMetaSolver();
 
-    @Autowired
-    public void setApplicationContext(ApplicationContext context) {
-        this.context = context;
+  @Autowired
+  public void setApplicationContext(ApplicationContext context) {
+    this.context = context;
+  }
+
+  public Solution<SolutionFormatType> solve(SolveRequest<ProblemFormatType> request) {
+    Solution<SolutionFormatType> solution = SolutionManager.createSolution();
+    Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, getProblemType());
+
+    SolverType solver = getMetaSolver()
+        .getSolver(request.requestedSolverId)
+        .orElseGet(() -> getMetaSolver().findSolver(problem, request.requestedMetaSolverSettings));
+
+    solution.setSolverName(solver.getName());
+
+    SubRoutinePool subRoutinePool =
+        request.requestedSubSolveRequests == null
+            ? context.getBean(SubRoutinePool.class)
+            : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
+
+    long start = System.currentTimeMillis();
+    solver.solve(problem, solution, subRoutinePool);
+    long finish = System.currentTimeMillis();
+
+    solution.setExecutionMilliseconds(finish - start);
+
+    return solution;
+  }
+
+  public Solution<SolutionFormatType> findSolution(long id) {
+    var solution = SolutionManager.getSolution(id);
+    if (solution == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+          String.format("Unable to find solution process with id %d", id));
     }
 
-    public Solution<SolutionFormatType> solve(SolveRequest<ProblemFormatType> request) {
-        Solution<SolutionFormatType> solution = SolutionManager.createSolution();
-        Problem<ProblemFormatType> problem = new Problem<>(request.requestContent, getProblemType());
+    return (Solution<SolutionFormatType>) solution;
+  }
 
-        SolverType solver = getMetaSolver()
-                .getSolver(request.requestedSolverId)
-                .orElseGet(() -> getMetaSolver().findSolver(problem, request.requestedMetaSolverSettings));
+  public SolverType getSolver(String id) {
+    Optional<SolverType> solver = getMetaSolver()
+        .getAllSolvers()
+        .stream()
+        .filter(s -> id.equals(s.getId()))
+        .findFirst();
 
-        solution.setSolverName(solver.getName());
-
-        SubRoutinePool subRoutinePool =
-                request.requestedSubSolveRequests == null
-                        ? context.getBean(SubRoutinePool.class)
-                        : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
-
-        long start = System.currentTimeMillis();
-        solver.solve(problem, solution, subRoutinePool);
-        long finish = System.currentTimeMillis();
-
-        solution.setExecutionMilliseconds(finish - start);
-
-        return solution;
+    if (solver.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+          String.format("Unable to find solver %s", id));
     }
 
-    public Solution<SolutionFormatType> findSolution(long id) {
-        var solution = SolutionManager.getSolution(id);
-        if (solution == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("Unable to find solution process with id %d", id));
-        }
+    return solver.get();
+  }
 
-        return (Solution<SolutionFormatType>) solution;
-    }
+  public Set<ProblemSolverInfo> getSolvers() {
+    return getMetaSolver()
+        .getAllSolvers()
+        .stream()
+        .map(s -> new ProblemSolverInfo(s.getId(), s.getName()))
+        .collect(Collectors.toSet());
+  }
 
-    public SolverType getSolver(String id) {
-        Optional<SolverType> solver = getMetaSolver()
-                .getAllSolvers()
-                .stream()
-                .filter(s -> id.equals(s.getId()))
-                .findFirst();
-
-        if (solver.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("Unable to find solver %s", id));
-        }
-
-        return solver.get();
-    }
-
-    public Set<ProblemSolverInfo> getSolvers() {
-        return getMetaSolver()
-                .getAllSolvers()
-                .stream()
-                .map(s -> new ProblemSolverInfo(s.getId(), s.getName()))
-                .collect(Collectors.toSet());
-    }
-
-    public List<SubRoutineDefinition> getSubRoutines(String id) {
-        SolverType solver = getSolver(id);
-        return solver.getSubRoutines();
-    }
+  public List<SubRoutineDefinition> getSubRoutines(String id) {
+    SolverType solver = getSolver(id);
+    return solver.getSubRoutines();
+  }
 }

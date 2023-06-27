@@ -14,32 +14,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UvlToDimacsCNF {
-    static {
-        FMCoreLibrary.getInstance().install();
+  static {
+    FMCoreLibrary.getInstance().install();
+  }
+
+  public static String convert(String content) throws ConversionException {
+    CharSequence charSequence = content.subSequence(0, content.length());
+
+    // Init empty model
+    var model = new MultiFeatureModel("de.ovgu.featureide.fm.core.MultiFeatureModelFactory");
+
+    // Parse uvl
+    var uvlFeatureModelHandler = new FormatHandler<>(new UVLFeatureModelFormat(), model);
+    List<Problem> problems = uvlFeatureModelHandler.read(charSequence);
+    if (problems.size() > 0) {
+      throw new ConversionException("UVL conversion resulted in errors "
+          + problems
+          .stream()
+          .map(Object::toString)
+          .collect(Collectors.joining("\n")));
     }
 
-    public static String convert(String content) throws ConversionException {
-        CharSequence charSequence = content.subSequence(0, content.length());
+    IFeatureModel fm = uvlFeatureModelHandler.getObject();
 
-        // Init empty model
-        var model = new MultiFeatureModel("de.ovgu.featureide.fm.core.MultiFeatureModelFactory");
+    FeatureModelFormula featureModelFormula = new FeatureModelFormula(fm);
+    var cnf = featureModelFormula.getCNF();
 
-        // Parse uvl
-        var uvlFeatureModelHandler = new FormatHandler<>(new UVLFeatureModelFormat(), model);
-        List<Problem> problems = uvlFeatureModelHandler.read(charSequence);
-        if (problems.size() > 0) {
-            throw new ConversionException("UVL conversion resulted in errors "
-                    + problems
-                    .stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining("\n")));
-        }
-
-        IFeatureModel fm = uvlFeatureModelHandler.getObject();
-
-        FeatureModelFormula featureModelFormula = new FeatureModelFormula(fm);
-        var cnf = featureModelFormula.getCNF();
-
-        return new DIMACSFormatCNF().write(cnf);
-    }
+    return new DIMACSFormatCNF().write(cnf);
+  }
 }

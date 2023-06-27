@@ -10,6 +10,7 @@ import java.util.function.Function;
  * {@link edu.kit.provideq.toolbox.meta.Problem} solving process triggered by a
  * {@link edu.kit.provideq.toolbox.meta.ProblemSolver}. This includes meta data, debug data,
  * the current status of the process, as well as the eventually generated solution data
+ *
  * @param <S> the type of the generated solution data
  */
 public class Solution<S> implements SolutionHandle {
@@ -53,6 +54,7 @@ public class Solution<S> implements SolutionHandle {
   /**
    * Converts this {@link Solution}{@code <T>} to a {@link Solution}{@code <String>} by applying a given transformation
    * function.
+   *
    * @param stringSelector the function that transforms the {@link Solution#solutionData} of type T to a String.
    * @return the solution with the stringified solution data.
    */
@@ -62,7 +64,8 @@ public class Solution<S> implements SolutionHandle {
     var stringSolution = new Solution<String>(getId());
     stringSolution.status = status;
     stringSolution.metaData = metaData;
-    stringSolution.solutionData = (solutionData == null) ? null : stringSelector.apply(solutionData);
+    stringSolution.solutionData =
+        (solutionData == null) ? null : stringSelector.apply(solutionData);
     stringSolution.debugData = debugData;
     stringSolution.solverName = solverName;
     stringSolution.executionMilliseconds = executionMilliseconds;
@@ -73,14 +76,18 @@ public class Solution<S> implements SolutionHandle {
    * sets the status to 'invalid'. irreversible
    */
   public void abort() {
-    if (!this.status.isCompleted()) this.status = SolutionStatus.INVALID;
+    if (!this.status.isCompleted()) {
+      this.status = SolutionStatus.INVALID;
+    }
   }
 
   /**
    * Sets the status to 'solved'. irreversible
    */
   public void complete() {
-    if (!this.status.isCompleted()) this.status = SolutionStatus.SOLVED;
+    if (!this.status.isCompleted()) {
+      this.status = SolutionStatus.SOLVED;
+    }
   }
 
   public String getMetaData() {
@@ -125,8 +132,12 @@ public class Solution<S> implements SolutionHandle {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (obj == null || obj.getClass() != this.getClass()) return false;
+    if (obj == this) {
+      return true;
+    }
+    if (obj == null || obj.getClass() != this.getClass()) {
+      return false;
+    }
     var that = (Solution<S>) obj;
     return this.ID == that.ID &&
         Objects.equals(this.status, that.status);

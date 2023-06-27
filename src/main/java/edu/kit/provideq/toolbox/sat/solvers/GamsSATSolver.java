@@ -15,61 +15,62 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GamsSATSolver extends SATSolver {
-    private final String satPath;
-    private final ApplicationContext context;
+  private final String satPath;
+  private final ApplicationContext context;
 
-    @Autowired
-    public GamsSATSolver(
-            @Value("${gams.directory.sat}") String satPath,
-            ApplicationContext context) {
-        this.satPath = satPath;
-        this.context = context;
+  @Autowired
+  public GamsSATSolver(
+      @Value("${gams.directory.sat}") String satPath,
+      ApplicationContext context) {
+    this.satPath = satPath;
+    this.context = context;
+  }
+
+  @Override
+  public String getName() {
+    return "GAMS SAT";
+  }
+
+  @Override
+  public boolean canSolve(Problem<String> problem) {
+    //TODO: assess problemData
+    return problem.type() == ProblemType.SAT;
+  }
+
+  @Override
+  public float getSuitability(Problem<String> problem) {
+    //TODO: implement algorithm for suitability calculation
+    return 1;
+  }
+
+  @Override
+  public void solve(Problem<String> problem, Solution<DimacsCNFSolution> solution,
+                    SubRoutinePool subRoutinePool) {
+    DimacsCNF dimacsCNF;
+    try {
+      dimacsCNF = DimacsCNF.fromString(problem.problemData());
+      solution.setDebugData("Using cnf input: " + dimacsCNF);
+    } catch (ConversionException | RuntimeException e) {
+      solution.setDebugData("Parsing error: " + e.getMessage());
+      return;
     }
 
-    @Override
-    public String getName() {
-        return "GAMS SAT";
+    // Run SAT with GAMS via console
+    var processResult = context
+        .getBean(
+            GamsProcessRunner.class,
+            satPath,
+            "sat.gms")
+        .run(problem.type(), solution.getId(), dimacsCNF.toString());
+
+    if (processResult.success()) {
+      var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, processResult.output());
+
+      solution.setSolutionData(dimacsCNFSolution);
+      solution.complete();
+    } else {
+      solution.setDebugData(processResult.output());
+      solution.abort();
     }
-
-    @Override
-    public boolean canSolve(Problem<String> problem) {
-        //TODO: assess problemData
-        return problem.type() == ProblemType.SAT;
-    }
-
-    @Override
-    public float getSuitability(Problem<String> problem) {
-        //TODO: implement algorithm for suitability calculation
-        return 1;
-    }
-
-    @Override
-    public void solve(Problem<String> problem, Solution<DimacsCNFSolution> solution, SubRoutinePool subRoutinePool) {
-        DimacsCNF dimacsCNF;
-        try {
-            dimacsCNF = DimacsCNF.fromString(problem.problemData());
-            solution.setDebugData("Using cnf input: " + dimacsCNF);
-        } catch (ConversionException | RuntimeException e) {
-            solution.setDebugData("Parsing error: " + e.getMessage());
-            return;
-        }
-
-        // Run SAT with GAMS via console
-        var processResult = context
-                .getBean(
-                        GamsProcessRunner.class,
-                        satPath,
-                        "sat.gms")
-                .run(problem.type(), solution.getId(), dimacsCNF.toString());
-
-        if (processResult.success()) {
-            var dimacsCNFSolution = DimacsCNFSolution.fromString(dimacsCNF, processResult.output());
-
-            solution.setSolutionData(dimacsCNFSolution);
-            solution.complete();
-        } else {
-            solution.setDebugData(processResult.output());
-            solution.abort();
-        }
-    }
+  }
 }

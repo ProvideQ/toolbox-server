@@ -11,19 +11,19 @@ import java.util.stream.Collectors;
 
 @Component
 public class ProblemControllerProvider {
-    private final Map<ProblemType, ProblemController> problemControllers;
+  private final Map<ProblemType, ProblemController> problemControllers;
 
-    @Autowired
-    public ProblemControllerProvider(
-            ApplicationContext context) {
-        problemControllers =
-                context.getBeansOfType(ProblemController.class)
-                        .values()
-                        .stream()
-                        .collect(Collectors.toMap(ProblemController::getProblemType, Function.identity()));
-    }
+  @Autowired
+  public ProblemControllerProvider(
+      ApplicationContext context) {
+    problemControllers =
+        context.getBeansOfType(ProblemController.class)
+            .values()
+            .stream()
+            .collect(Collectors.toMap(ProblemController::getProblemType, Function.identity()));
+  }
 
-    public ProblemController getProblemController(ProblemType problemType) {
-        return problemControllers.get(problemType);
-    }
+  public ProblemController getProblemController(ProblemType problemType) {
+    return problemControllers.get(problemType);
+  }
 }

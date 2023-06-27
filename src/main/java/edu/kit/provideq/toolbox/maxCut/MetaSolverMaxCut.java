@@ -20,7 +20,8 @@ import java.util.Random;
 public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {
 
   @Autowired
-  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver, GamsMaxCutSolver gamsMaxCutSolver) {
+  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver,
+                          GamsMaxCutSolver gamsMaxCutSolver) {
     super(qiskitMaxCutSolver, gamsMaxCutSolver);
   }
 

@@ -4,21 +4,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 class StringToDimacsCNFSolution {
-    public static Map<Integer, Boolean> parse(String solutionString) {
-        var variableMap = new HashMap<Integer, Boolean>();
+  public static Map<Integer, Boolean> parse(String solutionString) {
+    var variableMap = new HashMap<Integer, Boolean>();
 
-        solutionString
-                .lines()
-                .map(line -> line.split(String.valueOf(DimacsCNF.SEPARATOR)))
-                .forEach(lineSegment -> {
-                    if (lineSegment[0].charAt(0) == DimacsCNFSolution.VARIABLE_DECLARATION) {
-                        // Parse variable declaration
-                        var number = Integer.parseInt(lineSegment[1]);
+    solutionString
+        .lines()
+        .map(line -> line.split(String.valueOf(DimacsCNF.SEPARATOR)))
+        .forEach(lineSegment -> {
+          if (lineSegment[0].charAt(0) == DimacsCNFSolution.VARIABLE_DECLARATION) {
+            // Parse variable declaration
+            var number = Integer.parseInt(lineSegment[1]);
 
-                        variableMap.put(Math.abs(number), number >= 0);
-                    }
-                });
+            variableMap.put(Math.abs(number), number >= 0);
+          }
+        });
 
-        return variableMap;
-    }
+    return variableMap;
+  }
 }

@@ -13,68 +13,68 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class DimacsCNFTests {
-    @ParameterizedTest
-    @MethodSource("testToStringParameters")
-    public void testToString(String expression, String result) throws ConversionException {
-        result = result.replace("\n", System.lineSeparator());
+  @ParameterizedTest
+  @MethodSource("testToStringParameters")
+  public void testToString(String expression, String result) throws ConversionException {
+    result = result.replace("\n", System.lineSeparator());
 
-        var dimacsCNF = DimacsCNF.fromString(expression);
-        assertEquals(result, dimacsCNF.toString());
-    }
+    var dimacsCNF = DimacsCNF.fromString(expression);
+    assertEquals(result, dimacsCNF.toString());
+  }
 
-    static Stream<Arguments> testToStringParameters() {
-        return Stream.of(
-                Arguments.arguments("(!A | B)", """
-                        c 2 A
-                        c 1 B
-                        p cnf 2 1
-                        1 -2 0
-                        """),
-                Arguments.arguments("!A | B", """
-                        c 2 A
-                        c 1 B
-                        p cnf 2 1
-                        1 -2 0
-                        """),
-                Arguments.arguments("not A or B", """
-                        c 2 A
-                        c 1 B
-                        p cnf 2 1
-                        1 -2 0
-                        """),
-                Arguments.arguments("(!A | B) & !C & D", """
-                        c 4 A
-                        c 3 B
-                        c 2 C
-                        c 1 D
-                        p cnf 4 3
-                        1 0
-                        -2 0
-                        3 -4 0
-                        """),
-                Arguments.arguments("(A | B) & C", """
-                        c 2 A
-                        c 3 B
-                        c 1 C
-                        p cnf 3 2
-                        1 0
-                        2 3 0
-                        """),
-                Arguments.arguments("""
-                        c 1 C
-                        c 2 A
-                        c 3 B
-                        p cnf 3 2
-                        1 0
-                        2 -3 0
-                        """, """
-                        c 1 C
-                        c 2 A
-                        c 3 B
-                        p cnf 3 2
-                        1 0
-                        2 -3 0
-                        """)
-        );
-    }
+  static Stream<Arguments> testToStringParameters() {
+    return Stream.of(
+        Arguments.arguments("(!A | B)", """
+            c 2 A
+            c 1 B
+            p cnf 2 1
+            1 -2 0
+            """),
+        Arguments.arguments("!A | B", """
+            c 2 A
+            c 1 B
+            p cnf 2 1
+            1 -2 0
+            """),
+        Arguments.arguments("not A or B", """
+            c 2 A
+            c 1 B
+            p cnf 2 1
+            1 -2 0
+            """),
+        Arguments.arguments("(!A | B) & !C & D", """
+            c 4 A
+            c 3 B
+            c 2 C
+            c 1 D
+            p cnf 4 3
+            1 0
+            -2 0
+            3 -4 0
+            """),
+        Arguments.arguments("(A | B) & C", """
+            c 2 A
+            c 3 B
+            c 1 C
+            p cnf 3 2
+            1 0
+            2 3 0
+            """),
+        Arguments.arguments("""
+            c 1 C
+            c 2 A
+            c 3 B
+            p cnf 3 2
+            1 0
+            2 -3 0
+            """, """
+            c 1 C
+            c 2 A
+            c 3 B
+            p cnf 3 2
+            1 0
+            2 -3 0
+            """)
+    );
+  }
 }
