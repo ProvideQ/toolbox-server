@@ -21,7 +21,7 @@ public class DimacsCnf {
   private final List<Variable> variables;
   private final ArrayList<ArrayList<Variable>> orClauses;
 
-  public DimacsCnf(Expression<String> expression) {
+  public DimacsCnf(Expression<String> expression) throws ConversionException {
     this(new ExpressionToDimacsCnf().parse(expression));
   }
 
@@ -73,7 +73,8 @@ public class DimacsCnf {
    * @param expression logical expression
    * @return dimacs cnf structure
    */
-  public static DimacsCnf fromLogicalExpressionString(String expression) {
+  public static DimacsCnf fromLogicalExpressionString(String expression)
+      throws ConversionException {
     // Streamline bool expr format
     expression = expression
         .replaceAll("\\b(?:not|NOT)\\b", "!")

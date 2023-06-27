@@ -4,6 +4,7 @@ import com.bpodgursky.jbool_expressions.And;
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.Not;
 import com.bpodgursky.jbool_expressions.Or;
+import edu.kit.provideq.toolbox.exception.ConversionException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ class ExpressionToDimacsCnf {
   private int nextVariable = 1;
   private final HashMap<String, Variable> parsedVariables = new HashMap<>();
 
-  public DimacsCnf parse(Expression<String> cnfExpression) {
+  public DimacsCnf parse(Expression<String> cnfExpression) throws ConversionException {
     parsedVariables.clear();
     nextVariable = 1;
 
@@ -34,14 +35,14 @@ class ExpressionToDimacsCnf {
     return new DimacsCnf(clauses, variables);
   }
 
-  ArrayList<Variable> parseClause(Expression<String> expression) {
+  ArrayList<Variable> parseClause(Expression<String> expression) throws ConversionException {
     var variables = new ArrayList<Variable>();
     addVariables(variables, expression);
 
     return variables;
   }
 
-  void addVariables(List<Variable> variables, Expression<String> e) {
+  void addVariables(List<Variable> variables, Expression<String> e) throws ConversionException {
     // Expression can be a (negated) variable or an OR of multiple variables
     // Add parsed variables to list
 
@@ -60,6 +61,8 @@ class ExpressionToDimacsCnf {
         var name = ((com.bpodgursky.jbool_expressions.Variable<String>) e).getValue();
         variables.add(getVariable(name, false));
       }
+      default -> throw new ConversionException("Unexpected expression of type " + e.getExprType()
+          + " when adding variables " + e);
     }
   }
 
