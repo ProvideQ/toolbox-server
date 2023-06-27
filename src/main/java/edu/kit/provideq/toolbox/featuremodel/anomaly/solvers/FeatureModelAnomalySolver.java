@@ -63,6 +63,10 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
         solution.setDebugData("Not implemented yet!");
         solution.abort();
       }
+      default -> {
+        solution.setDebugData("Unknown anomaly type " + problem.problemData().anomaly() + "!");
+        solution.abort();
+      }
     }
   }
 
