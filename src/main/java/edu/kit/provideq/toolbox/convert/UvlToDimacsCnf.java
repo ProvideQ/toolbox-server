@@ -9,7 +9,6 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormatCNF;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
 import edu.kit.provideq.toolbox.exception.ConversionException;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

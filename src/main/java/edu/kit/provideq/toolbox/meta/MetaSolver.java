@@ -1,8 +1,11 @@
 package edu.kit.provideq.toolbox.meta;
 
-import edu.kit.provideq.toolbox.meta.setting.*;
-
-import java.util.*;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Decides which known {@link ProblemSolver} is suited best for a given problem,

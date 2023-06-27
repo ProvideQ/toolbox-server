@@ -2,10 +2,9 @@ package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import org.springframework.lang.Nullable;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 
 /**
  * Solve request containing some request content

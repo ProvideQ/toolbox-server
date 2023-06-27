@@ -1,18 +1,17 @@
 package edu.kit.provideq.toolbox.sat;
 
 import edu.kit.provideq.toolbox.ProblemController;
-import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
+import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
-import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.sat.solvers.SatSolver;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.web.bind.annotation.*;
 
 @RestController

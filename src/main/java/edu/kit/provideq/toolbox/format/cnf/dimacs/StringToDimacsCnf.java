@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.format.cnf.dimacs;
 
 import edu.kit.provideq.toolbox.exception.ConversionException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

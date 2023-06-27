@@ -1,10 +1,10 @@
 package edu.kit.provideq.toolbox.convert;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class UvlToDimacsCnfTests {

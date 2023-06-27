@@ -4,20 +4,19 @@ import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.parsers.ExprParser;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 import edu.kit.provideq.toolbox.exception.ConversionException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class DimacsCnf {
-  final static String LINE_SEPARATOR = System.lineSeparator();
-  final static char SEPARATOR = ' ';
-  final static char NEGATION_PREFIX = '-';
-  final static char COMMENT_START = 'c';
-  final static char PREAMBLE_START = 'p';
-  final static char CLAUSE_END = '0';
-  final static String CNF_IDENTIFIER = "cnf";
+  static final String LINE_SEPARATOR = System.lineSeparator();
+  static final char SEPARATOR = ' ';
+  static final char NEGATION_PREFIX = '-';
+  static final char COMMENT_START = 'c';
+  static final char PREAMBLE_START = 'p';
+  static final char CLAUSE_END = '0';
+  static final String CNF_IDENTIFIER = "cnf";
 
   private final List<Variable> variables;
   private final ArrayList<ArrayList<Variable>> orClauses;

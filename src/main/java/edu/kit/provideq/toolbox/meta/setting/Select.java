@@ -1,7 +1,7 @@
 package edu.kit.provideq.toolbox.meta.setting;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class Select<T> extends MetaSolverSetting {
   public List<T> options;

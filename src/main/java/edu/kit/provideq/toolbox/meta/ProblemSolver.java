@@ -2,7 +2,6 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-
 import java.util.Collections;
 import java.util.List;
 

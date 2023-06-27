@@ -2,15 +2,14 @@ package edu.kit.provideq.toolbox.sat;
 
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.setting.*;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import edu.kit.provideq.toolbox.sat.solvers.SatSolver;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Simple {@link MetaSolver} for SAT problems

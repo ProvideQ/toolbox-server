@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox;
 
 import jakarta.validation.constraints.NotNull;
-
 import java.util.Objects;
 import java.util.function.Function;
 

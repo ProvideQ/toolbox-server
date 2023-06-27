@@ -4,7 +4,6 @@ import com.bpodgursky.jbool_expressions.And;
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.Not;
 import com.bpodgursky.jbool_expressions.Or;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

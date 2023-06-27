@@ -1,14 +1,18 @@
 package edu.kit.provideq.toolbox.format.cnf.dimacs;
 
+import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf.CNF_IDENTIFIER;
+import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf.LINE_SEPARATOR;
+import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf.NEGATION_PREFIX;
+import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf.SEPARATOR;
+import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf.addVariableComments;
+
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf.*;
-
 public class DimacsCnfSolution {
-  public final static char SOLUTION_START = 's';
-  public final static char VARIABLE_DECLARATION = 'v';
+  public static final char SOLUTION_START = 's';
+  public static final char VARIABLE_DECLARATION = 'v';
 
   private final DimacsCnf dimacsCnf;
 

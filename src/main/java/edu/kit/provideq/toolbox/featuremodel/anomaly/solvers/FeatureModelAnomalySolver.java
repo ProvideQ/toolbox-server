@@ -10,13 +10,12 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import org.springframework.stereotype.Component;
-
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.springframework.stereotype.Component;
 
 @Component
 public class FeatureModelAnomalySolver extends FeatureModelSolver {
