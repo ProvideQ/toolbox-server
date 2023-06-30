@@ -21,7 +21,7 @@ public class SolveRequest<RequestT> {
   public List<MetaSolverSetting> requestedMetaSolverSettings;
 
   @Nullable
-  public Map<ProblemType, SolveRequest> requestedSubSolveRequests;
+  public Map<ProblemType, SolveRequest<?>> requestedSubSolveRequests;
 
   public <T> SolveRequest<T> replaceContent(T otherContent) {
     var request = new SolveRequest<T>();

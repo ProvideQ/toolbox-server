@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SubRoutinePool {
-  private final Map<ProblemType, SolveRequest> subRoutineCalls;
+  private final Map<ProblemType, SolveRequest<?>> subRoutineCalls;
 
   private ProblemControllerProvider problemControllerProvider;
 
@@ -25,7 +25,7 @@ public class SubRoutinePool {
    *
    * @param requestedSubRoutines problem types mapped to a solve requests
    */
-  public SubRoutinePool(Map<ProblemType, SolveRequest> requestedSubRoutines) {
+  public SubRoutinePool(Map<ProblemType, SolveRequest<?>> requestedSubRoutines) {
     this.subRoutineCalls = Map.copyOf(requestedSubRoutines);
   }
 
@@ -45,7 +45,7 @@ public class SubRoutinePool {
   public <ProblemT, SolutionT> Function<ProblemT, Solution<SolutionT>> getSubRoutine(
       ProblemType problemType) {
     return content -> {
-      SolveRequest<ProblemT> subRoutine = subRoutineCalls.get(problemType);
+      SolveRequest<?> subRoutine = subRoutineCalls.get(problemType);
       if (subRoutine == null) {
         subRoutine = new SolveRequest<>();
       }
