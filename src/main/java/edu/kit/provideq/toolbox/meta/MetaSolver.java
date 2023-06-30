@@ -1,8 +1,11 @@
 package edu.kit.provideq.toolbox.meta;
 
-import edu.kit.provideq.toolbox.meta.setting.*;
-
-import java.util.*;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Decides which known {@link ProblemSolver} is suited best for a given problem,
@@ -26,7 +29,8 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   /**
-   * adds a new solver to this meta solvers list of known solvers
+   * Adds a new solver to this meta solvers list of known solvers.
+   *
    * @param problemSolver the new problem solver
    * @return true in case the addition was successful, false otherwise
    */
@@ -35,7 +39,8 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   /**
-   * removes a solver from this meta solvers list of known solvers
+   * Removes a solver from this meta solvers list of known solvers.
+   *
    * @param problemSolver the solver
    * @return true in case the removal was successful, false otherwise
    */
@@ -44,7 +49,8 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   /**
-   * provides the best suited known solver this meta solver is aware of for a given problem
+   * Provides the best suited known solver this meta solver is aware of for a given problem.
+   *
    * @param problem the problem the meta solver is to check its solvers by
    * @return the best suited solver, null in case no suitable solver was found
    */
@@ -56,15 +62,18 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   }
 
   public Optional<T> getSolver(String id) {
-    if (id == null) return Optional.empty();
+    if (id == null) {
+      return Optional.empty();
+    }
 
     return solvers.stream()
-            .filter(solver -> solver.getId().equals(id))
-            .findFirst();
+        .filter(solver -> solver.getId().equals(id))
+        .findFirst();
   }
 
   /**
-   * provides a list of all solvers registered on this meta solver
+   * Provides a list of all solvers registered on this meta solver.
+   *
    * @return list of all solvers
    */
   public Set<T> getAllSolvers() {

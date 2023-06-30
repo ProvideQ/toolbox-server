@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
+    id 'checkstyle'
 }
 
 group = 'edu.kit.provideq'
@@ -30,3 +31,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 targetCompatibility = JavaVersion.VERSION_17
+
+checkstyle {
+    toolVersion = '10.12.0'
+}

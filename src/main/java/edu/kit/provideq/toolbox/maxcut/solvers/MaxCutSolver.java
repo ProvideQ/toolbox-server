@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.maxCut.solvers;
+package edu.kit.provideq.toolbox.maxcut.solvers;
 
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 

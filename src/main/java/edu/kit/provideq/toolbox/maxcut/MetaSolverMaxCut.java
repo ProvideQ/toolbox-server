@@ -1,26 +1,26 @@
-package edu.kit.provideq.toolbox.maxCut;
+package edu.kit.provideq.toolbox.maxcut;
 
-import edu.kit.provideq.toolbox.maxCut.solvers.GamsMaxCutSolver;
-import edu.kit.provideq.toolbox.maxCut.solvers.MaxCutSolver;
-import edu.kit.provideq.toolbox.maxCut.solvers.QiskitMaxCutSolver;
+import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
+import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
+import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
- * Simple {@link MetaSolver} for MaxCut problems
+ * Simple {@link MetaSolver} for MaxCut problems.
  */
 @Component
 public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {
 
   @Autowired
-  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver, GamsMaxCutSolver gamsMaxCutSolver) {
+  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver,
+                          GamsMaxCutSolver gamsMaxCutSolver) {
     super(qiskitMaxCutSolver, gamsMaxCutSolver);
   }
 

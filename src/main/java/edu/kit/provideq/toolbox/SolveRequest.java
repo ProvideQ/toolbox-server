@@ -2,18 +2,17 @@ package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import org.springframework.lang.Nullable;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 
 /**
- * Solve request containing some request content
- * CANNOT be abstract, otherwise internal springboot initializer throws
+ * Solve request containing some request content.
+ * CANNOT be abstract, otherwise internal springboot initializer throws.
  */
-public class SolveRequest<RequestType> {
+public class SolveRequest<RequestT> {
   @Nullable
-  public RequestType requestContent;
+  public RequestT requestContent;
 
   @Nullable
   public String requestedSolverId;

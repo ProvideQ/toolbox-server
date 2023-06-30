@@ -1,26 +1,30 @@
 package edu.kit.provideq.toolbox.sat;
 
 import edu.kit.provideq.toolbox.ProblemController;
-import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCNFSolution;
+import edu.kit.provideq.toolbox.SolutionHandle;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
-import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.sat.solvers.SATSolver;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import edu.kit.provideq.toolbox.sat.solvers.SatSolver;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class SatController extends ProblemController<String, DimacsCNFSolution, SATSolver> {
+public class SatController extends ProblemController<String, DimacsCnfSolution, SatSolver> {
 
-  private final MetaSolver<SATSolver> metaSolver;
+  private final MetaSolver<SatSolver> metaSolver;
 
-  public SatController(MetaSolver<SATSolver> metaSolver) {
+  public SatController(MetaSolver<SatSolver> metaSolver) {
     this.metaSolver = metaSolver;
   }
 
@@ -30,20 +34,20 @@ public class SatController extends ProblemController<String, DimacsCNFSolution, 
   }
 
   @Override
-  public MetaSolver<SATSolver> getMetaSolver() {
+  public MetaSolver<SatSolver> getMetaSolver() {
     return metaSolver;
   }
 
   @CrossOrigin
   @PostMapping("/solve/sat")
   public SolutionHandle solveSat(@RequestBody @Valid SolveSatRequest request) {
-    return super.solve(request).toStringSolution(DimacsCNFSolution::toHumanReadableString);
+    return super.solve(request).toStringSolution(DimacsCnfSolution::toHumanReadableString);
   }
 
   @CrossOrigin
   @GetMapping("/solve/sat")
   public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
-    return super.findSolution(id).toStringSolution(DimacsCNFSolution::toHumanReadableString);
+    return super.findSolution(id).toStringSolution(DimacsCnfSolution::toHumanReadableString);
   }
 
   @CrossOrigin

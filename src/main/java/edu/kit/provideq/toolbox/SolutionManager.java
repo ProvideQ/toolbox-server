@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Manages all solutions currently present in memory
+ * Manages all solutions currently present in memory.
  */
 public abstract class SolutionManager {
   private static final AtomicLong NEXT_ID = new AtomicLong();
@@ -28,6 +28,8 @@ public abstract class SolutionManager {
 
   public static void removeSolution(long id) {
     var solution = getSolution(id);
-    if (solution != null) SOLUTIONS.remove(solution);
+    if (solution != null) {
+      SOLUTIONS.remove(solution);
+    }
   }
 }

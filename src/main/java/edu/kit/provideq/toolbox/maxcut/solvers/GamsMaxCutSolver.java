@@ -1,6 +1,6 @@
-package edu.kit.provideq.toolbox.maxCut.solvers;
+package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
+import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -11,21 +11,21 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class QiskitMaxCutSolver extends MaxCutSolver{
+public class GamsMaxCutSolver extends MaxCutSolver {
   private final String maxCutPath;
   private final ApplicationContext context;
 
   @Autowired
-  public QiskitMaxCutSolver(
-          @Value("${qiskit.directory.max-cut}") String maxCutPath,
-          ApplicationContext context) {
+  public GamsMaxCutSolver(
+      @Value("${gams.directory.max-cut}") String maxCutPath,
+      ApplicationContext context) {
     this.maxCutPath = maxCutPath;
     this.context = context;
   }
 
   @Override
   public String getName() {
-    return "Qiskit MaxCut";
+    return "GAMS MaxCut";
   }
 
   @Override
@@ -41,16 +41,15 @@ public class QiskitMaxCutSolver extends MaxCutSolver{
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
-    // Run Qiskit solver via console
+  public void solve(Problem<String> problem, Solution<String> solution,
+                    SubRoutinePool subRoutinePool) {
+    // Run MaxCut with GAMS via console
     var processResult = context
-            .getBean(
-                    PythonProcessRunner.class,
-                    maxCutPath,
-                    "maxCut_qiskit.py")
-            .addProblemFilePathToProcessCommand()
-            .addSolutionFilePathToProcessCommand()
-            .run(problem.type(), solution.getId(), problem.problemData());
+        .getBean(
+            GamsProcessRunner.class,
+            maxCutPath,
+            "maxcut.gms")
+        .run(problem.type(), solution.getId(), problem.problemData());
 
     if (processResult.success()) {
       solution.setSolutionData(processResult.output());

@@ -30,7 +30,8 @@ public class GamsProcessRunner extends ProcessRunner {
 
   /**
    * Creates a process runner for a GAMS task.
-   * @param directory the working directory to run GAMS in.
+   *
+   * @param directory      the working directory to run GAMS in.
    * @param scriptFileName the filename of the GAMS script to run.
    */
   public GamsProcessRunner(String directory, String scriptFileName) {
@@ -39,9 +40,11 @@ public class GamsProcessRunner extends ProcessRunner {
 
   /**
    * Creates a process runner for a GAMS task.
-   * @param directory the working directory to run GAMS in.
+   *
+   * @param directory      the working directory to run GAMS in.
    * @param scriptFileName the filename of the GAMS script to run.
-   * @param arguments extra arguments to pass to GAMS. Use this to pass problem input to the solver.
+   * @param arguments      extra arguments to pass to GAMS. Use this to pass problem input to the
+   *                       solver.
    */
   public GamsProcessRunner(String directory, String scriptFileName, String... arguments) {
     super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName, arguments));
@@ -64,7 +67,7 @@ public class GamsProcessRunner extends ProcessRunner {
     String[] lines = output.split("\n");
 
     // init negatively to avoid unintended obfuscation in the beginning
-    int lastLicenseHeader = - LICENSE_LINE_COUNT;
+    int lastLicenseHeader = -LICENSE_LINE_COUNT;
     for (int i = 0; i < lines.length; i++) {
       if (lines[i].startsWith(LICENSE_HEADER_PREFIX)) {
         lastLicenseHeader = i;
