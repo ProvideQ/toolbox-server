@@ -35,12 +35,6 @@ public class GamsMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public float getSuitability(Problem<String> problem) {
-    //TODO: implement algorithm for suitability calculation
-    return 1;
-  }
-
-  @Override
   public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Run MaxCut with GAMS via console
