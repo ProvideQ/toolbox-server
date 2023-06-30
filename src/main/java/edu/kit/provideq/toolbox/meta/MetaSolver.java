@@ -10,20 +10,24 @@ import java.util.Set;
  * Decides which known {@link ProblemSolver} is suited best for a given problem,
  * manages known solvers.
  *
- * @param <T> the type of {@link ProblemSolver} this metasolver is to manage
+ * @param <SolverT> the type of {@link ProblemSolver} this metasolver is to manage
  */
-public abstract class MetaSolver<T extends ProblemSolver> {
+public abstract class MetaSolver<
+        ProblemT,
+        SolutionT,
+        SolverT extends ProblemSolver<ProblemT, SolutionT>> {
 
-  protected Set<T> solvers = new HashSet<>();
+  protected Set<SolverT> solvers = new HashSet<>();
 
   public MetaSolver() {
   }
 
-  public MetaSolver(List<T> problemSolvers) {
+  public MetaSolver(List<SolverT> problemSolvers) {
     solvers.addAll(problemSolvers);
   }
 
-  public MetaSolver(T... problemSolvers) {
+  @SafeVarargs
+  public MetaSolver(SolverT... problemSolvers) {
     solvers.addAll(List.of(problemSolvers));
   }
 
@@ -33,7 +37,7 @@ public abstract class MetaSolver<T extends ProblemSolver> {
    * @param problemSolver the new problem solver
    * @return true in case the addition was successful, false otherwise
    */
-  public boolean registerSolver(T problemSolver) {
+  public boolean registerSolver(SolverT problemSolver) {
     return solvers.add(problemSolver);
   }
 
@@ -43,7 +47,7 @@ public abstract class MetaSolver<T extends ProblemSolver> {
    * @param problemSolver the solver
    * @return true in case the removal was successful, false otherwise
    */
-  public boolean unregisterSolver(T problemSolver) {
+  public boolean unregisterSolver(SolverT problemSolver) {
     return solvers.remove(problemSolver);
   }
 
@@ -53,9 +57,9 @@ public abstract class MetaSolver<T extends ProblemSolver> {
    * @param problem the problem the meta solver is to check its solvers by
    * @return the best suited solver, null in case no suitable solver was found
    */
-  public abstract T findSolver(Problem problem, List<MetaSolverSetting> metaSolverSettings);
+  public abstract SolverT findSolver(Problem<ProblemT> problem, List<MetaSolverSetting> metaSolverSettings);
 
-  public Optional<T> getSolver(String id) {
+  public Optional<SolverT> getSolver(String id) {
     if (id == null) {
       return Optional.empty();
     }
@@ -68,9 +72,9 @@ public abstract class MetaSolver<T extends ProblemSolver> {
   /**
    * Provides a list of all solvers registered on this meta solver.
    *
-   * @return list of all solvers
+   * @return set of all solvers
    */
-  public Set<T> getAllSolvers() {
+  public Set<SolverT> getAllSolvers() {
     return new HashSet<>(solvers);
   }
 

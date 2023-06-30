@@ -31,7 +31,7 @@ public abstract class ProblemController<ProblemT, SolutionT, SolverT
 
   public abstract ProblemType getProblemType();
 
-  public abstract MetaSolver<SolverT> getMetaSolver();
+  public abstract MetaSolver<ProblemT, SolutionT, SolverT> getMetaSolver();
 
   @Autowired
   public void setApplicationContext(ApplicationContext context) {

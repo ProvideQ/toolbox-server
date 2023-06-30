@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MaxCutController extends ProblemController<String, String, MaxCutSolver> {
 
-  private final MetaSolver<MaxCutSolver> metaSolver;
+  private final MetaSolver<String, String, MaxCutSolver> metaSolver;
 
-  public MaxCutController(MetaSolver<MaxCutSolver> metaSolver) {
+  public MaxCutController(MetaSolver<String, String, MaxCutSolver> metaSolver) {
     this.metaSolver = metaSolver;
   }
 
@@ -33,7 +33,7 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
   }
 
   @Override
-  public MetaSolver<MaxCutSolver> getMetaSolver() {
+  public MetaSolver<String, String, MaxCutSolver> getMetaSolver() {
     return metaSolver;
   }
 

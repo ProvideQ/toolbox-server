@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.sat;
 
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
  * Simple {@link MetaSolver} for SAT problems.
  */
 @Component
-public class MetaSolverSat extends MetaSolver<SatSolver> {
+public class MetaSolverSat extends MetaSolver<String, DimacsCnfSolution, SatSolver> {
 
   @Autowired
   public MetaSolverSat(GamsSatSolver gamsSatSolver) {
@@ -24,7 +25,7 @@ public class MetaSolverSat extends MetaSolver<SatSolver> {
   }
 
   @Override
-  public SatSolver findSolver(Problem problem, List<MetaSolverSetting> metaSolverSettings) {
+  public SatSolver findSolver(Problem<String> problem, List<MetaSolverSetting> metaSolverSettings) {
     // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
