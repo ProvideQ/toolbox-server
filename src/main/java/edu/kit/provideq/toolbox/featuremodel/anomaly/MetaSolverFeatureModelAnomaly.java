@@ -14,7 +14,10 @@ import org.springframework.stereotype.Component;
  * Simple {@link MetaSolver} for FeatureModel problems.
  */
 @Component
-public class MetaSolverFeatureModelAnomaly extends MetaSolver<FeatureModelAnomalySolver> {
+public class MetaSolverFeatureModelAnomaly extends MetaSolver<
+        edu.kit.provideq.toolbox.featuremodel.anomaly.FeatureModelAnomalyProblem,
+        String,
+        FeatureModelAnomalySolver> {
 
   @Autowired
   public MetaSolverFeatureModelAnomaly(FeatureModelAnomalySolver anomalySolver) {
@@ -22,8 +25,9 @@ public class MetaSolverFeatureModelAnomaly extends MetaSolver<FeatureModelAnomal
   }
 
   @Override
-  public FeatureModelAnomalySolver findSolver(Problem problem,
-                                              List<MetaSolverSetting> metaSolverSettings) {
+  public FeatureModelAnomalySolver findSolver(
+          Problem<edu.kit.provideq.toolbox.featuremodel.anomaly.FeatureModelAnomalyProblem> problem,
+          List<MetaSolverSetting> metaSolverSettings) {
     // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }

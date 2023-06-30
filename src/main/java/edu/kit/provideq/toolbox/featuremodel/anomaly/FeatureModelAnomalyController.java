@@ -24,9 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class FeatureModelAnomalyController
     extends ProblemController<FeatureModelAnomalyProblem, String, FeatureModelAnomalySolver> {
 
-  private final MetaSolver<FeatureModelAnomalySolver> metaSolver;
+  private final MetaSolver<
+          FeatureModelAnomalyProblem,
+          String,
+          FeatureModelAnomalySolver> metaSolver;
 
-  public FeatureModelAnomalyController(MetaSolver<FeatureModelAnomalySolver> metaSolver) {
+  public FeatureModelAnomalyController(MetaSolver<
+          FeatureModelAnomalyProblem,
+          String,
+          FeatureModelAnomalySolver> metaSolver) {
     this.metaSolver = metaSolver;
   }
 
@@ -36,7 +42,7 @@ public class FeatureModelAnomalyController
   }
 
   @Override
-  public MetaSolver<FeatureModelAnomalySolver> getMetaSolver() {
+  public MetaSolver<FeatureModelAnomalyProblem, String, FeatureModelAnomalySolver> getMetaSolver() {
     return metaSolver;
   }
 
@@ -68,7 +74,7 @@ public class FeatureModelAnomalyController
 
   private SolutionHandle solveAnomaly(SolveFeatureModelRequest request,
                                       FeatureModelAnomaly anomaly) {
-    var solution = (Solution) super.solve(
+    var solution = (Solution<String>) super.solve(
         request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
     solution.setSolverName(solution.getSolverName() + ": " + anomaly.name);
     return solution;

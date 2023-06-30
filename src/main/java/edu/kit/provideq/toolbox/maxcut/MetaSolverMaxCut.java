@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * Simple {@link MetaSolver} for MaxCut problems.
  */
 @Component
-public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {
+public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
 
   @Autowired
   public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver,
@@ -25,7 +25,9 @@ public class MetaSolverMaxCut extends MetaSolver<MaxCutSolver> {
   }
 
   @Override
-  public MaxCutSolver findSolver(Problem problem, List<MetaSolverSetting> metaSolverSettings) {
+  public MaxCutSolver findSolver(
+          Problem<String> problem,
+          List<MetaSolverSetting> metaSolverSettings) {
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
 }

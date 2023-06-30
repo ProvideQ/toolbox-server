@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SatController extends ProblemController<String, DimacsCnfSolution, SatSolver> {
 
-  private final MetaSolver<SatSolver> metaSolver;
+  private final MetaSolver<String, DimacsCnfSolution, SatSolver> metaSolver;
 
-  public SatController(MetaSolver<SatSolver> metaSolver) {
+  public SatController(MetaSolver<String, DimacsCnfSolution, SatSolver> metaSolver) {
     this.metaSolver = metaSolver;
   }
 
@@ -34,7 +34,7 @@ public class SatController extends ProblemController<String, DimacsCnfSolution, 
   }
 
   @Override
-  public MetaSolver<SatSolver> getMetaSolver() {
+  public MetaSolver<String, DimacsCnfSolution, SatSolver> getMetaSolver() {
     return metaSolver;
   }
 
