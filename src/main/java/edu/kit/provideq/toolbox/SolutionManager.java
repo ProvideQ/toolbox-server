@@ -7,29 +7,29 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Manages all solutions currently present in memory.
  */
-public abstract class SolutionManager {
-  private static final AtomicLong NEXT_ID = new AtomicLong();
+public class SolutionManager<SolutionT> {
+  private final AtomicLong nextId = new AtomicLong();
 
-  private static final List<Solution<?>> SOLUTIONS = new LinkedList<>();
+  private final List<Solution<SolutionT>> solutions = new LinkedList<>();
 
-  public static <T> Solution<T> createSolution() {
-    var id = SolutionManager.NEXT_ID.incrementAndGet();
-    Solution<T> solution = new Solution<>(id);
-    SolutionManager.SOLUTIONS.add(solution);
+  public Solution<SolutionT> createSolution() {
+    var id = nextId.incrementAndGet();
+    Solution<SolutionT> solution = new Solution<>(id);
+    solutions.add(solution);
     return solution;
   }
 
-  public static Solution<?> getSolution(long id) {
-    return SOLUTIONS.stream()
+  public Solution<SolutionT> getSolution(long id) {
+    return solutions.stream()
         .filter(s -> s.getId() == id)
         .findFirst()
         .orElse(null);
   }
 
-  public static void removeSolution(long id) {
+  public void removeSolution(long id) {
     var solution = getSolution(id);
     if (solution != null) {
-      SOLUTIONS.remove(solution);
+      solutions.remove(solution);
     }
   }
 }

@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 public abstract class ProblemController<ProblemT, SolutionT, SolverT
     extends ProblemSolver<ProblemT, SolutionT>> {
   private ApplicationContext context;
+  private final SolutionManager<SolutionT> solutionManager = new SolutionManager<>();
 
   public abstract ProblemType getProblemType();
 
@@ -39,7 +40,7 @@ public abstract class ProblemController<ProblemT, SolutionT, SolverT
   }
 
   public Solution<SolutionT> solve(SolveRequest<ProblemT> request) {
-    Solution<SolutionT> solution = SolutionManager.createSolution();
+    Solution<SolutionT> solution = solutionManager.createSolution();
     Problem<ProblemT> problem = new Problem<>(request.requestContent, getProblemType());
 
     SolverT solver = getMetaSolver()
@@ -63,13 +64,13 @@ public abstract class ProblemController<ProblemT, SolutionT, SolverT
   }
 
   public Solution<SolutionT> findSolution(long id) {
-    var solution = SolutionManager.getSolution(id);
+    var solution = solutionManager.getSolution(id);
     if (solution == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,
           String.format("Unable to find solution process with id %d", id));
     }
 
-    return (Solution<SolutionT>) solution;
+    return solution;
   }
 
   public SolverT getSolver(String id) {
