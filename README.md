@@ -30,7 +30,7 @@ A web-based user interface can be found in our
 5. Run the server using `./gradlew bootRun`
 
 ## Deployment
-This repository is designed to be deployed with [Dokku](https://dokku.com/) but you can also run 
+This repository is designed to be deployed with [Dokku](https://dokku.com/), but you can also run 
 the Java application directly or inside a docker container (`Dockerfile` is included!).
 The docker container can be built and run as follows:
 ```shell
