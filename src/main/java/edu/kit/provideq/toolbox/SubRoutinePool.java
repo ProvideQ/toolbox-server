@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.Collections;
 import java.util.Map;
@@ -52,7 +53,15 @@ public class SubRoutinePool {
 
       var newSolveRequest = subRoutine.replaceContent(content);
 
-      var problemController = problemControllerProvider.getProblemController(problemType);
+      ProblemController<
+              ProblemT,
+              SolutionT,
+              ? extends ProblemSolver<ProblemT, SolutionT>> problemController
+              = (ProblemController<
+              ProblemT,
+              SolutionT,
+              ? extends ProblemSolver<ProblemT, SolutionT>>)
+              problemControllerProvider.getProblemController(problemType);
       return problemController.solve(newSolveRequest);
     };
   }
