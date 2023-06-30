@@ -2,7 +2,6 @@ package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProblemControllerProvider {
-  private final Map<ProblemType, ProblemController> problemControllers;
+  private final Map<ProblemType, ProblemController<?, ?, ?>> problemControllers;
 
   @Autowired
   public ProblemControllerProvider(
@@ -19,10 +18,12 @@ public class ProblemControllerProvider {
         context.getBeansOfType(ProblemController.class)
             .values()
             .stream()
-            .collect(Collectors.toMap(ProblemController::getProblemType, Function.identity()));
+            .collect(Collectors.toMap(
+                    ProblemController::getProblemType,
+                    problemController -> (ProblemController<?, ?, ?>) problemController));
   }
 
-  public ProblemController getProblemController(ProblemType problemType) {
+  public ProblemController<?, ?, ?> getProblemController(ProblemType problemType) {
     return problemControllers.get(problemType);
   }
 }
