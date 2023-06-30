@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DimacsCnf {
   static final String LINE_SEPARATOR = System.lineSeparator();
@@ -26,8 +27,7 @@ public class DimacsCnf {
   }
 
   public DimacsCnf(DimacsCnf cnf) {
-    this.orClauses = new ArrayList<>(cnf.orClauses);
-    this.variables = new ArrayList<>(cnf.variables);
+    this(cnf.orClauses, cnf.variables);
   }
 
   public DimacsCnf(ArrayList<ArrayList<Variable>> orClauses) {
@@ -38,8 +38,15 @@ public class DimacsCnf {
   }
 
   public DimacsCnf(ArrayList<ArrayList<Variable>> orClauses, List<Variable> variables) {
-    this.variables = List.copyOf(variables);
-    this.orClauses = new ArrayList<>(orClauses);
+    this.variables = variables.stream()
+            .map(Variable::new)
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    this.orClauses = orClauses.stream()
+            .map(list -> list.stream()
+                    .map(Variable::new)
+                    .collect(Collectors.toCollection(ArrayList::new)))
+            .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**

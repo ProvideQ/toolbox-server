@@ -3,6 +3,10 @@ package edu.kit.provideq.toolbox.format.cnf.dimacs;
 import java.util.Objects;
 
 public record Variable(int number, String name, boolean isNegated) {
+  public Variable(Variable other) {
+    this(other.number, other.name, other.isNegated);
+  }
+
   @Override
   public String toString() {
     if (isNegated) {
