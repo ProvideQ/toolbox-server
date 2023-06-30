@@ -38,12 +38,6 @@ public class FeatureModelAnomalySolver extends FeatureModelSolver {
   }
 
   @Override
-  public float getSuitability(Problem<FeatureModelAnomalyProblem> problem) {
-    //TODO: implement algorithm for suitability calculation
-    return 1;
-  }
-
-  @Override
   public void solve(Problem<FeatureModelAnomalyProblem> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Convert uvl to cnf

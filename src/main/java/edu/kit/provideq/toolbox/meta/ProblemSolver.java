@@ -46,14 +46,6 @@ public interface ProblemSolver<ProblemT, SolutionT> {
   boolean canSolve(Problem<ProblemT> problem);
 
   /**
-   * suitability self assessment, results may range from 0.0 to 1.0, 1.0 meaning perfect suitability
-   *
-   * @param problem the {@link Problem} which is to be assessed
-   * @return suitability ranging from 0.0 to 1.0
-   */
-  float getSuitability(Problem<ProblemT> problem);
-
-  /**
    * Solves a given {@link Problem}, current status and final results as well as debug information
    * is stored in the provided {@link Solution} object.
    *

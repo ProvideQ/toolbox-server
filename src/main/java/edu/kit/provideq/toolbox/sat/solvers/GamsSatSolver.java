@@ -38,12 +38,6 @@ public class GamsSatSolver extends SatSolver {
   }
 
   @Override
-  public float getSuitability(Problem<String> problem) {
-    //TODO: implement algorithm for suitability calculation
-    return 1;
-  }
-
-  @Override
   public void solve(Problem<String> problem, Solution<DimacsCnfSolution> solution,
                     SubRoutinePool subRoutinePool) {
     DimacsCnf dimacsCnf;
