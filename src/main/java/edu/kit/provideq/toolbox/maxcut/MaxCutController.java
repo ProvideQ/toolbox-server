@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.maxcut;
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.SolutionHandle;
+import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MaxCutController extends ProblemController<String, String, MaxCutSolver> {
+public class MaxCutController extends ProblemController<String, Gml, MaxCutSolver> {
 
   private final MetaSolver<MaxCutSolver> metaSolver;
 

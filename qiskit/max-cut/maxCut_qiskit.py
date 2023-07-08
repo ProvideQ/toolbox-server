@@ -81,7 +81,7 @@ result = vqe.compute_minimum_eigenvalue(qubitOp)
 
 # save results
 x = max_cut.sample_most_likely(result.eigenstate)
-f = open(output_path, 'a')
+f = open(output_path, 'w')
 f.write("energy:" + str(result.eigenvalue.real) + "\n")
 f.write("time:" + str(result.optimizer_time) + "\n")
 f.write("max-cut objective:" + str(result.eigenvalue.real + offset) + "\n")
