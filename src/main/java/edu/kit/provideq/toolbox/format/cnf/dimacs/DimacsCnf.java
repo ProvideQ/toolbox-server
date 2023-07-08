@@ -38,14 +38,16 @@ public class DimacsCnf {
   }
 
   public DimacsCnf(ArrayList<ArrayList<Variable>> orClauses, List<Variable> variables) {
-    this.variables = variables.stream()
-            .map(Variable::new)
-            .collect(Collectors.toCollection(ArrayList::new));
+    this.variables = deepCopyVariablesList(variables);
 
     this.orClauses = orClauses.stream()
-            .map(list -> list.stream()
-                    .map(Variable::new)
-                    .collect(Collectors.toCollection(ArrayList::new)))
+            .map(DimacsCnf::deepCopyVariablesList)
+            .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private static ArrayList<Variable> deepCopyVariablesList(List<Variable> list) {
+    return list.stream()
+            .map(Variable::new)
             .collect(Collectors.toCollection(ArrayList::new));
   }
 
