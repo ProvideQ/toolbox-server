@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
+import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
@@ -82,8 +83,8 @@ class MaxCutSolversTest {
         .getResponse().getContentAsString();
 
     JavaType solutionType =
-        mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
-    Solution<String> solution = mapper.readValue(result, solutionType);
+        mapper.getTypeFactory().constructParametricType(Solution.class, Gml.class);
+    Solution<Gml> solution = mapper.readValue(result, solutionType);
 
     assertThat(solution.getStatus())
         .isSameAs(SolutionStatus.SOLVED);
