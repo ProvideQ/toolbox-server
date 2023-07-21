@@ -9,6 +9,12 @@ jobs:
     container:
       image: debian:bullseye-slim # use the same image as our docker runner
     steps:
+      - name: check connectivity
+        run: |
+          apt-get update
+          apt-get install iputils-ping curl -y
+          ping -c 10 -4 provideq.kit.edu || true
+          ping -c 10 -6 provideq.kit.edu
       - name: Clone repo
         uses: actions/checkout@v3
       - name: Set up JDK 17
