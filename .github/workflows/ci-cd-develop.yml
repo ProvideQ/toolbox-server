@@ -9,15 +9,25 @@ jobs:
     container:
       image: debian:bullseye-slim # use the same image as our docker runner
     steps:
-      - name: Clone repo (shallow)
+      - name: Clone repo
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
       - name: Set up GAMS
         shell: bash # required for the source command
         env:
@@ -31,9 +41,13 @@ jobs:
         run: ./scripts/install-solver-dependencies.sh
       - name: Run checks
         shell: bash # required for the source command
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           source /opt/conda/bin/activate gams
-          ./gradlew check
+          ./gradlew check sonar --info
       - name: Archive test reports
         if: always()
         uses: actions/upload-artifact@v3

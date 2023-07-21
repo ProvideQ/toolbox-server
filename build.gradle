@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
     id 'checkstyle'
+    id 'org.sonarqube' version '3.5.0.2730'
 }
 
 group = 'edu.kit.provideq'
@@ -34,4 +35,10 @@ targetCompatibility = JavaVersion.VERSION_17
 
 checkstyle {
     toolVersion = '10.12.0'
+}
+
+sonar {
+    properties {
+        property 'sonar.projectKey', 'ProvideQ_toolbox-server_AYl5-9jeCve20Cpd0MEI'
+    }
 }
