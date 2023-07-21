@@ -11,17 +11,20 @@ A web-based user interface can be found in our
 2. Clone this repository
 3. Install a python env that works with GAMS (skip this step if you don't need GAMS)
    1. Install GAMS.
+      * Make sure the `gams` / `gams.exe` executable is available on the path!
    2. Install miniconda (or anaconda, if you prefer that):
       https://conda.io/projects/conda/en/stable/user-guide/install/index.html
    3. Create a GAMS conda environment: `conda create --name gams python=3.10 --yes`
    4. Activate your conda environment: `conda activate gams`.
-   5. Make GAMS use that python environment by setting the `GMSPYTHONLIB=<path-to-conda>/envs/gams/lib/libpython3.10.so`
+   5. Make GAMS use that python environment by setting the `GMSPYTHONLIB`
       environment variable.
+      * Linux: `GMSPYTHONLIB=<path-to-conda>/envs/gams/lib/libpython3.10.so`
+      * Windows: `GMSPYTHONLIB=<path-to-conda>\envs\gams\python310.dll`
    6. Install GAMS packages to the GAMS conda env:
-      `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
-      * If you get an error building `psycopg2`, try to install these postgres packages:
-        `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
-   7. Install the python dependencies we use in our python packages: `pip install -r gams/requirements.txt`
+      * Linux: `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
+         * If you get an error building `psycopg2`, try to install these postgres packages:
+           `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
+      * Windows: `pip install gams[core,connect] --find-links <path-to-gams>\api\python\bdist`
 4. Install solver dependencies (skip this step if you don't want to use the solvers):
    * Note that these dependencies must be installed to the gams conda env if you want to use GAMS and other solvers from
      the same toolbox installation!
