@@ -79,6 +79,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
       // Prepare solution data from python output
       String s = solutionLine.get();
       var solutionData = s
+              // Remove brackets around the solution data
               .substring(SOLUTION_LINE_PREFIX.length() + 1, s.length() - 1)
               .trim()
               .split("\\.");
