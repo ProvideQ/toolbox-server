@@ -10,6 +10,8 @@ import java.util.Set;
  * Decides which known {@link ProblemSolver} is suited best for a given problem,
  * manages known solvers.
  *
+ * @param <ProblemT> the type of the problem input of {@link ProblemSolver}
+ * @param <SolutionT> the type of the solution output of {@link ProblemSolver}
  * @param <SolverT> the type of {@link ProblemSolver} this metasolver is to manage
  */
 public abstract class MetaSolver<
