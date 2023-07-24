@@ -54,20 +54,23 @@ public record Edge(int source, int target, Map<String, String> attributes) {
             .append(Gml.LINE_SEPARATOR);
 
     // source
-    builder.append(Gml.SOURCE_IDENTIFIER)
+    builder.append(Gml.INDENTATION_STEP)
+            .append(Gml.SOURCE_IDENTIFIER)
             .append(Gml.SEPARATOR)
             .append(source)
             .append(Gml.LINE_SEPARATOR);
 
     // target
-    builder.append(Gml.TARGET_IDENTIFIER)
+    builder.append(Gml.INDENTATION_STEP)
+            .append(Gml.TARGET_IDENTIFIER)
             .append(Gml.SEPARATOR)
             .append(target)
             .append(Gml.LINE_SEPARATOR);
 
     // optional attributes
     for (String key : attributes.keySet()) {
-      builder.append(key)
+      builder.append(Gml.INDENTATION_STEP)
+              .append(key)
               .append(Gml.SEPARATOR)
               .append(attributes.get(key))
               .append(Gml.LINE_SEPARATOR);

@@ -54,14 +54,16 @@ public record Node(int id, String label, Map<String, String> attributes) {
             .append(Gml.LINE_SEPARATOR);
 
     // id
-    builder.append(Gml.ID_IDENTIFIER)
+    builder.append(Gml.INDENTATION_STEP)
+            .append(Gml.ID_IDENTIFIER)
             .append(Gml.SEPARATOR)
             .append(id)
             .append(Gml.LINE_SEPARATOR);
 
     // optional label
     if (label != null && !label.equals("")) {
-      builder.append(Gml.LABEL_IDENTIFIER)
+      builder.append(Gml.INDENTATION_STEP)
+              .append(Gml.LABEL_IDENTIFIER)
               .append(Gml.SEPARATOR)
               .append(label)
               .append(Gml.LINE_SEPARATOR);
@@ -69,7 +71,8 @@ public record Node(int id, String label, Map<String, String> attributes) {
 
     // optional attributes
     for (String key : attributes.keySet()) {
-      builder.append(key)
+      builder.append(Gml.INDENTATION_STEP)
+              .append(key)
               .append(Gml.SEPARATOR)
               .append(attributes.get(key))
               .append(Gml.LINE_SEPARATOR);
