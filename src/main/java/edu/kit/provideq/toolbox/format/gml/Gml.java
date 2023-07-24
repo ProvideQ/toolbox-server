@@ -22,7 +22,11 @@ public class Gml {
   static final String OPEN = "\\[";
   static final String CLOSE = "\\]";
 
-  static Pattern TokenPattern = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+  /**
+   * Separates a string into tokens by splitting by whitespaces,
+   * while ignoring whitespace inside quotes in order to preserve labels.
+   */
+  static final Pattern TokenPattern = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
   private final List<Node> nodes;
   private final List<Edge> edges;
@@ -72,7 +76,7 @@ public class Gml {
     }
   }
 
-  private static Gml parseGraph(Scanner scanner) {
+  private static Gml parseGraph(Scanner scanner) throws ConversionException {
     // graph
     scanner.next(Gml.GRAPH_IDENTIFIER);
 
@@ -96,6 +100,15 @@ public class Gml {
           scanner.next(Gml.OPEN);
           edges.add(Edge.parseEdge(scanner));
           scanner.next(Gml.CLOSE);
+        }
+        case Gml.OPEN -> {
+          throw new ConversionException("Unexpected opening bracket in node/edge list");
+        }
+        case Gml.CLOSE -> {
+          throw new ConversionException("Unexpected closing bracket in node/edge list");
+        }
+        case Gml.GRAPH_IDENTIFIER -> {
+          throw new ConversionException("Unexpected graph identifier in node/edge list");
         }
         default -> {
           // ignore custom attributes for the graph directly
