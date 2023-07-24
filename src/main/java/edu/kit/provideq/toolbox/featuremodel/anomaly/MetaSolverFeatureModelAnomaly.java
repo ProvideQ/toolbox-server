@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MetaSolverFeatureModelAnomaly extends MetaSolver<
-        edu.kit.provideq.toolbox.featuremodel.anomaly.FeatureModelAnomalyProblem,
+        FeatureModelAnomalyProblem,
         String,
         FeatureModelAnomalySolver> {
 
