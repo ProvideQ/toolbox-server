@@ -4,6 +4,7 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
@@ -19,8 +20,10 @@ public class Gml {
   static final String EDGE_IDENTIFIER = "edge";
   static final String SOURCE_IDENTIFIER = "source";
   static final String TARGET_IDENTIFIER = "target";
-  static final String OPEN = "\\[";
-  static final String CLOSE = "\\]";
+  static final String OPEN_REGEX = "\\[";
+  static final String OPEN = "[";
+  static final String CLOSE = "]";
+  static final String INDENTATION_STEP = "  ";
 
   /**
    * Separates a string into tokens by splitting by whitespaces,
@@ -81,7 +84,7 @@ public class Gml {
     scanner.next(Gml.GRAPH_IDENTIFIER);
 
     // [
-    scanner.next(Gml.OPEN);
+    scanner.next(Gml.OPEN_REGEX);
 
     // nodes and edges
     var nodes = new ArrayList<Node>();
@@ -92,16 +95,16 @@ public class Gml {
 
       switch (token) {
         case Gml.NODE_IDENTIFIER -> {
-          scanner.next(Gml.OPEN);
+          scanner.next(Gml.OPEN_REGEX);
           nodes.add(Node.parseNode(scanner));
           scanner.next(Gml.CLOSE);
         }
         case Gml.EDGE_IDENTIFIER -> {
-          scanner.next(Gml.OPEN);
+          scanner.next(Gml.OPEN_REGEX);
           edges.add(Edge.parseEdge(scanner));
           scanner.next(Gml.CLOSE);
         }
-        case Gml.OPEN -> {
+        case Gml.OPEN_REGEX -> {
           throw new ConversionException("Unexpected opening bracket in node/edge list");
         }
         case Gml.CLOSE -> {
@@ -144,6 +147,11 @@ public class Gml {
   public String toString() {
     var builder = new StringBuilder();
 
+    Consumer<String> addWithTabs = (String s) -> s
+            .lines()
+            .map(line -> INDENTATION_STEP + line + LINE_SEPARATOR)
+            .forEach(builder::append);
+
     // Add graph start
     // graph [
     builder.append(GRAPH_IDENTIFIER)
@@ -152,11 +160,11 @@ public class Gml {
             .append(LINE_SEPARATOR);
 
     for (var node : nodes) {
-      builder.append(node.toString());
+      addWithTabs.accept(node.toString());
     }
 
     for (var edge : edges) {
-      builder.append(edge.toString());
+      addWithTabs.accept(edge.toString());
     }
 
     // Add graph end
