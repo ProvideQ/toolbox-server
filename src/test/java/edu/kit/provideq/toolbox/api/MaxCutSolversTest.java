@@ -83,8 +83,8 @@ class MaxCutSolversTest {
         .getResponse().getContentAsString();
 
     JavaType solutionType =
-        mapper.getTypeFactory().constructParametricType(Solution.class, Gml.class);
-    Solution<Gml> solution = mapper.readValue(result, solutionType);
+        mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
+    Solution<String> solution = mapper.readValue(result, solutionType);
 
     assertThat(solution.getStatus())
         .isSameAs(SolutionStatus.SOLVED);
