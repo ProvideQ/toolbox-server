@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
