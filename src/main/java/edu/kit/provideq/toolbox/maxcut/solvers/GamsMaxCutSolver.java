@@ -37,7 +37,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<Gml> solution,
+  public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Run MaxCut with GAMS via console
     var processResult = context
@@ -54,17 +54,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
       return;
     }
 
-    // Parse GML output
-    Gml gml;
-    try {
-      gml = Gml.fromString(processResult.output());
-    } catch (ConversionException e) {
-      solution.setDebugData("GML conversion failed: " + e);
-      solution.abort();
-      return;
-    }
-
-    solution.setSolutionData(gml);
+    solution.setSolutionData(processResult.output());
     solution.complete();
   }
 }

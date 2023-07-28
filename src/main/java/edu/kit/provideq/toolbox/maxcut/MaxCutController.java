@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MaxCutController extends ProblemController<String, Gml, MaxCutSolver> {
+public class MaxCutController extends ProblemController<String, String, MaxCutSolver> {
 
   private final MetaSolver<MaxCutSolver> metaSolver;
 

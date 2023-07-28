@@ -40,7 +40,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<Gml> solution,
+  public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Run Qiskit solver via console
     var processResult = context
@@ -91,7 +91,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
       }
     }
 
-    solution.setSolutionData(gml);
+    solution.setSolutionData(gml.toString());
     solution.complete();
   }
 }
