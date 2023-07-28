@@ -26,7 +26,7 @@ public class MetaSolverFeatureModelAnomaly extends MetaSolver<
 
   @Override
   public FeatureModelAnomalySolver findSolver(
-          Problem<edu.kit.provideq.toolbox.featuremodel.anomaly.FeatureModelAnomalyProblem> problem,
+          Problem<FeatureModelAnomalyProblem> problem,
           List<MetaSolverSetting> metaSolverSettings) {
     // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
