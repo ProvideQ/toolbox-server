@@ -4,9 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
+
 import java.util.stream.Stream;
+
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,9 +22,9 @@ public class GmlTests {
     assertEquals(gmlString, gml.toString());
   }
 
-  static Stream<Arguments> testToStringParameters() {
+  static Stream<String> testToStringParameters() {
     return Stream.of(
-            Arguments.arguments("""
+            """
                     graph [
                       node [
                         id 1
@@ -38,8 +39,7 @@ public class GmlTests {
                         target 2
                         label "Edge from Node 1 to Node 2"
                       ]
-                    ]"""),
-            Arguments.arguments("""
+                    ]""", """
                     graph [
                       node [
                         id 1
@@ -71,8 +71,7 @@ public class GmlTests {
                         target 1
                         label "Edge from node 3 to node 1"
                       ]
-                    ]"""),
-            Arguments.arguments("""
+                    ]""", """
                     graph [
                       node [
                         id 1
@@ -98,7 +97,7 @@ public class GmlTests {
                         source 3
                         target 4
                       ]
-                    ]""")
+                    ]"""
     );
   }
 }
