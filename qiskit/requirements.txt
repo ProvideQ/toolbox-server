@@ -4,5 +4,6 @@
 # required for Qiskit MaxCut solver
 numpy
 pygmlparser
-qiskit
+qiskit == 0.44.*
 qiskit_optimization
+qiskit-aer
