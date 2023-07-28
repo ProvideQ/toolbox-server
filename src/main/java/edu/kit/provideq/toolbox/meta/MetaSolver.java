@@ -59,7 +59,9 @@ public abstract class MetaSolver<
    * @param problem the problem the meta solver is to check its solvers by
    * @return the best suited solver, null in case no suitable solver was found
    */
-  public abstract SolverT findSolver(Problem<ProblemT> problem, List<MetaSolverSetting> metaSolverSettings);
+  public abstract SolverT findSolver(
+          Problem<ProblemT> problem,
+          List<MetaSolverSetting> metaSolverSettings);
 
   public Optional<SolverT> getSolver(String id) {
     if (id == null) {
