@@ -7,6 +7,7 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.context.ApplicationContext;
@@ -192,5 +193,35 @@ public class SolveRouter {
                 .toList();
 
         return ok().body(solvers, new ParameterizedTypeReference<List<ProblemSolverInfo>>() {});
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> getMetaSolverSettingsRoutes() {
+        return metaSolvers.stream()
+                .map(this::defineMetaSolverSettingsRouteForMetaSolver)
+                .reduce(RouterFunction::and)
+                .orElseThrow();
+    }
+
+    private RouterFunction<ServerResponse> defineMetaSolverSettingsRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
+        String problemId = metaSolver.getProblemType().getId();
+        return route().GET(
+                "/meta-solver/settings/" + problemId,
+                req -> handleMetaSolverSettingsRouteForMetaSolver(metaSolver),
+                ops -> ops
+                        .operationId("/meta-solver/settings/" + problemId)
+                        .tag(problemId)
+                        .response(responseBuilder()
+                                .responseCode(String.valueOf(HttpStatus.OK.value()))
+                                .content(contentBuilder()
+                                        .mediaType(APPLICATION_JSON_VALUE)
+                                        .array(arraySchemaBuilder().schema(schemaBuilder().implementation(MetaSolverSetting.class)))
+                                )
+                        )
+        ).build();
+    }
+
+    private Mono<ServerResponse> handleMetaSolverSettingsRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
+        return ok().body(metaSolver.getSettings(), new ParameterizedTypeReference<List<MetaSolverSetting>>() {});
     }
 }

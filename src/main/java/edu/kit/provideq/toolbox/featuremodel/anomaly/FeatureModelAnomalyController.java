@@ -80,10 +80,4 @@ public class FeatureModelAnomalyController
   public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
     return super.findSolution(id);
   }
-
-  @CrossOrigin
-  @GetMapping("/meta-solver/settings/feature-model/anomaly")
-  public List<MetaSolverSetting> getMetaSolverSettings() {
-    return metaSolver.getSettings();
-  }
 }
