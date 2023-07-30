@@ -49,10 +49,4 @@ public class SatController extends ProblemController<String, DimacsCnfSolution, 
   public List<MetaSolverSetting> getMetaSolverSettings() {
     return metaSolver.getSettings();
   }
-
-  @CrossOrigin
-  @GetMapping("/solvers/sat")
-  public Set<ProblemSolverInfo> getSolvers() {
-    return super.getSolvers();
-  }
 }

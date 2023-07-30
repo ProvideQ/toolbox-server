@@ -1,9 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SolutionHandle;
-import edu.kit.provideq.toolbox.SolveRequest;
-import edu.kit.provideq.toolbox.SubRoutinePool;
+import edu.kit.provideq.toolbox.*;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.MetaSolverFeatureModelAnomaly;
 import edu.kit.provideq.toolbox.maxcut.MetaSolverMaxCut;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
@@ -12,7 +9,6 @@ import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import org.springdoc.core.fn.builders.arrayschema.Builder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -162,5 +158,39 @@ public class SolveRouter {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find a solver for this problem with this solver id!"));
 
         return ok().body(subroutines, new ParameterizedTypeReference<List<SubRoutineDefinition>>() {});
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> getSolversRoutes() {
+        return metaSolvers.stream()
+                .map(this::defineSolversRouteForMetaSolver)
+                .reduce(RouterFunction::and)
+                .orElseThrow();
+    }
+
+    private RouterFunction<ServerResponse> defineSolversRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
+        String problemId = metaSolver.getProblemType().getId();
+        return route().GET(
+                "/solvers/" + problemId,
+                req -> handleSolversRouteForMetaSolver(metaSolver),
+                ops -> ops
+                        .operationId("/solvers/" + problemId)
+                        .tag(problemId)
+                        .response(responseBuilder()
+                                .responseCode(String.valueOf(HttpStatus.OK.value()))
+                                .content(contentBuilder()
+                                        .mediaType(APPLICATION_JSON_VALUE)
+                                        .array(arraySchemaBuilder().schema(schemaBuilder().implementation(ProblemSolverInfo.class)))
+                                )
+                        )
+        ).build();
+    }
+
+    private Mono<ServerResponse> handleSolversRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
+        var solvers = metaSolver.getAllSolvers().stream()
+                .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName()))
+                .toList();
+
+        return ok().body(solvers, new ParameterizedTypeReference<List<ProblemSolverInfo>>() {});
     }
 }

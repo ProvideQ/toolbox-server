@@ -48,10 +48,4 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
   public List<MetaSolverSetting> getMetaSolverSettings() {
     return metaSolver.getSettings();
   }
-
-  @CrossOrigin
-  @GetMapping("/solvers/max-cut")
-  public Set<ProblemSolverInfo> getSolvers() {
-    return super.getSolvers();
-  }
 }

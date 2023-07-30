@@ -86,10 +86,4 @@ public class FeatureModelAnomalyController
   public List<MetaSolverSetting> getMetaSolverSettings() {
     return metaSolver.getSettings();
   }
-
-  @CrossOrigin
-  @GetMapping("/solvers/feature-model/anomaly")
-  public Set<ProblemSolverInfo> getSolvers() {
-    return super.getSolvers();
-  }
 }

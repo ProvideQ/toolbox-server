@@ -38,12 +38,4 @@ public abstract class ProblemController<ProblemT, SolutionT, SolverT
 
     return solution;
   }
-
-  public Set<ProblemSolverInfo> getSolvers() {
-    return getMetaSolver()
-        .getAllSolvers()
-        .stream()
-        .map(s -> new ProblemSolverInfo(s.getId(), s.getName()))
-        .collect(Collectors.toSet());
-  }
 }
