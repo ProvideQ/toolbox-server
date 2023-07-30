@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox.maxcut;
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.SolutionHandle;
-import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
