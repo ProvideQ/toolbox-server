@@ -1,8 +1,12 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionManager;
 import edu.kit.provideq.toolbox.SolveRequest;
+import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -28,6 +32,7 @@ public abstract class MetaSolver<
         SolverT extends ProblemSolver<ProblemT, SolutionT>> {
 
   private final SolutionManager<SolutionT> solutionManager = new SolutionManager<>();
+  private ApplicationContext context;
 
   protected Set<SolverT> solvers = new HashSet<>();
   private ProblemType problemType;
@@ -44,6 +49,11 @@ public abstract class MetaSolver<
   public MetaSolver(ProblemType problemType, SolverT... problemSolvers) {
     solvers.addAll(List.of(problemSolvers));
     this.problemType = problemType;
+  }
+
+  @Autowired
+  public void setContext(ApplicationContext context) {
+    this.context = context;
   }
 
   /**
@@ -110,5 +120,29 @@ public abstract class MetaSolver<
 
   public SolutionManager<SolutionT> getSolutionManager() {
     return solutionManager;
+  }
+
+  public Solution<SolutionT> solve(SolveRequest<ProblemT> request) {
+    Solution<SolutionT> solution = this.getSolutionManager().createSolution();
+    Problem<ProblemT> problem = new Problem<>(request.requestContent, this.getProblemType());
+
+    SolverT solver = this
+            .getSolver(request.requestedSolverId)
+            .orElseGet(() -> this.findSolver(problem, request.requestedMetaSolverSettings));
+
+    solution.setSolverName(solver.getName());
+
+    SubRoutinePool subRoutinePool =
+            request.requestedSubSolveRequests == null
+                    ? context.getBean(SubRoutinePool.class)
+                    : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
+
+    long start = System.currentTimeMillis();
+    solver.solve(problem, solution, subRoutinePool);
+    long finish = System.currentTimeMillis();
+
+    solution.setExecutionMilliseconds(finish - start);
+
+    return solution;
   }
 }

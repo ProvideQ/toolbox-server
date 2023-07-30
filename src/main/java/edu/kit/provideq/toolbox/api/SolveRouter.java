@@ -1,16 +1,11 @@
 package edu.kit.provideq.toolbox.api;
 
 import edu.kit.provideq.toolbox.*;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.MetaSolverFeatureModelAnomaly;
-import edu.kit.provideq.toolbox.maxcut.MetaSolverMaxCut;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.sat.MetaSolverSat;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
@@ -27,7 +22,6 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
@@ -44,19 +38,17 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 @Configuration
 @EnableWebFlux
 public class SolveRouter {
-    private final Set<MetaSolver<?, ?, ?>> metaSolvers;
-    private final ApplicationContext context;
+    private final MetaSolverProvider metaSolverProvider;
     private final Validator validator;
 
-    public SolveRouter(MetaSolverSat sat, MetaSolverMaxCut maxCut, MetaSolverFeatureModelAnomaly featureModelAnomaly, ApplicationContext context, Validator validator) {
-        this.metaSolvers = Set.of(sat, maxCut, featureModelAnomaly);
-        this.context = context;
+    public SolveRouter(MetaSolverProvider metaSolverProvider, Validator validator) {
+        this.metaSolverProvider = metaSolverProvider;
         this.validator = validator;
     }
 
     @Bean
     RouterFunction<ServerResponse> getSolveRoutes() {
-        return metaSolvers.stream()
+        return metaSolverProvider.getMetaSolvers().stream()
                 .map(this::defineRouteForMetaSolver)
                 .reduce(RouterFunction::and)
                 .orElseThrow(); // we should always have at least one route or the toolbox is useless
@@ -88,7 +80,7 @@ public class SolveRouter {
         var x = req
                 .bodyToMono(new ParameterizedTypeReference<SolveRequest<ProblemT>>() {})
                 .doOnNext(this::validate)
-                .map(request -> solve(metaSolver, request))
+                .map(metaSolver::solve)
                 .map(Solution::toStringSolution);
         return ok().body(x, new ParameterizedTypeReference<>() {});
     }
@@ -100,34 +92,9 @@ public class SolveRouter {
         }
     }
 
-    private <ProblemT, SolutionT, SolverT extends ProblemSolver<ProblemT, SolutionT>> Solution<SolutionT>
-            solve(MetaSolver<ProblemT, SolutionT, SolverT> metaSolver, SolveRequest<ProblemT> request) {
-        Solution<SolutionT> solution = metaSolver.getSolutionManager().createSolution();
-        Problem<ProblemT> problem = new Problem<>(request.requestContent, metaSolver.getProblemType());
-
-        SolverT solver = metaSolver
-                .getSolver(request.requestedSolverId)
-                .orElseGet(() -> metaSolver.findSolver(problem, request.requestedMetaSolverSettings));
-
-        solution.setSolverName(solver.getName());
-
-        SubRoutinePool subRoutinePool =
-                request.requestedSubSolveRequests == null
-                        ? context.getBean(SubRoutinePool.class)
-                        : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
-
-        long start = System.currentTimeMillis();
-        solver.solve(problem, solution, subRoutinePool);
-        long finish = System.currentTimeMillis();
-
-        solution.setExecutionMilliseconds(finish - start);
-
-        return solution;
-    }
-
     @Bean
     RouterFunction<ServerResponse> getSubRoutineRoutes() {
-        return metaSolvers.stream()
+        return metaSolverProvider.getMetaSolvers().stream()
                 .map(this::defineSubRoutineRouteForMetaSolver)
                 .reduce(RouterFunction::and)
                 .orElseThrow();
@@ -163,7 +130,7 @@ public class SolveRouter {
 
     @Bean
     RouterFunction<ServerResponse> getSolversRoutes() {
-        return metaSolvers.stream()
+        return metaSolverProvider.getMetaSolvers().stream()
                 .map(this::defineSolversRouteForMetaSolver)
                 .reduce(RouterFunction::and)
                 .orElseThrow();
@@ -197,7 +164,7 @@ public class SolveRouter {
 
     @Bean
     RouterFunction<ServerResponse> getMetaSolverSettingsRoutes() {
-        return metaSolvers.stream()
+        return metaSolverProvider.getMetaSolvers().stream()
                 .map(this::defineMetaSolverSettingsRouteForMetaSolver)
                 .reduce(RouterFunction::and)
                 .orElseThrow();
@@ -227,7 +194,7 @@ public class SolveRouter {
 
     @Bean
     RouterFunction<ServerResponse> getSolutionRoutes() {
-        return metaSolvers.stream()
+        return metaSolverProvider.getMetaSolvers().stream()
                 .map(this::defineSolutionRouteForMetaSolver)
                 .reduce(RouterFunction::and)
                 .orElseThrow(); // we should always have at least one route or the toolbox is useless

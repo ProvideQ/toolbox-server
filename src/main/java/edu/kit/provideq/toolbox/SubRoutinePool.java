@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.Collections;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class SubRoutinePool {
   private final Map<ProblemType, SolveRequest<?>> subRoutineCalls;
 
-  private ProblemControllerProvider problemControllerProvider;
+  private MetaSolverProvider metaSolverProvider;
 
   public SubRoutinePool() {
     subRoutineCalls = Collections.emptyMap();
@@ -31,8 +32,8 @@ public class SubRoutinePool {
   }
 
   @Autowired
-  public void setProblemControllerProvider(ProblemControllerProvider problemControllerProvider) {
-    this.problemControllerProvider = problemControllerProvider;
+  public void setProblemControllerProvider(MetaSolverProvider metaSolverProvider) {
+    this.metaSolverProvider = metaSolverProvider;
   }
 
   /**
@@ -45,8 +46,7 @@ public class SubRoutinePool {
    */
   public <ProblemT, SolutionT> Function<ProblemT, Solution<SolutionT>> getSubRoutine(
       ProblemType problemType) {
-    return null; // FIXME
-    /*return content -> {
+    return content -> {
       SolveRequest<?> subRoutine = subRoutineCalls.get(problemType);
       if (subRoutine == null) {
         subRoutine = new SolveRequest<>();
@@ -54,16 +54,10 @@ public class SubRoutinePool {
 
       var newSolveRequest = subRoutine.replaceContent(content);
 
-      ProblemController<
-              ProblemT,
-              SolutionT,
-              ? extends ProblemSolver<ProblemT, SolutionT>> problemController
-              = (ProblemController<
-              ProblemT,
-              SolutionT,
-              ? extends ProblemSolver<ProblemT, SolutionT>>)
-              problemControllerProvider.getProblemController(problemType);
-      return problemController.solve(newSolveRequest);
-    };*/
+      MetaSolver<ProblemT, SolutionT, ? extends ProblemSolver<ProblemT, SolutionT>> metaSolver =
+              (MetaSolver<ProblemT, SolutionT, ? extends ProblemSolver<ProblemT, SolutionT>>)
+                      metaSolverProvider.getMetaSolver(problemType);
+      return metaSolver.solve(newSolveRequest);
+    };
   }
 }
