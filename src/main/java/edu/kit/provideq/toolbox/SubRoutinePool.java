@@ -45,7 +45,8 @@ public class SubRoutinePool {
    */
   public <ProblemT, SolutionT> Function<ProblemT, Solution<SolutionT>> getSubRoutine(
       ProblemType problemType) {
-    return content -> {
+    return null; // FIXME
+    /*return content -> {
       SolveRequest<?> subRoutine = subRoutineCalls.get(problemType);
       if (subRoutine == null) {
         subRoutine = new SolveRequest<>();
@@ -63,6 +64,6 @@ public class SubRoutinePool {
               ? extends ProblemSolver<ProblemT, SolutionT>>)
               problemControllerProvider.getProblemController(problemType);
       return problemController.solve(newSolveRequest);
-    };
+    };*/
   }
 }

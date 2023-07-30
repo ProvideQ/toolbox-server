@@ -1,6 +1,12 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.SolutionManager;
+import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Mono;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +24,8 @@ public abstract class MetaSolver<
         ProblemT,
         SolutionT,
         SolverT extends ProblemSolver<ProblemT, SolutionT>> {
+
+  private final SolutionManager<SolutionT> solutionManager = new SolutionManager<>();
 
   protected Set<SolverT> solvers = new HashSet<>();
   private ProblemType problemType;
@@ -96,5 +104,9 @@ public abstract class MetaSolver<
 
   public ProblemType getProblemType() {
     return problemType;
+  }
+
+  public SolutionManager<SolutionT> getSolutionManager() {
+    return solutionManager;
   }
 }

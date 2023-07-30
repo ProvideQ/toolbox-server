@@ -39,12 +39,6 @@ public class SatController extends ProblemController<String, DimacsCnfSolution, 
   }
 
   @CrossOrigin
-  @PostMapping("/solve/sat")
-  public SolutionHandle solveSat(@RequestBody @Valid SolveSatRequest request) {
-    return super.solve(request).toStringSolution(DimacsCnfSolution::toHumanReadableString);
-  }
-
-  @CrossOrigin
   @GetMapping("/solve/sat")
   public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
     return super.findSolution(id).toStringSolution(DimacsCnfSolution::toHumanReadableString);

@@ -38,12 +38,6 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
   }
 
   @CrossOrigin
-  @PostMapping("/solve/max-cut")
-  public SolutionHandle solveMaxCut(@RequestBody @Valid SolveMaxCutRequest request) {
-    return super.solve(request);
-  }
-
-  @CrossOrigin
   @GetMapping("/solve/max-cut")
   public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
     return super.findSolution(id);

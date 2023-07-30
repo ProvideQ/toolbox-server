@@ -46,7 +46,7 @@ public class FeatureModelAnomalyController
     return metaSolver;
   }
 
-  @CrossOrigin
+  /*@CrossOrigin
   @PostMapping("/solve/feature-model/anomaly/void")
   public SolutionHandle findVoidFeatureModel(@RequestBody @Valid SolveFeatureModelRequest request) {
     return solveAnomaly(request, FeatureModelAnomaly.VOID);
@@ -78,7 +78,7 @@ public class FeatureModelAnomalyController
         request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
     solution.setSolverName(solution.getSolverName() + ": " + anomaly.name);
     return solution;
-  }
+  }*/
 
   @CrossOrigin
   @GetMapping("/solve/feature-model/anomaly/")

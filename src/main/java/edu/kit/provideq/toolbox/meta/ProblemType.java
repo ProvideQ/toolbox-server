@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.sat.SolveSatRequest;
@@ -31,9 +32,9 @@ public enum ProblemType {
   ;
 
   private final String id;
-  private final Class<?> requestType;
+  private final Class<? extends SolveRequest<?>> requestType;
 
-  ProblemType(String id, Class<?> requestType) {
+  ProblemType(String id, Class<? extends SolveRequest<?>> requestType) {
     this.id = id;
     this.requestType = requestType;
   }
@@ -42,7 +43,7 @@ public enum ProblemType {
     return id;
   }
 
-  public Class<?> getRequestType() {
+  public Class<? extends SolveRequest<?>> getRequestType() {
     return requestType;
   }
 }
