@@ -2,23 +2,18 @@ package edu.kit.provideq.toolbox.featuremodel.anomaly;
 
 import edu.kit.provideq.toolbox.ProblemController;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
-import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionHandle;
-import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.solvers.FeatureModelAnomalySolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Set;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Set;
 
 @RestController
 public class FeatureModelAnomalyController
@@ -77,19 +72,13 @@ public class FeatureModelAnomalyController
     var solution = (Solution<String>) super.solve(
         request.replaceContent(new FeatureModelAnomalyProblem(request.requestContent, anomaly)));
     solution.setSolverName(solution.getSolverName() + ": " + anomaly.name);
-    return solution;
+    return solution; FIXME
   }*/
 
   @CrossOrigin
   @GetMapping("/solve/feature-model/anomaly/")
   public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
     return super.findSolution(id);
-  }
-
-  @CrossOrigin
-  @GetMapping("/sub-routines/feature-model/anomaly")
-  public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
-    return super.getSubRoutines(solverId);
   }
 
   @CrossOrigin

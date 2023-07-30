@@ -9,13 +9,15 @@ import edu.kit.provideq.toolbox.maxcut.MetaSolverMaxCut;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import org.springdoc.core.fn.builders.arrayschema.Builder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -23,14 +25,17 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
@@ -53,7 +58,7 @@ public class SolveRouter {
     }
 
     @Bean
-    RouterFunction<ServerResponse> getRoutes() {
+    RouterFunction<ServerResponse> getSolveRoutes() {
         return metaSolvers.stream()
                 .map(this::defineRouteForMetaSolver)
                 .reduce(RouterFunction::and)
@@ -77,10 +82,11 @@ public class SolveRouter {
                                 .required(true)
                         )
                         .response(responseBuilder()
-                                .responseCode("200").implementation(SolutionHandle.class)
+                                .responseCode(String.valueOf(HttpStatus.OK.value())).implementation(SolutionHandle.class)
                         )
         ).build();
     }
+
     private <ProblemT, SolutionT> Mono<ServerResponse> handleRouteForMetaSolver(MetaSolver<ProblemT, SolutionT, ?> metaSolver, ServerRequest req) {
         var x = req
                 .bodyToMono(new ParameterizedTypeReference<SolveRequest<ProblemT>>() {})
@@ -89,7 +95,6 @@ public class SolveRouter {
                 .map(Solution::toStringSolution);
         return ok().body(x, new ParameterizedTypeReference<>() {});
     }
-
     private <ProblemT> void validate(SolveRequest<ProblemT> request) {
         Errors errors = new BeanPropertyBindingResult(request, "request");
         validator.validate(request, errors);
@@ -121,5 +126,41 @@ public class SolveRouter {
         solution.setExecutionMilliseconds(finish - start);
 
         return solution;
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> getSubRoutineRoutes() {
+        return metaSolvers.stream()
+                .map(this::defineSubRoutineRouteForMetaSolver)
+                .reduce(RouterFunction::and)
+                .orElseThrow();
+    }
+
+    private RouterFunction<ServerResponse> defineSubRoutineRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
+        String problemId = metaSolver.getProblemType().getId();
+        return route().GET(
+                "/sub-routines/" + problemId,
+                req -> handleSubRoutineRouteForMetaSolver(metaSolver, req),
+                ops -> ops
+                        .operationId("/sub-routines/" + problemId)
+                        .parameter(parameterBuilder().in(ParameterIn.QUERY).name("id"))
+                        .tag(problemId)
+                        .response(responseBuilder()
+                                .responseCode(String.valueOf(HttpStatus.OK.value()))
+                                .content(contentBuilder()
+                                        .mediaType(APPLICATION_JSON_VALUE)
+                                        .array(arraySchemaBuilder().schema(schemaBuilder().implementation(SubRoutineDefinition.class)))
+                                )
+                        )
+        ).build();
+    }
+
+    private Mono<ServerResponse> handleSubRoutineRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver, ServerRequest req) {
+        var subroutines = req.queryParam("id")
+                .flatMap(metaSolver::getSolver)
+                .map(ProblemSolver::getSubRoutines)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find a solver for this problem with this solver id!"));
+
+        return ok().body(subroutines, new ParameterizedTypeReference<List<SubRoutineDefinition>>() {});
     }
 }

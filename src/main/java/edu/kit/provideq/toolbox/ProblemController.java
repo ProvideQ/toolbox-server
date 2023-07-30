@@ -5,7 +5,6 @@ import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -40,31 +39,11 @@ public abstract class ProblemController<ProblemT, SolutionT, SolverT
     return solution;
   }
 
-  public SolverT getSolver(String id) {
-    Optional<SolverT> solver = getMetaSolver()
-        .getAllSolvers()
-        .stream()
-        .filter(s -> id.equals(s.getId()))
-        .findFirst();
-
-    if (solver.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-          String.format("Unable to find solver %s", id));
-    }
-
-    return solver.get();
-  }
-
   public Set<ProblemSolverInfo> getSolvers() {
     return getMetaSolver()
         .getAllSolvers()
         .stream()
         .map(s -> new ProblemSolverInfo(s.getId(), s.getName()))
         .collect(Collectors.toSet());
-  }
-
-  public List<SubRoutineDefinition> getSubRoutines(String id) {
-    SolverT solver = getSolver(id);
-    return solver.getSubRoutines();
   }
 }

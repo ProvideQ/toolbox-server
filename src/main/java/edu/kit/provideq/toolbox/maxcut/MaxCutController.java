@@ -44,12 +44,6 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
   }
 
   @CrossOrigin
-  @GetMapping("/sub-routines/max-cut")
-  public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
-    return super.getSubRoutines(solverId);
-  }
-
-  @CrossOrigin
   @GetMapping("/meta-solver/settings/max-cut")
   public List<MetaSolverSetting> getMetaSolverSettings() {
     return metaSolver.getSettings();

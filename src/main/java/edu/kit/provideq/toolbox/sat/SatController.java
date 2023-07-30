@@ -45,12 +45,6 @@ public class SatController extends ProblemController<String, DimacsCnfSolution, 
   }
 
   @CrossOrigin
-  @GetMapping("/sub-routines/sat")
-  public List<SubRoutineDefinition> getSubRoutines(@RequestParam(name = "id") String solverId) {
-    return super.getSubRoutines(solverId);
-  }
-
-  @CrossOrigin
   @GetMapping("/meta-solver/settings/sat")
   public List<MetaSolverSetting> getMetaSolverSettings() {
     return metaSolver.getSettings();

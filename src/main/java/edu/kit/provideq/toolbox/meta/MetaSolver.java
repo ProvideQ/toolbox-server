@@ -4,7 +4,9 @@ import edu.kit.provideq.toolbox.SolutionManager;
 import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -74,13 +76,13 @@ public abstract class MetaSolver<
           Problem<ProblemT> problem,
           List<MetaSolverSetting> metaSolverSettings);
 
-  public Optional<SolverT> getSolver(String id) {
-    if (id == null) {
+  public Optional<SolverT> getSolver(String solverId) {
+    if (solverId == null) {
       return Optional.empty();
     }
 
     return solvers.stream()
-        .filter(solver -> solver.getId().equals(id))
+        .filter(solver -> solver.getId().equals(solverId))
         .findFirst();
   }
 
