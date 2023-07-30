@@ -74,10 +74,4 @@ public class FeatureModelAnomalyController
     solution.setSolverName(solution.getSolverName() + ": " + anomaly.name);
     return solution; FIXME
   }*/
-
-  @CrossOrigin
-  @GetMapping("/solve/feature-model/anomaly/")
-  public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
-    return super.findSolution(id);
-  }
 }

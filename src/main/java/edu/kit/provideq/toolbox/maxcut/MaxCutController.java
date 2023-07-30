@@ -36,10 +36,4 @@ public class MaxCutController extends ProblemController<String, String, MaxCutSo
   public MetaSolver<String, String, MaxCutSolver> getMetaSolver() {
     return metaSolver;
   }
-
-  @CrossOrigin
-  @GetMapping("/solve/max-cut")
-  public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
-    return super.findSolution(id);
-  }
 }

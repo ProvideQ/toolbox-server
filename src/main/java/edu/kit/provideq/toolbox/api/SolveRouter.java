@@ -224,4 +224,38 @@ public class SolveRouter {
     private Mono<ServerResponse> handleMetaSolverSettingsRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
         return ok().body(metaSolver.getSettings(), new ParameterizedTypeReference<List<MetaSolverSetting>>() {});
     }
+
+    @Bean
+    RouterFunction<ServerResponse> getSolutionRoutes() {
+        return metaSolvers.stream()
+                .map(this::defineSolutionRouteForMetaSolver)
+                .reduce(RouterFunction::and)
+                .orElseThrow(); // we should always have at least one route or the toolbox is useless
+    }
+
+    private RouterFunction<ServerResponse> defineSolutionRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
+        String problemId = metaSolver.getProblemType().getId();
+        return route().GET(
+                "/solve/" + problemId,
+                accept(APPLICATION_JSON),
+                req -> handleSolutionRouteForMetaSolver(metaSolver, req),
+                ops -> ops
+                        .operationId("/solution/" + problemId)
+                        .tag(problemId)
+                        .parameter(parameterBuilder().in(ParameterIn.QUERY).name("id"))
+                        .response(responseBuilder()
+                                .responseCode(String.valueOf(HttpStatus.OK.value())).implementation(SolutionHandle.class)
+                        )
+        ).build();
+    }
+
+    private Mono<ServerResponse> handleSolutionRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver, ServerRequest req) {
+        var solution = req.queryParam("id")
+                .map(Long::parseLong)
+                .map(id -> metaSolver.getSolutionManager().getSolution(id))
+                .map(Solution::toStringSolution);
+
+        // yes, solution is of type `Solution<String>`. No idea why `toStringSolution` returns `SolutionHandle`
+        return ok().body(solution, new ParameterizedTypeReference<Solution<String>>() {});
+    }
 }

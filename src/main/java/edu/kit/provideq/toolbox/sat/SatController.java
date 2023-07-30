@@ -37,10 +37,4 @@ public class SatController extends ProblemController<String, DimacsCnfSolution, 
   public MetaSolver<String, DimacsCnfSolution, SatSolver> getMetaSolver() {
     return metaSolver;
   }
-
-  @CrossOrigin
-  @GetMapping("/solve/sat")
-  public SolutionHandle getSolution(@RequestParam(name = "id") long id) {
-    return super.findSolution(id).toStringSolution(DimacsCnfSolution::toHumanReadableString);
-  }
 }
