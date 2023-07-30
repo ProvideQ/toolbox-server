@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.sat;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import edu.kit.provideq.toolbox.sat.solvers.SatSolver;
@@ -20,7 +21,7 @@ public class MetaSolverSat extends MetaSolver<String, DimacsCnfSolution, SatSolv
 
   @Autowired
   public MetaSolverSat(GamsSatSolver gamsSatSolver) {
-    super(gamsSatSolver);
+    super(ProblemType.SAT, gamsSatSolver);
     //TODO: register more SAT Solvers
   }
 

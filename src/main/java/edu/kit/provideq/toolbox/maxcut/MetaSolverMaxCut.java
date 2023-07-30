@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
   @Autowired
   public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver,
                           GamsMaxCutSolver gamsMaxCutSolver) {
-    super(qiskitMaxCutSolver, gamsMaxCutSolver);
+    super(ProblemType.MAX_CUT, qiskitMaxCutSolver, gamsMaxCutSolver);
   }
 
   @Override

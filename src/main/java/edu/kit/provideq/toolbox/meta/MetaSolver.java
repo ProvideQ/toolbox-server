@@ -20,17 +20,20 @@ public abstract class MetaSolver<
         SolverT extends ProblemSolver<ProblemT, SolutionT>> {
 
   protected Set<SolverT> solvers = new HashSet<>();
+  private ProblemType problemType;
 
   public MetaSolver() {
   }
 
-  public MetaSolver(List<SolverT> problemSolvers) {
+  public MetaSolver(ProblemType problemType, List<SolverT> problemSolvers) {
     solvers.addAll(problemSolvers);
+    this.problemType = problemType;
   }
 
   @SafeVarargs
-  public MetaSolver(SolverT... problemSolvers) {
+  public MetaSolver(ProblemType problemType, SolverT... problemSolvers) {
     solvers.addAll(List.of(problemSolvers));
+    this.problemType = problemType;
   }
 
   /**
@@ -89,5 +92,9 @@ public abstract class MetaSolver<
   @Override
   public int hashCode() {
     return this.solvers.hashCode();
+  }
+
+  public ProblemType getProblemType() {
+    return problemType;
   }
 }

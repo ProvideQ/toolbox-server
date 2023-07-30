@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.featuremodel.anomaly;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.solvers.FeatureModelAnomalySolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class MetaSolverFeatureModelAnomaly extends MetaSolver<
 
   @Autowired
   public MetaSolverFeatureModelAnomaly(FeatureModelAnomalySolver anomalySolver) {
-    super(anomalySolver);
+    super(ProblemType.FEATURE_MODEL_ANOMALY, anomalySolver);
   }
 
   @Override
