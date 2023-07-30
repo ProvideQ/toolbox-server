@@ -77,12 +77,12 @@ public class SolveRouter {
     }
 
     private <ProblemT, SolutionT> Mono<ServerResponse> handleRouteForMetaSolver(MetaSolver<ProblemT, SolutionT, ?> metaSolver, ServerRequest req) {
-        var x = req
+        var solutionMono = req
                 .bodyToMono(new ParameterizedTypeReference<SolveRequest<ProblemT>>() {})
                 .doOnNext(this::validate)
                 .map(metaSolver::solve)
                 .map(Solution::toStringSolution);
-        return ok().body(x, new ParameterizedTypeReference<>() {});
+        return ok().body(solutionMono, new ParameterizedTypeReference<>() {});
     }
     private <ProblemT> void validate(SolveRequest<ProblemT> request) {
         Errors errors = new BeanPropertyBindingResult(request, "request");
@@ -102,6 +102,7 @@ public class SolveRouter {
 
     private RouterFunction<ServerResponse> defineSubRoutineRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
         String problemId = metaSolver.getProblemType().getId();
+        System.out.println("x");
         return route().GET(
                 "/sub-routines/" + problemId,
                 req -> handleSubRoutineRouteForMetaSolver(metaSolver, req),
@@ -125,7 +126,7 @@ public class SolveRouter {
                 .map(ProblemSolver::getSubRoutines)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find a solver for this problem with this solver id!"));
 
-        return ok().body(subroutines, new ParameterizedTypeReference<List<SubRoutineDefinition>>() {});
+        return ok().body(Mono.just(subroutines), new ParameterizedTypeReference<>() {});
     }
 
     @Bean
@@ -159,7 +160,7 @@ public class SolveRouter {
                 .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName()))
                 .toList();
 
-        return ok().body(solvers, new ParameterizedTypeReference<List<ProblemSolverInfo>>() {});
+        return ok().body(Mono.just(solvers), new ParameterizedTypeReference<>() {});
     }
 
     @Bean
@@ -189,7 +190,7 @@ public class SolveRouter {
     }
 
     private Mono<ServerResponse> handleMetaSolverSettingsRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
-        return ok().body(metaSolver.getSettings(), new ParameterizedTypeReference<List<MetaSolverSetting>>() {});
+        return ok().body(Mono.just(metaSolver.getSettings()), new ParameterizedTypeReference<>() {});
     }
 
     @Bean
@@ -219,10 +220,11 @@ public class SolveRouter {
     private Mono<ServerResponse> handleSolutionRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver, ServerRequest req) {
         var solution = req.queryParam("id")
                 .map(Long::parseLong)
-                .map(id -> metaSolver.getSolutionManager().getSolution(id))
-                .map(Solution::toStringSolution);
+                .map(solutionId -> metaSolver.getSolutionManager().getSolution(solutionId))
+                .map(Solution::toStringSolution)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find a solution for this problem with this solution id!"));
 
         // yes, solution is of type `Solution<String>`. No idea why `toStringSolution` returns `SolutionHandle`
-        return ok().body(solution, new ParameterizedTypeReference<Solution<String>>() {});
+        return ok().body(Mono.just(solution), new ParameterizedTypeReference<Solution<String>>() {});
     }
 }
