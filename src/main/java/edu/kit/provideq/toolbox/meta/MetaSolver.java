@@ -5,18 +5,12 @@ import edu.kit.provideq.toolbox.SolutionManager;
 import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Mono;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Decides which known {@link ProblemSolver} is suited best for a given problem,

@@ -2,7 +2,6 @@ package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;

@@ -1,5 +1,8 @@
 package edu.kit.provideq.toolbox.api;
 
+import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
+import static org.hamcrest.Matchers.is;
+
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
@@ -7,6 +10,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.MetaSolverFeatureModelAnomaly;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.solvers.FeatureModelAnomalySolver;
+import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,18 +21,14 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.stream.Stream;
-
-import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
-import static org.hamcrest.Matchers.is;
 
 @WebFluxTest
 @Import(value = {
-        SolveRouter.class,
-        MetaSolverProvider.class,
-        MetaSolverFeatureModelAnomaly.class,
-        FeatureModelAnomalySolver.class,
-        SubRoutinePool.class
+    SolveRouter.class,
+    MetaSolverProvider.class,
+    MetaSolverFeatureModelAnomaly.class,
+    FeatureModelAnomalySolver.class,
+    SubRoutinePool.class
 })
 public class FeatureModelAnomalySolverTest {
   @Autowired
@@ -85,13 +85,14 @@ public class FeatureModelAnomalySolverTest {
         """;
 
     var response = client.post()
-            .uri("/solve/feature-model-anomaly/" + anomalyType) // FIXME type of anomaly?
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(req)
-            .exchange();
+        .uri("/solve/feature-model-anomaly/" + anomalyType) // FIXME type of anomaly?
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(req)
+        .exchange();
 
     response.expectStatus().isOk();
-    response.expectBody(new ParameterizedTypeReference<Solution<String>>() {})
-            .value(Solution::getStatus, is(expectedStatus));
+    response.expectBody(new ParameterizedTypeReference<Solution<String>>() {
+        })
+        .value(Solution::getStatus, is(expectedStatus));
   }
 }
