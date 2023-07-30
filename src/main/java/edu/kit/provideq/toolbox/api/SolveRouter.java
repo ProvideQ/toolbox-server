@@ -102,7 +102,6 @@ public class SolveRouter {
 
     private RouterFunction<ServerResponse> defineSubRoutineRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
         String problemId = metaSolver.getProblemType().getId();
-        System.out.println("x");
         return route().GET(
                 "/sub-routines/" + problemId,
                 req -> handleSubRoutineRouteForMetaSolver(metaSolver, req),

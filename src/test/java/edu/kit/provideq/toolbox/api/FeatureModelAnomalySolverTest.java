@@ -1,39 +1,44 @@
 package edu.kit.provideq.toolbox.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
+import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.MetaSolverFeatureModelAnomaly;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.solvers.FeatureModelAnomalySolver;
-import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+import java.util.stream.Stream;
+
+import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
+import static org.hamcrest.Matchers.is;
+
+@WebFluxTest
+@Import(value = {
+        SolveRouter.class,
+        MetaSolverProvider.class,
+        MetaSolverFeatureModelAnomaly.class,
+        FeatureModelAnomalySolver.class,
+        SubRoutinePool.class
+})
 public class FeatureModelAnomalySolverTest {
   @Autowired
-  private MockMvc mvc;
-
-  @Autowired
-  private ObjectMapper mapper;
+  private WebTestClient client;
 
   public static Stream<Arguments> provideAnomalySolverIds() {
     String solverId = FeatureModelAnomalySolver.class.getName();
     return Stream.of(
-        Arguments.of(solverId, "void", SolutionStatus.SOLVED),
-        Arguments.of(solverId, "dead", SolutionStatus.SOLVED),
+        Arguments.of(solverId, "void", SOLVED),
+        Arguments.of(solverId, "dead", SOLVED),
 
         // not implemented yet, change to SOLVED when they have been implemented!
         Arguments.of(solverId, "false-optional", SolutionStatus.INVALID),
@@ -44,7 +49,7 @@ public class FeatureModelAnomalySolverTest {
   @ParameterizedTest
   @MethodSource("provideAnomalySolverIds")
   void testFeatureModelAnomalySolver(String solverId, String anomalyType,
-                                     SolutionStatus expectedStatus) throws Exception {
+                                     SolutionStatus expectedStatus) {
     var req = new SolveFeatureModelRequest();
     req.requestedSolverId = solverId;
     req.requestContent = """
@@ -79,22 +84,14 @@ public class FeatureModelAnomalySolverTest {
                             Lettuce
         """;
 
-    var requestBuilder = MockMvcRequestBuilders
-        .post("/solve/feature-model/anomaly/" + anomalyType)
-        .accept(MediaType.APPLICATION_JSON)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(mapper.writeValueAsString(req));
+    var response = client.post()
+            .uri("/solve/feature-model-anomaly/" + anomalyType) // FIXME type of anomaly?
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(req)
+            .exchange();
 
-    var result = mvc.perform(requestBuilder)
-        .andExpect(status().isOk())
-        .andReturn()
-        .getResponse().getContentAsString();
-
-    JavaType solutionType =
-        mapper.getTypeFactory().constructParametricType(Solution.class, String.class);
-    Solution<String> solution = mapper.readValue(result, solutionType);
-
-    assertThat(solution.getStatus())
-        .isSameAs(expectedStatus);
+    response.expectStatus().isOk();
+    response.expectBody(new ParameterizedTypeReference<Solution<String>>() {})
+            .value(Solution::getStatus, is(expectedStatus));
   }
 }
