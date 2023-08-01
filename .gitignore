@@ -49,3 +49,4 @@ gamslice.txt
 *.lst
 *.op2
 gams/**/225a
+*.out
