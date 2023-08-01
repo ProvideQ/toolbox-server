@@ -29,7 +29,8 @@ public enum ProblemType {
    * <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">More information</a>
    */
   FEATURE_MODEL_ANOMALY("feature-model-anomaly", SolveFeatureModelRequest.class),
-  ;
+  FEATURE_MODEL_ANOMALY_DEAD("feature-model-anomaly-dead", SolveFeatureModelRequest.class),
+  FEATURE_MODEL_ANOMALY_VOID("feature-model-anomaly-void", SolveFeatureModelRequest.class);
 
   private final String id;
   private final Class<? extends SolveRequest<?>> requestType;
