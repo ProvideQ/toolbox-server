@@ -40,7 +40,7 @@ class MaxCutSolversTest {
   @Autowired
   private WebTestClient client;
 
-  public static Stream<String> provideMaxCutSolverIds() {
+  static Stream<String> provideMaxCutSolverIds() {
     return Stream.of(
         GamsMaxCutSolver.class.getName(),
         QiskitMaxCutSolver.class.getName()

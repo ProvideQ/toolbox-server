@@ -30,11 +30,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     FeatureModelAnomalySolver.class,
     SubRoutinePool.class
 })
-public class FeatureModelAnomalySolverTest {
+class FeatureModelAnomalySolverTest {
   @Autowired
   private WebTestClient client;
 
-  public static Stream<Arguments> provideAnomalySolverIds() {
+  static Stream<Arguments> provideAnomalySolverIds() {
     String solverId = FeatureModelAnomalySolver.class.getName();
     return Stream.of(
         Arguments.of(solverId, "void", SOLVED),

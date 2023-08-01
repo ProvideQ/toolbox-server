@@ -31,7 +31,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     GamsProcessRunner.class,
     ResourceProvider.class
 })
-public class SatSolverTest {
+class SatSolverTest {
   @Autowired
   private WebTestClient client;
 

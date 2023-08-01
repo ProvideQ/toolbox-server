@@ -39,10 +39,16 @@ public enum ProblemType {
     this.requestType = requestType;
   }
 
+  /**
+   * Returns a unique identifier for this problem type.
+   */
   public String getId() {
     return id;
   }
 
+  /**
+   * Returns the java class representing the body of a REST request to solve a problem of this type.
+   */
   public Class<? extends SolveRequest<?>> getRequestType() {
     return requestType;
   }

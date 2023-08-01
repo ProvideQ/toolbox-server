@@ -29,16 +29,12 @@ public abstract class MetaSolver<
   private ApplicationContext context;
 
   protected Set<SolverT> solvers = new HashSet<>();
-  private ProblemType problemType;
+  private final ProblemType problemType;
 
-  public MetaSolver() {
-  }
-
-  public MetaSolver(ProblemType problemType, List<SolverT> problemSolvers) {
-    solvers.addAll(problemSolvers);
-    this.problemType = problemType;
-  }
-
+  /**
+   * Configures this meta solver to find the correct solver among {@code problemSolvers}, all of
+   * which solve problems of type {@code problemType}.
+   */
   @SafeVarargs
   public MetaSolver(ProblemType problemType, SolverT... problemSolvers) {
     solvers.addAll(List.of(problemSolvers));
@@ -51,26 +47,6 @@ public abstract class MetaSolver<
   }
 
   /**
-   * Adds a new solver to this meta solvers list of known solvers.
-   *
-   * @param problemSolver the new problem solver
-   * @return true in case the addition was successful, false otherwise
-   */
-  public boolean registerSolver(SolverT problemSolver) {
-    return solvers.add(problemSolver);
-  }
-
-  /**
-   * Removes a solver from this meta solvers list of known solvers.
-   *
-   * @param problemSolver the solver
-   * @return true in case the removal was successful, false otherwise
-   */
-  public boolean unregisterSolver(SolverT problemSolver) {
-    return solvers.remove(problemSolver);
-  }
-
-  /**
    * Provides the best suited known solver this meta solver is aware of for a given problem.
    *
    * @param problem the problem the meta solver is to check its solvers by
@@ -80,6 +56,11 @@ public abstract class MetaSolver<
           Problem<ProblemT> problem,
           List<MetaSolverSetting> metaSolverSettings);
 
+  /**
+   * Returns the solver from {@link #getAllSolvers()} with the given {@code solverId}.
+   * The optional is empty if there is no solver with the given {@code solverId} known by this
+   * meta-solver.
+   */
   public Optional<SolverT> getSolver(String solverId) {
     if (solverId == null) {
       return Optional.empty();
@@ -116,6 +97,11 @@ public abstract class MetaSolver<
     return solutionManager;
   }
 
+  /**
+   * Solves a given {@link SolveRequest} by using either the requested {@link ProblemSolver}
+   * (if specified) or the solver recommended by {@link #findSolver(Problem, List)}, and returns
+   * the solution.
+   */
   public Solution<SolutionT> solve(SolveRequest<ProblemT> request) {
     Solution<SolutionT> solution = this.getSolutionManager().createSolution();
     Problem<ProblemT> problem = new Problem<>(request.requestContent, this.getProblemType());
