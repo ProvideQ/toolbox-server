@@ -13,7 +13,9 @@ import edu.kit.provideq.toolbox.maxcut.MetaSolverMaxCut;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
+import java.time.Duration;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class MaxCutSolversTest {
   @Autowired
   private WebTestClient client;
+
+  @BeforeEach
+  void beforeEach() {
+    this.client = this.client.mutate()
+        .responseTimeout(Duration.ofSeconds(10))
+        .build();
+  }
 
   static Stream<String> provideMaxCutSolverIds() {
     return Stream.of(
