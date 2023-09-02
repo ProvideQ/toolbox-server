@@ -46,7 +46,7 @@ public class Solution<S> implements SolutionHandle {
   }
 
   @Override
-  public SolutionHandle toStringSolution() {
+  public Solution<String> toStringSolution() {
     return toStringSolution(Object::toString);
   }
 
@@ -58,7 +58,7 @@ public class Solution<S> implements SolutionHandle {
    *                       to a String.
    * @return the solution with the stringified solution data.
    */
-  public SolutionHandle toStringSolution(@NotNull Function<S, String> stringSelector) {
+  public Solution<String> toStringSolution(@NotNull Function<S, String> stringSelector) {
     Objects.requireNonNull(stringSelector, "Missing String selector!");
 
     var stringSolution = new Solution<String>(getId());

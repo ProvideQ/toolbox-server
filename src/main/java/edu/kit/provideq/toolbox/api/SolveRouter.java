@@ -138,9 +138,7 @@ public class SolveRouter {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Could not find a solution for this problem with this solution id!"));
 
-    // yes, solution is of type `Solution<String>`.
-    // No idea why `toStringSolution` returns `SolutionHandle`
-    return ok().body(Mono.just(solution), new ParameterizedTypeReference<Solution<String>>() {
+    return ok().body(Mono.just(solution), new ParameterizedTypeReference<>() {
     });
   }
 

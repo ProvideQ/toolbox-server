@@ -10,5 +10,8 @@ public interface SolutionHandle {
 
   void setStatus(SolutionStatus newStatus);
 
-  SolutionHandle toStringSolution();
+  /**
+   * Converts this solution handle to a string-based {@link Solution}.
+   */
+  Solution<String> toStringSolution();
 }
