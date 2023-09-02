@@ -11,6 +11,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,13 +48,13 @@ public class SolversRouter {
 
   private RouterFunction<ServerResponse> defineSolversRouteForMetaSolver(
       MetaSolver<?, ?, ?> metaSolver) {
-    String problemId = metaSolver.getProblemType().getId();
+    var problemType = metaSolver.getProblemType();
     return route().GET(
-        "/solvers/" + problemId,
+        getSolversRouteForProblemType(problemType),
         req -> handleSolversRouteForMetaSolver(metaSolver),
         ops -> ops
-            .operationId("/solvers/" + problemId)
-            .tag(problemId)
+            .operationId(getSolversRouteForProblemType(problemType))
+            .tag(problemType.getId())
             .response(responseBuilder()
                 .responseCode(String.valueOf(HttpStatus.OK.value()))
                 .content(contentBuilder()
@@ -72,5 +73,9 @@ public class SolversRouter {
 
     return ok().body(Mono.just(solvers), new ParameterizedTypeReference<>() {
     });
+  }
+
+  private String getSolversRouteForProblemType(ProblemType type) {
+    return "/solvers/" + type.getId();
   }
 }

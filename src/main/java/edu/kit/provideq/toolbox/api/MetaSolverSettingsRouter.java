@@ -10,6 +10,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -46,13 +47,13 @@ public class MetaSolverSettingsRouter {
 
   private RouterFunction<ServerResponse> defineMetaSolverSettingsRouteForMetaSolver(
       MetaSolver<?, ?, ?> metaSolver) {
-    String problemId = metaSolver.getProblemType().getId();
+    var problemType = metaSolver.getProblemType();
     return route().GET(
-        "/meta-solver/settings/" + problemId,
+        getRouteForProblemType(problemType),
         req -> handleMetaSolverSettingsRouteForMetaSolver(metaSolver),
         ops -> ops
-            .operationId("/meta-solver/settings/" + problemId)
-            .tag(problemId)
+            .operationId(getRouteForProblemType(problemType))
+            .tag(problemType.getId())
             .response(responseBuilder()
                 .responseCode(String.valueOf(HttpStatus.OK.value()))
                 .content(contentBuilder()
@@ -68,5 +69,9 @@ public class MetaSolverSettingsRouter {
       MetaSolver<?, ?, ?> metaSolver) {
     return ok().body(Mono.just(metaSolver.getSettings()), new ParameterizedTypeReference<>() {
     });
+  }
+
+  private String getRouteForProblemType(ProblemType type) {
+    return "/meta-solver/settings/" + type.getId();
   }
 }

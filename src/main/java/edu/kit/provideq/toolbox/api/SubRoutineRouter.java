@@ -12,6 +12,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,14 +53,14 @@ public class SubRoutineRouter {
 
   private RouterFunction<ServerResponse> defineSubRoutineRouteForMetaSolver(
       MetaSolver<?, ?, ?> metaSolver) {
-    String problemId = metaSolver.getProblemType().getId();
+    var problemType = metaSolver.getProblemType();
     return route().GET(
-        "/sub-routines/" + problemId,
+        getSubRoutinesRouteForProblemType(problemType),
         req -> handleSubRoutineRouteForMetaSolver(metaSolver, req),
         ops -> ops
-            .operationId("/sub-routines/" + problemId)
+            .operationId(getSubRoutinesRouteForProblemType(problemType))
             .parameter(parameterBuilder().in(ParameterIn.QUERY).name("id"))
-            .tag(problemId)
+            .tag(problemType.getId())
             .response(responseBuilder()
                 .responseCode(String.valueOf(HttpStatus.OK.value()))
                 .content(contentBuilder()
@@ -81,5 +82,9 @@ public class SubRoutineRouter {
 
     return ok().body(Mono.just(subroutines), new ParameterizedTypeReference<>() {
     });
+  }
+
+  private String getSubRoutinesRouteForProblemType(ProblemType type) {
+    return "/sub-routines/" + type.getId();
   }
 }

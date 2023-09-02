@@ -16,6 +16,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,14 +58,14 @@ public class SolveRouter {
   }
 
   private RouterFunction<ServerResponse> defineRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
-    String problemId = metaSolver.getProblemType().getId();
+    var problemType = metaSolver.getProblemType();
     return route().POST(
-        "/solve/" + problemId,
+        getSolveRouteForProblemType(problemType),
         accept(APPLICATION_JSON),
         req -> handleRouteForMetaSolver(metaSolver, req),
         ops -> ops
-            .operationId("/solve/" + problemId)
-            .tag(problemId)
+            .operationId(getSolveRouteForProblemType(problemType))
+            .tag(problemType.getId())
             .requestBody(requestBodyBuilder()
                 .content(contentBuilder()
                     .schema(schemaBuilder().implementation(
@@ -110,14 +111,16 @@ public class SolveRouter {
 
   private RouterFunction<ServerResponse> defineSolutionRouteForMetaSolver(
       MetaSolver<?, ?, ?> metaSolver) {
-    String problemId = metaSolver.getProblemType().getId();
+    var problemType = metaSolver.getProblemType();
     return route().GET(
-        "/solve/" + problemId,
+        // FIXME this is intentionally SOLVE instead of SOLUTION to avoid breaking things
+        //  but maybe we should switch the name at some point
+        getSolveRouteForProblemType(problemType),
         accept(APPLICATION_JSON),
         req -> handleSolutionRouteForMetaSolver(metaSolver, req),
         ops -> ops
-            .operationId("/solution/" + problemId)
-            .tag(problemId)
+            .operationId(getSolutionRouteForProblemType(problemType))
+            .tag(problemType.getId())
             .parameter(parameterBuilder().in(ParameterIn.QUERY).name("id"))
             .response(responseBuilder()
                 .responseCode(String.valueOf(HttpStatus.OK.value()))
@@ -139,5 +142,13 @@ public class SolveRouter {
     // No idea why `toStringSolution` returns `SolutionHandle`
     return ok().body(Mono.just(solution), new ParameterizedTypeReference<Solution<String>>() {
     });
+  }
+
+  private String getSolveRouteForProblemType(ProblemType type) {
+    return "/solve/" + type.getId();
+  }
+
+  private String getSolutionRouteForProblemType(ProblemType type) {
+    return "/solution/" + type.getId();
   }
 }
