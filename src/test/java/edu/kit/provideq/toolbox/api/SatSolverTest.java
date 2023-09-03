@@ -12,6 +12,7 @@ import edu.kit.provideq.toolbox.sat.MetaSolverSat;
 import edu.kit.provideq.toolbox.sat.SolveSatRequest;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebFluxTest
 @Import(value = {
     SolveRouter.class,
@@ -35,10 +37,13 @@ class SatSolverTest {
   @Autowired
   private WebTestClient client;
 
-  static Stream<String> provideSatSolverIds() {
-    return Stream.of(
-        GamsSatSolver.class.getName()
-    );
+  @Autowired
+  private MetaSolverSat metaSolverSat;
+
+  Stream<String> provideSatSolverIds() {
+    return metaSolverSat.getAllSolvers()
+            .stream()
+            .map(x -> x.getClass().getName());
   }
 
   @ParameterizedTest
