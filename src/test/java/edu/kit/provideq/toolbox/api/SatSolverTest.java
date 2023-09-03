@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
 import static org.hamcrest.Matchers.is;
 
+import com.google.common.collect.Lists;
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.ResourceProvider;
@@ -14,6 +15,7 @@ import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -40,18 +42,24 @@ class SatSolverTest {
   @Autowired
   private MetaSolverSat metaSolverSat;
 
-  Stream<String> provideSatSolverIds() {
-    return metaSolverSat.getAllSolvers()
+  Stream<Arguments> provideArguments() {
+    var solvers = metaSolverSat.getAllSolvers()
             .stream()
-            .map(x -> x.getClass().getName());
+            .map(x -> x.getClass().getName())
+            .toList();
+
+    var problems = metaSolverSat.getExampleProblems();
+
+    return Lists.cartesianProduct(solvers, problems).stream()
+            .map(list -> Arguments.of(list.get(0), list.get(1)));
   }
 
   @ParameterizedTest
-  @MethodSource("provideSatSolverIds")
-  void testSatSolver(String solverId) {
+  @MethodSource("provideArguments")
+  void testSatSolver(String solverId, String content) {
     var req = new SolveSatRequest();
     req.requestedSolverId = solverId;
-    req.requestContent = "a and b";
+    req.requestContent = content;
 
     var response = client.post()
         .uri("/solve/sat")
