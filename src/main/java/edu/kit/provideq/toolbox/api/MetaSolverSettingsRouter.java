@@ -8,10 +8,13 @@ import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,18 +54,46 @@ public class MetaSolverSettingsRouter {
     return route().GET(
         getRouteForProblemType(problemType),
         req -> handleMetaSolverSettingsRouteForMetaSolver(metaSolver),
-        ops -> ops
+        ops -> handleMetaSolverSettingsRouteDocumentation(ops, metaSolver)
+    ).build();
+  }
+
+  private void handleMetaSolverSettingsRouteDocumentation(
+          Builder ops, MetaSolver<?, ?, ?> metaSolver) {
+    var problemType = metaSolver.getProblemType();
+    ops
             .operationId(getRouteForProblemType(problemType))
             .tag(problemType.getId())
-            .response(responseBuilder()
-                .responseCode(String.valueOf(HttpStatus.OK.value()))
-                .content(contentBuilder()
+            .response(getResponseOk(metaSolver))
+            .response(getResponseNotFound());
+  }
+
+  private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseOk(
+          MetaSolver<?, ?, ?> metaSolver) {
+    String example;
+    try {
+      example = new ObjectMapper().writeValueAsString(metaSolver.getSettings());
+    } catch (JsonProcessingException e) {
+      example = "Error: example could not be parsed";
+    }
+
+    return responseBuilder()
+            .responseCode(String.valueOf(HttpStatus.OK.value()))
+            .content(contentBuilder()
                     .mediaType(APPLICATION_JSON_VALUE)
+                    .example(org.springdoc.core.fn.builders.exampleobject.Builder
+                            .exampleOjectBuilder()
+                            .name(metaSolver.getProblemType().getId())
+                            .value(example))
                     .array(arraySchemaBuilder().schema(
-                        schemaBuilder().implementation(MetaSolverSetting.class)))
-                )
-            )
-    ).build();
+                            schemaBuilder().implementation(MetaSolverSetting.class))
+                    )
+            );
+  }
+
+  private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseNotFound() {
+    return responseBuilder()
+            .responseCode(String.valueOf(HttpStatus.NOT_FOUND.value()));
   }
 
   private Mono<ServerResponse> handleMetaSolverSettingsRouteForMetaSolver(

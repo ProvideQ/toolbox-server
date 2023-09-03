@@ -31,4 +31,37 @@ public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
           List<MetaSolverSetting> metaSolverSettings) {
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
+
+  @Override
+  public List<String> getExampleProblems() {
+    return List.of("""
+            graph [
+                id 42
+                node [
+                    id 1
+                    label "1"
+                ]
+                node [
+                    id 2
+                    label "2"
+                ]
+                node [
+                    id 3
+                    label "3"
+                ]
+                edge [
+                    source 1
+                    target 2
+                ]
+                edge [
+                    source 2
+                    target 3
+                ]
+                edge [
+                    source 3
+                    target 1
+                ]
+            ]"""
+    );
+  }
 }
