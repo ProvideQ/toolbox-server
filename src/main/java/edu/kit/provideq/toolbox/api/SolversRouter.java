@@ -77,6 +77,8 @@ public class SolversRouter {
     ops
         .operationId(getSolversRouteForProblemType(metaSolver.getProblemType()))
         .tag(metaSolver.getProblemType().getId())
+        .description("Returns a list of solvers available to solve the "
+            + metaSolver.getProblemType().getId() + " problem type.")
         .response(responseBuilder()
             .responseCode(String.valueOf(HttpStatus.OK.value()))
             .content(getOkResponseContent(metaSolver))

@@ -139,6 +139,9 @@ public class SolveRouter {
     ops
         .operationId(getSolveRouteForProblemType(problemType))
         .tag(problemType.getId())
+        .description("Solves a " + problemType.getId() + " problem. To solve the problem, "
+            + "either the meta-solver will choose the best available solver,"
+            + "or a specific solver selected in the request will be used.")
         .requestBody(requestBodyBuilder()
                 .content(getRequestContent(metaSolver))
                 .required(true))
