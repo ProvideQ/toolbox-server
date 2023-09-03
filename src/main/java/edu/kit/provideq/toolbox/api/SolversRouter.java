@@ -8,10 +8,14 @@ import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.util.List;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,27 +56,50 @@ public class SolversRouter {
     return route().GET(
         getSolversRouteForProblemType(problemType),
         req -> handleSolversRouteForMetaSolver(metaSolver),
-        ops -> ops
-            .operationId(getSolversRouteForProblemType(problemType))
-            .tag(problemType.getId())
-            .response(responseBuilder()
-                .responseCode(String.valueOf(HttpStatus.OK.value()))
-                .content(contentBuilder()
-                    .mediaType(APPLICATION_JSON_VALUE)
-                    .array(arraySchemaBuilder().schema(
-                        schemaBuilder().implementation(ProblemSolverInfo.class)))
-                )
-            )
+        ops -> handleSolversRouteDocumentation(ops, metaSolver)
     ).build();
   }
 
   private Mono<ServerResponse> handleSolversRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
-    var solvers = metaSolver.getAllSolvers().stream()
-        .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName()))
-        .toList();
+    var solvers = getAllSolverInfos(metaSolver);
 
     return ok().body(Mono.just(solvers), new ParameterizedTypeReference<>() {
     });
+  }
+
+  private static List<ProblemSolverInfo> getAllSolverInfos(MetaSolver<?, ?, ?> metaSolver) {
+    return metaSolver.getAllSolvers().stream()
+            .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName()))
+            .toList();
+  }
+
+  private void handleSolversRouteDocumentation(Builder ops, MetaSolver<?, ?, ?> metaSolver) {
+    ops
+        .operationId(getSolversRouteForProblemType(metaSolver.getProblemType()))
+        .tag(metaSolver.getProblemType().getId())
+        .response(responseBuilder()
+            .responseCode(String.valueOf(HttpStatus.OK.value()))
+            .content(getOkResponseContent(metaSolver))
+        );
+  }
+
+  private static org.springdoc.core.fn.builders.content.Builder getOkResponseContent(
+          MetaSolver<?, ?, ?> metaSolver) {
+    var allSolvers = getAllSolverInfos(metaSolver);
+    String example;
+    try {
+      example = new ObjectMapper().writeValueAsString(allSolvers);
+    } catch (JsonProcessingException e) {
+      example = "Error: solvers could not be parsed";
+    }
+
+    return contentBuilder()
+            .mediaType(APPLICATION_JSON_VALUE)
+            .example(org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder()
+                    .name(metaSolver.getProblemType().getId())
+                    .value(example))
+            .array(arraySchemaBuilder().schema(
+                    schemaBuilder().implementation(ProblemSolverInfo.class)));
   }
 
   private String getSolversRouteForProblemType(ProblemType type) {

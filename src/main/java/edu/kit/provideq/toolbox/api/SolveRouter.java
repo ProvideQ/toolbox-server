@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
@@ -11,12 +12,19 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
@@ -57,26 +65,11 @@ public class SolveRouter {
   }
 
   private RouterFunction<ServerResponse> defineRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
-    var problemType = metaSolver.getProblemType();
     return route().POST(
-        getSolveRouteForProblemType(problemType),
+        getSolveRouteForProblemType(metaSolver.getProblemType()),
         accept(APPLICATION_JSON),
         req -> handleRouteForMetaSolver(metaSolver, req),
-        ops -> ops
-            .operationId(getSolveRouteForProblemType(problemType))
-            .tag(problemType.getId())
-            .requestBody(requestBodyBuilder()
-                .content(contentBuilder()
-                    .schema(schemaBuilder().implementation(
-                        metaSolver.getProblemType().getRequestType()))
-                    .mediaType(APPLICATION_JSON_VALUE)
-                )
-                .required(true)
-            )
-            .response(responseBuilder()
-                .responseCode(String.valueOf(HttpStatus.OK.value()))
-                .implementation(Solution.class)
-            )
+        ops -> handleRouteDocumentation(metaSolver, ops)
     ).build();
   }
 
@@ -139,6 +132,143 @@ public class SolveRouter {
 
     return ok().body(Mono.just(solution), new ParameterizedTypeReference<>() {
     });
+  }
+
+  private void handleRouteDocumentation(MetaSolver<?, ?, ?> metaSolver, Builder ops) {
+    var problemType = metaSolver.getProblemType();
+    ops
+        .operationId(getSolveRouteForProblemType(problemType))
+        .tag(problemType.getId())
+        .requestBody(requestBodyBuilder()
+                .content(getRequestContent(metaSolver))
+                .required(true))
+        .response(getResponseOk(metaSolver))
+        .response(getResponseNotFound());
+  }
+
+  private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseOk(
+          MetaSolver<?, ?, ?> metaSolver) {
+    return responseBuilder()
+            .responseCode(String.valueOf(HttpStatus.OK.value()))
+            .content(contentBuilder()
+                    .mediaType(APPLICATION_JSON_VALUE)
+                    .example(getExampleSolved(metaSolver))
+                    .example(getExampleInvalid(metaSolver))
+                    .array(arraySchemaBuilder().schema(
+                            schemaBuilder().implementation(Solution.class))));
+  }
+
+  private static org.springdoc.core.fn.builders.exampleobject.Builder getExampleSolved(
+          MetaSolver<?, ?, ?> metaSolver) {
+    return getExampleOk(
+            "Solved",
+            metaSolver,
+            solution -> {
+              solution.setSolutionData("Solution data to solve the problem");
+              solution.complete();
+            });
+  }
+
+  private static org.springdoc.core.fn.builders.exampleobject.Builder getExampleInvalid(
+          MetaSolver<?, ?, ?> metaSolver) {
+    return getExampleOk(
+            "Error",
+            metaSolver,
+            solution -> {
+              solution.setDebugData("Some error occurred");
+              solution.abort();
+            });
+  }
+
+  private static org.springdoc.core.fn.builders.exampleobject.Builder getExampleOk(
+          String exampleName,
+          MetaSolver<?, ?, ?> metaSolver,
+          Consumer<Solution<String>> solutionModifier) {
+    // Prepare a solved solution with some example data
+    var solvedSolution = new Solution<String>(42);
+    solvedSolution.setExecutionMilliseconds(42);
+    metaSolver.getAllSolvers().stream()
+            .findFirst()
+            .ifPresent(solver -> solvedSolution.setSolverName(solver.getName()));
+    solutionModifier.accept(solvedSolution);
+
+    // Convert the solution to a string
+    String solvedSolutionString;
+    try {
+      solvedSolutionString = new ObjectMapper().writeValueAsString(solvedSolution);
+    } catch (JsonProcessingException e) {
+      solvedSolutionString = "Error: example could not be parsed";
+    }
+
+    // Build the example
+    return org.springdoc.core.fn.builders.exampleobject.Builder
+            .exampleOjectBuilder()
+            .name(exampleName)
+            .description("The problem was solved successfully.")
+            .value(solvedSolutionString);
+  }
+
+  private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseNotFound() {
+    return responseBuilder()
+            .responseCode(String.valueOf(HttpStatus.NOT_FOUND.value()));
+  }
+
+  private org.springdoc.core.fn.builders.content.Builder getRequestContent(
+          MetaSolver<?, ?, ?> metaSolver) {
+    String content = metaSolver.getExampleProblems()
+            .stream().findFirst()
+            .map(e -> {
+              if (e instanceof String) {
+                return (String) e;
+              }
+
+              try {
+                return new ObjectMapper().writeValueAsString(e);
+              } catch (JsonProcessingException exception) {
+                return "Error: example could not be parsed";
+              }
+            })
+            .orElse("Error: no example available");
+
+    var request = new SolveRequest<String>();
+    request.requestContent = content;
+    request.requestedMetaSolverSettings = metaSolver.getSettings();
+
+    metaSolver.getAllSolvers().stream()
+            .findFirst()
+            .ifPresentOrElse(solver -> {
+              request.requestedSolverId = solver.getId();
+              request.requestedSubSolveRequests = solver.getSubRoutines().stream()
+                      .collect(Collectors.toMap(
+                              SubRoutineDefinition::type,
+                              subRoutine -> {
+                                var subSolveRequest = new SolveRequest<>();
+
+                                subSolveRequest.requestedSolverId = metaSolverProvider
+                                        .getMetaSolver(subRoutine.type())
+                                        .getAllSolvers().stream()
+                                        .findFirst()
+                                        .map(ProblemSolver::getId)
+                                        .orElse("");
+                                return subSolveRequest;
+                              }));
+            }, () -> request.requestedSolverId = "Error: no solver found");
+
+    String requestString;
+    try {
+      requestString = new ObjectMapper().writeValueAsString(request);
+    } catch (JsonProcessingException exception) {
+      requestString = "Error: no example available";
+    }
+
+    var problemType = metaSolver.getProblemType();
+    return contentBuilder()
+            .example(org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder()
+                    .name(problemType.getId())
+                    .value(requestString))
+            .schema(schemaBuilder().implementation(
+                    problemType.getRequestType()))
+            .mediaType(APPLICATION_JSON_VALUE);
   }
 
   private String getSolveRouteForProblemType(ProblemType type) {
