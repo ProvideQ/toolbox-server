@@ -17,6 +17,7 @@ import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebFluxTest
 @Import(value = {
     SolveRouter.class,
@@ -44,6 +46,9 @@ class MaxCutSolversTest {
   @Autowired
   private WebTestClient client;
 
+  @Autowired
+  private MetaSolverMaxCut metaSolverMaxCut;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -51,12 +56,10 @@ class MaxCutSolversTest {
         .build();
   }
 
-  static Stream<String> provideMaxCutSolverIds() {
-    return Stream.of(
-        GamsMaxCutSolver.class.getName(),
-        QiskitMaxCutSolver.class.getName(),
-        CirqMaxCutSolver.class.getName()
-    );
+  Stream<String> provideMaxCutSolverIds() {
+    return metaSolverMaxCut.getAllSolvers()
+            .stream()
+            .map(x -> x.getClass().getName());
   }
 
   @ParameterizedTest

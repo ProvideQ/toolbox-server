@@ -19,6 +19,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -30,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebFluxTest
 @Import(value = {
     SolveRouter.class,
@@ -48,13 +50,20 @@ class FeatureModelAnomalySolverTest {
   @Autowired
   private WebTestClient client;
 
-  static Stream<Arguments> provideAnomalySolverIds() {
-    return Stream.of(
-        Arguments.of(SatBasedVoidFeatureSolver.class,
-            ProblemType.FEATURE_MODEL_ANOMALY_VOID, SOLVED),
-        Arguments.of(SatBasedDeadFeatureSolver.class,
-            ProblemType.FEATURE_MODEL_ANOMALY_DEAD, SOLVED)
-    );
+  @Autowired
+  private VoidFeatureMetaSolver voidMetaSolver;
+
+  @Autowired
+  private DeadFeatureMetaSolver deadFeatureMetaSolver;
+
+  Stream<Arguments> provideAnomalySolverIds() {
+    return Stream.concat(
+            voidMetaSolver.getAllSolvers()
+                    .stream()
+                    .map(x -> Arguments.of(x.getClass().getName(), ProblemType.FEATURE_MODEL_ANOMALY_VOID, SOLVED)),
+            deadFeatureMetaSolver.getAllSolvers()
+                    .stream()
+                    .map(x -> Arguments.of(x.getClass().getName(), ProblemType.FEATURE_MODEL_ANOMALY_DEAD, SOLVED)));
   }
 
   @ParameterizedTest
