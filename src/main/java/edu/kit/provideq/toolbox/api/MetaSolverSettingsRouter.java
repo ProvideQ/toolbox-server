@@ -64,6 +64,9 @@ public class MetaSolverSettingsRouter {
     ops
             .operationId(getRouteForProblemType(problemType))
             .tag(problemType.getId())
+            .description(("Returns the selection of settings available for of the "
+            + problemType.getId() + " meta-solver. Settings can be used to configure"
+            + " what the meat solver considers to choose the best solver."))
             .response(getResponseOk(metaSolver))
             .response(getResponseNotFound());
   }

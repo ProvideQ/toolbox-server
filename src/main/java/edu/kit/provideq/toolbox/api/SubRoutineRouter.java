@@ -82,6 +82,11 @@ public class SubRoutineRouter {
     ops.operationId(getSubRoutinesRouteForProblemType(problemType))
             .parameter(getParameterBuilder(metaSolver))
             .tag(problemType.getId())
+            .description("Returns the sub-routines available for the given solver id of type "
+                    + problemType.getId() + ". "
+                    + "Sub-routines are used in some solvers to solve sub-problems. "
+                    + "Passing a sub-routine in a solve request will ensure that"
+                    + " the desired sub-routine is used in the calculation.")
             .response(responseBuilder()
                     .responseCode(String.valueOf(HttpStatus.OK.value()))
                     .content(getOkResponseContent(metaSolver)))
