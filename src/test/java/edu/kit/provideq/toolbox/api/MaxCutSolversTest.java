@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
 import static org.hamcrest.Matchers.is;
 
+import com.google.common.collect.Lists;
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.PythonProcessRunner;
@@ -15,10 +16,12 @@ import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
 import java.time.Duration;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -56,45 +59,24 @@ class MaxCutSolversTest {
         .build();
   }
 
-  Stream<String> provideMaxCutSolverIds() {
-    return metaSolverMaxCut.getAllSolvers()
+  Stream<Arguments> provideArguments() {
+    var solvers = metaSolverMaxCut.getAllSolvers()
             .stream()
-            .map(x -> x.getClass().getName());
+            .map(x -> x.getClass().getName())
+            .toList();
+
+    var problems = metaSolverMaxCut.getExampleProblems();
+
+    return Lists.cartesianProduct(solvers, problems).stream()
+            .map(list -> Arguments.of(list.get(0), list.get(1)));
   }
 
   @ParameterizedTest
-  @MethodSource("provideMaxCutSolverIds")
-  void testMaxCutSolver(String solverId) {
+  @MethodSource("provideArguments")
+  void testMaxCutSolver(String solverId, String content) {
     var req = new SolveMaxCutRequest();
     req.requestedSolverId = solverId;
-    req.requestContent = """
-        graph [
-            id 42
-            node [
-                id 1
-                label "1"
-            ]
-            node [
-                id 2
-                label "2"
-            ]
-            node [
-                id 3
-                label "3"
-            ]
-            edge [
-                source 1
-                target 2
-            ]
-            edge [
-                source 2
-                target 3
-            ]
-            edge [
-                source 3
-                target 1
-            ]
-        ]""";
+    req.requestContent = content;
 
     var response = client.post()
         .uri("/solve/max-cut")

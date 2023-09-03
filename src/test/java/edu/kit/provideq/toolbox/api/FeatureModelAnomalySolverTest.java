@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
 import static org.hamcrest.Matchers.is;
 
+import com.google.common.collect.Lists;
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.ResourceProvider;
@@ -56,55 +57,41 @@ class FeatureModelAnomalySolverTest {
   @Autowired
   private DeadFeatureMetaSolver deadFeatureMetaSolver;
 
-  Stream<Arguments> provideAnomalySolverIds() {
-    return Stream.concat(
-            voidMetaSolver.getAllSolvers()
-                    .stream()
-                    .map(x -> Arguments.of(x.getClass().getName(), ProblemType.FEATURE_MODEL_ANOMALY_VOID, SOLVED)),
-            deadFeatureMetaSolver.getAllSolvers()
-                    .stream()
-                    .map(x -> Arguments.of(x.getClass().getName(), ProblemType.FEATURE_MODEL_ANOMALY_DEAD, SOLVED)));
+  Stream<Arguments> provideArguments() {
+    // Void arguments
+    var voidSolvers = voidMetaSolver.getAllSolvers()
+            .stream()
+            .map(x -> x.getClass().getName())
+            .toList();
+    var voidProblems = voidMetaSolver.getExampleProblems();
+
+    var voidArguments = Lists.cartesianProduct(voidSolvers, voidProblems).stream()
+            .map(list -> Arguments.of(list.get(0), ProblemType.FEATURE_MODEL_ANOMALY_VOID, SOLVED, list.get(1)));
+
+    // Dead arguments
+    var deadSolvers = deadFeatureMetaSolver.getAllSolvers()
+            .stream()
+            .map(x -> x.getClass().getName())
+            .toList();
+    var deadProblems = deadFeatureMetaSolver.getExampleProblems();
+
+    var deadArguments = Lists.cartesianProduct(deadSolvers, deadProblems).stream()
+            .map(list -> Arguments.of(list.get(0), ProblemType.FEATURE_MODEL_ANOMALY_DEAD, SOLVED, list.get(1)));
+
+    // Return combined stream
+    return Stream.concat(voidArguments, deadArguments) ;
   }
 
   @ParameterizedTest
-  @MethodSource("provideAnomalySolverIds")
+  @MethodSource("provideArguments")
   void testFeatureModelAnomalySolver(
       Class<? extends ProblemSolver<String, String>> solver,
       ProblemType anomalyType,
-      SolutionStatus expectedStatus) {
+      SolutionStatus expectedStatus,
+      String content) {
     var req = new SolveFeatureModelRequest();
     req.requestedSolverId = solver.getName();
-    req.requestContent = """
-        namespace Sandwich
-                        
-        features
-            Sandwich {extended__}   \s
-                mandatory
-                    Bread   \s
-                        alternative
-                            "Full Grain" {Calories 203, Price 1.99, Organic true}
-                            Flatbread {Calories 90, Price 0.79, Organic true}
-                            Toast {Calories 250, Price 0.99, Organic false}
-                optional
-                    Cheese   \s
-                        optional
-                            Gouda   \s
-                                alternative
-                                    Sprinkled {Fat {value 35, unit "g"}}
-                                    Slice {Fat {value 35, unit "g"}}
-                            Cheddar
-                            "Cream Cheese"
-                    Meat   \s
-                        or
-                            "Salami" {Producer "Farmer Bob"}
-                            Ham {Producer "Farmer Sam"}
-                            "Chicken Breast" {Producer "Farmer Sam"}
-                    Vegetables   \s
-                        optional
-                            "Cucumber"
-                            Tomatoes
-                            Lettuce
-        """;
+    req.requestContent = content;
 
     var response = client.post()
         .uri("/solve/" + anomalyType.getId())
