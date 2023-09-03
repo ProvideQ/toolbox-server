@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.dead;
 
+import edu.kit.provideq.toolbox.featuremodel.ExtendedUvlFeatureModel;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -23,5 +24,10 @@ public class DeadFeatureMetaSolver
                                                   List<MetaSolverSetting> metaSolverSettings) {
     // we only have one solver at this point
     return getAllSolvers().stream().findAny().orElseThrow();
+  }
+
+  @Override
+  public List<String> getExampleProblems() {
+    return ExtendedUvlFeatureModel.getExamples();
   }
 }

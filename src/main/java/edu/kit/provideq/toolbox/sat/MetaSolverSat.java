@@ -30,4 +30,12 @@ public class MetaSolverSat extends MetaSolver<String, DimacsCnfSolution, SatSolv
     // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
+
+  @Override
+  public List<String> getExampleProblems() {
+    return List.of(
+        "a and b",
+        "a and b or c"
+    );
+  }
 }
