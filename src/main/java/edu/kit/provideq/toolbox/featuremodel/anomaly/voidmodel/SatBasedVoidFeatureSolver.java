@@ -14,8 +14,12 @@ import java.util.List;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
 
+/**
+ * This problem solver solves the {@link ProblemType#FEATURE_MODEL_ANOMALY_VOID} problem by building
+ * {@link ProblemType#SAT} formula that is solved by a corresponding solver.
+ */
 @Component
-public class VoidFeatureSolver
+public class SatBasedVoidFeatureSolver
     implements ProblemSolver<String, String> {
   @Override
   public String getName() {

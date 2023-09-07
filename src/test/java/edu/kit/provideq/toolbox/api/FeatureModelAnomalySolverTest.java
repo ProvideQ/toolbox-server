@@ -11,9 +11,9 @@ import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureMetaSolver;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureSolver;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.SatBasedDeadFeatureSolver;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.SatBasedVoidFeatureSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidFeatureMetaSolver;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidFeatureSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
@@ -35,9 +35,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     SolveRouter.class,
     MetaSolverProvider.class,
     DeadFeatureMetaSolver.class,
-    DeadFeatureSolver.class,
+    SatBasedDeadFeatureSolver.class,
     VoidFeatureMetaSolver.class,
-    VoidFeatureSolver.class,
+    SatBasedVoidFeatureSolver.class,
     SubRoutinePool.class,
     MetaSolverSat.class,
     GamsSatSolver.class,
@@ -50,8 +50,10 @@ class FeatureModelAnomalySolverTest {
 
   static Stream<Arguments> provideAnomalySolverIds() {
     return Stream.of(
-        Arguments.of(VoidFeatureSolver.class, ProblemType.FEATURE_MODEL_ANOMALY_VOID, SOLVED),
-        Arguments.of(DeadFeatureSolver.class, ProblemType.FEATURE_MODEL_ANOMALY_DEAD, SOLVED)
+        Arguments.of(SatBasedVoidFeatureSolver.class,
+            ProblemType.FEATURE_MODEL_ANOMALY_VOID, SOLVED),
+        Arguments.of(SatBasedDeadFeatureSolver.class,
+            ProblemType.FEATURE_MODEL_ANOMALY_DEAD, SOLVED)
     );
   }
 

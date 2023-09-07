@@ -17,8 +17,12 @@ import java.util.List;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
 
+/**
+ * This problem solver solves the {@link ProblemType#FEATURE_MODEL_ANOMALY_DEAD} problem by building
+ * {@link ProblemType#SAT} formulae that are solved by a corresponding solver.
+ */
 @Component
-public class DeadFeatureSolver implements ProblemSolver<String, String> {
+public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> {
   @Override
   public String getName() {
     return "SAT-based Dead Feature Solver";
