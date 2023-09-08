@@ -24,12 +24,20 @@ public enum ProblemType {
 
   /**
    * A searching problem:
-   * For a given feature model, check for Void Feature Model, Dead Features,
-   * False-Optional Features, Redundant Constraints.
-   * <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">More information</a>
+   * For a given feature model, check if the model contains dead features.
+   *
+   * @see <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">
+   *      "Explaining Anomalies in Feature Models", Kowal et al., 2026</a>
    */
-  FEATURE_MODEL_ANOMALY("feature-model-anomaly", SolveFeatureModelRequest.class),
-  ;
+  FEATURE_MODEL_ANOMALY_DEAD("feature-model-anomaly-dead", SolveFeatureModelRequest.class),
+  /**
+   * A searching problem:
+   * For a given feature model, check if the model is void.
+   *
+   * @see <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">
+   *      "Explaining Anomalies in Feature Models", Kowal et al., 2026</a>
+   */
+  FEATURE_MODEL_ANOMALY_VOID("feature-model-anomaly-void", SolveFeatureModelRequest.class);
 
   private final String id;
   private final Class<? extends SolveRequest<?>> requestType;
