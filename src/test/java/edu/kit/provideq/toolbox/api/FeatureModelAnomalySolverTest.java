@@ -66,7 +66,11 @@ class FeatureModelAnomalySolverTest {
     var voidProblems = voidMetaSolver.getExampleProblems();
 
     var voidArguments = Lists.cartesianProduct(voidSolvers, voidProblems).stream()
-            .map(list -> Arguments.of(list.get(0), ProblemType.FEATURE_MODEL_ANOMALY_VOID, SOLVED, list.get(1)));
+            .map(list -> Arguments.of(
+                    list.get(0),
+                    ProblemType.FEATURE_MODEL_ANOMALY_VOID,
+                    SOLVED,
+                    list.get(1)));
 
     // Dead arguments
     var deadSolvers = deadFeatureMetaSolver.getAllSolvers()
@@ -76,10 +80,14 @@ class FeatureModelAnomalySolverTest {
     var deadProblems = deadFeatureMetaSolver.getExampleProblems();
 
     var deadArguments = Lists.cartesianProduct(deadSolvers, deadProblems).stream()
-            .map(list -> Arguments.of(list.get(0), ProblemType.FEATURE_MODEL_ANOMALY_DEAD, SOLVED, list.get(1)));
+            .map(list -> Arguments.of(
+                    list.get(0),
+                    ProblemType.FEATURE_MODEL_ANOMALY_DEAD,
+                    SOLVED,
+                    list.get(1)));
 
     // Return combined stream
-    return Stream.concat(voidArguments, deadArguments) ;
+    return Stream.concat(voidArguments, deadArguments);
   }
 
   @ParameterizedTest
