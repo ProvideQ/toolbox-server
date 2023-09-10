@@ -11,6 +11,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.maxcut.MetaSolverMaxCut;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
+import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
 import java.time.Duration;
@@ -31,6 +32,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     MetaSolverProvider.class,
     MetaSolverMaxCut.class,
     QiskitMaxCutSolver.class,
+    CirqMaxCutSolver.class,
     GamsMaxCutSolver.class,
     QiskitMaxCutSolver.class,
     SubRoutinePool.class,
@@ -52,7 +54,8 @@ class MaxCutSolversTest {
   static Stream<String> provideMaxCutSolverIds() {
     return Stream.of(
         GamsMaxCutSolver.class.getName(),
-        QiskitMaxCutSolver.class.getName()
+        QiskitMaxCutSolver.class.getName(),
+        CirqMaxCutSolver.class.getName()
     );
   }
 

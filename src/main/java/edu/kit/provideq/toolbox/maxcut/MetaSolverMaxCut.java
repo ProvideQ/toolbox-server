@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.maxcut;
 
+import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
@@ -20,9 +21,10 @@ import org.springframework.stereotype.Component;
 public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
 
   @Autowired
-  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver,
-                          GamsMaxCutSolver gamsMaxCutSolver) {
-    super(ProblemType.MAX_CUT, qiskitMaxCutSolver, gamsMaxCutSolver);
+  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitSolver,
+                          GamsMaxCutSolver gamsSolver,
+                          CirqMaxCutSolver cirqSolver) {
+    super(ProblemType.MAX_CUT, qiskitSolver, gamsSolver, cirqSolver);
   }
 
   @Override
