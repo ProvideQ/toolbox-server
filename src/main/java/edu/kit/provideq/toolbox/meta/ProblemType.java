@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
@@ -50,6 +51,7 @@ public enum ProblemType {
   /**
    * Returns a unique identifier for this problem type.
    */
+  @JsonValue
   public String getId() {
     return id;
   }
