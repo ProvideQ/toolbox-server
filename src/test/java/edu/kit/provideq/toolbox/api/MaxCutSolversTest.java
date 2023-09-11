@@ -15,8 +15,8 @@ import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
+import edu.kit.provideq.toolbox.meta.MetaSolverHelper;
 import java.time.Duration;
-import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -60,14 +60,7 @@ class MaxCutSolversTest {
   }
 
   Stream<Arguments> provideArguments() {
-    var solvers = metaSolverMaxCut.getAllSolvers()
-            .stream()
-            .map(x -> x.getClass().getName())
-            .toList();
-
-    var problems = metaSolverMaxCut.getExampleProblems();
-
-    return Lists.cartesianProduct(solvers, problems).stream()
+    return MetaSolverHelper.getAllArgumentCombinations(metaSolverMaxCut)
             .map(list -> Arguments.of(list.get(0), list.get(1)));
   }
 

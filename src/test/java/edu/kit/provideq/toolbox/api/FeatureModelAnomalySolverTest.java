@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
 import static org.hamcrest.Matchers.is;
 
-import com.google.common.collect.Lists;
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.ResourceProvider;
@@ -15,6 +14,8 @@ import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureMetaSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.SatBasedDeadFeatureSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.SatBasedVoidFeatureSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidFeatureMetaSolver;
+import edu.kit.provideq.toolbox.meta.MetaSolver;
+import edu.kit.provideq.toolbox.meta.MetaSolverHelper;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
@@ -58,36 +59,19 @@ class FeatureModelAnomalySolverTest {
   private DeadFeatureMetaSolver deadFeatureMetaSolver;
 
   Stream<Arguments> provideArguments() {
-    // Void arguments
-    var voidSolvers = voidMetaSolver.getAllSolvers()
-            .stream()
-            .map(x -> x.getClass().getName())
-            .toList();
-    var voidProblems = voidMetaSolver.getExampleProblems();
-
-    var voidArguments = Lists.cartesianProduct(voidSolvers, voidProblems).stream()
-            .map(list -> Arguments.of(
-                    list.get(0),
-                    ProblemType.FEATURE_MODEL_ANOMALY_VOID,
-                    SOLVED,
-                    list.get(1)));
-
-    // Dead arguments
-    var deadSolvers = deadFeatureMetaSolver.getAllSolvers()
-            .stream()
-            .map(x -> x.getClass().getName())
-            .toList();
-    var deadProblems = deadFeatureMetaSolver.getExampleProblems();
-
-    var deadArguments = Lists.cartesianProduct(deadSolvers, deadProblems).stream()
-            .map(list -> Arguments.of(
-                    list.get(0),
-                    ProblemType.FEATURE_MODEL_ANOMALY_DEAD,
-                    SOLVED,
-                    list.get(1)));
-
     // Return combined stream
-    return Stream.concat(voidArguments, deadArguments);
+    return Stream.concat(
+            getArguments(voidMetaSolver, ProblemType.FEATURE_MODEL_ANOMALY_VOID),
+            getArguments(deadFeatureMetaSolver, ProblemType.FEATURE_MODEL_ANOMALY_DEAD));
+  }
+
+  static Stream<Arguments> getArguments(MetaSolver<?, ?, ?> metaSolver, ProblemType problemType) {
+    return MetaSolverHelper.getAllArgumentCombinations(metaSolver)
+            .map(list -> Arguments.of(
+                    list.get(0),
+                    problemType,
+                    SOLVED,
+                    list.get(1)));
   }
 
   @ParameterizedTest
