@@ -146,8 +146,7 @@ public class SolveRouter {
         .requestBody(requestBodyBuilder()
                 .content(getRequestContent(metaSolver))
                 .required(true))
-        .response(getResponseOk(metaSolver))
-        .response(getResponseNotFound());
+        .response(getResponseOk(metaSolver));
   }
 
   private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseOk(
@@ -210,11 +209,6 @@ public class SolveRouter {
             .name(exampleName)
             .description("The problem was solved successfully.")
             .value(solvedSolutionString);
-  }
-
-  private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseNotFound() {
-    return responseBuilder()
-            .responseCode(String.valueOf(HttpStatus.NOT_FOUND.value()));
   }
 
   private org.springdoc.core.fn.builders.content.Builder getRequestContent(
