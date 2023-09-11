@@ -178,7 +178,8 @@ public class ProcessRunner {
     try {
       Process process = processBuilder.start();
 
-      processOutput = readStream(process.inputReader()) + readStream(process.errorReader());
+      processOutput = resourceProvider.readStream(process.inputReader())
+              + resourceProvider.readStream(process.errorReader());
 
       processExitCode = process.waitFor();
     } catch (IOException | InterruptedException e) {
@@ -219,18 +220,6 @@ public class ProcessRunner {
     List<String> existingCommands = processBuilder.command();
     existingCommands.add(command);
     processBuilder.command(existingCommands);
-  }
-
-  private String readStream(BufferedReader reader) throws IOException {
-    var inputBuilder = new StringBuilder();
-    var line = reader.readLine();
-    while (line != null) {
-      inputBuilder.append(line).append('\n');
-      line = reader.readLine();
-    }
-    reader.close();
-
-    return inputBuilder.toString();
   }
 
   protected static ProcessBuilder createGenericProcessBuilder(
