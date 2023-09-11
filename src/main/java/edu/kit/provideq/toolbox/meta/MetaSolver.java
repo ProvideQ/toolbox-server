@@ -126,7 +126,5 @@ public abstract class MetaSolver<
     return solution;
   }
 
-  public List<ProblemT> getExampleProblems() {
-    return List.of();
-  }
+  public abstract List<ProblemT> getExampleProblems();
 }
