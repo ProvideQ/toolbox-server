@@ -1,12 +1,14 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.dead;
 
-import edu.kit.provideq.toolbox.featuremodel.ExtendedUvlFeatureModel;
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,8 +17,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeadFeatureMetaSolver
     extends MetaSolver<String, String, ProblemSolver<String, String>> {
-  public DeadFeatureMetaSolver(SatBasedDeadFeatureSolver solver) {
+  private final String examplesDirectoryPath;
+  private final ResourceProvider resourceProvider;
+
+  @Autowired
+  public DeadFeatureMetaSolver(
+          @Value("${examples.directory.feature-model}") String examplesDirectoryPath,
+          ResourceProvider resourceProvider,
+          SatBasedDeadFeatureSolver solver) {
     super(ProblemType.FEATURE_MODEL_ANOMALY_DEAD, solver);
+    this.examplesDirectoryPath = examplesDirectoryPath;
+    this.resourceProvider = resourceProvider;
   }
 
   @Override
@@ -28,6 +39,10 @@ public class DeadFeatureMetaSolver
 
   @Override
   public List<String> getExampleProblems() {
-    return ExtendedUvlFeatureModel.getExamples();
+    try {
+      return resourceProvider.getExampleProblems(examplesDirectoryPath);
+    } catch (Exception e) {
+      return List.of();
+    }
   }
 }

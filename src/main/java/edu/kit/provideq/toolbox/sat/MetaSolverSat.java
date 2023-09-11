@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.sat;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,11 +20,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MetaSolverSat extends MetaSolver<String, DimacsCnfSolution, SatSolver> {
+  private final String examplesDirectoryPath;
+  private final ResourceProvider resourceProvider;
 
   @Autowired
-  public MetaSolverSat(GamsSatSolver gamsSatSolver) {
+  public MetaSolverSat(
+          @Value("${examples.directory.sat}") String examplesDirectoryPath,
+          ResourceProvider resourceProvider,
+          GamsSatSolver gamsSatSolver) {
     super(ProblemType.SAT, gamsSatSolver);
     //TODO: register more SAT Solvers
+    this.examplesDirectoryPath = examplesDirectoryPath;
+    this.resourceProvider = resourceProvider;
   }
 
   @Override
@@ -33,9 +42,10 @@ public class MetaSolverSat extends MetaSolver<String, DimacsCnfSolution, SatSolv
 
   @Override
   public List<String> getExampleProblems() {
-    return List.of(
-        "a and b",
-        "a and b or c"
-    );
+    try {
+      return resourceProvider.getExampleProblems(examplesDirectoryPath);
+    } catch (Exception e) {
+      return List.of();
+    }
   }
 }
