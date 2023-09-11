@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.maxcut;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.MaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,11 +20,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
+  private final String examplesDirectoryPath;
+  private final ResourceProvider resourceProvider;
 
   @Autowired
-  public MetaSolverMaxCut(QiskitMaxCutSolver qiskitMaxCutSolver,
-                          GamsMaxCutSolver gamsMaxCutSolver) {
+  public MetaSolverMaxCut(
+          @Value("${examples.directory.max-cut}") String examplesDirectoryPath,
+          ResourceProvider resourceProvider,
+          QiskitMaxCutSolver qiskitMaxCutSolver,
+          GamsMaxCutSolver gamsMaxCutSolver) {
     super(ProblemType.MAX_CUT, qiskitMaxCutSolver, gamsMaxCutSolver);
+    this.examplesDirectoryPath = examplesDirectoryPath;
+    this.resourceProvider = resourceProvider;
   }
 
   @Override
@@ -34,34 +43,10 @@ public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
 
   @Override
   public List<String> getExampleProblems() {
-    return List.of("""
-            graph [
-                id 42
-                node [
-                    id 1
-                    label "1"
-                ]
-                node [
-                    id 2
-                    label "2"
-                ]
-                node [
-                    id 3
-                    label "3"
-                ]
-                edge [
-                    source 1
-                    target 2
-                ]
-                edge [
-                    source 2
-                    target 3
-                ]
-                edge [
-                    source 3
-                    target 1
-                ]
-            ]"""
-    );
+    try {
+      return resourceProvider.getExampleProblems(examplesDirectoryPath);
+    } catch (Exception e) {
+      return List.of();
+    }
   }
 }
