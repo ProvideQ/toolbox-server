@@ -9,6 +9,7 @@ import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
+import edu.kit.provideq.toolbox.meta.MetaSolverHelper;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
 import edu.kit.provideq.toolbox.sat.SolveSatRequest;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
@@ -43,14 +44,7 @@ class SatSolverTest {
   private MetaSolverSat metaSolverSat;
 
   Stream<Arguments> provideArguments() {
-    var solvers = metaSolverSat.getAllSolvers()
-            .stream()
-            .map(x -> x.getClass().getName())
-            .toList();
-
-    var problems = metaSolverSat.getExampleProblems();
-
-    return Lists.cartesianProduct(solvers, problems).stream()
+    return MetaSolverHelper.getAllArgumentCombinations(metaSolverSat)
             .map(list -> Arguments.of(list.get(0), list.get(1)));
   }
 
