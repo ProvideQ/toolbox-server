@@ -67,8 +67,7 @@ public class MetaSolverSettingsRouter {
             .description(("Returns the selection of settings available for of the "
             + problemType.getId() + " meta-solver. Settings can be used to configure"
             + " what the meat solver considers to choose the best solver."))
-            .response(getResponseOk(metaSolver))
-            .response(getResponseNotFound());
+            .response(getResponseOk(metaSolver));
   }
 
   private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseOk(
@@ -92,11 +91,6 @@ public class MetaSolverSettingsRouter {
                             schemaBuilder().implementation(MetaSolverSetting.class))
                     )
             );
-  }
-
-  private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseNotFound() {
-    return responseBuilder()
-            .responseCode(String.valueOf(HttpStatus.NOT_FOUND.value()));
   }
 
   private Mono<ServerResponse> handleMetaSolverSettingsRouteForMetaSolver(
