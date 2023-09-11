@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -62,6 +63,20 @@ public class ResourceProvider {
     Files.createDirectories(dir);
 
     return dir.toFile();
+  }
+
+  public List<String> getExampleProblems(String examplesDirectoryPath) throws IOException {
+    // Reading the directory yields all names of the files in the directory, one per line
+    return readResourceString(examplesDirectoryPath)
+            .lines()
+            .map(file -> {
+              try {
+                return readResourceString(examplesDirectoryPath + "/" + file);
+              } catch (Exception e) {
+                return null;
+              }
+            })
+            .toList();
   }
 
   /**
