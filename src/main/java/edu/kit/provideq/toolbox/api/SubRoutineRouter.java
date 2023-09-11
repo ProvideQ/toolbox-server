@@ -107,7 +107,7 @@ public class SubRoutineRouter {
                     .getAllSolvers().stream()
                     .findFirst()
                     .map(ProblemSolver::getId)
-                    .orElse("Error: no solver found"));
+                    .orElseThrow(() -> new RuntimeException("No solver found")));
   }
 
   private static Builder getOkResponseContent(MetaSolver<?, ?, ?> metaSolver) {
@@ -119,10 +119,10 @@ public class SubRoutineRouter {
               try {
                 return new ObjectMapper().writeValueAsString(subRoutines);
               } catch (JsonProcessingException e) {
-                return "Error: example could not be parsed";
+                throw new RuntimeException("example could not be parsed", e);
               }
             })
-            .orElse("Error: no solver found");
+            .orElseThrow(() -> new RuntimeException("no solver found"));
 
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)

@@ -92,7 +92,7 @@ public class SolversRouter {
     try {
       example = new ObjectMapper().writeValueAsString(allSolvers);
     } catch (JsonProcessingException e) {
-      example = "Error: solvers could not be parsed";
+      throw new RuntimeException("solvers could not be parsed", e);
     }
 
     return contentBuilder()

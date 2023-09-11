@@ -199,7 +199,7 @@ public class SolveRouter {
     try {
       solvedSolutionString = new ObjectMapper().writeValueAsString(solvedSolution);
     } catch (JsonProcessingException e) {
-      solvedSolutionString = "Error: example could not be parsed";
+      throw new RuntimeException("example could not be parsed", e);
     }
 
     // Build the example
@@ -222,10 +222,10 @@ public class SolveRouter {
               try {
                 return new ObjectMapper().writeValueAsString(e);
               } catch (JsonProcessingException exception) {
-                return "Error: example could not be parsed";
+                throw new RuntimeException("example could not be parsed", exception);
               }
             })
-            .orElse("Error: no example available");
+            .orElseThrow(() -> new RuntimeException("no example available"));
 
     var request = new SolveRequest<String>();
     request.requestContent = content;
@@ -249,13 +249,15 @@ public class SolveRouter {
                                         .orElse("");
                                 return subSolveRequest;
                               }));
-            }, () -> request.requestedSolverId = "Error: no solver found");
+            }, () -> {
+              throw new RuntimeException("no solver found");
+            });
 
     String requestString;
     try {
       requestString = new ObjectMapper().writeValueAsString(request);
     } catch (JsonProcessingException exception) {
-      requestString = "Error: no example available";
+      throw new RuntimeException("no example available", exception);
     }
 
     var problemType = metaSolver.getProblemType();

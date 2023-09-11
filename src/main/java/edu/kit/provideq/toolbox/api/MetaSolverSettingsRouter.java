@@ -76,7 +76,7 @@ public class MetaSolverSettingsRouter {
     try {
       example = new ObjectMapper().writeValueAsString(metaSolver.getSettings());
     } catch (JsonProcessingException e) {
-      example = "Error: example could not be parsed";
+      throw new RuntimeException("example could not be parsed", e);
     }
 
     return responseBuilder()
