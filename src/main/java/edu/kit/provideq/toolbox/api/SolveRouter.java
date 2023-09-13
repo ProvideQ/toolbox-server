@@ -212,22 +212,11 @@ public class SolveRouter {
 
   private org.springdoc.core.fn.builders.content.Builder getRequestContent(
           MetaSolver<?, ?, ?> metaSolver) {
-    String content = metaSolver.getExampleProblems()
-            .stream().findFirst()
-            .map(e -> {
-              if (e instanceof String) {
-                return (String) e;
-              }
-
-              try {
-                return new ObjectMapper().writeValueAsString(e);
-              } catch (JsonProcessingException exception) {
-                throw new RuntimeException("example could not be parsed", exception);
-              }
-            })
+    Object content = metaSolver.getExampleProblems().stream()
+            .findFirst()
             .orElseThrow(() -> new RuntimeException("no example available"));
 
-    var request = new SolveRequest<String>();
+    var request = new SolveRequest<>();
     request.requestContent = content;
     request.requestedMetaSolverSettings = metaSolver.getSettings();
 
