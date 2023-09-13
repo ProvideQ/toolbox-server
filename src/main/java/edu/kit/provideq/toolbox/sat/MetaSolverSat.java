@@ -45,7 +45,7 @@ public class MetaSolverSat extends MetaSolver<String, DimacsCnfSolution, SatSolv
     try {
       return resourceProvider.getExampleProblems(examplesDirectoryPath);
     } catch (Exception e) {
-      return List.of();
+      throw new RuntimeException("Could not load example problems", e);
     }
   }
 }
