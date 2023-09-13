@@ -4,6 +4,7 @@ import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
 import static org.hamcrest.Matchers.is;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
+import edu.kit.provideq.toolbox.MetaSolverHelper;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
@@ -14,7 +15,6 @@ import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
-import edu.kit.provideq.toolbox.MetaSolverHelper;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
