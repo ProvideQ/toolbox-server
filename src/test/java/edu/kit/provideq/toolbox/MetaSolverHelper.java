@@ -1,6 +1,7 @@
-package edu.kit.provideq.toolbox.meta;
+package edu.kit.provideq.toolbox;
 
 import com.google.common.collect.Lists;
+import edu.kit.provideq.toolbox.meta.MetaSolver;
 import java.util.List;
 import java.util.stream.Stream;
 
