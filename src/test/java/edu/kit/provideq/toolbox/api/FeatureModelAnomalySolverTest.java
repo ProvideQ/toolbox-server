@@ -15,7 +15,7 @@ import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.SatBasedDeadFeatureSol
 import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.SatBasedVoidFeatureSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidFeatureMetaSolver;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
-import edu.kit.provideq.toolbox.meta.MetaSolverHelper;
+import edu.kit.provideq.toolbox.MetaSolverHelper;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
