@@ -48,7 +48,7 @@ public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
     try {
       return resourceProvider.getExampleProblems(examplesDirectoryPath);
     } catch (Exception e) {
-      return List.of();
+      throw new RuntimeException("Could not load example problems", e);
     }
   }
 }
