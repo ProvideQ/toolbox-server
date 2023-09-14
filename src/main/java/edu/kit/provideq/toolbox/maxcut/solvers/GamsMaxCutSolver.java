@@ -50,7 +50,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
     // Return if process failed
     if (!processResult.success()) {
       solution.setDebugData("GAMS process failed: " + processResult.output());
-      solution.abort();
+      solution.fail();
       return;
     }
 
