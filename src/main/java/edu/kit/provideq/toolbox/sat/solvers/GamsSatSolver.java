@@ -64,7 +64,7 @@ public class GamsSatSolver extends SatSolver {
       solution.complete();
     } else {
       solution.setDebugData(processResult.output());
-      solution.abort();
+      solution.fail();
     }
   }
 }

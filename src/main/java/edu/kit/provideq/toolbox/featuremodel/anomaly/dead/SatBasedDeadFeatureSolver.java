@@ -104,7 +104,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
       builder.append("Following errors occurred:\n")
           .append(errorBuilder);
 
-      solution.abort();
+      solution.fail();
     }
 
     solution.setSolutionData(builder.toString());

@@ -73,7 +73,7 @@ public class SatBasedVoidFeatureSolver
       solution.complete();
     } else {
       solution.setDebugData(voidSolution.getDebugData());
-      solution.abort();
+      solution.fail();
     }
   }
 }

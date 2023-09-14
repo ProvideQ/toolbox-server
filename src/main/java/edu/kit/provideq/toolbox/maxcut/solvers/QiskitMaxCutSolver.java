@@ -55,7 +55,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     // Return if process failed
     if (!processResult.success()) {
       solution.setDebugData(processResult.output());
-      solution.abort();
+      solution.fail();
       return;
     }
 
