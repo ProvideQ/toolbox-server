@@ -80,6 +80,15 @@ public class Solution<S> {
   }
 
   /**
+   * sets the status to 'invalid'. irreversible
+   */
+  public void fail() {
+    if (!this.status.isCompleted()) {
+      this.status = SolutionStatus.ERROR;
+    }
+  }
+
+  /**
    * Sets the status to 'solved'. irreversible
    */
   public void complete() {
