@@ -13,7 +13,6 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SolutionHandle;
 import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -76,7 +75,7 @@ public class SolveRouter {
             )
             .response(responseBuilder()
                 .responseCode(String.valueOf(HttpStatus.OK.value()))
-                .implementation(SolutionHandle.class)
+                .implementation(Solution.class)
             )
     ).build();
   }
@@ -124,7 +123,7 @@ public class SolveRouter {
             .parameter(parameterBuilder().in(ParameterIn.QUERY).name("id"))
             .response(responseBuilder()
                 .responseCode(String.valueOf(HttpStatus.OK.value()))
-                .implementation(SolutionHandle.class)
+                .implementation(Solution.class)
             )
     ).build();
   }
