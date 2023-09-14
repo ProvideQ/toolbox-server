@@ -26,7 +26,8 @@ A web-based user interface can be found in our
    * Note that these dependencies must be installed to the gams conda env if you want to use GAMS and other solvers from
      the same toolbox installation!
    1. Install GAMS solver dependencies: `pip install -r gams/requirements.txt`
-   2. Install Qiskit solver dependencies: `pip install -r qiskit/requirements.txt` 
+   2. Install Qiskit solver dependencies: `pip install -r qiskit/requirements.txt`
+   3. Install Cirq solver dependencies: `pip install -r cirq/requirements.txt`
 5. Run the server using `./gradlew bootRun`
 
 ## Deployment
@@ -34,6 +35,7 @@ This repository is designed to be deployed with [Dokku](https://dokku.com/), but
 the Java application directly or inside a docker container (`Dockerfile` is included!).
 The docker container can be built and run as follows:
 ```shell
+# we assume that you have a gamslice.txt file in this directory containing a valid GAMS license (typically 6 lines)
 docker build --tag provideq-toolbox-backend --build-arg GAMS_LICENSE=$(base64 -w 0 ./gamslice.txt) .
 docker run --publish 8080:5000 provideq-toolbox-backend
 ```
