@@ -12,7 +12,7 @@ import java.util.function.Function;
  *
  * @param <S> the type of the generated solution data
  */
-public class Solution<S> implements SolutionHandle {
+public class Solution<S> {
   private final long id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
@@ -40,12 +40,10 @@ public class Solution<S> implements SolutionHandle {
     return this.status;
   }
 
-  @Override
   public void setStatus(SolutionStatus newStatus) {
     this.status = newStatus;
   }
 
-  @Override
   public Solution<String> toStringSolution() {
     return toStringSolution(Object::toString);
   }
