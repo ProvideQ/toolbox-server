@@ -42,6 +42,16 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
+    // Parse GML to add partition data to
+    Gml gml;
+    try {
+      gml = Gml.fromString(problem.problemData());
+    } catch (ConversionException e) {
+      solution.setDebugData("Couldn't convert problem data to GML:\n" + e);
+      solution.abort();
+      return;
+    }
+
     // Run Qiskit solver via console
     var processResult = context
         .getBean(
@@ -56,16 +66,6 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     if (!processResult.success()) {
       solution.setDebugData(processResult.output());
       solution.fail();
-      return;
-    }
-
-    // Parse GML to add partition data to
-    Gml gml;
-    try {
-      gml = Gml.fromString(problem.problemData());
-    } catch (ConversionException e) {
-      solution.setDebugData("Couldn't convert problem data to GML:\n" + e);
-      solution.abort();
       return;
     }
 
