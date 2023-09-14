@@ -46,6 +46,7 @@ public class GamsSatSolver extends SatSolver {
       solution.setDebugData("Using cnf input: " + dimacsCnf);
     } catch (ConversionException | RuntimeException e) {
       solution.setDebugData("Parsing error: " + e.getMessage());
+      solution.abort();
       return;
     }
 

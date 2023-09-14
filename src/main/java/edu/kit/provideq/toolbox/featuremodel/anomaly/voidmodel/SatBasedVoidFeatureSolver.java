@@ -47,6 +47,7 @@ public class SatBasedVoidFeatureSolver
       cnf = UvlToDimacsCnf.convert(problem.problemData());
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
+      solution.abort();
       return;
     }
 

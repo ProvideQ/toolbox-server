@@ -49,6 +49,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
       cnf = UvlToDimacsCnf.convert(problem.problemData());
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
+      solution.abort();
       return;
     }
 
@@ -64,6 +65,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
       dimacsCnf = DimacsCnf.fromDimacsCnfString(cnf);
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
+      solution.abort();
       return;
     }
 
