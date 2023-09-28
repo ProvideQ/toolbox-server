@@ -32,7 +32,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   public List<SubRoutineDefinition> getSubRoutines() {
     return List.of(
         new SubRoutineDefinition(ProblemType.SAT,
-            "Used to find valid configurations in the Feature Model"));
+            "Called per feature to determine if it is dead"));
   }
 
   @Override
