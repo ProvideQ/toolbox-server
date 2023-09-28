@@ -30,7 +30,7 @@ public class SatBasedVoidFeatureSolver
   public List<SubRoutineDefinition> getSubRoutines() {
     return List.of(
         new SubRoutineDefinition(ProblemType.SAT,
-            "Used to find valid configurations in the Feature Model"));
+            "Used to determine if there is any valid configurations of the Feature Model"));
   }
 
   @Override
