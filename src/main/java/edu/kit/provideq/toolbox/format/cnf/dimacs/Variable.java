@@ -22,7 +22,7 @@ public record Variable(int number, String name, boolean isNegated) {
   @Override
   public String toString() {
     if (isNegated) {
-      return DimacsCnf.NEGATION_PREFIX + String.valueOf(number);
+        return String.valueOf(DimacsCnf.NEGATION_PREFIX) + number;
     }
 
     return String.valueOf(number);
