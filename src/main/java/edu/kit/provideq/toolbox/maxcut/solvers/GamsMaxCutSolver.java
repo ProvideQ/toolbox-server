@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link ProblemType#MAX_CUT} solver using a GAMS implementation.
+ */
 @Component
 public class GamsMaxCutSolver extends MaxCutSolver {
   private final String maxCutPath;
