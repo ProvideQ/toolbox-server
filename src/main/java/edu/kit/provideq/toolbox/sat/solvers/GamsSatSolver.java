@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link ProblemType#SAT} solver using a GAMS implementation.
+ */
 @Component
 public class GamsSatSolver extends SatSolver {
   private final String satPath;

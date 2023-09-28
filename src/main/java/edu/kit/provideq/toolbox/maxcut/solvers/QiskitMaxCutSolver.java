@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link ProblemType#MAX_CUT} solver using a Qiskit implementation.
+ */
 @Component
 public class QiskitMaxCutSolver extends MaxCutSolver {
   private static final String SOLUTION_LINE_PREFIX = "solution:";
