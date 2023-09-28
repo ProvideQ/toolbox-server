@@ -4,15 +4,15 @@ import java.util.Objects;
 
 /**
  * Represents a variable in a DIMACS CNF file.
-
- * @param number number of the variable
- * @param name name of the variable
+ *
+ * @param number    number of the variable
+ * @param name      name of the variable
  * @param isNegated true if the variable is negated
  */
 public record Variable(int number, String name, boolean isNegated) {
   /**
    * Copy constructor.
-
+   *
    * @param other variable to copy
    */
   public Variable(Variable other) {
@@ -22,7 +22,7 @@ public record Variable(int number, String name, boolean isNegated) {
   @Override
   public String toString() {
     if (isNegated) {
-        return String.valueOf(DimacsCnf.NEGATION_PREFIX) + number;
+      return String.valueOf(DimacsCnf.NEGATION_PREFIX) + number;
     }
 
     return String.valueOf(number);
