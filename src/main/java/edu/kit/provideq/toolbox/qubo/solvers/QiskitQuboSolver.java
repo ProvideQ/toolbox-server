@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link ProblemType#QUBO} solver using a Qiskit QAOA implementation.
+ */
 @Component
 public class QiskitQuboSolver extends QuboSolver {
   private final String quboPath;
