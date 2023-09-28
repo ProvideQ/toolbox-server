@@ -28,7 +28,7 @@ public class QiskitQuboSolver extends QuboSolver {
 
   @Override
   public String getName() {
-    return "Qiskit QUBO";
+    return "Qiskit Qubo";
   }
 
   @Override
