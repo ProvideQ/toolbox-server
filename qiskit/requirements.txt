@@ -5,5 +5,5 @@
 numpy == 1.26.*
 pygmlparser == 1.0.*
 qiskit == 0.45.*
-qiskit-optimization == 0.5.*
+qiskit-optimization[cplex] == 0.5.*
 qiskit-aer == 0.13.*
