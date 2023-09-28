@@ -51,7 +51,7 @@ public class DimacsCnfSolution {
   }
 
   public boolean isVoid() {
-    return variableMap.size() == 0;
+    return variableMap.isEmpty();
   }
 
   @Override
