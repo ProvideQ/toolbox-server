@@ -79,7 +79,7 @@ public class DimacsCnfSolution {
       var number = variableBooleanEntry.getKey().number();
       var variable = variableBooleanEntry.getValue()
           ? number
-          : NEGATION_PREFIX + number;
+          : String.valueOf(NEGATION_PREFIX) + number;
 
       builder.append(VARIABLE_DECLARATION)
           .append(SEPARATOR)
