@@ -1,10 +1,13 @@
 package edu.kit.provideq.toolbox.meta;
 
 /**
- * Definition of a sub routine that holds basic information
- * @param type type of the problem that is used in the sub routine
- * @param url url of the problem to call the sub routine
- * @param description description of the sub routine call to provide information where and why it is needed
+ * A sub-routine definition describes which problem type needs to be solved by a sub-routine and why
+ * it needs to be solved.
+ *
+ * @param type {@link ProblemType} that needs to be solved
+ *     by this sub-routine.
+ * @param description description of the sub-routine call to provide information where and why it is
+ *     needed.
  */
-public record SubRoutineDefinition(ProblemType type, String url, String description) {
+public record SubRoutineDefinition(ProblemType type, String description) {
 }

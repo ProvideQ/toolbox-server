@@ -1,17 +1,19 @@
 package edu.kit.provideq.toolbox;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.function.Function;
 
 /**
  * A solution holds all information concerning a specific
  * {@link edu.kit.provideq.toolbox.meta.Problem} solving process triggered by a
- * {@link edu.kit.provideq.toolbox.meta.ProblemSolver}. This includes meta data, debug data,
+ * {@link edu.kit.provideq.toolbox.meta.ProblemSolver}. This includes metadata, debug data,
  * the current status of the process, as well as the eventually generated solution data
+ *
  * @param <S> the type of the generated solution data
  */
-public class Solution<S> implements SolutionHandle {
-  private final long ID;
+public class Solution<S> {
+  private final long id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
   private S solutionData;
@@ -19,33 +21,49 @@ public class Solution<S> implements SolutionHandle {
   private String solverName;
   private long executionMilliseconds;
 
-  public Solution(long ID) {
-    this.ID = ID;
+  /**
+   * Internal constructor, used for de-serialization.
+   */
+  private Solution() {
+    this.id = Long.MIN_VALUE;
+  }
+
+  public Solution(long id) {
+    this.id = id;
   }
 
   public long getId() {
-    return this.ID;
+    return this.id;
   }
 
   public SolutionStatus getStatus() {
     return this.status;
   }
 
-  @Override
   public void setStatus(SolutionStatus newStatus) {
     this.status = newStatus;
   }
 
-  @Override
-  public SolutionHandle toStringSolution() {
+  public Solution<String> toStringSolution() {
     return toStringSolution(Object::toString);
   }
 
-  public SolutionHandle toStringSolution(Function<S, String> stringSelector) {
+  /**
+   * Converts this {@link Solution}{@code <T>} to a {@link Solution}{@code <String>} by applying a
+   * given transformation function.
+   *
+   * @param stringSelector the function that transforms the {@link Solution#solutionData} of type T
+   *                       to a String.
+   * @return the solution with the stringified solution data.
+   */
+  public Solution<String> toStringSolution(@NotNull Function<S, String> stringSelector) {
+    Objects.requireNonNull(stringSelector, "Missing String selector!");
+
     var stringSolution = new Solution<String>(getId());
     stringSolution.status = status;
     stringSolution.metaData = metaData;
-    stringSolution.solutionData = stringSelector.apply(solutionData);
+    stringSolution.solutionData =
+        (solutionData == null) ? null : stringSelector.apply(solutionData);
     stringSolution.debugData = debugData;
     stringSolution.solverName = solverName;
     stringSolution.executionMilliseconds = executionMilliseconds;
@@ -56,14 +74,27 @@ public class Solution<S> implements SolutionHandle {
    * sets the status to 'invalid'. irreversible
    */
   public void abort() {
-    if (!this.status.isCompleted()) this.status = SolutionStatus.INVALID;
+    if (!this.status.isCompleted()) {
+      this.status = SolutionStatus.INVALID;
+    }
+  }
+
+  /**
+   * sets the status to 'invalid'. irreversible
+   */
+  public void fail() {
+    if (!this.status.isCompleted()) {
+      this.status = SolutionStatus.ERROR;
+    }
   }
 
   /**
    * Sets the status to 'solved'. irreversible
    */
   public void complete() {
-    if (!this.status.isCompleted()) this.status = SolutionStatus.SOLVED;
+    if (!this.status.isCompleted()) {
+      this.status = SolutionStatus.SOLVED;
+    }
   }
 
   public String getMetaData() {
@@ -108,24 +139,28 @@ public class Solution<S> implements SolutionHandle {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (obj == null || obj.getClass() != this.getClass()) return false;
+    if (obj == this) {
+      return true;
+    }
+    if (obj == null || obj.getClass() != this.getClass()) {
+      return false;
+    }
     var that = (Solution<S>) obj;
-    return this.ID == that.ID &&
-        Objects.equals(this.status, that.status);
+    return this.id == that.id
+        && Objects.equals(this.status, that.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(ID, status);
+    return Objects.hash(id, status);
   }
 
   @Override
   public String toString() {
-    return "Solution[" +
-        "id=" + ID + ", " +
-        "status=" + status + ", " +
-        "metaData=" + metaData + ", " +
-        "solutionData" + solutionData + ']';
+    return "Solution["
+        + "id=" + id + ", "
+        + "status=" + status + ", "
+        + "metaData=" + metaData + ", "
+        + "solutionData" + solutionData + ']';
   }
 }

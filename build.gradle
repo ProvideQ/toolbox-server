@@ -2,10 +2,11 @@ plugins {
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
+    id 'checkstyle'
 }
 
 group = 'edu.kit.provideq'
-version = '0.2.1'
+version = '0.3.0'
 sourceCompatibility = '17'
 
 repositories {
@@ -13,9 +14,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4'
     implementation 'com.bpodgursky:jbool_expressions:1.24'
     implementation files('lib/de.ovgu.featureide.lib.fm-v3.9.1.jar', 'lib/uvl-parser.jar')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -30,3 +31,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 targetCompatibility = JavaVersion.VERSION_17
+
+checkstyle {
+    toolVersion = '10.12.0'
+}

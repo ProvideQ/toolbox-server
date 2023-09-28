@@ -10,17 +10,27 @@ public enum SolutionStatus {
    */
   INVALID(true),
 
+  /**
+   * The solution is currently being computed.
+   */
   COMPUTING(false),
+
   /**
    * The problem has been solved and the solution is attached.
    */
-  SOLVED(true);
+  SOLVED(true),
+
+  /**
+   * The problem could not be solved.
+   */
+  ERROR(true);
+
   /**
    * The solution is currently being computed.
    */
   private final boolean isCompleted;
 
-  private SolutionStatus (boolean isCompleted) {
+  private SolutionStatus(boolean isCompleted) {
     this.isCompleted = isCompleted;
   }
 
