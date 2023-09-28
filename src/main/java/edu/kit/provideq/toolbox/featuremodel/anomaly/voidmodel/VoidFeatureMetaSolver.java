@@ -6,7 +6,11 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,8 +44,12 @@ public class VoidFeatureMetaSolver
   @Override
   public List<String> getExampleProblems() {
     try {
-      return resourceProvider.getExampleProblems(examplesDirectoryPath);
-    } catch (Exception e) {
+      var problemStream = Objects.requireNonNull(
+          getClass().getResourceAsStream("sandwich.txt"),
+          "Sandwich example for Void Feature Models is unavailable!"
+      );
+      return List.of(resourceProvider.readStream(problemStream));
+    } catch (IOException e) {
       throw new RuntimeException("Could not load example problems", e);
     }
   }

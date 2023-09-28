@@ -9,8 +9,12 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,8 +50,12 @@ public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
   @Override
   public List<String> getExampleProblems() {
     try {
-      return resourceProvider.getExampleProblems(examplesDirectoryPath);
-    } catch (Exception e) {
+      var problemStream = Objects.requireNonNull(
+          getClass().getResourceAsStream("3-nodes-3-edges.txt"),
+          "3-nodes-3-edges example for MaxCut is unavailable!"
+      );
+      return List.of(resourceProvider.readStream(problemStream));
+    } catch (IOException e) {
       throw new RuntimeException("Could not load example problems", e);
     }
   }
