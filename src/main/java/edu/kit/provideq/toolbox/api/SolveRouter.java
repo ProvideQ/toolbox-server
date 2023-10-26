@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox.api;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
-import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
@@ -21,7 +20,6 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -36,7 +34,6 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
@@ -91,47 +88,6 @@ public class SolveRouter {
     if (errors.hasErrors()) {
       throw new ServerWebInputException(errors.toString());
     }
-  }
-
-  @Bean
-  RouterFunction<ServerResponse> getSolutionRoutes() {
-    return metaSolverProvider.getMetaSolvers().stream()
-        .map(this::defineSolutionRouteForMetaSolver)
-        .reduce(RouterFunction::and)
-        .orElseThrow(); // we should always have at least one route or the toolbox is useless
-  }
-
-  private RouterFunction<ServerResponse> defineSolutionRouteForMetaSolver(
-      MetaSolver<?, ?, ?> metaSolver) {
-    var problemType = metaSolver.getProblemType();
-    return route().GET(
-        // FIXME this is intentionally SOLVE instead of SOLUTION to avoid breaking things
-        //  but maybe we should switch the name at some point
-        getSolveRouteForProblemType(problemType),
-        accept(APPLICATION_JSON),
-        req -> handleSolutionRouteForMetaSolver(metaSolver, req),
-        ops -> ops
-            .operationId(getSolutionRouteForProblemType(problemType))
-            .tag(problemType.getId())
-            .parameter(parameterBuilder().in(ParameterIn.QUERY).name("id"))
-            .response(responseBuilder()
-                .responseCode(String.valueOf(HttpStatus.OK.value()))
-                .implementation(Solution.class)
-            )
-    ).build();
-  }
-
-  private Mono<ServerResponse> handleSolutionRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver,
-                                                                ServerRequest req) {
-    var solution = req.queryParam("id")
-        .map(Long::parseLong)
-        .map(solutionId -> metaSolver.getSolutionManager().getSolution(solutionId))
-        .map(Solution::toStringSolution)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "Could not find a solution for this problem with this solution id!"));
-
-    return ok().body(Mono.just(solution), new ParameterizedTypeReference<>() {
-    });
   }
 
   private void handleRouteDocumentation(MetaSolver<?, ?, ?> metaSolver, Builder ops) {
@@ -262,9 +218,5 @@ public class SolveRouter {
 
   private String getSolveRouteForProblemType(ProblemType type) {
     return "/solve/" + type.getId();
-  }
-
-  private String getSolutionRouteForProblemType(ProblemType type) {
-    return "/solution/" + type.getId();
   }
 }
