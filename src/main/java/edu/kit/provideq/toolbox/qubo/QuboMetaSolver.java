@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Simple {@link MetaSolver} for MaxCut problems.
+ * Simple {@link MetaSolver} for QUBO problems.
  */
 @Component
 public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
