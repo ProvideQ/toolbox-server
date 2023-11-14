@@ -36,7 +36,7 @@ the Java application directly or inside a docker container (`Dockerfile` is incl
 The docker container can be built and run as follows:
 ```shell
 # we assume that you have a gamslice.txt file in this directory containing a valid GAMS license (typically 6 lines)
-docker build --tag provideq-toolbox-backend --build-arg GAMS_LICENSE=$(base64 -w 0 ./gamslice.txt) .
+docker build --tag provideq-toolbox-backend --build-arg GAMS_LICENSE=$(base64 --wrap=0 ./gamslice.txt) .
 docker run --publish 8080:5000 provideq-toolbox-backend
 ```
 
@@ -53,6 +53,32 @@ docker run --publish 8080:5000 provideq-toolbox-backend
 8. Pull the main branch (`git checkout main && git pull`),
    merge it into the develop branch (`git checkout develop && git pull && git merge main`)
    and push it (`git push`).
+
+## CI / CD
+We're using GitHub Actions to automate the execution of our validation tools and the deployment of our software.
+To use this, enable GitHub Actions and configure the following secrets in the GitHub repository settings:
+
+* `GAMS_LICENSE`:
+  1. Get a license for GAMS and put it in a `gamslice.txt` file.
+     A free [demo or community license](https://www.gams.com/try_gams/) should be sufficient.
+  2. Convert the license text to base64 using this command:
+     ```shell
+     base64 --wrap=0 ./gamslice.txt
+     ```
+  3. Copy the printed base64 string to the `GAMS_LICENSE` secret in your GitHub repository.
+* `DOKKU_SERVER_ADDRESS`:
+  1. Install [Dokku](https://dokku.com/) on your deployment server.
+     Make sure it can be reached from GitHub Actions!
+  2. Set the `DOKKU_SERVER_ADDRESS` secret to the address of your server.
+     
+     *Tip: If you use an IP address, the IP address will be obfuscated in the Actions logs.
+     Counterintuitively, using a domain name as an address might leak your IP address due to SSH address resolution
+     logs.*
+* `DOKKU_DEPLOYMENT_KEY`:
+  1. Generate an ssh key and register it as a dokku user.
+  2. Make sure this user has push access the `toolbox-frontend`, `toolbox-backend`, `toolbox-frontend-staging` and
+     `toolbox-backend-staging` apps.
+  3. Set `DOKKU_DEPLOYMENT_KEY` to the private key generated in step i.
 
 ## License
 Copyright (c) 2022 - 2023 ProvideQ
