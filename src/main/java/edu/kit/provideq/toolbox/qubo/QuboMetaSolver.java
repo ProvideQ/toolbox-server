@@ -47,8 +47,8 @@ public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
   public List<String> getExampleProblems() {
     try {
       var problemStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("linear-problem.txt"),
-          "linear-problem example for QUBO is unavailable!"
+          getClass().getResourceAsStream("qubo1.txt"),
+          "qubo1 example for QUBO is unavailable!"
       );
       return List.of(resourceProvider.readStream(problemStream));
     } catch (Exception e) {

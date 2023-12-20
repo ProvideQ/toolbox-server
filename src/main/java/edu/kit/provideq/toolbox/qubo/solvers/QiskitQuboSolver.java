@@ -40,7 +40,7 @@ public class QiskitQuboSolver extends QuboSolver {
   @Override
   public Mono<Solution<String>> solve(Problem<String> problem,
                                       Solution<String> solution,
-                                      SubRoutinePool subRoutinePool) {
+                                      SolveOptions solveOptions) {
     // Run Qiskit solver via console
     var processResult = context
         .getBean(
