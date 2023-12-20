@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.QuantagoniaQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QuboSolver;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,9 @@ public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
   public QuboMetaSolver(
       @Value("${examples.directory.qubo}") String examplesDirectoryPath,
       ResourceProvider resourceProvider,
-      QiskitQuboSolver qiskitQuboSolver) {
-    super(ProblemType.QUBO, qiskitQuboSolver);
+      QiskitQuboSolver qiskitQuboSolver,
+      QuantagoniaQuboSolver quantagoniaQuboSolver) {
+    super(ProblemType.QUBO, qiskitQuboSolver, quantagoniaQuboSolver);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }
