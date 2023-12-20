@@ -79,7 +79,7 @@ public class SolveRouter {
         .bodyToMono(new ParameterizedTypeReference<SolveRequest<ProblemT>>() {
         })
         .doOnNext(this::validate)
-        .map(metaSolver::solve)
+        .flatMap(metaSolver::solve)
         .map(Solution::toStringSolution);
     return ok().body(solutionMono, new ParameterizedTypeReference<>() {
     });

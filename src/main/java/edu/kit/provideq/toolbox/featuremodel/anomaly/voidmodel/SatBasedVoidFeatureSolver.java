@@ -13,6 +13,7 @@ import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import java.util.List;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * This problem solver solves the {@link ProblemType#FEATURE_MODEL_ANOMALY_VOID} problem by building
@@ -39,8 +40,9 @@ public class SatBasedVoidFeatureSolver
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<String>> solve(Problem<String> problem,
+                                      Solution<String> solution,
+                                      SubRoutinePool subRoutinePool) {
     // Convert uvl to cnf
     String cnf;
     try {
@@ -48,33 +50,35 @@ public class SatBasedVoidFeatureSolver
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
     var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
-    checkVoidFeatureModel(solution, cnf, satSolve);
+    return checkVoidFeatureModel(solution, cnf, satSolve);
   }
 
-  private static void checkVoidFeatureModel(Solution<String> solution,
-                                            String cnf,
-                                            Function<String,
-                                                Solution<DimacsCnfSolution>> satSolve) {
+  private static Mono<Solution<String>> checkVoidFeatureModel(
+      Solution<String> solution,
+      String cnf,
+      Function<String, Mono<Solution<DimacsCnfSolution>>> satSolve) {
     // Check if the feature model is not a void feature model
-    var voidSolution = satSolve.apply(cnf);
+    return satSolve.apply(cnf)
+        .map(voidSolution -> {
+          solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
+          if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
+            // If there is a valid configuration, the feature model is not a void feature model
+            var dimacsCnfSolution = voidSolution.getSolutionData();
 
-    solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
-    if (voidSolution.getStatus() == SolutionStatus.SOLVED) {
-      // If there is a valid configuration, the feature model is not a void feature model
-      var dimacsCnfSolution = voidSolution.getSolutionData();
-
-      solution.setSolutionData(voidSolution.getSolutionData().isVoid()
-          ? "The feature model is a void feature model. The configuration is never valid."
-          : "The feature model has valid configurations, for example: \n"
-          + dimacsCnfSolution.toHumanReadableString());
-      solution.complete();
-    } else {
-      solution.setDebugData(voidSolution.getDebugData());
-      solution.fail();
-    }
+            solution.setSolutionData(voidSolution.getSolutionData().isVoid()
+                ? "The feature model is a void feature model. The configuration is never valid."
+                : "The feature model has valid configurations, for example: \n"
+                + dimacsCnfSolution.toHumanReadableString());
+            solution.complete();
+          } else {
+            solution.setDebugData(voidSolution.getDebugData());
+            solution.fail();
+          }
+          return solution;
+        });
   }
 }

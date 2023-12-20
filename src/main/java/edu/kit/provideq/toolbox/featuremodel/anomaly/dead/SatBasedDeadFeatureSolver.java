@@ -14,8 +14,11 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * This problem solver solves the {@link ProblemType#FEATURE_MODEL_ANOMALY_DEAD} problem by building
@@ -41,8 +44,9 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<String>> solve(Problem<String> problem,
+                                      Solution<String> solution,
+                                      SubRoutinePool subRoutinePool) {
     // Convert uvl to cnf
     String cnf;
     try {
@@ -50,15 +54,17 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
-      return;
+      return null;
     }
 
     var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
-    checkDeadFeatures(solution, cnf, satSolve);
+    return checkDeadFeatures(solution, cnf, satSolve);
   }
 
-  private static void checkDeadFeatures(Solution<String> solution, String cnf,
-                                        Function<String, Solution<DimacsCnfSolution>> satSolve) {
+  private static Mono<Solution<String>> checkDeadFeatures(
+      Solution<String> solution,
+      String cnf,
+      Function<String, Mono<Solution<DimacsCnfSolution>>> satSolve) {
     // Check if there are any Dead Features
     DimacsCnf dimacsCnf;
     try {
@@ -66,50 +72,63 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
-    var builder = new StringBuilder();
-    var errorBuilder = new StringBuilder();
+    return Flux.fromIterable(dimacsCnf.getVariables())
+        .flatMap(variable -> {
+          // Use formula: ¬SAT (FM ∧ f) to check for a dead feature
+          // So add variable to the cnf of the feature model and check if there is a solution
+          // If there is a solution, the feature is not dead
+          var orClause = new ArrayList<Variable>();
+          orClause.add(variable);
+          var variableCnf = dimacsCnf.addOrClause(orClause);
 
-    for (Variable variable : dimacsCnf.getVariables()) {
-      // Use formula: ¬SAT (FM ∧ f) to check for a dead feature
-      // So add variable to the cnf of the feature model and check if there is a solution
-      // If there is a solution, the feature is not dead
-      var orClause = new ArrayList<Variable>();
-      orClause.add(variable);
-      var variableCnf = dimacsCnf.addOrClause(orClause);
+          return satSolve.apply(variableCnf.toString())
+              .flatMap(x -> Mono.just(Map.entry(variable, x)));
+        })
+        .collectList()
+        .flatMap(solutions -> {
+          var builder = new StringBuilder();
+          var errorBuilder = new StringBuilder();
 
-      var variableSolution = satSolve.apply(variableCnf.toString());
+          for (Map.Entry<Variable, Solution<DimacsCnfSolution>> entry : solutions) {
+            Variable variable = entry.getKey();
+            Solution<DimacsCnfSolution> variableSolution = entry.getValue();
 
-      if (variableSolution.getStatus() == SolutionStatus.SOLVED) {
-        var dimacsCnfSolution =
-            DimacsCnfSolution.fromString(dimacsCnf, variableSolution.getSolutionData().toString());
+            if (variableSolution.getStatus() == SolutionStatus.SOLVED) {
+              var dimacsCnfSolution = DimacsCnfSolution
+                  .fromString(dimacsCnf, variableSolution.getSolutionData().toString());
 
-        if (dimacsCnfSolution.isVoid()) {
-          builder.append(variable.name())
-              .append("\n");
-        }
-      } else {
-        errorBuilder.append(variableSolution.getDebugData())
-            .append("\n");
-      }
-    }
+              if (dimacsCnfSolution.isVoid()) {
+                builder
+                    .append(variable.name())
+                    .append("\n");
+              }
+            } else {
+              errorBuilder
+                  .append(variableSolution.getDebugData())
+                  .append("\n");
+            }
+          }
 
-    if (builder.isEmpty()) {
-      builder.append("No features are dead features!\n");
-    } else {
-      builder.insert(0, "The following features are dead features:\n");
-    }
+          if (builder.isEmpty()) {
+            builder.append("No features are dead features!\n");
+          } else {
+            builder.insert(0, "The following features are dead features:\n");
+          }
 
-    if (!errorBuilder.isEmpty()) {
-      builder.append("Following errors occurred:\n")
-          .append(errorBuilder);
+          if (!errorBuilder.isEmpty()) {
+            builder.append("Following errors occurred:\n")
+                .append(errorBuilder);
 
-      solution.fail();
-    }
+            solution.fail();
+            return Mono.just(solution);
+          }
 
-    solution.setSolutionData(builder.toString());
-    solution.complete();
+          solution.setSolutionData(builder.toString());
+          solution.complete();
+          return Mono.just(solution);
+        });
   }
 }

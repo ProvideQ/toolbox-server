@@ -4,6 +4,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import java.util.Collections;
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * A problem solver provides information about its own suitability to solve a given problem.
@@ -36,6 +37,17 @@ public interface ProblemSolver<ProblemT, SolutionT> {
   }
 
   /**
+   * Returns the {@link AuthenticationOptions} that this solver provides.
+   * If the solver does not provide any authentication options, {@code null} is returned.
+   * Authentication options are used to authenticate the user to the solver.
+   *
+   * @return authentication options or {@code null}
+   */
+  default AuthenticationOptions getAuthenticationOptions() {
+    return null;
+  }
+
+  /**
    * Simple true-false-check,
    * {@code true}: given {@link Problem} can be solved with this solver,
    * {@code false}: it cannot.
@@ -53,6 +65,7 @@ public interface ProblemSolver<ProblemT, SolutionT> {
    * @param solution       the {@link Solution} in which all resulting information is to be stored
    * @param subRoutinePool {@link SubRoutinePool} pool to retrieve sub routine from
    */
-  void solve(Problem<ProblemT> problem, Solution<SolutionT> solution,
+  Mono<Solution<SolutionT>> solve(Problem<ProblemT> problem,
+             Solution<SolutionT> solution,
              SubRoutinePool subRoutinePool);
 }

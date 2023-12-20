@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * {@link ProblemType#MAX_CUT} solver using a Qiskit implementation.
@@ -43,8 +44,9 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<String>> solve(Problem<String> problem,
+                                      Solution<String> solution,
+                                      SubRoutinePool subRoutinePool) {
     // Parse GML to add partition data to
     Gml gml;
     try {
@@ -52,7 +54,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     } catch (ConversionException e) {
       solution.setDebugData("Couldn't convert problem data to GML:\n" + e);
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
     // Run Qiskit solver via console
@@ -69,7 +71,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     if (!processResult.success()) {
       solution.setDebugData(processResult.output());
       solution.fail();
-      return;
+      return Mono.just(solution);
     }
 
     // Parse solution data and add partition data to GML
@@ -96,5 +98,6 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     solution.setSolutionData(gml.toString());
     solution.complete();
+    return Mono.just(solution);
   }
 }
