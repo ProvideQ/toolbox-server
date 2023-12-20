@@ -120,7 +120,8 @@ public abstract class MetaSolver<
 
     long start = System.currentTimeMillis();
 
-    return solver.solve(problem, solution, subRoutinePool)
+    var solveOptions = new SolveOptions(subRoutinePool, request.authentication);
+    return solver.solve(problem, solution, solveOptions)
         .flatMap(s -> {
           long finish = System.currentTimeMillis();
 

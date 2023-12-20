@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.toolbox.authentication.Authentication;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import java.util.List;
@@ -22,6 +23,9 @@ public class SolveRequest<RequestT> {
 
   @Nullable
   public Map<ProblemType, SolveRequest<?>> requestedSubSolveRequests;
+
+  @Nullable
+  public Authentication authentication;
 
   public <T> SolveRequest<T> replaceContent(T otherContent) {
     var request = new SolveRequest<T>();

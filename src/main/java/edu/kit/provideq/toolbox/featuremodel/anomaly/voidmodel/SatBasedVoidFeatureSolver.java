@@ -2,13 +2,13 @@ package edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.convert.UvlToDimacsCnf;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolveOptions;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import java.util.List;
 import java.util.function.Function;
@@ -42,7 +42,7 @@ public class SatBasedVoidFeatureSolver
   @Override
   public Mono<Solution<String>> solve(Problem<String> problem,
                                       Solution<String> solution,
-                                      SubRoutinePool subRoutinePool) {
+                                      SolveOptions solveOptions) {
     // Convert uvl to cnf
     String cnf;
     try {
@@ -53,7 +53,8 @@ public class SatBasedVoidFeatureSolver
       return Mono.just(solution);
     }
 
-    var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
+    var satSolve = solveOptions.subRoutinePool()
+        .<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
     return checkVoidFeatureModel(solution, cnf, satSolve);
   }
 
