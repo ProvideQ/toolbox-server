@@ -1,0 +1,6 @@
+Maximize
+  3x + y
+Subject To
+Binary
+  x y
+End

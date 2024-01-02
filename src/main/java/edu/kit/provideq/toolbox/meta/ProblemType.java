@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import edu.kit.provideq.toolbox.SolveRequest;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
+import edu.kit.provideq.toolbox.qubo.SolveQuboRequest;
 import edu.kit.provideq.toolbox.sat.SolveSatRequest;
 
 /**
@@ -38,7 +39,14 @@ public enum ProblemType {
    * @see <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">
    *      "Explaining Anomalies in Feature Models", Kowal et al., 2026</a>
    */
-  FEATURE_MODEL_ANOMALY_VOID("feature-model-anomaly-void", SolveFeatureModelRequest.class);
+  FEATURE_MODEL_ANOMALY_VOID("feature-model-anomaly-void", SolveFeatureModelRequest.class),
+  /**
+   * QUBO (Quadratic Unconstrained Binary Optimization)
+   * A combinatorial optimization problem.
+   * For a given quadratic term with binary decision variables,
+   * find the minimal variable assignment of the term.
+   */
+  QUBO("qubo", SolveQuboRequest.class);
 
   private final String id;
   private final Class<? extends SolveRequest<?>> requestType;
