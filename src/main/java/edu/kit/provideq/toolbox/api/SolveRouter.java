@@ -214,7 +214,8 @@ public class SolveRouter {
           MetaSolver<?, ?, ?> metaSolver) {
     Object content = metaSolver.getExampleProblems().stream()
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("no example available"));
+            .orElseThrow(() -> new RuntimeException(
+                "No example available for problem " + metaSolver.getProblemType() + "!"));
 
     var request = new SolveRequest<>();
     request.requestContent = content;
