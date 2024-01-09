@@ -31,6 +31,25 @@ if len(sys.argv) != 3:
 input_path = sys.argv[1]
 output_path = sys.argv[2]
 
+# To include the weight information, we'll need to map the weight to the label
+# so the parser can read it. Therefore, remove all existing "label" lines and
+# replace all "weight" lines with "label" lines.
+with open(input_path, 'r+') as file:
+    # Read all lines from the file
+    lines = file.readlines()
+
+    # Move the file cursor to the beginning
+    file.seek(0)
+
+    # Iterate through the lines, removing lines with "label" and replacing "weight" with "label"
+    for line in lines:
+        if "label" not in line:
+            modified_line = line.replace("weight", "label")
+            file.write(modified_line)
+
+    # Truncate the remaining content in case the new content is shorter than the old content
+    file.truncate()
+
 # Instantiate a parser, load a file, and parse it!
 parser: Parser = Parser()
 parser.loadGML(input_path)
@@ -49,7 +68,7 @@ G.add_nodes_from(np.arange(0, n, 1))
 elist = []
 
 for e in edges:
-    elist.append((e.source_node.id, e.target_node.id, 1))  # TODO: extract edge weight
+    elist.append((e.source_node.id, e.target_node.id, e.label))
 
 # tuple is (i,j,weight) where (i,j) is the edge
 G.add_weighted_edges_from(elist)
