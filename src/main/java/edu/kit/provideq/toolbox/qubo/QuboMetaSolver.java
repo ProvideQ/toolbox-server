@@ -9,6 +9,7 @@ import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QuboSolver;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,11 @@ public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
   @Override
   public List<String> getExampleProblems() {
     try {
-      return resourceProvider.getExampleProblems(examplesDirectoryPath);
+      var problemStream = Objects.requireNonNull(
+          getClass().getResourceAsStream("linear-problem.txt"),
+          "linear-problem example for QUBO is unavailable!"
+      );
+      return List.of(resourceProvider.readStream(problemStream));
     } catch (Exception e) {
       throw new RuntimeException("Could not load example problems", e);
     }
