@@ -2,13 +2,14 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 
 import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolveOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * {@link ProblemType#QUBO} solver using a Qiskit QAOA implementation.
@@ -28,7 +29,7 @@ public class QiskitQuboSolver extends QuboSolver {
 
   @Override
   public String getName() {
-    return "Qiskit QUBO";
+    return "Qiskit Qubo";
   }
 
   @Override
@@ -37,8 +38,9 @@ public class QiskitQuboSolver extends QuboSolver {
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<String>> solve(Problem<String> problem,
+                                      Solution<String> solution,
+                                      SolveOptions solveOptions) {
     // Run Qiskit solver via console
     var processResult = context
         .getBean(
@@ -54,10 +56,11 @@ public class QiskitQuboSolver extends QuboSolver {
     if (!processResult.success()) {
       solution.setDebugData(processResult.output());
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
     solution.setSolutionData(processResult.output());
     solution.complete();
+    return Mono.just(solution);
   }
 }

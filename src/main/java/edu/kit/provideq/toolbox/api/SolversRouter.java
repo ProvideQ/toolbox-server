@@ -69,7 +69,10 @@ public class SolversRouter {
 
   private static List<ProblemSolverInfo> getAllSolverInfos(MetaSolver<?, ?, ?> metaSolver) {
     return metaSolver.getAllSolvers().stream()
-            .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName()))
+            .map(solver -> new ProblemSolverInfo(
+                solver.getId(),
+                solver.getName(),
+                solver.getAuthenticationOptions()))
             .toList();
   }
 
