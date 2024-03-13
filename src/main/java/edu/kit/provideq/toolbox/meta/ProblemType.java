@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.qubo.SolveQuboRequest;
 import edu.kit.provideq.toolbox.sat.SolveSatRequest;
+import edu.kit.provideq.toolbox.vrp.SolveVrpRequest;
 
 /**
  * The type of problem to solve.
@@ -41,12 +42,18 @@ public enum ProblemType {
    */
   FEATURE_MODEL_ANOMALY_VOID("feature-model-anomaly-void", SolveFeatureModelRequest.class),
   /**
+   * A satisfiability problem:
+   * For a given boolean formula, check if there is an interpretation that satisfies the formula.
+   */
+  VRP("vrp", SolveVrpRequest.class),
+  /**
    * QUBO (Quadratic Unconstrained Binary Optimization)
    * A combinatorial optimization problem.
    * For a given quadratic term with binary decision variables,
    * find the minimal variable assignment of the term.
    */
   QUBO("qubo", SolveQuboRequest.class);
+
 
   private final String id;
   private final Class<? extends SolveRequest<?>> requestType;
