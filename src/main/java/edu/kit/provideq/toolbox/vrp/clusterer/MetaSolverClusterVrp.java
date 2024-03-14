@@ -1,11 +1,11 @@
-package edu.kit.provideq.toolbox.vrp;
+package edu.kit.provideq.toolbox.vrp.clusterer;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
+import edu.kit.provideq.toolbox.vrp.MetaSolverVrp;
 import edu.kit.provideq.toolbox.vrp.solvers.TestVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.VrpSolver;
 
@@ -22,23 +22,22 @@ import org.springframework.stereotype.Component;
  * Simple {@link MetaSolver} for VRP problems.
  */
 @Component
-public class MetaSolverVrp extends MetaSolver<String, String, VrpSolver> {
+public class MetaSolverClusterVrp extends MetaSolver<String, String[], VrpClusterer> {
   private final String examplesDirectoryPath;
   private final ResourceProvider resourceProvider;
 
   @Autowired
-  public MetaSolverVrp(
+  public MetaSolverClusterVrp(
           @Value("${examples.directory.vrp}") String examplesDirectoryPath,
           ResourceProvider resourceProvider,
-          TestVrpSolver testVrpSolver,
-          ClusterAndSolveVrpSolver clusterAndSolveVrpSolver) {
-    super(ProblemType.VRP, testVrpSolver, clusterAndSolveVrpSolver);
+          NoClusteringClusterer noClusteringClusterer) {
+    super(ProblemType.CLUSTERABLE_VRP, noClusteringClusterer);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }
 
   @Override
-  public VrpSolver findSolver(Problem<String> problem, List<MetaSolverSetting> metaSolverSettings) {
+  public VrpClusterer findSolver(Problem<String> problem, List<MetaSolverSetting> metaSolverSettings) {
     // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
@@ -47,7 +46,7 @@ public class MetaSolverVrp extends MetaSolver<String, String, VrpSolver> {
   public List<String> getExampleProblems() {
     try {
       var problemStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("CMT1.vrp"),
+          MetaSolverVrp.class.getResourceAsStream("CMT1.vrp"),
           "Simple VRP CMT1 Problem unavailable!"
       );
       return List.of(resourceProvider.readStream(problemStream));

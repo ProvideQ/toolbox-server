@@ -7,6 +7,7 @@ import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.qubo.SolveQuboRequest;
 import edu.kit.provideq.toolbox.sat.SolveSatRequest;
 import edu.kit.provideq.toolbox.vrp.SolveVrpRequest;
+import edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpRequest;
 
 /**
  * The type of problem to solve.
@@ -42,10 +43,16 @@ public enum ProblemType {
    */
   FEATURE_MODEL_ANOMALY_VOID("feature-model-anomaly-void", SolveFeatureModelRequest.class),
   /**
-   * A satisfiability problem:
-   * For a given boolean formula, check if there is an interpretation that satisfies the formula.
+   * A vehicle routing problem:
+   * For a given set of locations and a vehicle with a given capacity,
+   * find the optimal route for the vehicle to visit all locations and return to the starting location.
    */
   VRP("vrp", SolveVrpRequest.class),
+  /**
+   * A clusterable vehicle routing problem:
+   * It is a 1:1 representation of the vehicle routing problem. Just a different internal type to distingiush vrp clusterers.
+   */
+  CLUSTERABLE_VRP("clusterable-vrp", ClusterVrpRequest.class),
   /**
    * QUBO (Quadratic Unconstrained Binary Optimization)
    * A combinatorial optimization problem.
