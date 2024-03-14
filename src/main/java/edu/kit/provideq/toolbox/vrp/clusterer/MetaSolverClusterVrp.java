@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * Simple {@link MetaSolver} for VRP problems.
  */
 @Component
-public class MetaSolverClusterVrp extends MetaSolver<String, String[], VrpClusterer> {
+public class MetaSolverClusterVrp extends MetaSolver<String, String, VrpClusterer> {
   private final String examplesDirectoryPath;
   private final ResourceProvider resourceProvider;
 
