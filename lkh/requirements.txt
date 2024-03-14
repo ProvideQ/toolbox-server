@@ -1,0 +1,6 @@
+# This file describes the python package requirements for all LKH scripts
+# supported by ProvideQ
+
+# required for LKH VRP solver
+lkh == 1.1.1
+tsplib95 == 0.7.1
