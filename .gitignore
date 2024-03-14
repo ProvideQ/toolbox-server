@@ -38,6 +38,9 @@ out/
 .vscode/
 
 
+### virtual envs ###
+venv/
+
 
 ### ProvideQ toolbox-server ###
 # input, output and temporary files for solving problems with our solvers

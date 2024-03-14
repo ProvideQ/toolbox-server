@@ -1,0 +1,1 @@
+These Python scripts are sourced from another repository, [quantum-vrp](https://github.com/LucasBerger/quantum-vrp), as of March 14th. If you want to have the latest updates, you can either update the scripts manually or as a todo add the repository as a Git submodule.
