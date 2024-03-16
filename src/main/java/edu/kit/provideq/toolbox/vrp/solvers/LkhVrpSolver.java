@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 public class LkhVrpSolver extends VrpSolver {
   private final String scriptDir;
   private final ApplicationContext context;
-  protected ResourceProvider resourceProvider;
 
   @Autowired
   public LkhVrpSolver(
@@ -35,12 +34,6 @@ public class LkhVrpSolver extends VrpSolver {
       ApplicationContext context) {
     this.scriptDir = scriptDir;
     this.context = context;
-  }
-
-
-  @Autowired
-  public void setResourceProvider(ResourceProvider resourceProvider) {
-    this.resourceProvider = resourceProvider;
   }
 
   @Override
@@ -57,32 +50,14 @@ public class LkhVrpSolver extends VrpSolver {
   public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
       
-      // Retrieve the problem directory
-      String problemDirectoryPath;
-      try {
-        problemDirectoryPath = resourceProvider
-            .getProblemDirectory(problem.type(), solution.getId())
-            .getAbsolutePath();
-      } catch (IOException e) {
-        solution.abort();
-        return;
-      }
-
-      // Build the problem and solution file paths
-      var problemFilePath = Paths.get(problemDirectoryPath, "problem.vrp");
-      var normalizedProblemFilePath = problemFilePath.toString().replace("\\", "/");
-
-      var solutionFile = Paths.get(problemDirectoryPath, "problem.sol");
-      var normalizedSolutionFilePath = solutionFile.toString().replace("\\", "/");
-
-
       var processResult = context.getBean(
-        BinaryProcessRunner.class,
-        scriptDir,
-        "../venv/bin/python",
-        "vrp_lkh.py",
-        new String[] {normalizedProblemFilePath,"--output-file", normalizedSolutionFilePath}
+          BinaryProcessRunner.class,
+          scriptDir,
+          "../venv/bin/python",
+          "vrp_lkh.py"
         )
+        .addProblemFilePathToProcessCommand()
+        .addSolutionFilePathToProcessCommand("--output-file", "%s")
         .problemFileName("problem.vrp")
         .solutionFileName("problem.sol")
         .run(problem.type(), solution.getId(), problem.problemData());

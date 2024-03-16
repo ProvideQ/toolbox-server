@@ -35,8 +35,8 @@ public class ProcessRunner {
   protected final ProcessBuilder processBuilder;
   protected ResourceProvider resourceProvider;
 
-  private String problemFilePathCommandFormat;
-  private String solutionFilePathCommandFormat;
+  private String[] problemFilePathCommandFormat;
+  private String[] solutionFilePathCommandFormat;
   private String problemFileName = PROBLEM_FILE_NAME;
   private String solutionFileName = SOLUTION_FILE_NAME;
 
@@ -69,7 +69,7 @@ public class ProcessRunner {
    *                               the path to a file that contains the problem data.
    * @return Returns this instance for chaining.
    */
-  public ProcessRunner addProblemFilePathToProcessCommand(String inputPathCommandFormat) {
+  public ProcessRunner addProblemFilePathToProcessCommand(String... inputPathCommandFormat) {
     this.problemFilePathCommandFormat = inputPathCommandFormat;
 
     return this;
@@ -93,7 +93,7 @@ public class ProcessRunner {
    *                                the path to a file that contains the solution data.
    * @return Returns this instance for chaining.
    */
-  public ProcessRunner addSolutionFilePathToProcessCommand(String outputPathCommandFormat) {
+  public ProcessRunner addSolutionFilePathToProcessCommand(String... outputPathCommandFormat) {
     this.solutionFilePathCommandFormat = outputPathCommandFormat;
 
     return this;
@@ -166,14 +166,18 @@ public class ProcessRunner {
 
     // Optionally add the problem file path to the command
     if (problemFilePathCommandFormat != null) {
-      addCommand(problemFilePathCommandFormat.formatted(normalizedProblemFilePath));
+      for (String format : problemFilePathCommandFormat) {
+        addCommand(format.formatted(normalizedProblemFilePath));
+      }
     }
 
     // Optionally add the solution path to the command
     if (solutionFilePathCommandFormat != null) {
-      addCommand(solutionFilePathCommandFormat.formatted(normalizedSolutionFilePath));
+      for (String format : solutionFilePathCommandFormat) {
+        addCommand(format.formatted(normalizedProblemFilePath));
+      }
     }
-
+    
     // Run the process
     String processOutput;
     int processExitCode;
