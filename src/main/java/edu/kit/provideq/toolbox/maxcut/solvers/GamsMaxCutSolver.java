@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.GamsProcessRunner;
+import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
@@ -52,12 +52,12 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
     // Return if process failed
     if (!processResult.success()) {
-      solution.setDebugData("GAMS process failed: " + processResult.output());
+      solution.setDebugData("GAMS process failed: " + processResult.errorOutput());
       solution.fail();
       return;
     }
 
-    solution.setSolutionData(processResult.output());
+    solution.setSolutionData(processResult.output().orElse("Empty Solution"));
     solution.complete();
   }
 }

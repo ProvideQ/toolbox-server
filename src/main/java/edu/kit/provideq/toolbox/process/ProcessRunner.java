@@ -1,12 +1,14 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.process;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,13 +37,17 @@ public class ProcessRunner {
   protected final ProcessBuilder processBuilder;
   protected ResourceProvider resourceProvider;
 
+
+  private final String[] arguments;
+
   private String[] problemFilePathCommandFormat;
   private String[] solutionFilePathCommandFormat;
   private String problemFileName = PROBLEM_FILE_NAME;
   private String solutionFileName = SOLUTION_FILE_NAME;
 
-  public ProcessRunner(ProcessBuilder processBuilder) {
+  public ProcessRunner(ProcessBuilder processBuilder, String[] arguments) {
     this.processBuilder = processBuilder;
+    this.arguments = arguments;
   }
 
   @Autowired
@@ -123,6 +129,7 @@ public class ProcessRunner {
 
   /**
    * Runs the process provided in the constructor.
+   * @param <T>
    *
    * @param problemType The type of the problem that is run
    * @param solutionId  The id of the resulting solution
@@ -130,7 +137,22 @@ public class ProcessRunner {
    * @return Returns the process result, which contains the solution data
    *     or an error as output depending on the success of the process.
    */
-  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+  public ProcessResult<String> run(ProblemType problemType, long solutionId, String problemData) {
+    return run(problemType, solutionId, problemData, new SimpleProcessResultReader());
+  }
+
+  /**
+   * Runs the process provided in the constructor.
+   * @param <T>
+   *
+   * @param problemType The type of the problem that is run
+   * @param solutionId  The id of the resulting solution
+   * @param problemData The problem data that should be solved
+   * @param reader     The reader that retrieves the output of the process
+   * @return Returns the process result, which contains the solution data
+   *     or an error as output depending on the success of the process.
+   */
+  public <T> ProcessResult<T> run(ProblemType problemType, long solutionId, String problemData, ProcessResultReader<T> reader) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {
@@ -138,9 +160,10 @@ public class ProcessRunner {
           .getProblemDirectory(problemType, solutionId)
           .getAbsolutePath();
     } catch (IOException e) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage())
+          Optional.empty(),
+          Optional.of("Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage()))
       );
     }
 
@@ -155,11 +178,16 @@ public class ProcessRunner {
     try {
       Files.writeString(problemFilePath, problemData);
     } catch (IOException e) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "Error: The problem data couldn't be written to %s:%n%s".formatted(
-              normalizedProblemFilePath, e.getMessage())
+          Optional.empty(),
+          Optional.of("Error: The problem data couldn't be written to %s:%n%s".formatted(
+              normalizedProblemFilePath, e.getMessage()))
       );
+    }
+
+    for (String argument : arguments) {
+      addCommand(argument.formatted(normalizedProblemFilePath, normalizedSolutionFilePath, problemDirectoryPath));
     }
 
     // Optionally add the problem file path to the command
@@ -172,10 +200,10 @@ public class ProcessRunner {
     // Optionally add the solution path to the command
     if (solutionFilePathCommandFormat != null) {
       for (String format : solutionFilePathCommandFormat) {
-        addCommand(format.formatted(normalizedProblemFilePath));
+        addCommand(format.formatted(normalizedSolutionFilePath));
       }
     }
-    
+
     // Run the process
     String processOutput;
     int processExitCode;
@@ -187,37 +215,35 @@ public class ProcessRunner {
 
       processExitCode = process.waitFor();
     } catch (IOException | InterruptedException e) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "Solving %s problem resulted in exception:%n%s".formatted(problemType, e.getMessage())
+          Optional.empty(),
+          Optional.of(
+            "Solving %s problem resulted in exception:%n%s".formatted(problemType, e.getMessage())
+          )
       );
     }
 
     // Return prematurely if the process failed
     if (processExitCode != 0) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "%s problem couldn't be solved:%n%s".formatted(problemType, processOutput));
+          Optional.empty(),
+          Optional.of("%s problem couldn't be solved:%n%s".formatted(problemType, processOutput)));
     }
 
     // Read the solution file
-    String solutionText;
-    try {
-      solutionText = Files.readString(solutionFile);
-    } catch (IOException e) {
-      return new ProcessResult(
-          false,
-          "Error: The problem data couldn't be read from %s:%n%s".formatted(
-              normalizedProblemFilePath, e.getMessage())
+    ProcessResult<T> result = reader.read(solutionFile, problemFilePath, Paths.get(problemDirectoryPath));
+
+    if (!result.success()) {
+      return new ProcessResult<T>(
+          result.success(),
+          result.output(),
+          result.errorOutput().isPresent() ? Optional.of(result.errorOutput().get() + "%nCommand Output: %s".formatted(processOutput)) : Optional.empty()
       );
     }
-
-    // Return the solution
-    return new ProcessResult(
-        true,
-        solutionText
-    );
-
+    
+    return result;
   }
 
   private void addCommand(String command) {
@@ -229,12 +255,10 @@ public class ProcessRunner {
   protected static ProcessBuilder createGenericProcessBuilder(
       String directory,
       String executableName,
-      String scriptName,
-      String... arguments) {
-    String[] commands = new String[arguments.length + 2];
+      String scriptName) {
+    String[] commands = new String[2];
     commands[0] = executableName;
     commands[1] = scriptName;
-    System.arraycopy(arguments, 0, commands, 2, arguments.length);
 
     return new ProcessBuilder()
         .directory(new File(directory))

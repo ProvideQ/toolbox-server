@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
@@ -67,13 +67,13 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     // Return if process failed
     if (!processResult.success()) {
-      solution.setDebugData(processResult.output());
+      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.fail();
       return;
     }
 
     // Parse solution data and add partition data to GML
-    Optional<String> solutionLine = processResult.output()
+    Optional<String> solutionLine = processResult.output().orElse("")
             .lines()
             .filter(s -> s.startsWith(SOLUTION_LINE_PREFIX))
             .findFirst();

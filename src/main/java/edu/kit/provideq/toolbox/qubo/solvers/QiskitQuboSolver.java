@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -52,12 +52,12 @@ public class QiskitQuboSolver extends QuboSolver {
 
     // Return if process failed
     if (!processResult.success()) {
-      solution.setDebugData(processResult.output());
+      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.abort();
       return;
     }
 
-    solution.setSolutionData(processResult.output());
+    solution.setSolutionData(processResult.output().orElse("Empty Solution"));
     solution.complete();
   }
 }

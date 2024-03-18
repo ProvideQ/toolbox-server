@@ -1,6 +1,7 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.process;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
+
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -47,17 +48,25 @@ public class GamsProcessRunner extends ProcessRunner {
    *                       solver.
    */
   public GamsProcessRunner(String directory, String scriptFileName, String... arguments) {
-    super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName, arguments));
+    super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName), arguments);
 
     addProblemFilePathToProcessCommand("--INPUT=\"%s\"");
   }
 
   @Override
-  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+  public ProcessResult<String> run(ProblemType problemType, long solutionId, String problemData) {
     var result = super.run(problemType, solutionId, problemData);
 
-    var obfuscatedOutput = obfuscateGamsLicense(result.output());
-    return new ProcessResult(result.success(), obfuscatedOutput);
+    var obfuscatedOutput = result.output().map((output) -> obfuscateGamsLicense(output));
+    return new ProcessResult<String>(result.success(), obfuscatedOutput, result.output());
+  }
+
+  @Override
+  public <T> ProcessResult<T> run(ProblemType problemType, long solutionId, String problemData, ProcessResultReader<T> reader) {
+    var result = super.run(problemType, solutionId, problemData, reader);
+
+    var obfuscatedErrorOutput = result.errorOutput().map((output) -> obfuscateGamsLicense(output));
+    return new ProcessResult<T>(result.success(), result.output(), obfuscatedErrorOutput);
   }
 
   /**
