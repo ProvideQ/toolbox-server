@@ -27,7 +27,6 @@ public class MultiFileProcessResultReader implements ProcessResultReader<HashMap
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(problemDirectory.toString(), directoryPath), filePattern)) {
             for (Path file : stream) {
-                System.out.println("Reading file: " + file);
                 solutions.put(file, Files.readString(file));
             }
         } catch (IOException e) {
