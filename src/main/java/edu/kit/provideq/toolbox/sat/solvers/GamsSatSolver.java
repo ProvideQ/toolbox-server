@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
-import edu.kit.provideq.toolbox.GamsProcessRunner;
+import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
@@ -60,12 +60,12 @@ public class GamsSatSolver extends SatSolver {
         .run(getProblemType(), solution.getId(), dimacsCnf.toString());
 
     if (processResult.success()) {
-      var dimacsCnfSolution = DimacsCnfSolution.fromString(dimacsCnf, processResult.output());
+      var dimacsCnfSolution = DimacsCnfSolution.fromString(dimacsCnf, processResult.output().orElse(""));
 
       solution.setSolutionData(dimacsCnfSolution);
       solution.complete();
     } else {
-      solution.setDebugData(processResult.output());
+      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.fail();
     }
     return Mono.just(solution);

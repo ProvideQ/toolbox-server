@@ -1,12 +1,15 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,6 +38,9 @@ public class ProcessRunner {
   protected final ProcessBuilder processBuilder;
   protected ResourceProvider resourceProvider;
 
+
+  private final String[] arguments;
+
   private String[] problemFilePathCommandFormat;
   private String[] solutionFilePathCommandFormat;
   private String problemFileName = PROBLEM_FILE_NAME;
@@ -42,8 +48,10 @@ public class ProcessRunner {
 
   public ProcessRunner(
           @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-          ProcessBuilder processBuilder) {
+          ProcessBuilder processBuilder,
+          String[] arguments) {
     this.processBuilder = processBuilder;
+    this.arguments = arguments;
   }
 
   @Autowired
@@ -125,6 +133,7 @@ public class ProcessRunner {
 
   /**
    * Runs the process provided in the constructor.
+   * @param <T>
    *
    * @param problemType The type of the problem that is run
    * @param solutionId  The id of the resulting solution
@@ -132,7 +141,22 @@ public class ProcessRunner {
    * @return Returns the process result, which contains the solution data
    *     or an error as output depending on the success of the process.
    */
-  public ProcessResult run(ProblemType<?, ?> problemType, UUID solutionId, String problemData) {
+  public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId, String problemData) {
+    return run(problemType, solutionId, problemData, new SimpleProcessResultReader());
+  }
+
+  /**
+   * Runs the process provided in the constructor.
+   * @param <T>
+   *
+   * @param problemType The type of the problem that is run
+   * @param solutionId  The id of the resulting solution
+   * @param problemData The problem data that should be solved
+   * @param reader     The reader that retrieves the output of the process
+   * @return Returns the process result, which contains the solution data
+   *     or an error as output depending on the success of the process.
+   */
+  public ProcessResult run(ProblemType<?, ?> problemType, UUID solutionId, String problemData, ProcessResultReader<T> reader) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {
@@ -164,6 +188,10 @@ public class ProcessRunner {
       );
     }
 
+    for (String argument : arguments) {
+      addCommand(argument.formatted(normalizedProblemFilePath, normalizedSolutionFilePath, problemDirectoryPath));
+    }
+
     // Optionally add the problem file path to the command
     if (problemFilePathCommandFormat != null) {
       for (String format : problemFilePathCommandFormat) {
@@ -174,7 +202,7 @@ public class ProcessRunner {
     // Optionally add the solution path to the command
     if (solutionFilePathCommandFormat != null) {
       for (String format : solutionFilePathCommandFormat) {
-        addCommand(format.formatted(normalizedProblemFilePath));
+        addCommand(format.formatted(normalizedSolutionFilePath));
       }
     }
     

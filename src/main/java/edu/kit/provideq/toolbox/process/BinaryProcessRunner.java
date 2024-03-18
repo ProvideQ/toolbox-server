@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.process;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -33,6 +33,6 @@ public class BinaryProcessRunner extends ProcessRunner {
    */
   public BinaryProcessRunner(String directory, String executable, String command, String... arguments) {
     super(
-        createGenericProcessBuilder(directory, executable, command, arguments));
+        createGenericProcessBuilder(directory, executable, command), arguments);
   }
 }
