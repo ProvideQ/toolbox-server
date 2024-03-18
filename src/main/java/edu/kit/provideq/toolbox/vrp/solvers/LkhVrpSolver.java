@@ -1,9 +1,9 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
-import edu.kit.provideq.toolbox.BinaryProcessRunner;
-import edu.kit.provideq.toolbox.ProcessResult;
-import edu.kit.provideq.toolbox.ProcessRunner;
-import edu.kit.provideq.toolbox.PythonProcessRunner;
+import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
@@ -63,12 +63,12 @@ public class LkhVrpSolver extends VrpSolver {
         .run(problem.type(), solution.getId(), problem.problemData());
         
       if (!processResult.success()) {
-        solution.setDebugData(processResult.output());
+        solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
         solution.abort();
         return;
       }
   
-      solution.setSolutionData(processResult.output());
+      solution.setSolutionData(processResult.output().orElse("Empty Solution"));
       solution.complete();
   }
 }
