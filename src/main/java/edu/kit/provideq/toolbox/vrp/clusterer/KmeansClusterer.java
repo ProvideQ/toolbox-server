@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +68,7 @@ public class KmeansClusterer extends VrpClusterer {
     @Override
     public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
 
+        // cluster with kmeans
         var processResult = context.getBean(
           BinaryProcessRunner.class,
           binaryDir,
@@ -83,8 +85,6 @@ public class KmeansClusterer extends VrpClusterer {
           return;
         }
 
-        int i = 0;
-
         // Retrieve the problem directory
         String problemDirectoryPath;
         try {
@@ -97,16 +97,19 @@ public class KmeansClusterer extends VrpClusterer {
             return;
         }
 
-        for (var subproblem : processResult.output().orElse(new String[0])) {
+        // solve each subproblem
+        for (var subproblemEntry : processResult.output().orElse(new HashMap<>()).entrySet()) {
             var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
-            var vrpSolution = vrpSolver.apply(subproblem);
+            var vrpSolution = vrpSolver.apply(subproblemEntry.getValue());
             if (vrpSolution.getStatus() == INVALID) {
                 solution.setDebugData(vrpSolution.getDebugData());
                 solution.abort();
                 return;
             }
 
-            var solutionFilePath = Path.of(problemDirectoryPath, ".vrp/problem_" + i + ".sol");
+            var fileName = subproblemEntry.getKey().getFileName().toString().replace(".vrp", ".sol");
+
+            var solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
 
             try {
 				Files.writeString(solutionFilePath, vrpSolution.getSolutionData());
@@ -115,10 +118,9 @@ public class KmeansClusterer extends VrpClusterer {
                 solution.abort();
                 return;
 			}
-
-            i++;
         }
 
+        // combine the solution paths
         var combineProcessRunner = context.getBean(
           BinaryProcessRunner.class,
           binaryDir,
