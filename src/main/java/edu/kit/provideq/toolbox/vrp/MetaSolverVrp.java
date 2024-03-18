@@ -7,7 +7,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
-import edu.kit.provideq.toolbox.vrp.solvers.TestVrpSolver;
+import edu.kit.provideq.toolbox.vrp.solvers.QuboTspSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.VrpSolver;
 
 import java.io.IOException;
@@ -31,10 +31,10 @@ public class MetaSolverVrp extends MetaSolver<String, String, VrpSolver> {
   public MetaSolverVrp(
           @Value("${examples.directory.vrp}") String examplesDirectoryPath,
           ResourceProvider resourceProvider,
-          TestVrpSolver testVrpSolver,
           ClusterAndSolveVrpSolver clusterAndSolveVrpSolver,
-          LkhVrpSolver lkhVrpSolver) {
-    super(ProblemType.VRP, testVrpSolver, clusterAndSolveVrpSolver, lkhVrpSolver);
+          LkhVrpSolver lkhVrpSolver,
+          QuboTspSolver quboTspSolver) {
+    super(ProblemType.VRP, clusterAndSolveVrpSolver, lkhVrpSolver, quboTspSolver);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }

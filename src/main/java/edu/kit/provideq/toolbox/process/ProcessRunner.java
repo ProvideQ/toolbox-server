@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +55,7 @@ public class ProcessRunner {
   public void setResourceProvider(ResourceProvider resourceProvider) {
     this.resourceProvider = resourceProvider;
   }
+  
 
   /**
    * Adds another command to the process builder.
@@ -233,7 +235,7 @@ public class ProcessRunner {
     }
 
     // Read the solution file
-    ProcessResult<T> result = reader.read(solutionFile, problemFilePath, Paths.get(problemDirectoryPath));
+    ProcessResult<T> result = reader.read(solutionFile, problemFilePath, Path.of(problemDirectoryPath));
 
     if (!result.success()) {
       return new ProcessResult<T>(

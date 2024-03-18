@@ -6,8 +6,6 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.vrp.MetaSolverVrp;
-import edu.kit.provideq.toolbox.vrp.solvers.TestVrpSolver;
-import edu.kit.provideq.toolbox.vrp.solvers.VrpSolver;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,8 +28,10 @@ public class MetaSolverClusterVrp extends MetaSolver<String, String, VrpClustere
   public MetaSolverClusterVrp(
           @Value("${examples.directory.vrp}") String examplesDirectoryPath,
           ResourceProvider resourceProvider,
-          NoClusteringClusterer noClusteringClusterer) {
-    super(ProblemType.CLUSTERABLE_VRP, noClusteringClusterer);
+          NoClusteringClusterer noClusteringClusterer,
+          TwoPhaseClusterer twoPhaseClusterer,
+          KmeansClusterer kmeansClusterer) {
+    super(ProblemType.CLUSTERABLE_VRP, noClusteringClusterer, twoPhaseClusterer, kmeansClusterer);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }
