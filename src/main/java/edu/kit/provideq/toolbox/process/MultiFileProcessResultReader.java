@@ -5,10 +5,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-public class MultiFileProcessResultReader implements ProcessResultReader<String[]> {
+public class MultiFileProcessResultReader implements ProcessResultReader<HashMap<Path, String>> {
 
     private final String globPattern;
 
@@ -16,9 +17,9 @@ public class MultiFileProcessResultReader implements ProcessResultReader<String[
         this.globPattern = globPattern;
     }
 
-    public ProcessResult<String[]> read(Path solutionPath, Path problemPath, Path problemDirectory) {
+    public ProcessResult<HashMap<Path, String>> read(Path solutionPath, Path problemPath, Path problemDirectory) {
 
-        List<String> solutions = new ArrayList<>();
+        HashMap<Path, String> solutions = new HashMap<>();
 
         // Split globPattern at the last slash
         String directoryPath = globPattern.substring(0, globPattern.lastIndexOf('/'));
@@ -26,10 +27,11 @@ public class MultiFileProcessResultReader implements ProcessResultReader<String[
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(problemDirectory.toString(), directoryPath), filePattern)) {
             for (Path file : stream) {
-                solutions.add(Files.readString(file));
+                System.out.println("Reading file: " + file);
+                solutions.put(file, Files.readString(file));
             }
         } catch (IOException e) {
-            return new ProcessResult<String[]>(
+            return new ProcessResult<HashMap<Path, String>>(
                 false,
                 Optional.empty(),
                 Optional.of("Error: The problem data couldn't be read from %s:%n%s%nCommand Output: %s".formatted(
@@ -38,9 +40,9 @@ public class MultiFileProcessResultReader implements ProcessResultReader<String[
         }
 
         // Return the solution
-        return new ProcessResult<String[]>(
+        return new ProcessResult<HashMap<Path, String>>(
             true,
-            Optional.of(solutions.toArray(new String[0])),
+            Optional.of(solutions),
             Optional.empty()
         );
     }
