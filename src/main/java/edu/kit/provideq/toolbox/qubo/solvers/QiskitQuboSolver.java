@@ -2,16 +2,18 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 
 import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.qubo.QuboProblemManagerConfiguration;
+import edu.kit.provideq.toolbox.test.SubRoutineResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
- * {@link ProblemType#QUBO} solver using a Qiskit QAOA implementation.
+ * {@link QuboProblemManagerConfiguration#QUBO} solver using a Qiskit QAOA implementation.
  */
 @Component
 public class QiskitQuboSolver extends QuboSolver {
@@ -33,12 +35,14 @@ public class QiskitQuboSolver extends QuboSolver {
 
   @Override
   public boolean canSolve(Problem<String> problem) {
-    return problem.type() == ProblemType.QUBO;
+    return problem.type() == QuboProblemManagerConfiguration.QUBO;
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<String>> solve(Problem<String> problem,
+                                      SubRoutineResolver subRoutineResolver) {
+    var solution = new Solution<String>();
+
     // Run Qiskit solver via console
     var processResult = context
         .getBean(
@@ -48,16 +52,20 @@ public class QiskitQuboSolver extends QuboSolver {
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand()
         .problemFileName("problem.lp")
-        .run(problem.type(), solution.getId(), problem.problemData());
+        .run(
+            problem.type(),
+            (long) (Math.random() * Long.MAX_VALUE), // TODO
+            problem.problemData()
+        );
 
     // Return if process failed
     if (!processResult.success()) {
       solution.setDebugData(processResult.output());
       solution.abort();
-      return;
+    } else {
+      solution.setSolutionData(processResult.output());
+      solution.complete();
     }
-
-    solution.setSolutionData(processResult.output());
-    solution.complete();
+    return Mono.just(solution);
   }
 }

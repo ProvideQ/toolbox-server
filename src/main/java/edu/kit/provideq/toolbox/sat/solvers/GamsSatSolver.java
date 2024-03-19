@@ -2,19 +2,20 @@ package edu.kit.provideq.toolbox.sat.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sat.SatManagerConfiguration;
+import edu.kit.provideq.toolbox.test.SubRoutineResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
- * {@link ProblemType#SAT} solver using a GAMS implementation.
+ * {@link SatManagerConfiguration#SAT} solver using a GAMS implementation.
  */
 @Component
 public class GamsSatSolver extends SatSolver {
@@ -37,12 +38,15 @@ public class GamsSatSolver extends SatSolver {
   @Override
   public boolean canSolve(Problem<String> problem) {
     //TODO: assess problemData
-    return problem.type() == ProblemType.SAT;
+    return problem.type() == SatManagerConfiguration.SAT;
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<DimacsCnfSolution> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<DimacsCnfSolution>> solve(
+      Problem<String> problem,
+      SubRoutineResolver subRoutineResolver) {
+    var solution = new Solution<DimacsCnfSolution>();
+
     DimacsCnf dimacsCnf;
     try {
       dimacsCnf = DimacsCnf.fromString(problem.problemData());
@@ -50,7 +54,7 @@ public class GamsSatSolver extends SatSolver {
     } catch (ConversionException | RuntimeException e) {
       solution.setDebugData("Parsing error: " + e.getMessage());
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
     // Run SAT with GAMS via console
@@ -59,7 +63,11 @@ public class GamsSatSolver extends SatSolver {
             GamsProcessRunner.class,
             satPath,
             "sat.gms")
-        .run(problem.type(), solution.getId(), dimacsCnf.toString());
+        .run(
+            problem.type(),
+            (long) (Math.random() * Long.MAX_VALUE), // TODO
+            dimacsCnf.toString()
+        );
 
     if (processResult.success()) {
       var dimacsCnfSolution = DimacsCnfSolution.fromString(dimacsCnf, processResult.output());
@@ -70,5 +78,6 @@ public class GamsSatSolver extends SatSolver {
       solution.setDebugData(processResult.output());
       solution.fail();
     }
+    return Mono.just(solution);
   }
 }

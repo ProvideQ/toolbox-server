@@ -2,19 +2,20 @@ package edu.kit.provideq.toolbox.maxcut.solvers;
 
 import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
+import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.test.SubRoutineResolver;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
- * {@link ProblemType#MAX_CUT} solver using a Qiskit implementation.
+ * {@link MaxCutConfiguration#MAX_CUT} solver using a Qiskit implementation.
  */
 @Component
 public class QiskitMaxCutSolver extends MaxCutSolver {
@@ -39,12 +40,13 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   @Override
   public boolean canSolve(Problem<String> problem) {
     //TODO: assess problemData
-    return problem.type() == ProblemType.MAX_CUT;
+    return problem.type() == MaxCutConfiguration.MAX_CUT;
   }
 
   @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<String>> solve(Problem<String> problem,
+                                      SubRoutineResolver subRoutineResolver) {
+    var solution = new Solution<String>();
     // Parse GML to add partition data to
     Gml gml;
     try {
@@ -52,7 +54,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     } catch (ConversionException e) {
       solution.setDebugData("Couldn't convert problem data to GML:\n" + e);
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
     // Run Qiskit solver via console
@@ -63,13 +65,17 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
             "maxCut_qiskit.py")
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand()
-        .run(problem.type(), solution.getId(), problem.problemData());
+        .run(
+            problem.type(),
+            (long) (Math.random() * Long.MAX_VALUE), // TODO
+            problem.problemData()
+        );
 
     // Return if process failed
     if (!processResult.success()) {
       solution.setDebugData(processResult.output());
       solution.fail();
-      return;
+      return Mono.just(solution);
     }
 
     // Parse solution data and add partition data to GML
@@ -96,5 +102,6 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     solution.setSolutionData(gml.toString());
     solution.complete();
+    return Mono.just(solution);
   }
 }

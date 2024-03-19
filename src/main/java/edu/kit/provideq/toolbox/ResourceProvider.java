@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox;
 
-import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.TypedProblemType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +55,10 @@ public class ResourceProvider {
    * @return File object of the directory
    * @throws IOException when the directory couldn't be accessed or created
    */
-  public File getProblemDirectory(ProblemType problemType, long solutionId) throws IOException {
+  public File getProblemDirectory(
+      TypedProblemType<?, ?> problemType,
+      long solutionId
+  ) throws IOException {
     File workingDirectory = getWorkingDirectory();
 
     Path dir =

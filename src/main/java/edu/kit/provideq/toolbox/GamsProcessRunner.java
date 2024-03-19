@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.TypedProblemType;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -53,7 +54,7 @@ public class GamsProcessRunner extends ProcessRunner {
   }
 
   @Override
-  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+  public ProcessResult run(TypedProblemType<?, ?> problemType, long solutionId, String problemData) {
     var result = super.run(problemType, solutionId, problemData);
 
     var obfuscatedOutput = obfuscateGamsLicense(result.output());

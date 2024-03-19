@@ -13,28 +13,12 @@ import java.util.function.Function;
  * @param <S> the type of the generated solution data
  */
 public class Solution<S> {
-  private final long id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
   private S solutionData;
   private String debugData;
   private String solverName;
   private long executionMilliseconds;
-
-  /**
-   * Internal constructor, used for de-serialization.
-   */
-  private Solution() {
-    this.id = Long.MIN_VALUE;
-  }
-
-  public Solution(long id) {
-    this.id = id;
-  }
-
-  public long getId() {
-    return this.id;
-  }
 
   public SolutionStatus getStatus() {
     return this.status;
@@ -59,7 +43,7 @@ public class Solution<S> {
   public Solution<String> toStringSolution(@NotNull Function<S, String> stringSelector) {
     Objects.requireNonNull(stringSelector, "Missing String selector!");
 
-    var stringSolution = new Solution<String>(getId());
+    var stringSolution = new Solution<String>();
     stringSolution.status = status;
     stringSolution.metaData = metaData;
     stringSolution.solutionData =
@@ -146,19 +130,18 @@ public class Solution<S> {
       return false;
     }
     var that = (Solution<S>) obj;
-    return this.id == that.id
-        && Objects.equals(this.status, that.status);
+    // TODO incomplete!
+    return Objects.equals(this.status, that.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, status);
+    return Objects.hash(status); // TODO
   }
 
   @Override
   public String toString() {
     return "Solution["
-        + "id=" + id + ", "
         + "status=" + status + ", "
         + "metaData=" + metaData + ", "
         + "solutionData" + solutionData + ']';

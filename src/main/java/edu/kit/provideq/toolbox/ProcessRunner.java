@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.TypedProblemType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -130,7 +131,11 @@ public class ProcessRunner {
    * @return Returns the process result, which contains the solution data
    *     or an error as output depending on the success of the process.
    */
-  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+  public ProcessResult run(
+      TypedProblemType<?, ?> problemType,
+      long solutionId,
+      String problemData
+  ) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {

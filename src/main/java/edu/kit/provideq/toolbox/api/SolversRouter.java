@@ -10,10 +10,10 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.provideq.toolbox.MetaSolverProvider;
+import edu.kit.provideq.toolbox.ProblemManager;
+import edu.kit.provideq.toolbox.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.ProblemSolverInfo;
-import edu.kit.provideq.toolbox.meta.MetaSolver;
-import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.TypedProblemType;
 import java.util.List;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,59 +35,61 @@ import reactor.core.publisher.Mono;
 @Configuration
 @EnableWebFlux
 public class SolversRouter {
-  private final MetaSolverProvider metaSolverProvider;
+  private final ProblemManagerProvider problemManagerProvider;
 
   @Autowired
-  public SolversRouter(MetaSolverProvider metaSolverProvider) {
-    this.metaSolverProvider = metaSolverProvider;
+  public SolversRouter(ProblemManagerProvider problemManagerProvider) {
+    this.problemManagerProvider = problemManagerProvider;
   }
 
   @Bean
   RouterFunction<ServerResponse> getSolversRoutes() {
-    return metaSolverProvider.getMetaSolvers().stream()
-        .map(this::defineSolversRouteForMetaSolver)
+    return problemManagerProvider.getProblemManagers().stream()
+        .map(this::defineSolversRouteForProblemManager)
         .reduce(RouterFunction::and)
         .orElseThrow();
   }
 
-  private RouterFunction<ServerResponse> defineSolversRouteForMetaSolver(
-      MetaSolver<?, ?, ?> metaSolver) {
-    var problemType = metaSolver.getProblemType();
+  private RouterFunction<ServerResponse> defineSolversRouteForProblemManager(
+      ProblemManager<?, ?> problemManager) {
+    var problemType = problemManager.getProblemType();
     return route().GET(
         getSolversRouteForProblemType(problemType),
-        req -> handleSolversRouteForMetaSolver(metaSolver),
-        ops -> handleSolversRouteDocumentation(ops, metaSolver)
+        req -> handleSolversRouteForProblemManager(problemManager),
+        ops -> handleSolversRouteDocumentation(ops, problemManager)
     ).build();
   }
 
-  private Mono<ServerResponse> handleSolversRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver) {
-    var solvers = getAllSolverInfos(metaSolver);
+  private Mono<ServerResponse> handleSolversRouteForProblemManager(
+      ProblemManager<?, ?> problemManager
+  ) {
+    var solvers = getAllSolverInfos(problemManager);
 
     return ok().body(Mono.just(solvers), new ParameterizedTypeReference<>() {
     });
   }
 
-  private static List<ProblemSolverInfo> getAllSolverInfos(MetaSolver<?, ?, ?> metaSolver) {
-    return metaSolver.getAllSolvers().stream()
+  private static List<ProblemSolverInfo> getAllSolverInfos(ProblemManager<?, ?> problemManager) {
+    return problemManager.getProblemSolvers().stream()
             .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName()))
             .toList();
   }
 
-  private void handleSolversRouteDocumentation(Builder ops, MetaSolver<?, ?, ?> metaSolver) {
+  private void handleSolversRouteDocumentation(Builder ops, ProblemManager<?, ?> problemManager) {
     ops
-        .operationId(getSolversRouteForProblemType(metaSolver.getProblemType()))
-        .tag(metaSolver.getProblemType().getId())
+        .operationId(getSolversRouteForProblemType(problemManager.getProblemType()))
+        .tag(problemManager.getProblemType().getId())
         .description("Returns a list of solvers available to solve the "
-            + metaSolver.getProblemType().getId() + " problem type.")
+            + problemManager.getProblemType().getId() + " problem type.")
         .response(responseBuilder()
             .responseCode(String.valueOf(HttpStatus.OK.value()))
-            .content(getOkResponseContent(metaSolver))
+            .content(getOkResponseContent(problemManager))
         );
   }
 
   private static org.springdoc.core.fn.builders.content.Builder getOkResponseContent(
-          MetaSolver<?, ?, ?> metaSolver) {
-    var allSolvers = getAllSolverInfos(metaSolver);
+          ProblemManager<?, ?> problemManager) {
+    var allSolvers = getAllSolverInfos(problemManager);
     String example;
     try {
       example = new ObjectMapper().writeValueAsString(allSolvers);
@@ -98,13 +100,13 @@ public class SolversRouter {
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)
             .example(org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder()
-                    .name(metaSolver.getProblemType().getId())
+                    .name(problemManager.getProblemType().getId())
                     .value(example))
             .array(arraySchemaBuilder().schema(
                     schemaBuilder().implementation(ProblemSolverInfo.class)));
   }
 
-  private String getSolversRouteForProblemType(ProblemType type) {
+  private String getSolversRouteForProblemType(TypedProblemType<?, ?> type) {
     return "/solvers/" + type.getId();
   }
 }
