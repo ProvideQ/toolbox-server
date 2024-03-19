@@ -8,6 +8,10 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -42,7 +46,7 @@ public class GamsSatSolver extends SatSolver {
 
   @Override
   public void solve(Problem<String> problem, Solution<DimacsCnfSolution> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     DimacsCnf dimacsCnf;
     try {
       dimacsCnf = DimacsCnf.fromString(problem.problemData());

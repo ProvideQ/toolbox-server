@@ -2,6 +2,8 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +38,15 @@ public interface ProblemSolver<ProblemT, SolutionT> {
   }
 
   /**
+   * Returns a list of settings needed for this particular ProblemSolver.
+   *
+   * @return list of settings
+   */
+  default List<MetaSolverSetting> getSettings() {
+    return List.of();
+  }
+
+  /**
    * Simple true-false-check,
    * {@code true}: given {@link Problem} can be solved with this solver,
    * {@code false}: it cannot.
@@ -52,7 +63,8 @@ public interface ProblemSolver<ProblemT, SolutionT> {
    * @param problem        the {@link Problem} that is to be solved
    * @param solution       the {@link Solution} in which all resulting information is to be stored
    * @param subRoutinePool {@link SubRoutinePool} pool to retrieve sub routine from
+   * @param settings       {@link MetaSolverSettings} settings that were given to the solver
    */
   void solve(Problem<ProblemT> problem, Solution<SolutionT> solution,
-             SubRoutinePool subRoutinePool);
+             SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings);
 }

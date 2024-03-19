@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
 import static edu.kit.provideq.toolbox.SolutionStatus.ERROR;
 import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
@@ -48,7 +49,7 @@ public class ClusterAndSolveVrpSolver extends VrpSolver {
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     var vrpClusterer = subRoutinePool.<String, String>getSubRoutine(ProblemType.CLUSTERABLE_VRP);
 
     var vrpSolution = vrpClusterer.apply(problem.problemData());

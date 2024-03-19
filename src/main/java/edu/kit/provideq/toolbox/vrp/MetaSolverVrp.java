@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import edu.kit.provideq.toolbox.meta.setting.Select;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.QuboTspSolver;
@@ -24,18 +25,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MetaSolverVrp extends MetaSolver<String, String, VrpSolver> {
-  private final String examplesDirectoryPath;
   private final ResourceProvider resourceProvider;
 
   @Autowired
   public MetaSolverVrp(
-          @Value("${examples.directory.vrp}") String examplesDirectoryPath,
           ResourceProvider resourceProvider,
           ClusterAndSolveVrpSolver clusterAndSolveVrpSolver,
           LkhVrpSolver lkhVrpSolver,
           QuboTspSolver quboTspSolver) {
     super(ProblemType.VRP, clusterAndSolveVrpSolver, lkhVrpSolver, quboTspSolver);
-    this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }
 

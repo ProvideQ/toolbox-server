@@ -24,6 +24,9 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.IntegerSetting;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import edu.kit.provideq.toolbox.meta.setting.Text;
 
 @Component
 public class KmeansClusterer extends VrpClusterer {
@@ -31,6 +34,8 @@ public class KmeansClusterer extends VrpClusterer {
     private final String binaryDir;
     private final String binaryName;
     private ResourceProvider resourceProvider;
+
+    private final String CLUSTER_SETTING_NAME = "cluster";
     
     @Autowired
     public KmeansClusterer(
@@ -61,12 +66,24 @@ public class KmeansClusterer extends VrpClusterer {
     }
 
     @Override
+    public List<MetaSolverSetting> getSettings() {
+        return List.of(new IntegerSetting(CLUSTER_SETTING_NAME, "Number of Kmeans Cluster (default: 3)", 3));
+    }
+
+    @Override
     public boolean canSolve(Problem<String> problem) {
         return problem.type() == ProblemType.CLUSTERABLE_VRP;
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
+    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
+
+        int clusterNumber = settings.stream()
+            .filter(setting -> setting.name.equals(CLUSTER_SETTING_NAME))
+            .map(setting -> (IntegerSetting) setting)
+            .findFirst()
+            .map(setting -> setting.number)
+            .orElse(3);
 
         // cluster with kmeans
         var processResult = context.getBean(
@@ -74,7 +91,7 @@ public class KmeansClusterer extends VrpClusterer {
           binaryDir,
           binaryName,
           "partial",
-          new String[] { "cluster", "%1$s", "kmeans", "--build-dir", "%3$s/.vrp"}
+          new String[] { "cluster", "%1$s", "kmeans", "--build-dir", "%3$s/.vrp", "--cluster-number", String.valueOf(clusterNumber)}
         )
         .problemFileName("problem.vrp")
         .run(problem.type(), solution.getId(), problem.problemData(), new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));

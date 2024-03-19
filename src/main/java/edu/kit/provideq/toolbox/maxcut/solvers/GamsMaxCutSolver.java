@@ -7,6 +7,10 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -41,7 +45,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     // Run MaxCut with GAMS via console
     var processResult = context
         .getBean(

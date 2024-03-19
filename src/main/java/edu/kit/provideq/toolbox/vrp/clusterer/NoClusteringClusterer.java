@@ -11,6 +11,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
 @Component
 public class NoClusteringClusterer extends VrpClusterer {
@@ -41,7 +42,7 @@ public class NoClusteringClusterer extends VrpClusterer {
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
+    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
         var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
 
         var vrpSolution = vrpSolver.apply(problem.problemData());

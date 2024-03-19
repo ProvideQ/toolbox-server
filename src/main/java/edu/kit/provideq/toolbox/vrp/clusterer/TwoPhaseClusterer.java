@@ -19,6 +19,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 
@@ -63,7 +64,7 @@ public class TwoPhaseClusterer extends VrpClusterer {
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool) {
+    public void solve(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
         
         // cluster with tsp/two-phase clustering
         var processResult = context.getBean(
