@@ -152,9 +152,7 @@ public class QuboTspSolver extends VrpSolver {
             solution.abort();
             return;
         }
-
-        System.out.println("QUBO solution written to: " + quboSolutionFilePath.toString());
-
+        
         var processRetransformResult = context.getBean(
             BinaryProcessRunner.class,
             binaryDir,
