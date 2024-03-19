@@ -145,7 +145,7 @@ public class Solution<S> {
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
-    var that = (Solution<S>) obj;
+    var that = (Solution<?>) obj;
     return this.id == that.id
         && Objects.equals(this.status, that.status);
   }
