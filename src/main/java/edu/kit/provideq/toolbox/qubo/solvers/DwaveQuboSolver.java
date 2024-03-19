@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
+import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
@@ -15,14 +16,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DwaveQuboSolver extends QuboSolver {
-  private final String quboPath;
+  private final String quboScriptPath;
   private final ApplicationContext context;
 
   @Autowired
   public DwaveQuboSolver(
-      @Value("${qiskit.directory.qubo}") String quboPath,
+      @Value("${dwave.directory.qubo}") String quboScriptPath,
       ApplicationContext context) {
-    this.quboPath = quboPath;
+    this.quboScriptPath = quboScriptPath;
     this.context = context;
   }
 
@@ -39,9 +40,25 @@ public class DwaveQuboSolver extends QuboSolver {
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
-    // Run Dwave python script via console
-
-    solution.setSolutionData("");
-    solution.complete();
+    
+      var processResult = context.getBean(
+          BinaryProcessRunner.class,
+          quboScriptPath,
+          "../venv/bin/python",
+          "main.py",
+          new String[] {"%1$s", "sim", "--output-file", "%2$s"}
+        )
+        .problemFileName("problem.lp")
+        .solutionFileName("problem.bin")
+        .run(problem.type(), solution.getId(), problem.problemData());
+        
+      if (!processResult.success()) {
+        solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
+        solution.abort();
+        return;
+      }
+  
+      solution.setSolutionData(processResult.output().orElse("Empty Solution"));
+      solution.complete();
   }
 }

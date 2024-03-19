@@ -38,9 +38,9 @@ out/
 .vscode/
 
 
-### virtual envs ###
+### virtual envs and python ###
 venv/
-
+__pycache__/
 
 ### ProvideQ toolbox-server ###
 # input, output and temporary files for solving problems with our solvers
