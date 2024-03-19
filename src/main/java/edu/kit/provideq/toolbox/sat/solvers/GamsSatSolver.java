@@ -6,7 +6,6 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,17 +34,11 @@ public class GamsSatSolver extends SatSolver {
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    //TODO: assess problemData
-    return problem.type() == ProblemType.SAT;
-  }
-
-  @Override
-  public void solve(Problem<String> problem, Solution<DimacsCnfSolution> solution,
+  public void solve(String input, Solution<DimacsCnfSolution> solution,
                     SubRoutinePool subRoutinePool) {
     DimacsCnf dimacsCnf;
     try {
-      dimacsCnf = DimacsCnf.fromString(problem.problemData());
+      dimacsCnf = DimacsCnf.fromString(input);
       solution.setDebugData("Using cnf input: " + dimacsCnf);
     } catch (ConversionException | RuntimeException e) {
       solution.setDebugData("Parsing error: " + e.getMessage());
@@ -59,7 +52,7 @@ public class GamsSatSolver extends SatSolver {
             GamsProcessRunner.class,
             satPath,
             "sat.gms")
-        .run(problem.type(), solution.getId(), dimacsCnf.toString());
+        .run(getProblemType(), solution.getId(), dimacsCnf.toString());
 
     if (processResult.success()) {
       var dimacsCnfSolution = DimacsCnfSolution.fromString(dimacsCnf, processResult.output());

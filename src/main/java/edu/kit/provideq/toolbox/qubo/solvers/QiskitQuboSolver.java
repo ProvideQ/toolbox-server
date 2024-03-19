@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,12 +31,7 @@ public class QiskitQuboSolver extends QuboSolver {
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    return problem.type() == ProblemType.QUBO;
-  }
-
-  @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
+  public void solve(String input, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Run Qiskit solver via console
     var processResult = context
@@ -48,7 +42,7 @@ public class QiskitQuboSolver extends QuboSolver {
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand()
         .problemFileName("problem.lp")
-        .run(problem.type(), solution.getId(), problem.problemData());
+        .run(getProblemType(), solution.getId(), input);
 
     // Return if process failed
     if (!processResult.success()) {

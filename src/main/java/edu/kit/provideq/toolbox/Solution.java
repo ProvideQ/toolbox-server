@@ -5,8 +5,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * A solution holds all information concerning a specific
- * {@link edu.kit.provideq.toolbox.meta.Problem} solving process triggered by a
+ * A solution holds all information concerning a specific problem-solving process triggered by a
  * {@link edu.kit.provideq.toolbox.meta.ProblemSolver}. This includes metadata, debug data,
  * the current status of the process, as well as the eventually generated solution data
  *

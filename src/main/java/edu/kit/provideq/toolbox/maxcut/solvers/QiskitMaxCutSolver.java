@@ -5,7 +5,6 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,18 +36,12 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    //TODO: assess problemData
-    return problem.type() == ProblemType.MAX_CUT;
-  }
-
-  @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
+  public void solve(String input, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Parse GML to add partition data to
     Gml gml;
     try {
-      gml = Gml.fromString(problem.problemData());
+      gml = Gml.fromString(input);
     } catch (ConversionException e) {
       solution.setDebugData("Couldn't convert problem data to GML:\n" + e);
       solution.abort();
@@ -63,7 +56,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
             "maxCut_qiskit.py")
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand()
-        .run(problem.type(), solution.getId(), problem.problemData());
+        .run(getProblemType(), solution.getId(), input);
 
     // Return if process failed
     if (!processResult.success()) {

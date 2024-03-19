@@ -6,7 +6,6 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.convert.UvlToDimacsCnf;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -34,17 +33,12 @@ public class SatBasedVoidFeatureSolver
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    return problem.type() == ProblemType.FEATURE_MODEL_ANOMALY_VOID;
-  }
-
-  @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
+  public void solve(String input, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Convert uvl to cnf
     String cnf;
     try {
-      cnf = UvlToDimacsCnf.convert(problem.problemData());
+      cnf = UvlToDimacsCnf.convert(input);
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
@@ -76,5 +70,10 @@ public class SatBasedVoidFeatureSolver
       solution.setDebugData(voidSolution.getDebugData());
       solution.fail();
     }
+  }
+
+  @Override
+  public ProblemType getProblemType() {
+    return ProblemType.FEATURE_MODEL_ANOMALY_VOID;
   }
 }

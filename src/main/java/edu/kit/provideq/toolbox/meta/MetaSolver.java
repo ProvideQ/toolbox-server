@@ -16,14 +16,14 @@ import org.springframework.context.ApplicationContext;
  * Decides which known {@link ProblemSolver} is suited best for a given problem,
  * manages known solvers.
  *
- * @param <ProblemT> the type of the problem input of {@link ProblemSolver}
+ * @param <InputT> the type of the problem input of {@link ProblemSolver}
  * @param <SolutionT> the type of the solution output of {@link ProblemSolver}
- * @param <SolverT> the type of {@link ProblemSolver} this metasolver is to manage
+ * @param <SolverT> the type of {@link ProblemSolver} this meta-solver is to manage
  */
 public abstract class MetaSolver<
-        ProblemT,
+    InputT,
         SolutionT,
-        SolverT extends ProblemSolver<ProblemT, SolutionT>> {
+        SolverT extends ProblemSolver<InputT, SolutionT>> {
 
   private final SolutionManager<SolutionT> solutionManager = new SolutionManager<>();
   private ApplicationContext context;
@@ -45,16 +45,6 @@ public abstract class MetaSolver<
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
-
-  /**
-   * Provides the best suited known solver this meta solver is aware of for a given problem.
-   *
-   * @param problem the problem the meta solver is to check its solvers by
-   * @return the best suited solver, null in case no suitable solver was found
-   */
-  public abstract SolverT findSolver(
-          Problem<ProblemT> problem,
-          List<MetaSolverSetting> metaSolverSettings);
 
   /**
    * Returns the solver from {@link #getAllSolvers()} with the given {@code solverId}.
@@ -99,16 +89,14 @@ public abstract class MetaSolver<
 
   /**
    * Solves a given {@link SolveRequest} by using either the requested {@link ProblemSolver}
-   * (if specified) or the solver recommended by {@link #findSolver(Problem, List)}, and returns
-   * the solution.
+   * (if specified, otherwise any solver), and returns the solution.
    */
-  public Solution<SolutionT> solve(SolveRequest<ProblemT> request) {
+  public Solution<SolutionT> solve(SolveRequest<InputT> request) {
     Solution<SolutionT> solution = this.getSolutionManager().createSolution();
-    Problem<ProblemT> problem = new Problem<>(request.requestContent, this.getProblemType());
 
     SolverT solver = this
             .getSolver(request.requestedSolverId)
-            .orElseGet(() -> this.findSolver(problem, request.requestedMetaSolverSettings));
+            .orElseGet(() -> this.getAllSolvers().stream().findAny().orElseThrow());
 
     solution.setSolverName(solver.getName());
 
@@ -118,7 +106,7 @@ public abstract class MetaSolver<
                     : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
 
     long start = System.currentTimeMillis();
-    solver.solve(problem, solution, subRoutinePool);
+    solver.solve(request.requestContent, solution, subRoutinePool);
     long finish = System.currentTimeMillis();
 
     solution.setExecutionMilliseconds(finish - start);
@@ -126,5 +114,5 @@ public abstract class MetaSolver<
     return solution;
   }
 
-  public abstract List<ProblemT> getExampleProblems();
+  public abstract List<InputT> getExampleProblems();
 }

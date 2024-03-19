@@ -3,9 +3,6 @@ package edu.kit.provideq.toolbox.maxcut.solvers;
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.gml.Gml;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,13 +31,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    //TODO: assess problemData
-    return problem.type() == ProblemType.MAX_CUT;
-  }
-
-  @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
+  public void solve(String input, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Run MaxCut with GAMS via console
     var processResult = context
@@ -48,7 +39,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
             GamsProcessRunner.class,
             maxCutPath,
             "maxcut.gms")
-        .run(problem.type(), solution.getId(), problem.problemData());
+        .run(getProblemType(), solution.getId(), input);
 
     // Return if process failed
     if (!processResult.success()) {

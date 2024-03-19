@@ -8,7 +8,6 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -36,17 +35,12 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    return problem.type() == ProblemType.FEATURE_MODEL_ANOMALY_DEAD;
-  }
-
-  @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
+  public void solve(String input, Solution<String> solution,
                     SubRoutinePool subRoutinePool) {
     // Convert uvl to cnf
     String cnf;
     try {
-      cnf = UvlToDimacsCnf.convert(problem.problemData());
+      cnf = UvlToDimacsCnf.convert(input);
     } catch (ConversionException e) {
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
@@ -55,6 +49,11 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
 
     var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
     checkDeadFeatures(solution, cnf, satSolve);
+  }
+
+  @Override
+  public ProblemType getProblemType() {
+    return ProblemType.FEATURE_MODEL_ANOMALY_DEAD;
   }
 
   private static void checkDeadFeatures(Solution<String> solution, String cnf,
