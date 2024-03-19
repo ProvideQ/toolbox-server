@@ -15,7 +15,7 @@ public class SimpleProcessResultReader implements ProcessResultReader<String> {
             return new ProcessResult<String>(
                 false,
                 Optional.empty(),
-                Optional.of("Error: The problem data couldn't be read from %s:%n%s%nCommand Output: %s".formatted(
+                Optional.of("Error: The problem data couldn't be read from %s:%n%s%n".formatted(
                     solutionPath, e.getMessage()))
             );
         }
