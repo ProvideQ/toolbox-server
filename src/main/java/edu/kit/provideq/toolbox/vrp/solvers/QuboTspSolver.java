@@ -52,7 +52,7 @@ public class QuboTspSolver extends VrpSolver {
 
     @Override
     public String getName() {
-        return "TSP to QUBO Solver";
+        return "TSP to QUBO Solver (Classical)";
     }
 
 

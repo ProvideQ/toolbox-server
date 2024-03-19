@@ -25,7 +25,7 @@ public class NoClusteringClusterer extends VrpClusterer {
 
     @Override
     public String getName() {
-        return "No Clustering VRP Clusterer";
+        return "No Clustering VRP Clusterer (Classical)";
     }
 
     @Override
