@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -40,6 +42,7 @@ public class ProcessRunner {
 
 
   private final String[] arguments;
+  private HashMap<String, String> env;
 
   private String[] problemFilePathCommandFormat;
   private String[] solutionFilePathCommandFormat;
@@ -49,6 +52,7 @@ public class ProcessRunner {
   public ProcessRunner(ProcessBuilder processBuilder, String[] arguments) {
     this.processBuilder = processBuilder;
     this.arguments = arguments;
+    this.env = new HashMap<>();
   }
 
   @Autowired
@@ -192,6 +196,10 @@ public class ProcessRunner {
       addCommand(argument.formatted(normalizedProblemFilePath, normalizedSolutionFilePath, problemDirectoryPath));
     }
 
+    for (Entry<String, String> entry : env.entrySet()) {
+      addEnvironmentVariableToBuilder(entry.getKey(), entry.getValue());
+    }
+
     // Optionally add the problem file path to the command
     if (problemFilePathCommandFormat != null) {
       for (String format : problemFilePathCommandFormat) {
@@ -252,6 +260,14 @@ public class ProcessRunner {
     List<String> existingCommands = processBuilder.command();
     existingCommands.add(command);
     processBuilder.command(existingCommands);
+  }
+
+  public void addEnvironmentVariable(String key, String value) {
+    env.put(key, value);
+  }
+
+  private void addEnvironmentVariableToBuilder(String key, String value) {
+    processBuilder.environment().put(key, value);
   }
 
   protected static ProcessBuilder createGenericProcessBuilder(
