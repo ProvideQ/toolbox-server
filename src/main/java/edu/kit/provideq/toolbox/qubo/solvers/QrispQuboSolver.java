@@ -4,6 +4,10 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -37,7 +41,7 @@ public class QrispQuboSolver extends QuboSolver {
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     // Run Qrisp solver via console
 
     solution.setSolutionData("");

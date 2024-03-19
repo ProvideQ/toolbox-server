@@ -8,12 +8,12 @@ public class Select<T> extends MetaSolverSetting {
   @Nullable
   public T selectedOption;
 
-  public Select(String name, List<T> options) {
-    this(name, options, null);
+  public Select(String name, String title, List<T> options) {
+    this(name, title, options, null);
   }
 
-  public Select(String name, List<T> options, T selectedOption) {
-    super(name, MetaSolverSettingType.SELECT);
+  public Select(String name, String title, List<T> options, T selectedOption) {
+    super(name, title, MetaSolverSettingType.SELECT);
 
     this.options = options;
     this.selectedOption = selectedOption;

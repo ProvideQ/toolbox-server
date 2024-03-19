@@ -8,6 +8,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
 import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
 
@@ -102,7 +103,7 @@ public class QuboTspSolver extends VrpSolver {
 
     @Override
     public void solve(Problem<String> problem, Solution<String> solution,
-                        SubRoutinePool subRoutinePool) {
+                        SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
 
         // translate into qubo in lp-file format with rust vrp meta solver
         var processResult = context.getBean(

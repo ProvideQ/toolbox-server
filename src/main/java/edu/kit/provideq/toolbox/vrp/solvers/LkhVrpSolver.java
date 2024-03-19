@@ -10,6 +10,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -48,7 +49,7 @@ public class LkhVrpSolver extends VrpSolver {
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
       
       var processResult = context.getBean(
           BinaryProcessRunner.class,

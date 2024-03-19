@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import edu.kit.provideq.toolbox.meta.setting.Select;
 import edu.kit.provideq.toolbox.vrp.MetaSolverVrp;
 
 import java.io.IOException;
