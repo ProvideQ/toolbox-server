@@ -54,7 +54,7 @@ public class KmeansClusterer extends VrpClusterer {
 
     @Override
     public String getName() {
-        return "Kmeans VRP Clusterer";
+        return "Kmeans VRP Clusterer (Classical)";
     }
 
     @Override

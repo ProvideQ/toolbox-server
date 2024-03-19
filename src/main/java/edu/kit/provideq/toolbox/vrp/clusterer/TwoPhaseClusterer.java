@@ -47,7 +47,7 @@ public class TwoPhaseClusterer extends VrpClusterer {
 
     @Override
     public String getName() {
-        return "Two Phase VRP To TSP Clusterer";
+        return "Two Phase VRP To TSP Clusterer (Classical)";
     }
 
     @Override
