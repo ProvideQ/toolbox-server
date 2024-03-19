@@ -50,7 +50,11 @@ public class MetaSolverVrp extends MetaSolver<String, String, VrpSolver> {
           getClass().getResourceAsStream("CMT1.vrp"),
           "Simple VRP CMT1 Problem unavailable!"
       );
-      return List.of(resourceProvider.readStream(problemStream));
+      var problemTwoStream = Objects.requireNonNull(
+          getClass().getResourceAsStream("SmallSample.vrp"),
+          "Simple VRP SmallSample Problem unavailable!"
+      );
+      return List.of(resourceProvider.readStream(problemStream), resourceProvider.readStream(problemTwoStream));
     } catch (IOException e) {
       throw new RuntimeException("Could not load example problems", e);
     }

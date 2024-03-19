@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboMetaSolver;
+import edu.kit.provideq.toolbox.qubo.SolveQuboRequest;
 import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
@@ -12,8 +13,10 @@ import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.vrp.MetaSolverVrp;
 import edu.kit.provideq.toolbox.vrp.SolveVrpRequest;
+import edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpRequest;
 import edu.kit.provideq.toolbox.vrp.clusterer.KmeansClusterer;
 import edu.kit.provideq.toolbox.vrp.clusterer.MetaSolverClusterVrp;
 import edu.kit.provideq.toolbox.vrp.clusterer.NoClusteringClusterer;
@@ -24,6 +27,7 @@ import edu.kit.provideq.toolbox.vrp.solvers.QuboTspSolver;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -74,15 +78,51 @@ class VRPSolverTest {
     simpleLKHRequest.requestedSolverId = LkhVrpSolver.class.getName();
     simpleLKHRequest.requestContent = exampleProblem;
 
+
+    var clusterKmeansAndLKH = new SolveVrpRequest();
+
+    clusterKmeansAndLKH.requestedSolverId = ClusterAndSolveVrpSolver.class.getName();
+    clusterKmeansAndLKH.requestContent = exampleProblem;
+
+    var clusterRequest = new ClusterVrpRequest();
+    clusterRequest.requestedSolverId = KmeansClusterer.class.getName();
+
+    var solveRequest = new SolveVrpRequest();
+    solveRequest.requestedSolverId = LkhVrpSolver.class.getName();
+
+    clusterRequest.requestedSubSolveRequests = Map.of(ProblemType.VRP, solveRequest);
+    clusterKmeansAndLKH.requestedSubSolveRequests = Map.of(ProblemType.CLUSTERABLE_VRP, clusterRequest);
+
+
+
+    String smallProblem = metaSolverVrp.getExampleProblems().get(1);
+
+    var clusterTspToQuboAndAnneal = new SolveVrpRequest();
+    clusterTspToQuboAndAnneal.requestedSolverId = ClusterAndSolveVrpSolver.class.getName();
+    clusterTspToQuboAndAnneal.requestContent = smallProblem;
+
+    var clusterTspRequest = new ClusterVrpRequest();
+    clusterTspRequest.requestedSolverId = TwoPhaseClusterer.class.getName();
+
+    var transformQuboRequest = new SolveVrpRequest();
+    transformQuboRequest.requestedSolverId = QuboTspSolver.class.getName();
+
+    var quboRequest = new SolveQuboRequest();
+    quboRequest.requestedSolverId = DwaveQuboSolver.class.getName();
+
+    transformQuboRequest.requestedSubSolveRequests = Map.of(ProblemType.QUBO, quboRequest);
+    clusterTspRequest.requestedSubSolveRequests = Map.of(ProblemType.VRP, transformQuboRequest);
+    clusterTspToQuboAndAnneal.requestedSubSolveRequests = Map.of(ProblemType.CLUSTERABLE_VRP, clusterTspRequest);
+
     
-    return List.of(simpleLKHRequest).stream().map(Arguments::of);
+    return List.of(simpleLKHRequest, clusterKmeansAndLKH, clusterTspToQuboAndAnneal).stream().map(Arguments::of);
   }
 
   @BeforeEach
   void setUp() {  
     this.client = this.client
                              .mutate()
-                             .responseTimeout(Duration.ofSeconds(10)) // Set to 10 seconds
+                             .responseTimeout(Duration.ofSeconds(60)) // Set to 60 seconds
                              .build();
   }
 
