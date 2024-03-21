@@ -17,15 +17,15 @@ import org.springframework.context.ApplicationContext;
  * manages known solvers.
  *
  * @param <InputT> the type of the problem input of {@link ProblemSolver}
- * @param <SolutionT> the type of the solution output of {@link ProblemSolver}
+ * @param <ResultT> the type of the solution output of {@link ProblemSolver}
  * @param <SolverT> the type of {@link ProblemSolver} this meta-solver is to manage
  */
 public abstract class MetaSolver<
     InputT,
-        SolutionT,
-        SolverT extends ProblemSolver<InputT, SolutionT>> {
+    ResultT,
+        SolverT extends ProblemSolver<InputT, ResultT>> {
 
-  private final SolutionManager<SolutionT> solutionManager = new SolutionManager<>();
+  private final SolutionManager<ResultT> solutionManager = new SolutionManager<>();
   private ApplicationContext context;
 
   protected Set<SolverT> solvers = new HashSet<>();
@@ -83,7 +83,7 @@ public abstract class MetaSolver<
     return problemType;
   }
 
-  public SolutionManager<SolutionT> getSolutionManager() {
+  public SolutionManager<ResultT> getSolutionManager() {
     return solutionManager;
   }
 
@@ -91,8 +91,8 @@ public abstract class MetaSolver<
    * Solves a given {@link SolveRequest} by using either the requested {@link ProblemSolver}
    * (if specified, otherwise any solver), and returns the solution.
    */
-  public Solution<SolutionT> solve(SolveRequest<InputT> request) {
-    Solution<SolutionT> solution = this.getSolutionManager().createSolution();
+  public Solution<ResultT> solve(SolveRequest<InputT> request) {
+    Solution<ResultT> solution = this.getSolutionManager().createSolution();
 
     SolverT solver = this
             .getSolver(request.requestedSolverId)
@@ -105,11 +105,9 @@ public abstract class MetaSolver<
                     ? context.getBean(SubRoutinePool.class)
                     : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
 
-    long start = System.currentTimeMillis();
-    solver.solve(request.requestContent, solution, subRoutinePool);
-    long finish = System.currentTimeMillis();
-
-    solution.setExecutionMilliseconds(finish - start);
+    var problem = new Problem<InputT, ResultT>(getProblemType(), subRoutinePool);
+    problem.setInput(request.requestContent);
+    problem.setProblemSolver(solver);
 
     return solution;
   }
