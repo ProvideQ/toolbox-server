@@ -19,7 +19,7 @@ import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 @Component
 public class KmeansClusterer extends VrpClusterer {
 
-    private static final String CLUSTER_SETTING_NAME = "cluster";
+    private static final String CLUSTER_SETTING_NAME = "kmeans-cluster-number";
     
     @Autowired
     public KmeansClusterer(
