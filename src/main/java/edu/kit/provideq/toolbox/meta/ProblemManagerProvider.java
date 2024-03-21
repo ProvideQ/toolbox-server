@@ -16,11 +16,10 @@ public interface ProblemManagerProvider {
   /**
    * Finds the problem manager for the given problem {@code type}.
    */
+  @SuppressWarnings("unchecked") // compiler does not recognize implicit type check, see below
   default <InputT, ResultT> Optional<ProblemManager<InputT, ResultT>> findProblemManagerForType(
-      ProblemType type
+      ProblemType<InputT, ResultT> type
   ) {
-    // suppress warning for a cast that we check explicitly by comparing the problem type
-    //noinspection unchecked
     return getProblemManagers()
         .stream()
         .filter(manager -> manager.getType().equals(type)) // implies type check
