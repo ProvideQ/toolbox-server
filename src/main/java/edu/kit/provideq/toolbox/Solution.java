@@ -23,7 +23,7 @@ public class Solution<S> {
   /**
    * Internal constructor, used for de-serialization.
    */
-  private Solution() {
+  public Solution() {
     this.id = Long.MIN_VALUE;
   }
 

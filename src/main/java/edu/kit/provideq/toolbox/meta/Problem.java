@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.time.Duration;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
  */
 public class Problem<InputT, ResultT> {
   private final UUID id;
-  private final ProblemType type;
+  private final ProblemType<InputT, ResultT> type;
 
   private InputT input;
   private Solution<ResultT> solution;
@@ -30,7 +31,7 @@ public class Problem<InputT, ResultT> {
    *
    * @param type the kind of problem.
    */
-  public Problem(ProblemType type, SubRoutinePool subRoutinePool) {
+  public Problem(ProblemType<InputT, ResultT> type, SubRoutinePool subRoutinePool) {
     this.id = UUID.randomUUID();
     this.type = type;
 
@@ -75,7 +76,7 @@ public class Problem<InputT, ResultT> {
     return id;
   }
 
-  public ProblemType getType() {
+  public ProblemType<InputT, ResultT> getType() {
     return type;
   }
 
@@ -95,8 +96,16 @@ public class Problem<InputT, ResultT> {
     return this.solver;
   }
 
+  public void setSolver(ProblemSolver<InputT, ResultT> solver) {
+    this.solver = solver;
+  }
+
   public void setProblemSolver(ProblemSolver<InputT, ResultT> solver) {
     this.solver = solver;
+  }
+
+  public ProblemState getState() {
+    return this.state;
   }
 
   private void setState(ProblemState newState) {

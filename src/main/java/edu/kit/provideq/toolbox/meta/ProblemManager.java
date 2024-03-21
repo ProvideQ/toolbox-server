@@ -13,7 +13,7 @@ import java.util.UUID;
  * @param <ResultT> the data type of the problem's solution.
  */
 public class ProblemManager<InputT, ResultT> {
-  private final ProblemType type;
+  private final ProblemType<InputT, ResultT> type;
   private final Set<ProblemSolver<InputT, ResultT>> solvers;
   private final Set<Problem<InputT, ResultT>> instances;
   private final Set<Problem<InputT, ResultT>> exampleInstances;
@@ -23,7 +23,7 @@ public class ProblemManager<InputT, ResultT> {
    * Only one problem manager should be created per {@code type}.
    */
   public ProblemManager(
-      ProblemType type,
+      ProblemType<InputT, ResultT> type,
       Set<ProblemSolver<InputT, ResultT>> solvers,
       Set<Problem<InputT, ResultT>> exampleInstances
   ) {
@@ -43,6 +43,20 @@ public class ProblemManager<InputT, ResultT> {
     return this.instances.stream()
         .filter(instance -> instance.getId().equals(id))
         .findAny();
+  }
+
+  /**
+   * Finds a problem solver for this problem manager's {@link #getType() type} with the given
+   * {@code id}.
+   */
+  public Optional<ProblemSolver<InputT, ResultT>> findSolverById(String id) {
+    return this.solvers.stream()
+        .filter(solver -> solver.getId().equals(id))
+        .findAny();
+  }
+
+  public Set<Problem<InputT, ResultT>> getInstances() {
+    return Collections.unmodifiableSet(this.instances);
   }
 
   public void addInstance(Problem<InputT, ResultT> instance) {
@@ -67,7 +81,7 @@ public class ProblemManager<InputT, ResultT> {
     return Collections.unmodifiableSet(this.exampleInstances);
   }
 
-  public ProblemType getType() {
+  public ProblemType<InputT, ResultT> getType() {
     return type;
   }
 }
