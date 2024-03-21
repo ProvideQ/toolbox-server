@@ -1,7 +1,15 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
+import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Set;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -22,4 +30,34 @@ public class VoidModelConfiguration {
       String.class,
       SolveFeatureModelRequest.class
   );
+
+  @Bean
+  ProblemManager<String, String> getVoidModelManager(
+      SatBasedVoidFeatureSolver satSolver,
+      ResourceProvider resourceProvider,
+      SubRoutinePool subRoutinePool
+  ) {
+    return new ProblemManager<>(
+        FEATURE_MODEL_ANOMALY_VOID,
+        Set.of(satSolver),
+        loadExampleProblems(resourceProvider, subRoutinePool)
+    );
+  }
+
+  private Set<Problem<String, String>> loadExampleProblems(
+      ResourceProvider resourceProvider,
+      SubRoutinePool subRoutinePool
+  ) {
+    try {
+      var problemInputStream = Objects.requireNonNull(
+          getClass().getResourceAsStream("sandwich.txt"),
+          "Sandwich example for Void Feature Models is unavailable!"
+      );
+      var problem = new Problem<>(FEATURE_MODEL_ANOMALY_VOID, subRoutinePool);
+      problem.setInput(resourceProvider.readStream(problemInputStream));
+      return Set.of(problem);
+    } catch (IOException e) {
+      throw new RuntimeException("Could not load example problems", e);
+    }
+  }
 }
