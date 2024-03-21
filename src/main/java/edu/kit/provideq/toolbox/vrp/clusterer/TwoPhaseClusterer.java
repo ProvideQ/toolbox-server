@@ -25,25 +25,15 @@ import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 
 @Component
 public class TwoPhaseClusterer extends VrpClusterer {
-    private final ApplicationContext context;
-    private final String binaryDir;
-    private final String binaryName;
-    private ResourceProvider resourceProvider;
     
     @Autowired
     public TwoPhaseClusterer(
         @Value("${vrp.directory}") String binaryDir,
         @Value("${vrp.bin.meta-solver}") String binaryName,
         ApplicationContext context) {
-            this.binaryName = binaryName;
-            this.binaryDir = binaryDir;
-            this.context = context;
+            super(binaryDir, binaryName, context);
     }
 
-    @Autowired
-    public void setResourceProvider(ResourceProvider resourceProvider) {
-        this.resourceProvider = resourceProvider;
-    }
 
     @Override
     public String getName() {
@@ -83,64 +73,8 @@ public class TwoPhaseClusterer extends VrpClusterer {
           return;
         }
 
-        int i = 0;
-
-        // Retrieve the problem directory
-        String problemDirectoryPath;
-        try {
-            problemDirectoryPath = resourceProvider
-                .getProblemDirectory(problem.type(), solution.getId())
-                .getAbsolutePath();
-        } catch (IOException e) {
-            solution.setDebugData("Failed to retrieve problem directory.");
-            solution.abort();
-            return;
-        }
-
-        // solve each subproblem
-        for (var subproblemEntry : processResult.output().orElse(new HashMap<>()).entrySet()) {
-            var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
-            var vrpSolution = vrpSolver.apply(subproblemEntry.getValue());
-            if (vrpSolution.getStatus() == INVALID) {
-                solution.setDebugData(vrpSolution.getDebugData());
-                solution.abort();
-                return;
-            }
-
-            var fileName = subproblemEntry.getKey().getFileName().toString().replace(".vrp", ".sol");
-
-            var solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
-
-            try {
-				Files.writeString(solutionFilePath, vrpSolution.getSolutionData());
-			} catch (IOException e) {
-				solution.setDebugData("Failed to write solution file. Path: " + solutionFilePath.toString());
-                solution.abort();
-                return;
-			}
-        }
-
-        // combine the solution paths
-        var combineProcessRunner = context.getBean(
-          BinaryProcessRunner.class,
-          binaryDir,
-          binaryName,
-          "solve",
-          new String[] { "%1$s", "cluster-from-file", "solution-from-file", "--build-dir", "%3$s/.vrp", "--solution-dir", "%3$s/.vrp", "--cluster-file", "%3$s/.vrp/problem.map"}
-        )
-        .problemFileName("problem.vrp")
-        .solutionFileName("problem.sol")
-        .run(problem.type(), solution.getId(), problem.problemData());
-        
-        
-      if (!combineProcessRunner.success()) {
-        solution.setDebugData(combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
-        solution.abort();
-        return;
-      }
-  
-      solution.setSolutionData(combineProcessRunner.output().orElse("Empty Solution"));
-      solution.complete();
+        // solve the clusters
+        solveClusters(problem, solution, subRoutinePool, processResult);
     }
 
 }

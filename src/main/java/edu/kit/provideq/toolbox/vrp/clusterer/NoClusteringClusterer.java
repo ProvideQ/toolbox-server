@@ -15,12 +15,11 @@ import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
 @Component
 public class NoClusteringClusterer extends VrpClusterer {
-    private final ApplicationContext context;
     
     @Autowired
     public NoClusteringClusterer(
         ApplicationContext context) {
-        this.context = context;
+        super("", "", context);
     }
 
     @Override
