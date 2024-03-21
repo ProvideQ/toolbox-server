@@ -3,8 +3,6 @@ package edu.kit.provideq.toolbox.maxcut.solvers;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;

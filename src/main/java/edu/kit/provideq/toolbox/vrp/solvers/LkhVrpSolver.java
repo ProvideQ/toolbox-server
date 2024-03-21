@@ -1,19 +1,12 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
-import edu.kit.provideq.toolbox.process.ProcessResult;
-import edu.kit.provideq.toolbox.process.ProcessRunner;
-import edu.kit.provideq.toolbox.process.PythonProcessRunner;
-import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;

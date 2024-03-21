@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 public class MultiFileProcessResultReader implements ProcessResultReader<HashMap<Path, String>> {
@@ -33,7 +31,7 @@ public class MultiFileProcessResultReader implements ProcessResultReader<HashMap
             return new ProcessResult<HashMap<Path, String>>(
                 false,
                 Optional.empty(),
-                Optional.of("Error: The problem data couldn't be read from %s:%n%s%nCommand Output: %s".formatted(
+                Optional.of("Error: The problem data couldn't be read from %s:%n%s%nCommand".formatted(
                     solutionPath, e.getMessage()))
             );
         }

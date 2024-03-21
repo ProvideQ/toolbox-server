@@ -31,7 +31,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
     protected final String binaryName;
     protected ResourceProvider resourceProvider;
 
-    public VrpClusterer(
+    protected VrpClusterer(
         String binaryDir,
         String binaryName,
         ApplicationContext context

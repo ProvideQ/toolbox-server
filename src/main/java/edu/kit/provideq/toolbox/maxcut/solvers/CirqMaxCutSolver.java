@@ -3,14 +3,11 @@ package edu.kit.provideq.toolbox.maxcut.solvers;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
