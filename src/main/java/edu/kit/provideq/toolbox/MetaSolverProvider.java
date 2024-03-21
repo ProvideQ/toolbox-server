@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
  * The meta solver provide can be used to find all or specific {@link MetaSolver}s.
  */
 @Component
+@Deprecated
 public class MetaSolverProvider {
   private final Map<ProblemType, MetaSolver<?, ?, ?>> metaSolvers;
 
