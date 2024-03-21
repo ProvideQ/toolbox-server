@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 
 import java.util.List;
 
@@ -18,20 +19,20 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class QrispQuboSolver extends QuboSolver {
-  private final String quboPath;
+  private final String vrpPath;
   private final ApplicationContext context;
 
   @Autowired
   public QrispQuboSolver(
-      @Value("${qiskit.directory.qubo}") String quboPath,
+      @Value("${qrisp.directory.vrp}") String vrpPath,
       ApplicationContext context) {
-    this.quboPath = quboPath;
+    this.vrpPath = vrpPath;
     this.context = context;
   }
 
   @Override
   public String getName() {
-    return "Qrisp QAOA QUBO Solver";
+    return "Qrisp QAOA VRP QUBO Solver";
   }
 
   @Override
@@ -42,9 +43,27 @@ public class QrispQuboSolver extends QuboSolver {
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
                     SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
-    // Run Qrisp solver via console
+    
+    var processRunner = context.getBean(
+        BinaryProcessRunner.class,
+        vrpPath,
+        "../venv/bin/python",
+        "qaoa.py",
+        new String[] {"%1$s", "--output-file", "%2$s", "--size-gate", "4"}
+        )
+        .problemFileName("problem.lp")
+        .solutionFileName("problem.bin");
 
-    solution.setSolutionData("");
+    var processResult = processRunner
+        .run(problem.type(), solution.getId(), problem.problemData());
+        
+    if (!processResult.success()) {
+        solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
+        solution.abort();
+        return;
+    }
+
+    solution.setSolutionData(processResult.output().orElse("Empty Solution"));
     solution.complete();
   }
 }
