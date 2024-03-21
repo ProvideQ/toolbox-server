@@ -196,7 +196,7 @@ public class SolveRouter {
                                 return subSolveRequest;
                               }));
             }, () -> {
-              throw new RuntimeException("no solver found");
+              throw new ServerWebInputException("no solver found");
             });
 
     String requestString;

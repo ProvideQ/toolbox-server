@@ -12,6 +12,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.MetaSolverProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -117,7 +118,7 @@ public class SolverSettingsRouter {
               try {
                 return new ObjectMapper().writeValueAsString(settings);
               } catch (JsonProcessingException e) {
-                throw new RuntimeException("example could not be parsed", e);
+                throw new MissingExampleException("example could not be parsed", e);
               }
             })
             .orElseThrow(() -> new RuntimeException("no solver found"));

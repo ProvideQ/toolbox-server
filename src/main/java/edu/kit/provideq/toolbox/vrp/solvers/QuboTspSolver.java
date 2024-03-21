@@ -70,35 +70,35 @@ public class QuboTspSolver extends VrpSolver {
     }
 
     public static boolean checkVehicleCapacity(String vrp) {
-            int capacity = 0;
-            int totalDemand = 0;
-            boolean demandSection = false;
+        int capacity = 0;
+        int totalDemand = 0;
+        boolean demandSection = false;
 
-            Pattern capacityPattern = Pattern.compile("CAPACITY\\s*:\\s*(\\d+)");
-            Pattern demandPattern = Pattern.compile("\\d+\\s*(\\d+)");
+        Pattern capacityPattern = Pattern.compile("CAPACITY\\s*:\\s*(\\d+)");
+        Pattern demandPattern = Pattern.compile("^\\d+\\s*(\\d+)");
 
-            for ( String line : vrp.split("\n")) {
-                Matcher capacityMatcher = capacityPattern.matcher(line);
-                if (capacityMatcher.find()) {
-                    capacity = Integer.parseInt(capacityMatcher.group(1));
-                }
-                if (line.startsWith("DEMAND_SECTION")) {
-                    demandSection = true;
-                    continue;
-                }
-                if (line.startsWith("EOF")) {
-                    break;
-                }
-                if (demandSection) {
-                    Matcher demandMatcher = demandPattern.matcher(line);
-                    if (demandMatcher.find()) {
-                        totalDemand += Integer.parseInt(demandMatcher.group(1));
-                    }
+        for ( String line : vrp.split("\n")) {
+            Matcher capacityMatcher = capacityPattern.matcher(line);
+            if (capacityMatcher.find()) {
+                capacity = Integer.parseInt(capacityMatcher.group(1));
+            }
+            if (line.startsWith("DEMAND_SECTION")) {
+                demandSection = true;
+                continue;
+            }
+            if (line.startsWith("EOF")) {
+                break;
+            }
+            if (demandSection) {
+                Matcher demandMatcher = demandPattern.matcher(line);
+                if (demandMatcher.find()) {
+                    totalDemand += Integer.parseInt(demandMatcher.group(1));
                 }
             }
-
-            return totalDemand <= capacity;
         }
+
+        return totalDemand <= capacity;
+    }
 
     @Override
     public void solve(Problem<String> problem, Solution<String> solution,

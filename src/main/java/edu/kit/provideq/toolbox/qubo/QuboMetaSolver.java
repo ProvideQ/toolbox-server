@@ -42,7 +42,7 @@ public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
   public QuboSolver findSolver(
           Problem<String> problem,
           List<MetaSolverSetting> metaSolverSettings) {
-    return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
+    return (new ArrayList<>(this.solvers)).get(0);
   }
 
   @Override
