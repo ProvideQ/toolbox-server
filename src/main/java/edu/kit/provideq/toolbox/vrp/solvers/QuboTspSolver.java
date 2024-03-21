@@ -87,7 +87,7 @@ public class QuboTspSolver extends VrpSolver {
                 continue;
             }
             if (line.startsWith("EOF")) {
-                break;
+                demandSection = false;
             }
             if (demandSection) {
                 Matcher demandMatcher = demandPattern.matcher(line);
