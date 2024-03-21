@@ -10,7 +10,6 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
 @Component
@@ -25,19 +24,6 @@ public class NoClusteringClusterer extends VrpClusterer {
     @Override
     public String getName() {
         return "No Clustering VRP Clusterer (Classical)";
-    }
-
-    @Override
-    public List<SubRoutineDefinition> getSubRoutines() {
-        return List.of(
-            new SubRoutineDefinition(ProblemType.VRP,
-                "How should the clusters be solved?")
-        );
-    }
-
-    @Override
-    public boolean canSolve(Problem<String> problem) {
-        return problem.type() == ProblemType.CLUSTERABLE_VRP;
     }
 
     @Override

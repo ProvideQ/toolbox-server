@@ -13,12 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
@@ -38,19 +35,6 @@ public class TwoPhaseClusterer extends VrpClusterer {
     @Override
     public String getName() {
         return "Two Phase VRP To TSP Clusterer (Classical)";
-    }
-
-    @Override
-    public List<SubRoutineDefinition> getSubRoutines() {
-        return List.of(
-            new SubRoutineDefinition(ProblemType.VRP,
-                "How should the clusters be solved?")
-        );
-    }
-
-    @Override
-    public boolean canSolve(Problem<String> problem) {
-        return problem.type() == ProblemType.CLUSTERABLE_VRP;
     }
 
     @Override
