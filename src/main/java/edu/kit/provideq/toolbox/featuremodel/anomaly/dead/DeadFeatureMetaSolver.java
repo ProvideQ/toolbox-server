@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the meta solver for the {@link ProblemType#FEATURE_MODEL_ANOMALY_DEAD} problem.
+ * This is the meta solver for the {@link DeadFeatureConfiguration#FEATURE_MODEL_ANOMALY_DEAD}
+ * problem.
  */
 @Component
 public class DeadFeatureMetaSolver
@@ -25,7 +26,7 @@ public class DeadFeatureMetaSolver
           @Value("${examples.directory.feature-model}") String examplesDirectoryPath,
           ResourceProvider resourceProvider,
           SatBasedDeadFeatureSolver solver) {
-    super(ProblemType.FEATURE_MODEL_ANOMALY_DEAD, solver);
+    super(DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD, solver);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }

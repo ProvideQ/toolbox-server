@@ -29,7 +29,7 @@ public class MetaSolverMaxCut extends MetaSolver<String, String, MaxCutSolver> {
           QiskitMaxCutSolver qiskitMaxCutSolver,
           GamsMaxCutSolver gamsMaxCutSolver,
           CirqMaxCutSolver cirqMaxCutSolver) {
-    super(ProblemType.MAX_CUT, qiskitMaxCutSolver, gamsMaxCutSolver, cirqMaxCutSolver);
+    super(MaxCutConfiguration.MAX_CUT, qiskitMaxCutSolver, gamsMaxCutSolver, cirqMaxCutSolver);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }

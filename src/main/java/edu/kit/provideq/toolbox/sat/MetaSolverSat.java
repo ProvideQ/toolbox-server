@@ -26,7 +26,7 @@ public class MetaSolverSat extends MetaSolver<String, DimacsCnfSolution, SatSolv
           @Value("${examples.directory.sat}") String examplesDirectoryPath,
           ResourceProvider resourceProvider,
           GamsSatSolver gamsSatSolver) {
-    super(ProblemType.SAT, gamsSatSolver);
+    super(SatConfiguration.SAT, gamsSatSolver);
     //TODO: register more SAT Solvers
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;

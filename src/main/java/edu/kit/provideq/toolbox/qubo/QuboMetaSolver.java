@@ -25,7 +25,7 @@ public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
       @Value("${examples.directory.qubo}") String examplesDirectoryPath,
       ResourceProvider resourceProvider,
       QiskitQuboSolver qiskitQuboSolver) {
-    super(ProblemType.QUBO, qiskitQuboSolver);
+    super(QuboConfiguration.QUBO, qiskitQuboSolver);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }

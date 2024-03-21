@@ -9,13 +9,14 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import java.util.List;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
 
 /**
- * This problem solver solves the {@link ProblemType#FEATURE_MODEL_ANOMALY_VOID} problem by building
- * {@link ProblemType#SAT} formula that is solved by a corresponding solver.
+ * This problem solver solves the {@link VoidModelConfiguration#FEATURE_MODEL_ANOMALY_VOID} problem
+ * by building {@link SatConfiguration#SAT} formula that is solved by a corresponding solver.
  */
 @Component
 public class SatBasedVoidFeatureSolver
@@ -28,7 +29,7 @@ public class SatBasedVoidFeatureSolver
   @Override
   public List<SubRoutineDefinition> getSubRoutines() {
     return List.of(
-        new SubRoutineDefinition(ProblemType.SAT,
+        new SubRoutineDefinition(SatConfiguration.SAT,
             "Used to determine if there is any valid configurations of the Feature Model"));
   }
 
@@ -45,7 +46,7 @@ public class SatBasedVoidFeatureSolver
       return;
     }
 
-    var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
+    var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(SatConfiguration.SAT);
     checkVoidFeatureModel(solution, cnf, satSolve);
   }
 
@@ -73,7 +74,7 @@ public class SatBasedVoidFeatureSolver
   }
 
   @Override
-  public ProblemType getProblemType() {
-    return ProblemType.FEATURE_MODEL_ANOMALY_VOID;
+  public ProblemType<String, String> getProblemType() {
+    return VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID;
   }
 }

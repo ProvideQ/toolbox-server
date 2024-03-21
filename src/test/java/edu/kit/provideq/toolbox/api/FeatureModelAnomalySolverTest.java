@@ -11,10 +11,12 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureConfiguration;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureMetaSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.SatBasedDeadFeatureSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.SatBasedVoidFeatureSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidFeatureMetaSolver;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidModelConfiguration;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -61,11 +63,16 @@ class FeatureModelAnomalySolverTest {
   Stream<Arguments> provideArguments() {
     // Return combined stream
     return Stream.concat(
-            getArguments(voidMetaSolver, ProblemType.FEATURE_MODEL_ANOMALY_VOID),
-            getArguments(deadFeatureMetaSolver, ProblemType.FEATURE_MODEL_ANOMALY_DEAD));
+            getArguments(voidMetaSolver,
+                VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID),
+            getArguments(deadFeatureMetaSolver,
+                DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD));
   }
 
-  static Stream<Arguments> getArguments(MetaSolver<?, ?, ?> metaSolver, ProblemType problemType) {
+  static <InputT, ResultT> Stream<Arguments> getArguments(
+      MetaSolver<InputT, ResultT, ?> metaSolver,
+      ProblemType<InputT, ResultT> problemType
+  ) {
     return MetaSolverHelper.getAllArgumentCombinations(metaSolver)
             .map(list -> Arguments.of(
                     list.get(0),
@@ -78,7 +85,7 @@ class FeatureModelAnomalySolverTest {
   @MethodSource("provideArguments")
   void testFeatureModelAnomalySolver(
       Class<? extends ProblemSolver<String, String>> solver,
-      ProblemType anomalyType,
+      ProblemType<String, String> anomalyType,
       SolutionStatus expectedStatus,
       String content) {
     var req = new SolveFeatureModelRequest();

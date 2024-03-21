@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the meta solver for the {@link ProblemType#FEATURE_MODEL_ANOMALY_VOID} problem.
+ * This is the meta solver for the {@link VoidModelConfiguration#FEATURE_MODEL_ANOMALY_VOID}
+ * problem.
  */
 @Component
 public class VoidFeatureMetaSolver
@@ -25,7 +26,7 @@ public class VoidFeatureMetaSolver
           @Value("${examples.directory.feature-model}") String examplesDirectoryPath,
           ResourceProvider resourceProvider,
           SatBasedVoidFeatureSolver solver) {
-    super(ProblemType.FEATURE_MODEL_ANOMALY_VOID, solver);
+    super(VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID, solver);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }

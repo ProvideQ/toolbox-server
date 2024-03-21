@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @param <InputT> the input type of the problems this solver can solve.
  */
-public interface ProblemSolver<InputT, SolutionT> {
+public interface ProblemSolver<InputT, ResultT> {
   /**
    * Returns an id which is unique to the solver.
    *
@@ -45,11 +45,11 @@ public interface ProblemSolver<InputT, SolutionT> {
    * @param solution the {@link Solution} in which all resulting information is to be stored
    * @param subRoutinePool {@link SubRoutinePool} pool to retrieve sub routine from
    */
-  void solve(InputT input, Solution<SolutionT> solution,
+  void solve(InputT input, Solution<ResultT> solution,
              SubRoutinePool subRoutinePool);
 
   /**
    * Returns the problem type that can be solved by this problem solver.
    */
-  ProblemType getProblemType();
+  ProblemType<InputT, ResultT> getProblemType();
 }

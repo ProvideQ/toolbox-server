@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
+import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 
@@ -8,7 +9,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
  */
 public abstract class MaxCutSolver implements ProblemSolver<String, String> {
   @Override
-  public ProblemType getProblemType() {
-    return ProblemType.MAX_CUT;
+  public ProblemType<String, String> getProblemType() {
+    return MaxCutConfiguration.MAX_CUT;
   }
 }

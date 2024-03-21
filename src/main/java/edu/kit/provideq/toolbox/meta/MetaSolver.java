@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationContext;
  * @param <ResultT> the type of the solution output of {@link ProblemSolver}
  * @param <SolverT> the type of {@link ProblemSolver} this meta-solver is to manage
  */
+@Deprecated
 public abstract class MetaSolver<
     InputT,
     ResultT,

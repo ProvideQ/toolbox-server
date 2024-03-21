@@ -11,14 +11,16 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
 
 /**
- * This problem solver solves the {@link ProblemType#FEATURE_MODEL_ANOMALY_DEAD} problem by building
- * {@link ProblemType#SAT} formulae that are solved by a corresponding solver.
+ * This problem solver solves the {@link DeadFeatureConfiguration#FEATURE_MODEL_ANOMALY_DEAD}
+ * problem by building {@link SatConfiguration#SAT} formulae that are solved by a corresponding
+ * solver.
  */
 @Component
 public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> {
@@ -30,7 +32,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   @Override
   public List<SubRoutineDefinition> getSubRoutines() {
     return List.of(
-        new SubRoutineDefinition(ProblemType.SAT,
+        new SubRoutineDefinition(SatConfiguration.SAT,
             "Called per feature to determine if it is dead"));
   }
 
@@ -47,13 +49,13 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
       return;
     }
 
-    var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(ProblemType.SAT);
+    var satSolve = subRoutinePool.<String, DimacsCnfSolution>getSubRoutine(SatConfiguration.SAT);
     checkDeadFeatures(solution, cnf, satSolve);
   }
 
   @Override
-  public ProblemType getProblemType() {
-    return ProblemType.FEATURE_MODEL_ANOMALY_DEAD;
+  public ProblemType<String, String> getProblemType() {
+    return DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD;
   }
 
   private static void checkDeadFeatures(Solution<String> solution, String cnf,
