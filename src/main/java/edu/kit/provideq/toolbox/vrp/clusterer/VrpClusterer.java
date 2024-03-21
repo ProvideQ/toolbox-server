@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -16,6 +17,7 @@ import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 
@@ -42,6 +44,18 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
     @Autowired
     public void setResourceProvider(ResourceProvider resourceProvider) {
         this.resourceProvider = resourceProvider;
+    }
+
+    @Override
+    public List<SubRoutineDefinition> getSubRoutines() {
+        return List.of(
+            new SubRoutineDefinition(ProblemType.VRP,
+                "How should the clusters be solved?")
+        );
+    }
+    @Override
+    public boolean canSolve(Problem<String> problem) {
+        return problem.type() == ProblemType.CLUSTERABLE_VRP;
     }
 
     public void solveClusters(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool, ProcessResult<HashMap<Path, String>> cluster) {
