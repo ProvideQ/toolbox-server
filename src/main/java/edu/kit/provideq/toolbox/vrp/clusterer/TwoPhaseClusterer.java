@@ -1,11 +1,5 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
-import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -58,7 +58,7 @@ public class SolverSettingsRouter {
       MetaSolver<?, ?, ?> metaSolver) {
     var problemType = metaSolver.getProblemType();
     return route().GET(
-        getSettingssRouteForProblemType(problemType),
+        getSettingsRouteForProblemType(problemType),
         req -> handleSettingsRouteForMetaSolver(metaSolver, req),
         ops -> handleSettingsRouteDocumentation(metaSolver, ops)
     ).build();
@@ -66,20 +66,20 @@ public class SolverSettingsRouter {
 
   private Mono<ServerResponse> handleSettingsRouteForMetaSolver(MetaSolver<?, ?, ?> metaSolver,
                                                                   ServerRequest req) {
-    var Settingss = req.queryParam("id")
+    var settings = req.queryParam("id")
         .flatMap(metaSolver::getSolver)
         .map(ProblemSolver::getSettings)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Could not find a solver for this problem with this solver id!"));
 
-    return ok().body(Mono.just(Settingss), new ParameterizedTypeReference<>() {
+    return ok().body(Mono.just(settings), new ParameterizedTypeReference<>() {
     });
   }
 
   private void handleSettingsRouteDocumentation(
           MetaSolver<?, ?, ?> metaSolver, org.springdoc.core.fn.builders.operation.Builder ops) {
     ProblemType problemType = metaSolver.getProblemType();
-    ops.operationId(getSettingssRouteForProblemType(problemType))
+    ops.operationId(getSettingsRouteForProblemType(problemType))
             .parameter(getParameterBuilder(metaSolver))
             .tag(problemType.getId())
             .description("Returns the settings available for the given solver id of type "
@@ -131,7 +131,7 @@ public class SolverSettingsRouter {
                     schemaBuilder().implementation(MetaSolverSetting.class)));
   }
 
-  private String getSettingssRouteForProblemType(ProblemType type) {
+  private String getSettingsRouteForProblemType(ProblemType type) {
     return "/settings/" + type.getId();
   }
 }

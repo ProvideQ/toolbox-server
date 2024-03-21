@@ -5,7 +5,6 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.meta.setting.Select;
 import edu.kit.provideq.toolbox.vrp.MetaSolverVrp;
 
 import java.io.IOException;
@@ -39,7 +38,6 @@ public class MetaSolverClusterVrp extends MetaSolver<String, String, VrpClustere
 
   @Override
   public VrpClusterer findSolver(Problem<String> problem, List<MetaSolverSetting> metaSolverSettings) {
-    // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
 

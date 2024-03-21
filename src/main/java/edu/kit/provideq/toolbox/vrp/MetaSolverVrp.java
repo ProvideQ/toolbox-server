@@ -5,7 +5,6 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.meta.setting.Select;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.QuboTspSolver;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +37,6 @@ public class MetaSolverVrp extends MetaSolver<String, String, VrpSolver> {
 
   @Override
   public VrpSolver findSolver(Problem<String> problem, List<MetaSolverSetting> metaSolverSettings) {
-    // todo add decision
     return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
   }
 

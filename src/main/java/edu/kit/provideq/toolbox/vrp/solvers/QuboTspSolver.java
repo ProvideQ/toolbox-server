@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
-import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
@@ -117,7 +116,7 @@ public class QuboTspSolver extends VrpSolver {
             .solutionFileName("problem.lp")
             .run(problem.type(), solution.getId(), problem.problemData());
         
-        if (!processResult.success()) {
+        if (!processResult.success() || processResult.output().isEmpty()) {
             solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
             solution.abort();
             return;

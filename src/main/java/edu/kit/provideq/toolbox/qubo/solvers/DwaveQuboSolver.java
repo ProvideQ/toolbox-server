@@ -1,12 +1,10 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
-import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.setting.IntegerSetting;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.Select;
 import edu.kit.provideq.toolbox.meta.setting.Text;

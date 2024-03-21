@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 
 /**

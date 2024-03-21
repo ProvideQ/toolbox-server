@@ -7,13 +7,11 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 
-import static edu.kit.provideq.toolbox.SolutionStatus.ERROR;
 import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
