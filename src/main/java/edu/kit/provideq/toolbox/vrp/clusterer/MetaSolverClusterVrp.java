@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -38,7 +39,7 @@ public class MetaSolverClusterVrp extends MetaSolver<String, String, VrpClustere
 
   @Override
   public VrpClusterer findSolver(Problem<String> problem, List<MetaSolverSetting> metaSolverSettings) {
-    return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
+    return (new ArrayList<>(this.solvers)).get(0);
   }
 
   @Override
@@ -50,7 +51,7 @@ public class MetaSolverClusterVrp extends MetaSolver<String, String, VrpClustere
       );
       return List.of(resourceProvider.readStream(problemStream));
     } catch (IOException e) {
-      throw new RuntimeException("Could not load example problems", e);
+      throw new MissingExampleException("Could not load example problems", e);
     }
   }
 }

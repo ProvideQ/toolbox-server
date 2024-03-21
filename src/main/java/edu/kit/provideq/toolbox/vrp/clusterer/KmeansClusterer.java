@@ -46,7 +46,7 @@ public class KmeansClusterer extends VrpClusterer {
             .filter(setting -> setting.name.equals(CLUSTER_SETTING_NAME))
             .map(setting -> (IntegerSetting) setting)
             .findFirst()
-            .map(setting -> setting.number)
+            .map(setting -> setting.getNumber())
             .orElse(3);
 
         // cluster with kmeans
