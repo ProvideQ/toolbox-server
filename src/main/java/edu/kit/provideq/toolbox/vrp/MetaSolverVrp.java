@@ -8,6 +8,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
+import edu.kit.provideq.toolbox.vrp.solvers.QrispVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.QuboTspSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.VrpSolver;
 
@@ -30,8 +31,9 @@ public class MetaSolverVrp extends MetaSolver<String, String, VrpSolver> {
           ResourceProvider resourceProvider,
           ClusterAndSolveVrpSolver clusterAndSolveVrpSolver,
           LkhVrpSolver lkhVrpSolver,
-          QuboTspSolver quboTspSolver) {
-    super(ProblemType.VRP, clusterAndSolveVrpSolver, lkhVrpSolver, quboTspSolver);
+          QuboTspSolver quboTspSolver,
+          QrispVrpSolver qrispVrpSolver) {
+    super(ProblemType.VRP, clusterAndSolveVrpSolver, lkhVrpSolver, quboTspSolver, qrispVrpSolver);
     this.resourceProvider = resourceProvider;
   }
 
