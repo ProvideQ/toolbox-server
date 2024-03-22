@@ -48,7 +48,9 @@ distance_matrix, scaling = normalize_vrp(distance_matrix, city_demand, max_cap)
 
 print(distance_matrix)
 
-dump_length, _ = calc_paths(distance_matrix, city_demand, max_cap, [1, 2, 3])
+dump_length, _ = calc_paths(
+    distance_matrix, city_demand, max_cap, np.arange(1, city_amount)
+)
 
 precision = 5 + int(ceil(np.log2(scaling)) / 2)
 
