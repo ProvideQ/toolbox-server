@@ -14,19 +14,40 @@ def swap_to_front(qa, index):
         demux(qa[0], index, qa, permit_mismatching_size=True)
 
 
-def eval_perm(perm_specifiers, city_amount):
+def eval_perm(perm_specifiers, city_amount, qa=None):
     N = len(perm_specifiers)
 
     # To filter out the cyclic permutations, we impose that the first city is always city 0
     # We will have to consider this assumption later when calculating the route distance
     # by manually adding the trip distance of the first trip (from city 0) and the
     # last trip (to city 0)
-    qa = QuantumArray(QuantumFloat(int(np.ceil(np.log2(city_amount)))), city_amount - 1)
+    if qa is None:
+        qa = QuantumArray(
+            QuantumFloat(int(np.ceil(np.log2(city_amount)))), city_amount - 1
+        )
 
-    qa[:] = np.arange(1, city_amount)
+    for i in range(city_amount - 1):
+        qa[i] += i + 1
 
     for i in range(N):
         swap_to_front(qa[i:], perm_specifiers[i])
+
+    return qa
+
+
+def eval_perm_backward(perm_specifiers, city_amount, qa=None):
+    N = len(perm_specifiers)
+
+    # To filter out the cyclic permutations, we impose that the first city is always city 0
+    # We will have to consider this assumption later when calculating the route distance
+    # by manually adding the trip distance of the first trip (from city 0) and the
+    # last trip (to city 0)
+
+    for i in reversed(range(N)):
+        demux(qa[i], perm_specifiers[i], qa[i:], permit_mismatching_size=True)
+
+    for i in range(city_amount - 1):
+        qa[i] -= i + 1
 
     return qa
 
@@ -53,7 +74,7 @@ def eval_perm_old(perm_specifiers, city_amount, qa=None):
 
 
 # Create function that returns QuantumFloats specifying the permutations (these will be in uniform superposition)
-def create_perm_specifiers(city_amount, init_seq=None):
+def create_perm_specifiers(city_amount, init_seq=None) -> list[QuantumFloat]:
     perm_specifiers = []
 
     for i in range(city_amount - 1):
