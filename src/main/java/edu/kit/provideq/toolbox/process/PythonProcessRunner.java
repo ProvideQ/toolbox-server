@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.process;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,6 +35,6 @@ public class PythonProcessRunner extends ProcessRunner {
    */
   public PythonProcessRunner(String directory, String scriptFileName, String... arguments) {
     super(
-        createGenericProcessBuilder(directory, PYTHON_EXECUTABLE_NAME, scriptFileName, arguments));
+        createGenericProcessBuilder(directory, PYTHON_EXECUTABLE_NAME, scriptFileName), arguments);
   }
 }

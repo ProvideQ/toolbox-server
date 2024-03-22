@@ -1,12 +1,17 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.process;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.Map.Entry;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,19 +40,26 @@ public class ProcessRunner {
   protected final ProcessBuilder processBuilder;
   protected ResourceProvider resourceProvider;
 
-  private String problemFilePathCommandFormat;
-  private String solutionFilePathCommandFormat;
+
+  private final String[] arguments;
+  private HashMap<String, String> env;
+
+  private String[] problemFilePathCommandFormat;
+  private String[] solutionFilePathCommandFormat;
   private String problemFileName = PROBLEM_FILE_NAME;
   private String solutionFileName = SOLUTION_FILE_NAME;
 
-  public ProcessRunner(ProcessBuilder processBuilder) {
+  public ProcessRunner(ProcessBuilder processBuilder, String[] arguments) {
     this.processBuilder = processBuilder;
+    this.arguments = arguments;
+    this.env = new HashMap<>();
   }
 
   @Autowired
   public void setResourceProvider(ResourceProvider resourceProvider) {
     this.resourceProvider = resourceProvider;
   }
+  
 
   /**
    * Adds another command to the process builder.
@@ -67,7 +79,7 @@ public class ProcessRunner {
    *                               the path to a file that contains the problem data.
    * @return Returns this instance for chaining.
    */
-  public ProcessRunner addProblemFilePathToProcessCommand(String inputPathCommandFormat) {
+  public ProcessRunner addProblemFilePathToProcessCommand(String... inputPathCommandFormat) {
     this.problemFilePathCommandFormat = inputPathCommandFormat;
 
     return this;
@@ -91,7 +103,7 @@ public class ProcessRunner {
    *                                the path to a file that contains the solution data.
    * @return Returns this instance for chaining.
    */
-  public ProcessRunner addSolutionFilePathToProcessCommand(String outputPathCommandFormat) {
+  public ProcessRunner addSolutionFilePathToProcessCommand(String... outputPathCommandFormat) {
     this.solutionFilePathCommandFormat = outputPathCommandFormat;
 
     return this;
@@ -123,6 +135,7 @@ public class ProcessRunner {
 
   /**
    * Runs the process provided in the constructor.
+   * @param <T>
    *
    * @param problemType The type of the problem that is run
    * @param solutionId  The id of the resulting solution
@@ -130,7 +143,22 @@ public class ProcessRunner {
    * @return Returns the process result, which contains the solution data
    *     or an error as output depending on the success of the process.
    */
-  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+  public ProcessResult<String> run(ProblemType problemType, long solutionId, String problemData) {
+    return run(problemType, solutionId, problemData, new SimpleProcessResultReader());
+  }
+
+  /**
+   * Runs the process provided in the constructor.
+   * @param <T>
+   *
+   * @param problemType The type of the problem that is run
+   * @param solutionId  The id of the resulting solution
+   * @param problemData The problem data that should be solved
+   * @param reader     The reader that retrieves the output of the process
+   * @return Returns the process result, which contains the solution data
+   *     or an error as output depending on the success of the process.
+   */
+  public <T> ProcessResult<T> run(ProblemType problemType, long solutionId, String problemData, ProcessResultReader<T> reader) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {
@@ -138,9 +166,10 @@ public class ProcessRunner {
           .getProblemDirectory(problemType, solutionId)
           .getAbsolutePath();
     } catch (IOException e) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage())
+          Optional.empty(),
+          Optional.of("Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage()))
       );
     }
 
@@ -155,21 +184,34 @@ public class ProcessRunner {
     try {
       Files.writeString(problemFilePath, problemData);
     } catch (IOException e) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "Error: The problem data couldn't be written to %s:%n%s".formatted(
-              normalizedProblemFilePath, e.getMessage())
+          Optional.empty(),
+          Optional.of("Error: The problem data couldn't be written to %s:%n%s".formatted(
+              normalizedProblemFilePath, e.getMessage()))
       );
+    }
+
+    for (String argument : arguments) {
+      addCommand(argument.formatted(normalizedProblemFilePath, normalizedSolutionFilePath, problemDirectoryPath));
+    }
+
+    for (Entry<String, String> entry : env.entrySet()) {
+      addEnvironmentVariableToBuilder(entry.getKey(), entry.getValue());
     }
 
     // Optionally add the problem file path to the command
     if (problemFilePathCommandFormat != null) {
-      addCommand(problemFilePathCommandFormat.formatted(normalizedProblemFilePath));
+      for (String format : problemFilePathCommandFormat) {
+        addCommand(format.formatted(normalizedProblemFilePath));
+      }
     }
 
     // Optionally add the solution path to the command
     if (solutionFilePathCommandFormat != null) {
-      addCommand(solutionFilePathCommandFormat.formatted(normalizedSolutionFilePath));
+      for (String format : solutionFilePathCommandFormat) {
+        addCommand(format.formatted(normalizedSolutionFilePath));
+      }
     }
 
     // Run the process
@@ -183,37 +225,35 @@ public class ProcessRunner {
 
       processExitCode = process.waitFor();
     } catch (IOException | InterruptedException e) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "Solving %s problem resulted in exception:%n%s".formatted(problemType, e.getMessage())
+          Optional.empty(),
+          Optional.of(
+            "Solving %s problem resulted in exception:%n%s".formatted(problemType, e.getMessage())
+          )
       );
     }
 
     // Return prematurely if the process failed
     if (processExitCode != 0) {
-      return new ProcessResult(
+      return new ProcessResult<T>(
           false,
-          "%s problem couldn't be solved:%n%s".formatted(problemType, processOutput));
+          Optional.empty(),
+          Optional.of("%s problem couldn't be solved:%n%s".formatted(problemType, processOutput)));
     }
 
     // Read the solution file
-    String solutionText;
-    try {
-      solutionText = Files.readString(solutionFile);
-    } catch (IOException e) {
-      return new ProcessResult(
-          false,
-          "Error: The problem data couldn't be read from %s:%n%s".formatted(
-              normalizedProblemFilePath, e.getMessage())
+    ProcessResult<T> result = reader.read(solutionFile, problemFilePath, Path.of(problemDirectoryPath));
+
+    if (!result.success()) {
+      return new ProcessResult<T>(
+          result.success(),
+          result.output(),
+          result.errorOutput().isPresent() ? Optional.of(result.errorOutput().get() + "%nCommand Output: %s".formatted(processOutput)) : Optional.empty()
       );
     }
-
-    // Return the solution
-    return new ProcessResult(
-        true,
-        solutionText
-    );
-
+    
+    return result;
   }
 
   private void addCommand(String command) {
@@ -222,15 +262,21 @@ public class ProcessRunner {
     processBuilder.command(existingCommands);
   }
 
+  public void addEnvironmentVariable(String key, String value) {
+    env.put(key, value);
+  }
+
+  private void addEnvironmentVariableToBuilder(String key, String value) {
+    processBuilder.environment().put(key, value);
+  }
+
   protected static ProcessBuilder createGenericProcessBuilder(
       String directory,
       String executableName,
-      String scriptName,
-      String... arguments) {
-    String[] commands = new String[arguments.length + 2];
+      String scriptName) {
+    String[] commands = new String[2];
     commands[0] = executableName;
     commands[1] = scriptName;
-    System.arraycopy(arguments, 0, commands, 2, arguments.length);
 
     return new ProcessBuilder()
         .directory(new File(directory))

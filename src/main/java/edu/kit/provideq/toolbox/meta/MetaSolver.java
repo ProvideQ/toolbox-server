@@ -106,9 +106,13 @@ public abstract class MetaSolver<
     Solution<SolutionT> solution = this.getSolutionManager().createSolution();
     Problem<ProblemT> problem = new Problem<>(request.requestContent, this.getProblemType());
 
+    List<MetaSolverSetting> metaSolverSettings = request.requestedMetaSolverSettings != null
+            ? request.requestedMetaSolverSettings
+            : List.of();
+
     SolverT solver = this
             .getSolver(request.requestedSolverId)
-            .orElseGet(() -> this.findSolver(problem, request.requestedMetaSolverSettings));
+            .orElseGet(() -> this.findSolver(problem, metaSolverSettings));
 
     solution.setSolverName(solver.getName());
 
@@ -118,7 +122,7 @@ public abstract class MetaSolver<
                     : context.getBean(SubRoutinePool.class, request.requestedSubSolveRequests);
 
     long start = System.currentTimeMillis();
-    solver.solve(problem, solution, subRoutinePool);
+    solver.solve(problem, solution, subRoutinePool, metaSolverSettings);
     long finish = System.currentTimeMillis();
 
     solution.setExecutionMilliseconds(finish - start);

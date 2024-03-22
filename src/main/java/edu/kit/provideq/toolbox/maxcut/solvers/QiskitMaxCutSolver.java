@@ -1,12 +1,15 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +47,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     // Parse GML to add partition data to
     Gml gml;
     try {
@@ -67,13 +70,13 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     // Return if process failed
     if (!processResult.success()) {
-      solution.setDebugData(processResult.output());
+      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.fail();
       return;
     }
 
     // Parse solution data and add partition data to GML
-    Optional<String> solutionLine = processResult.output()
+    Optional<String> solutionLine = processResult.output().orElse("")
             .lines()
             .filter(s -> s.startsWith(SOLUTION_LINE_PREFIX))
             .findFirst();

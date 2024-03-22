@@ -5,12 +5,13 @@ import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QuboSolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,8 +29,10 @@ public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
   public QuboMetaSolver(
       @Value("${examples.directory.qubo}") String examplesDirectoryPath,
       ResourceProvider resourceProvider,
-      QiskitQuboSolver qiskitQuboSolver) {
-    super(ProblemType.QUBO, qiskitQuboSolver);
+      QiskitQuboSolver qiskitQuboSolver,
+      QrispQuboSolver qrispQuboSolver,
+      DwaveQuboSolver dwaveQuboSolver) {
+    super(ProblemType.QUBO, qiskitQuboSolver, qrispQuboSolver, dwaveQuboSolver);
     this.examplesDirectoryPath = examplesDirectoryPath;
     this.resourceProvider = resourceProvider;
   }
@@ -38,7 +41,7 @@ public class QuboMetaSolver extends MetaSolver<String, String, QuboSolver> {
   public QuboSolver findSolver(
           Problem<String> problem,
           List<MetaSolverSetting> metaSolverSettings) {
-    return (new ArrayList<>(this.solvers)).get((new Random()).nextInt(this.solvers.size()));
+    return (new ArrayList<>(this.solvers)).get(0);
   }
 
   @Override

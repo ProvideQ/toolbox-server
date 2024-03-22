@@ -5,15 +5,16 @@ public class BoundedInteger extends MetaSolverSetting {
   public double max;
   public double value;
 
-  public BoundedInteger(String name, double min, double max) {
-    this(name, min, max, (max - min) / 2);
+  public BoundedInteger(String name, String title, double min, double max) {
+    this(name, title, min, max, (max - min) / 2);
   }
 
-  public BoundedInteger(String name, double min, double max, double value) {
-    super(name, MetaSolverSettingType.RANGE);
+  public BoundedInteger(String name, String title, double min, double max, double value) {
+    super(name, title, MetaSolverSettingType.RANGE);
 
     this.min = min;
     this.max = max;
     this.value = value;
   }
+
 }

@@ -1,12 +1,14 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.GamsProcessRunner;
+import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -41,7 +43,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     // Run MaxCut with GAMS via console
     var processResult = context
         .getBean(
@@ -52,12 +54,12 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
     // Return if process failed
     if (!processResult.success()) {
-      solution.setDebugData("GAMS process failed: " + processResult.output());
+      solution.setDebugData("GAMS process failed: " + processResult.errorOutput());
       solution.fail();
       return;
     }
 
-    solution.setSolutionData(processResult.output());
+    solution.setSolutionData(processResult.output().orElse("Empty Solution"));
     solution.complete();
   }
 }

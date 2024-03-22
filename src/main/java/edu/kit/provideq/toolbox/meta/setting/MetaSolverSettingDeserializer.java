@@ -20,17 +20,22 @@ public class MetaSolverSettingDeserializer extends JsonDeserializer<MetaSolverSe
 
     // Get type
     MetaSolverSettingType type = MetaSolverSettingType.valueOf(node.get("type").asText());
+    
 
+    var name = node.get("name").asText();
+    var title = node.get("title").asText();
     // Create subclass based on the type
     switch (type) {
       case CHECKBOX -> {
         return new BooleanState(
-            node.get("name").asText(),
+            name,
+            title,
             node.get("state").asBoolean());
       }
       case RANGE -> {
         return new BoundedInteger(
-            node.get("name").asText(),
+            name,
+            title,
             node.get("min").asDouble(),
             node.get("max").asDouble(),
             node.get("value").asDouble());
@@ -42,14 +47,22 @@ public class MetaSolverSettingDeserializer extends JsonDeserializer<MetaSolverSe
           options.add(codec.treeToValue(optionNode, Object.class).toString());
         }
         return new Select<>(
-            node.get("name").asText(),
+            name,
+            title,
             options,
             codec.treeToValue(node.get("selectedOption"), Object.class).toString());
       }
       case TEXT -> {
         return new Text(
-            node.get("name").asText(),
+            name,
+            title,
             node.get("text").asText());
+      }
+      case INTEGER -> {
+        return new IntegerSetting(
+            name,
+            title,
+            node.get("number").asInt());
       }
       default -> throw new IllegalArgumentException("Invalid MetaSolverSettingType: " + type);
     }

@@ -10,6 +10,8 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+
 import java.util.List;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
@@ -40,7 +42,7 @@ public class SatBasedVoidFeatureSolver
 
   @Override
   public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     // Convert uvl to cnf
     String cnf;
     try {

@@ -1,0 +1,4 @@
+qrisp == 0.4.4
+numpy == 1.26.4
+gurobipy == 11.0.1 # for lp file reading
+tsplib95 == 0.7.1 # for tsplib file parsing
