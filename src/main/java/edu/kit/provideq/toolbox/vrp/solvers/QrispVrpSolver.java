@@ -49,7 +49,7 @@ public class QrispVrpSolver extends VrpSolver {
           scriptDir,
           "../venv/bin/python",
           "grover.py",
-          new String[] {"--size-gate", "30"}
+          new String[] {"--size-gate", "35"}
         )
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand("--output-file", "%s")
