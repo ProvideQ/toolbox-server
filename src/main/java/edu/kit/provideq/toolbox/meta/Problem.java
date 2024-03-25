@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import java.time.Duration;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
@@ -27,8 +26,7 @@ public class Problem<InputT, ResultT> {
    *
    * @param type the kind of problem.
    */
-  public Problem(ProblemType<InputT, ResultT> type,
-      SubRoutinePool subRoutinePool /* TODO remove */) {
+  public Problem(ProblemType<InputT, ResultT> type) {
     this.id = UUID.randomUUID();
     this.type = type;
 

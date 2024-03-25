@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.maxcut;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
@@ -36,26 +35,22 @@ public class MaxCutConfiguration {
       QiskitMaxCutSolver qiskitSolver,
       GamsMaxCutSolver gamsSolver,
       CirqMaxCutSolver cirqSolver,
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
+      ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         MAX_CUT,
         Set.of(qiskitSolver, gamsSolver, cirqSolver),
-        loadExampleProblems(resourceProvider, subRoutinePool)
+        loadExampleProblems(resourceProvider)
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
-  ) {
+  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("3-nodes-3-edges.txt"),
           "3-nodes-3-edges example for MaxCut is unavailable!"
       );
-      var problem = new Problem<>(MAX_CUT, subRoutinePool);
+      var problem = new Problem<>(MAX_CUT);
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {

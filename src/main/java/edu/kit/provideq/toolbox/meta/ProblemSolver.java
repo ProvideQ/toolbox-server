@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import java.util.Collections;
 import java.util.List;
 import reactor.core.publisher.Mono;
@@ -43,7 +42,7 @@ public interface ProblemSolver<InputT, ResultT> {
    * is stored in the provided {@link Solution} object.
    *
    * @param input the problem instance to solve.
-   * @param subRoutineResolver {@link SubRoutinePool} pool to retrieve sub routine from.
+   * @param subRoutineResolver interface to execute sub-routines with.
    * @return the {@link Solution} in which all resulting information is stored.
    */
   Mono<Solution<ResultT>> solve(

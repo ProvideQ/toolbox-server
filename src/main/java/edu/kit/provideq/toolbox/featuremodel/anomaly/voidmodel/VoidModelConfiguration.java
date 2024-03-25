@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
@@ -34,26 +33,22 @@ public class VoidModelConfiguration {
   @Bean
   ProblemManager<String, String> getVoidModelManager(
       SatBasedVoidFeatureSolver satSolver,
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
+      ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         FEATURE_MODEL_ANOMALY_VOID,
         Set.of(satSolver),
-        loadExampleProblems(resourceProvider, subRoutinePool)
+        loadExampleProblems(resourceProvider)
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
-  ) {
+  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("sandwich.txt"),
           "Sandwich example for Void Feature Models is unavailable!"
       );
-      var problem = new Problem<>(FEATURE_MODEL_ANOMALY_VOID, subRoutinePool);
+      var problem = new Problem<>(FEATURE_MODEL_ANOMALY_VOID);
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {

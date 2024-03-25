@@ -7,7 +7,6 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.google.common.collect.Streams;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -39,8 +38,7 @@ public class ProblemRouter {
   public static final String PROBLEM_ID_PARAM_NAME = "problemId";
   private ProblemManagerProvider managerProvider;
   private Validator validator;
-  private SubRoutinePool subRoutinePool;
-  
+
   @Bean
   RouterFunction<ServerResponse> getProblemRoutes() {
     var managers = this.managerProvider.getProblemManagers();
@@ -108,7 +106,7 @@ public class ProblemRouter {
         .bodyToMono(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {})
         .doOnNext(this::validate)
         .map(submittedDto -> {
-          var problem = new Problem<InputT, ResultT>(manager.getType(), subRoutinePool);
+          var problem = new Problem<>(manager.getType());
           applySubmittedProblemPatch(manager, problem, submittedDto);
           manager.addInstance(problem);
           return problem;
@@ -222,10 +220,5 @@ public class ProblemRouter {
   @Autowired
   void setValidator(Validator validator) {
     this.validator = validator;
-  }
-
-  @Autowired
-  void setSubRoutinePool(SubRoutinePool subRoutinePool) {
-    this.subRoutinePool = subRoutinePool;
   }
 }

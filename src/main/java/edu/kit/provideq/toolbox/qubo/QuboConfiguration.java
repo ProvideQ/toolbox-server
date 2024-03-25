@@ -1,14 +1,10 @@
 package edu.kit.provideq.toolbox.qubo;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
-import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
-import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -36,26 +32,22 @@ public class QuboConfiguration {
   @Bean
   ProblemManager<String, String> getQuboManager(
       QiskitQuboSolver qiskitSolver,
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
+      ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         QUBO,
         Set.of(qiskitSolver),
-        loadExampleProblems(resourceProvider, subRoutinePool)
+        loadExampleProblems(resourceProvider)
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
-  ) {
+  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("linear-problem.txt"),
           "linear-problem example for QUBO is unavailable!"
       );
-      var problem = new Problem<>(QUBO, subRoutinePool);
+      var problem = new Problem<>(QUBO);
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {

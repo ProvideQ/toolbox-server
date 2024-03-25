@@ -2,9 +2,7 @@ package edu.kit.provideq.toolbox.maxcut.solvers;
 
 import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
-import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

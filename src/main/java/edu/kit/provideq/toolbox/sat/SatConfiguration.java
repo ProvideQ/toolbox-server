@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.sat;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
@@ -32,26 +31,24 @@ public class SatConfiguration {
   @Bean
   ProblemManager<String, DimacsCnfSolution> getSatManager(
       GamsSatSolver gamsSolver,
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
+      ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         SAT,
         Set.of(gamsSolver),
-        loadExampleProblems(resourceProvider, subRoutinePool)
+        loadExampleProblems(resourceProvider)
     );
   }
 
   private Set<Problem<String, DimacsCnfSolution>> loadExampleProblems(
-      ResourceProvider resourceProvider,
-      SubRoutinePool subRoutinePool
+      ResourceProvider resourceProvider
   ) {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("simple-and.txt"),
           "Simple-And example for SAT is unavailable!"
       );
-      var problem = new Problem<>(SAT, subRoutinePool);
+      var problem = new Problem<>(SAT);
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
