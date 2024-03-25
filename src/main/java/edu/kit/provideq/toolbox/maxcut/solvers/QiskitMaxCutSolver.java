@@ -2,18 +2,19 @@ package edu.kit.provideq.toolbox.maxcut.solvers;
 
 import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
-import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
- * {@link ProblemType#MAX_CUT} solver using a Qiskit implementation.
+ * {@link MaxCutConfiguration#MAX_CUT} solver using a Qiskit implementation.
  */
 @Component
 public class QiskitMaxCutSolver extends MaxCutSolver {
@@ -36,8 +37,11 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public void solve(String input, Solution<String> solution,
-                    SubRoutinePool subRoutinePool) {
+  public Mono<Solution<String>> solve(
+      String input,
+      SubRoutineResolver subRoutineResolver
+  ) {
+    var solution = new Solution<String>();
     // Parse GML to add partition data to
     Gml gml;
     try {
@@ -45,7 +49,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     } catch (ConversionException e) {
       solution.setDebugData("Couldn't convert problem data to GML:\n" + e);
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
     // Run Qiskit solver via console
@@ -62,7 +66,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     if (!processResult.success()) {
       solution.setDebugData(processResult.output());
       solution.fail();
-      return;
+      return Mono.just(solution);
     }
 
     // Parse solution data and add partition data to GML
@@ -89,5 +93,6 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     solution.setSolutionData(gml.toString());
     solution.complete();
+    return Mono.just(solution);
   }
 }

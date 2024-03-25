@@ -4,6 +4,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import java.util.Collections;
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * A problem solver provides information about its own suitability to solve a given problem.
@@ -33,7 +34,7 @@ public interface ProblemSolver<InputT, ResultT> {
    *
    * @return list of sub problems
    */
-  default List<SubRoutineDefinition> getSubRoutines() {
+  default List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return Collections.emptyList();
   }
 
@@ -41,12 +42,14 @@ public interface ProblemSolver<InputT, ResultT> {
    * Solves a given problem instance, current status and final results as well as debug information
    * is stored in the provided {@link Solution} object.
    *
-   * @param input the problem instance to solve
-   * @param solution the {@link Solution} in which all resulting information is to be stored
-   * @param subRoutinePool {@link SubRoutinePool} pool to retrieve sub routine from
+   * @param input the problem instance to solve.
+   * @param subRoutineResolver {@link SubRoutinePool} pool to retrieve sub routine from.
+   * @return the {@link Solution} in which all resulting information is stored.
    */
-  void solve(InputT input, Solution<ResultT> solution,
-             SubRoutinePool subRoutinePool);
+  Mono<Solution<ResultT>> solve(
+      InputT input,
+      SubRoutineResolver subRoutineResolver
+  );
 
   /**
    * Returns the problem type that can be solved by this problem solver.

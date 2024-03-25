@@ -26,10 +26,7 @@ public class SubRoutinePool {
     return content -> {
       var manager = problemManagerProvider.findProblemManagerForType(problemType).orElseThrow();
       var solver = manager.getSolvers().stream().findAny().orElseThrow();
-
-      var solution = new Solution<ResultT>();
-      solver.solve(content, solution, this);
-      return solution;
+      return solver.solve(content, null /* TODO*/).block();
     };
   }
 

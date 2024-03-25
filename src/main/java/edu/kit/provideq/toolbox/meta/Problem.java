@@ -2,7 +2,6 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.time.Duration;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
@@ -23,19 +22,15 @@ public class Problem<InputT, ResultT> {
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
 
-  @Deprecated
-  private SubRoutinePool subRoutinePool;
-
   /**
    * Creates a new problem of a given {@link ProblemType}.
    *
    * @param type the kind of problem.
    */
-  public Problem(ProblemType<InputT, ResultT> type, SubRoutinePool subRoutinePool) {
+  public Problem(ProblemType<InputT, ResultT> type,
+      SubRoutinePool subRoutinePool /* TODO remove */) {
     this.id = UUID.randomUUID();
     this.type = type;
-
-    this.subRoutinePool = subRoutinePool;
 
     this.setState(ProblemState.NEEDS_CONFIGURATION);
   }
@@ -44,7 +39,7 @@ public class Problem<InputT, ResultT> {
    * Starts the solution of this problem.
    * Once the problem is solved, the solution can be obtained using {@link #getSolution()}.
    */
-  public Mono<Solution<ResultT>> solve(Solution<ResultT> solution) {
+  public Mono<Solution<ResultT>> solve(Solution<ResultT> solution /* TODO remove */) {
     if (!this.isConfigured()) {
       throw new IllegalStateException("The problem is not fully configured!");
     }
@@ -52,10 +47,7 @@ public class Problem<InputT, ResultT> {
     this.setState(ProblemState.SOLVING);
 
     long start = System.currentTimeMillis();
-    getSolver().solve(getInput(), solution, this.subRoutinePool);
-
-    // TODO refactor ProblemSolver#solve() to use Mono
-    return Mono.just(solution)
+    return getSolver().solve(getInput(), null /* TODO sub routines! */)
         .repeatWhen(flux -> flux.delayElements(Duration.ofSeconds(5)))
         .takeUntil(sol -> sol.getStatus().isCompleted())
         .last()
