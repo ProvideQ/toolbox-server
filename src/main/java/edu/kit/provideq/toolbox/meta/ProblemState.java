@@ -1,7 +1,5 @@
 package edu.kit.provideq.toolbox.meta;
 
-import edu.kit.provideq.toolbox.Solution;
-
 /**
  * Describes the state of the solution process of a {@link Problem}.
  */
@@ -13,7 +11,7 @@ public enum ProblemState {
   NEEDS_CONFIGURATION,
 
   /**
-   * The problem is configured and can be solved using the {@link Problem#solve(Solution)} method.
+   * The problem is configured and can be solved using the {@link #solve()} method.
    */
   READY_TO_SOLVE,
 

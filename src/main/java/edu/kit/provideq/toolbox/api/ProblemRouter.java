@@ -6,13 +6,11 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 import com.google.common.collect.Streams;
-import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import java.util.Random;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -190,8 +188,7 @@ public class ProblemRouter {
 
     // state must be changed at last as this might trigger other processes
     if (patch.getState() == ProblemState.SOLVING) {
-      // TODO remove id parameter
-      problem.solve(new Solution<>(new Random().nextLong())).subscribe();
+      problem.solve().subscribe();
     }
   }
 

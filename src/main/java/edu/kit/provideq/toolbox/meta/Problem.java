@@ -2,7 +2,10 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import reactor.core.publisher.Mono;
 
 /**
@@ -15,6 +18,8 @@ import reactor.core.publisher.Mono;
 public class Problem<InputT, ResultT> {
   private final UUID id;
   private final ProblemType<InputT, ResultT> type;
+  private final SubProblems<InputT, ResultT> subProblems;
+  private final Set<ProblemObserver<InputT, ResultT>> observers;
 
   private InputT input;
   private Solution<ResultT> solution;
@@ -30,6 +35,15 @@ public class Problem<InputT, ResultT> {
     this.id = UUID.randomUUID();
     this.type = type;
 
+    this.observers = new HashSet<>();
+
+    Consumer<Problem<?, ?>> notifyAdded = addedSubProblem -> this.observers.forEach(
+        observer -> observer.onSubProblemAdded(this, addedSubProblem));
+    Consumer<Problem<?, ?>> notifyRemoved = removedSubProblem -> this.observers.forEach(
+        observer -> observer.onSubProblemRemoved(this, removedSubProblem));
+    this.subProblems = new SubProblems<>(notifyAdded, notifyRemoved);
+    this.addObserver(subProblems);
+
     this.setState(ProblemState.NEEDS_CONFIGURATION);
   }
 
@@ -37,7 +51,7 @@ public class Problem<InputT, ResultT> {
    * Starts the solution of this problem.
    * Once the problem is solved, the solution can be obtained using {@link #getSolution()}.
    */
-  public Mono<Solution<ResultT>> solve(Solution<ResultT> solution /* TODO remove */) {
+  public Mono<Solution<ResultT>> solve() {
     if (!this.isConfigured()) {
       throw new IllegalStateException("The problem is not fully configured!");
     }
@@ -45,7 +59,7 @@ public class Problem<InputT, ResultT> {
     this.setState(ProblemState.SOLVING);
 
     long start = System.currentTimeMillis();
-    return getSolver().solve(getInput(), null /* TODO sub routines! */)
+    return getSolver().solve(getInput(), subProblems)
         .repeatWhen(flux -> flux.delayElements(Duration.ofSeconds(5)))
         .takeUntil(sol -> sol.getStatus().isCompleted())
         .last()
@@ -74,8 +88,13 @@ public class Problem<InputT, ResultT> {
     return this.input;
   }
 
-  public void setInput(InputT input) {
-    this.input = input;
+  /**
+   * Changes the problem input data.
+   */
+  public void setInput(InputT newInput) {
+    this.input = newInput;
+
+    this.observers.forEach(observer -> observer.onInputChanged(this, newInput));
   }
 
   public Solution<ResultT> getSolution() {
@@ -86,19 +105,34 @@ public class Problem<InputT, ResultT> {
     return this.solver;
   }
 
-  public void setSolver(ProblemSolver<InputT, ResultT> solver) {
-    this.solver = solver;
-  }
+  /**
+   * Changes the problem solver to be used for this problem.
+   */
+  public void setSolver(ProblemSolver<InputT, ResultT> newSolver) {
+    this.solver = newSolver;
 
-  public void setProblemSolver(ProblemSolver<InputT, ResultT> solver) {
-    this.solver = solver;
+    this.observers.forEach(observer -> observer.onSolverChanged(this, newSolver));
   }
 
   public ProblemState getState() {
     return this.state;
   }
 
+  public Set<Problem<?, ?>> getSubProblems() {
+    return subProblems.getProblems();
+  }
+
   private void setState(ProblemState newState) {
     this.state = newState;
+
+    this.observers.forEach(observer -> observer.onStateChanged(this, newState));
+  }
+
+  public void addObserver(ProblemObserver<InputT, ResultT> observer) {
+    this.observers.add(observer);
+  }
+
+  public void removeObserver(ProblemObserver<InputT, ResultT> observer) {
+    this.observers.remove(observer);
   }
 }
