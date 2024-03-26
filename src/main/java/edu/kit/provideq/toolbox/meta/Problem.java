@@ -122,6 +122,12 @@ public class Problem<InputT, ResultT> {
     return subProblems.getProblems();
   }
 
+  public <SubInputT, SubResultT> Set<Problem<SubInputT, SubResultT>> getSubProblems(
+      SubRoutineDefinition<SubInputT, SubResultT> subRoutineDefinition
+  ) {
+    return subProblems.getProblems(subRoutineDefinition);
+  }
+
   private void setState(ProblemState newState) {
     this.state = newState;
 

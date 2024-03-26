@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -51,6 +52,18 @@ public class SubProblems<InputT, ResultT>
     return this.entries.stream()
         .map(entry -> entry.problem)
         .collect(Collectors.toUnmodifiableSet());
+  }
+
+  /**
+   * Returns all sub-problems related to a given sub-routine.
+   */
+  public <SubResultT, SubInputT> Set<Problem<SubInputT, SubResultT>> getProblems(
+      SubRoutineDefinition<SubInputT, SubResultT> subRoutineDefinition) {
+    var optionalEntry = findEntry(subRoutineDefinition);
+
+    return optionalEntry
+        .map(entry -> Set.of(entry.problem))
+        .orElse(Collections.emptySet());
   }
 
   @Override
