@@ -1,7 +1,5 @@
 package edu.kit.provideq.toolbox.meta;
 
-import edu.kit.provideq.toolbox.SolveRequest;
-
 /**
  * The type of problem to solve.
  */
@@ -10,28 +8,21 @@ public class ProblemType<InputT, ResultT> {
   private final Class<InputT> inputClass;
   private final Class<ResultT> resultClass;
 
-  @Deprecated
-  private final Class<? extends SolveRequest<?>> requestType;
-
   /**
    * Defines a new problem type.
    *
    * @param id a unique string identifier for this type of problem.
    * @param inputClass the Java class object corresponding to the {@link InputT} type parameter.
    * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
-   * @param requestType the Java subclass of {@link SolveRequest} used for REST API calls of this
-   *     problem type.
    */
   public ProblemType(
       String id,
       Class<InputT> inputClass,
-      Class<ResultT> resultClass,
-      Class<? extends SolveRequest<?>> requestType
+      Class<ResultT> resultClass
   ) {
     this.id = id;
     this.inputClass = inputClass;
     this.resultClass = resultClass;
-    this.requestType = requestType;
   }
 
   /**
@@ -53,13 +44,5 @@ public class ProblemType<InputT, ResultT> {
    */
   public Class<ResultT> getResultClass() {
     return resultClass;
-  }
-
-  /**
-   * Returns the java class representing the body of a REST request to solve a problem of this type.
-   */
-  @Deprecated
-  public Class<? extends SolveRequest<?>> getRequestType() {
-    return requestType;
   }
 }

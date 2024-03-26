@@ -10,7 +10,6 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureConfiguration;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureMetaSolver;
 import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.SatBasedDeadFeatureSolver;

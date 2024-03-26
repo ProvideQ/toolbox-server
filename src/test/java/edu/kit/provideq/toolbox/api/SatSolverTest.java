@@ -10,7 +10,6 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.sat.MetaSolverSat;
-import edu.kit.provideq.toolbox.sat.SolveSatRequest;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.TestInstance;

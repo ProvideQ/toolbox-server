@@ -26,8 +26,7 @@ public class MaxCutConfiguration {
   public static final ProblemType<String, String> MAX_CUT = new ProblemType<>(
       "max-cut",
       String.class,
-      String.class,
-      SolveMaxCutRequest.class
+      String.class
   );
 
   @Bean

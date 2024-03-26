@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.featuremodel.SolveFeatureModelRequest;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -26,8 +25,7 @@ public class VoidModelConfiguration {
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_VOID = new ProblemType<>(
       "feature-model-anomaly-void",
       String.class,
-      String.class,
-      SolveFeatureModelRequest.class
+      String.class
   );
 
   @Bean
