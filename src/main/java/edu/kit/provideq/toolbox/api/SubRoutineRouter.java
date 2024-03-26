@@ -116,9 +116,11 @@ public class SubRoutineRouter {
             .getSolvers().stream()
             .findFirst()
             .map(solver -> {
-              var subRoutines = solver.getSubRoutines();
+              var subRoutineDtos = solver.getSubRoutines().stream()
+                  .map(SubRoutineDefinitionDto::fromSubRoutineDefinition)
+                  .toList();
               try {
-                return new ObjectMapper().writeValueAsString(subRoutines);
+                return new ObjectMapper().writeValueAsString(subRoutineDtos);
               } catch (JsonProcessingException e) {
                 throw new RuntimeException("example could not be parsed", e);
               }

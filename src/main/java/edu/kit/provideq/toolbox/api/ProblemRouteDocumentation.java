@@ -4,6 +4,7 @@ import static edu.kit.provideq.toolbox.api.ProblemRouter.PROBLEM_ID_PARAM_NAME;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
@@ -11,11 +12,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import java.util.function.Consumer;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.http.HttpStatus;
 
@@ -36,7 +36,7 @@ final class ProblemRouteDocumentation {
         .requestBody(requestBodyBuilder()
             .content(getRequestContent(manager))
             .required(true))
-        .response(getResponseOk(manager));
+        .response(buildProblemResponse(manager));
   }
 
   static void configureReadDocs(ProblemManager<?, ?> manager, Builder ops) {
@@ -45,10 +45,7 @@ final class ProblemRouteDocumentation {
         .operationId(getOperationId(type, "read"))
         .tag(type.getId())
         .parameter(parameterBuilder().in(ParameterIn.PATH).name(PROBLEM_ID_PARAM_NAME))
-        .response(responseBuilder()
-            .responseCode(String.valueOf(HttpStatus.OK.value()))
-            .implementation(ProblemDto.class)
-        );
+        .response(buildProblemResponse(manager));
   }
 
   public static void configureListDocs(ProblemManager<?, ?> manager, Builder ops) {
@@ -56,10 +53,7 @@ final class ProblemRouteDocumentation {
     ops
         .operationId(getOperationId(type, "list"))
         .tag(type.getId())
-        .response(responseBuilder()
-            .responseCode(String.valueOf(HttpStatus.OK.value()))
-            .implementationArray(ProblemDto.class)
-        );
+        .response(buildProblemListResponse(manager));
   }
 
   static void configureUpdateDocs(ProblemManager<?, ?> manager, Builder ops) {
@@ -71,10 +65,7 @@ final class ProblemRouteDocumentation {
         .requestBody(requestBodyBuilder()
             .content(getRequestContent(manager))
             .required(true))
-        .response(responseBuilder()
-            .responseCode(String.valueOf(HttpStatus.OK.value()))
-            .implementation(ProblemDto.class)
-        );
+        .response(buildProblemResponse(manager));
     // TODO missing error codes and examples
   }
 
@@ -97,7 +88,7 @@ final class ProblemRouteDocumentation {
 
     var problemType = manager.getType();
     return contentBuilder()
-        .example(org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder()
+        .example(exampleOjectBuilder()
             .name(problemType.getId())
             .value(requestString))
         .schema(schemaBuilder()
@@ -105,67 +96,64 @@ final class ProblemRouteDocumentation {
         .mediaType(APPLICATION_JSON_VALUE);
   }
 
-  private static org.springdoc.core.fn.builders.apiresponse.Builder getResponseOk(
-      ProblemManager<?, ?> problemManager) {
+  private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemListResponse(
+      ProblemManager<?, ?> manager) {
+    var problemDtos = manager.getExampleInstances().stream()
+        .map(ProblemDto::fromProblem)
+        .toList();
+
+    String problemDtosJson;
+    try {
+      problemDtosJson = new ObjectMapper().writeValueAsString(problemDtos);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Could not serialize example problems!", e);
+    }
+
     return responseBuilder()
         .responseCode(String.valueOf(HttpStatus.OK.value()))
         .content(contentBuilder()
-            .mediaType(APPLICATION_JSON_VALUE)
-            .example(getExampleSolved(problemManager))
-            .example(getExampleInvalid(problemManager))
-            .array(arraySchemaBuilder().schema(
-                schemaBuilder().implementation(Solution.class))));
+            .array(arraySchemaBuilder()
+                .schema(schemaBuilder().implementation(ProblemDto.class))
+            )
+            .example(exampleOjectBuilder()
+                .value(problemDtosJson)
+            )
+        );
   }
 
-  private static org.springdoc.core.fn.builders.exampleobject.Builder getExampleOk(
-      String exampleName,
-      ProblemManager<?, ?> problemManager,
-      Consumer<Solution<String>> solutionModifier
-  ) {
-    // Prepare a solved solution with some example data
-    var solvedSolution = new Solution<String>();
-    solvedSolution.setExecutionMilliseconds(42);
-    problemManager.getSolvers().stream()
-        .findFirst()
-        .ifPresent(solver -> solvedSolution.setSolverName(solver.getName()));
-    solutionModifier.accept(solvedSolution);
 
-    // Convert the solution to a string
-    String solvedSolutionString;
-    try {
-      solvedSolutionString = new ObjectMapper().writeValueAsString(solvedSolution);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("example could not be parsed", e);
+  private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemResponse(
+      ProblemManager<?, ?> problemManager) {
+    var contentBuilder = contentBuilder()
+        .mediaType(APPLICATION_JSON_VALUE)
+        .schema(schemaBuilder().implementation(ProblemDto.class));
+
+    // getExampleSolved, getExampleInvalid
+    int exampleProblemIndex = 1;
+    for (var exampleProblem : problemManager.getExampleInstances()) {
+      contentBuilder = contentBuilder.example(
+          buildExample(exampleProblem, "Example " + exampleProblemIndex)
+      );
     }
 
-    // Build the example
-    return org.springdoc.core.fn.builders.exampleobject.Builder
-        .exampleOjectBuilder()
-        .name(exampleName)
-        .description("The problem was solved successfully.")
-        .value(solvedSolutionString);
+    return responseBuilder()
+        .responseCode(String.valueOf(HttpStatus.OK.value()))
+        .content(contentBuilder);
   }
 
-  private static org.springdoc.core.fn.builders.exampleobject.Builder getExampleSolved(
-      ProblemManager<?, ?> problemManager) {
-    return getExampleOk(
-        "Solved",
-        problemManager,
-        solution -> {
-          solution.setSolutionData("Solution data to solve the problem");
-          solution.complete();
-        });
-  }
+  private static org.springdoc.core.fn.builders.exampleobject.Builder buildExample(
+      Problem<?, ?> exampleProblem, String name) {
+    String problemDtoJson;
+    try {
+      var problemDto = ProblemDto.fromProblem(exampleProblem);
+      problemDtoJson = new ObjectMapper().writeValueAsString(problemDto);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Example problem could not be parsed!", e);
+    }
 
-  private static org.springdoc.core.fn.builders.exampleobject.Builder getExampleInvalid(
-      ProblemManager<?, ?> problemManager) {
-    return getExampleOk(
-        "Error",
-        problemManager,
-        solution -> {
-          solution.setDebugData("Some error occurred");
-          solution.abort();
-        });
+    return exampleOjectBuilder()
+        .name(name)
+        .value(problemDtoJson);
   }
 
   private static String getOperationId(ProblemType<?, ?> type, String operationName) {
