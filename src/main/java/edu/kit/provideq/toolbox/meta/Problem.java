@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.meta;
 import edu.kit.provideq.toolbox.Solution;
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -52,14 +53,15 @@ public class Problem<InputT, ResultT> {
    * Once the problem is solved, the solution can be obtained using {@link #getSolution()}.
    */
   public Mono<Solution<ResultT>> solve() {
-    if (!this.isConfigured()) {
+    if (getSolver().isEmpty() || getInput().isEmpty()) {
       throw new IllegalStateException("The problem is not fully configured!");
     }
 
     this.setState(ProblemState.SOLVING);
 
     long start = System.currentTimeMillis();
-    return getSolver().solve(getInput(), subProblems)
+
+    return getSolver().get().solve(getInput().get(), subProblems)
         .repeatWhen(flux -> flux.delayElements(Duration.ofSeconds(5)))
         .takeUntil(sol -> sol.getStatus().isCompleted())
         .last()
@@ -71,11 +73,6 @@ public class Problem<InputT, ResultT> {
         });
   }
 
-  private boolean isConfigured() {
-    return this.input != null
-        && this.solver != null;
-  }
-
   public UUID getId() {
     return id;
   }
@@ -84,8 +81,8 @@ public class Problem<InputT, ResultT> {
     return type;
   }
 
-  public InputT getInput() {
-    return this.input;
+  public Optional<InputT> getInput() {
+    return Optional.ofNullable(this.input);
   }
 
   /**
@@ -101,8 +98,8 @@ public class Problem<InputT, ResultT> {
     return this.solution;
   }
 
-  public ProblemSolver<InputT, ResultT> getSolver() {
-    return this.solver;
+  public Optional<ProblemSolver<InputT, ResultT>> getSolver() {
+    return Optional.ofNullable(this.solver);
   }
 
   /**

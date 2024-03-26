@@ -2,8 +2,8 @@ package edu.kit.provideq.toolbox.api;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,20 +29,16 @@ public class ProblemDto<InputT, ResultT> {
 
     dto.id = problem.getId().toString();
     dto.typeId = problem.getType().getId();
-    dto.input = problem.getInput();
+    dto.input = problem.getInput().orElse(null);
     dto.solution = problem.getSolution();
     dto.state = problem.getState();
-
-    if (problem.getSolver() != null) {
-      dto.solverId = problem.getSolver().getId();
-    }
-
-    dto.subProblems = new ArrayList<>(problem.getSubProblems().size());
-    if (problem.getSolver() != null) {
-      for (var subRoutine : problem.getSolver().getSubRoutines()) {
-        dto.subProblems.add(SubProblemReferenceDto.forSubRoutine(problem, subRoutine));
-      }
-    }
+    dto.solverId = problem.getSolver()
+        .map(ProblemSolver::getId)
+        .orElse(null);
+    dto.subProblems = problem.getSolver().stream()
+        .flatMap(solver -> solver.getSubRoutines().stream())
+        .map(subRoutine -> SubProblemReferenceDto.forSubRoutine(problem, subRoutine))
+        .toList();
 
     return dto;
   }
