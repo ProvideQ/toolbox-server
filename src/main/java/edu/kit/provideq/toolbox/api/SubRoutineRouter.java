@@ -54,23 +54,25 @@ public class SubRoutineRouter {
     var problemType = manager.getType();
     return route().GET(
         getSubRoutinesRouteForProblemType(problemType),
-        req -> handleSubRoutineRouteForMetaSolver(manager, req),
+        req -> handleSubRoutineRouteForManager(manager, req),
         ops -> handleSubRoutineRouteDocumentation(manager, ops)
     ).build();
   }
 
-  private Mono<ServerResponse> handleSubRoutineRouteForMetaSolver(
+  private Mono<ServerResponse> handleSubRoutineRouteForManager(
       ProblemManager<?, ?> manager,
       ServerRequest req
   ) {
-    var subroutines = req.queryParam("id")
+    var solver = req.queryParam("id")
         .flatMap(manager::findSolverById)
-        .map(ProblemSolver::getSubRoutines)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Could not find a solver for this problem with this solver id!"));
 
-    return ok().body(Mono.just(subroutines), new ParameterizedTypeReference<>() {
-    });
+    var subRoutineDtos = solver.getSubRoutines().stream()
+        .map(SubRoutineDefinitionDto::fromSubRoutineDefinition)
+        .toList();
+
+    return ok().body(Mono.just(subRoutineDtos), new ParameterizedTypeReference<>() {});
   }
 
   private void handleSubRoutineRouteDocumentation(
