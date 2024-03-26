@@ -1,8 +1,141 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.Solution;
+import java.time.Duration;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
+import reactor.core.publisher.Mono;
+
 /**
- * A Problem consists of problem data, i.e. a formatted string, as well as a type by which it can be
- * assigned to a suitable solver
+ * A problem encapsulates an input for a given problem type.
+ * The problem can be solved using a matching ProblemSolver.
+ *
+ * @param <InputT> the data type of the problem's input.
+ * @param <ResultT> the data type of the problem's solution.
  */
-public record Problem<FormatT>(FormatT problemData, ProblemType type) {
+public class Problem<InputT, ResultT> {
+  private final UUID id;
+  private final ProblemType<InputT, ResultT> type;
+  private final SubProblems<InputT, ResultT> subProblems;
+  private final Set<ProblemObserver<InputT, ResultT>> observers;
+
+  private InputT input;
+  private Solution<ResultT> solution;
+  private ProblemState state;
+  private ProblemSolver<InputT, ResultT> solver;
+
+  /**
+   * Creates a new problem of a given {@link ProblemType}.
+   *
+   * @param type the kind of problem.
+   */
+  public Problem(ProblemType<InputT, ResultT> type) {
+    this.id = UUID.randomUUID();
+    this.type = type;
+
+    this.observers = new HashSet<>();
+
+    Consumer<Problem<?, ?>> notifyAdded = addedSubProblem -> this.observers.forEach(
+        observer -> observer.onSubProblemAdded(this, addedSubProblem));
+    Consumer<Problem<?, ?>> notifyRemoved = removedSubProblem -> this.observers.forEach(
+        observer -> observer.onSubProblemRemoved(this, removedSubProblem));
+    this.subProblems = new SubProblems<>(notifyAdded, notifyRemoved);
+    this.addObserver(subProblems);
+
+    this.setState(ProblemState.NEEDS_CONFIGURATION);
+  }
+
+  /**
+   * Starts the solution of this problem.
+   * Once the problem is solved, the solution can be obtained using {@link #getSolution()}.
+   */
+  public Mono<Solution<ResultT>> solve() {
+    if (getSolver().isEmpty() || getInput().isEmpty()) {
+      throw new IllegalStateException("The problem is not fully configured!");
+    }
+
+    this.setState(ProblemState.SOLVING);
+
+    long start = System.currentTimeMillis();
+
+    return getSolver().get().solve(getInput().get(), subProblems)
+        .repeatWhen(flux -> flux.delayElements(Duration.ofSeconds(5)))
+        .takeUntil(sol -> sol.getStatus().isCompleted())
+        .last()
+        .doOnNext(sol -> {
+          long finish = System.currentTimeMillis();
+          sol.setExecutionMilliseconds(finish - start);
+          this.solution = sol;
+          this.setState(ProblemState.SOLVED);
+        });
+  }
+
+  public UUID getId() {
+    return id;
+  }
+
+  public ProblemType<InputT, ResultT> getType() {
+    return type;
+  }
+
+  public Optional<InputT> getInput() {
+    return Optional.ofNullable(this.input);
+  }
+
+  /**
+   * Changes the problem input data.
+   */
+  public void setInput(InputT newInput) {
+    this.input = newInput;
+
+    this.observers.forEach(observer -> observer.onInputChanged(this, newInput));
+  }
+
+  public Solution<ResultT> getSolution() {
+    return this.solution;
+  }
+
+  public Optional<ProblemSolver<InputT, ResultT>> getSolver() {
+    return Optional.ofNullable(this.solver);
+  }
+
+  /**
+   * Changes the problem solver to be used for this problem.
+   */
+  public void setSolver(ProblemSolver<InputT, ResultT> newSolver) {
+    this.solver = newSolver;
+
+    this.observers.forEach(observer -> observer.onSolverChanged(this, newSolver));
+  }
+
+  public ProblemState getState() {
+    return this.state;
+  }
+
+  public Set<Problem<?, ?>> getSubProblems() {
+    return subProblems.getProblems();
+  }
+
+  public <SubInputT, SubResultT> Set<Problem<SubInputT, SubResultT>> getSubProblems(
+      SubRoutineDefinition<SubInputT, SubResultT> subRoutineDefinition
+  ) {
+    return subProblems.getProblems(subRoutineDefinition);
+  }
+
+  private void setState(ProblemState newState) {
+    this.state = newState;
+
+    this.observers.forEach(observer -> observer.onStateChanged(this, newState));
+  }
+
+  public void addObserver(ProblemObserver<InputT, ResultT> observer) {
+    this.observers.add(observer);
+  }
+
+  public void removeObserver(ProblemObserver<InputT, ResultT> observer) {
+    this.observers.remove(observer);
+  }
 }

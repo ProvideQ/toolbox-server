@@ -9,5 +9,8 @@ package edu.kit.provideq.toolbox.meta;
  * @param description description of the sub-routine call to provide information where and why it is
  *     needed.
  */
-public record SubRoutineDefinition(ProblemType type, String description) {
+public record SubRoutineDefinition<InputT, ResultT>(
+    ProblemType<InputT, ResultT> type,
+    String description
+) {
 }

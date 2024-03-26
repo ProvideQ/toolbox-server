@@ -11,7 +11,6 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.maxcut.MetaSolverMaxCut;
-import edu.kit.provideq.toolbox.maxcut.SolveMaxCutRequest;
 import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
