@@ -45,4 +45,13 @@ public class ProblemType<InputT, ResultT> {
   public Class<ResultT> getResultClass() {
     return resultClass;
   }
+
+  @Override
+  public String toString() {
+    return "ProblemType{"
+        + "id='%s'".formatted(id)
+        + ", inputClass=%s".formatted(inputClass)
+        + ", resultClass=%s".formatted(resultClass)
+        + '}';
+  }
 }
