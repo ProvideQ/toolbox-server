@@ -29,10 +29,11 @@ final class ProblemRouteDocumentation {
     var type = manager.getType();
     ops
         .operationId(getOperationId(type, "create"))
+        .description("Creates a problem of type '" + type.getId() + "'. "
+            + "Optionally, the caller can submit a request body with this request that acts like "
+            + "an update / patch request applied immediately after creating the problem. "
+            + "This endpoint will respond with the created problem.")
         .tag(type.getId())
-        .description("Solves a " + type.getId() + " problem. To solve the problem, "
-            + "either the meta-solver will choose the best available solver,"
-            + "or a specific solver selected in the request will be used.")
         .requestBody(requestBodyBuilder()
             .content(getRequestContent(manager))
             .required(true))
@@ -43,6 +44,8 @@ final class ProblemRouteDocumentation {
     var type = manager.getType();
     ops
         .operationId(getOperationId(type, "read"))
+        .description("This endpoint can be used to get / read problems of problem type '"
+            + type.getId() + "'.")
         .tag(type.getId())
         .parameter(parameterBuilder().in(ParameterIn.PATH).name(PROBLEM_ID_PARAM_NAME))
         .response(buildProblemResponse(manager));
@@ -52,6 +55,9 @@ final class ProblemRouteDocumentation {
     var type = manager.getType();
     ops
         .operationId(getOperationId(type, "list"))
+        .description("Responds with a list of all problems of type '" + type.getId() + "'. "
+            + "This includes all problems created either through the create / post endpoint of "
+            + "this problem type or as sub-problems of other problems during the solution process.")
         .tag(type.getId())
         .response(buildProblemListResponse(manager));
   }
@@ -60,6 +66,15 @@ final class ProblemRouteDocumentation {
     var type = manager.getType();
     ops
         .operationId(getOperationId(type, "update"))
+        .description("Updates the problem of type '" + type.getId() + "' with the given problem "
+            + "ID."
+            + "Only the 'input', 'solverId', and 'state' fields can be updated; all other fields "
+            + "will be ignored."
+            + "Changes to the input or solver will reset the problem state to 'READY_TO_SOLVE'. "
+            + "If the problem is fully configured, changing the state to 'SOLVING' will start the "
+            + "solution process. "
+            + "Setting the state to another value is not allowed. "
+            + "The endpoint will respond with the updated problem.")
         .tag(type.getId())
         .parameter(parameterBuilder().in(ParameterIn.PATH).name(PROBLEM_ID_PARAM_NAME))
         .requestBody(requestBodyBuilder()
