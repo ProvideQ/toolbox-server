@@ -20,7 +20,7 @@ public class DeadFeatureConfiguration {
    * For a given feature model, check if the model contains dead features.
    *
    * @see <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">
-   *      "Explaining Anomalies in Feature Models", Kowal et al., 2026</a>
+   *      "Explaining Anomalies in Feature Models", Kowal et al., 2016</a>
    */
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_DEAD = new ProblemType<>(
       "feature-model-anomaly-dead",
