@@ -5,10 +5,20 @@ import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 /**
  * Data-transfer object to be used for {@link SubRoutineDefinition}s in the REST API.
  */
-public record SubRoutineDefinitionDto(
-    String typeId,
-    String description
-) {
+public final class SubRoutineDefinitionDto {
+  private final String typeId;
+  private final String description;
+
+  /**
+   * Use {@link #fromSubRoutineDefinition(SubRoutineDefinition)}.
+   */
+  private SubRoutineDefinitionDto(
+      String typeId,
+      String description
+  ) {
+    this.typeId = typeId;
+    this.description = description;
+  }
 
   /**
    * Creates a DTO representing the given {@link SubRoutineDefinition}.
@@ -20,5 +30,20 @@ public record SubRoutineDefinitionDto(
     var description = definition.description();
 
     return new SubRoutineDefinitionDto(typeId, description);
+  }
+
+  public String getTypeId() {
+    return typeId;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public String toString() {
+    return "SubRoutineDefinitionDto["
+        + "typeId=" + typeId + ", "
+        + "description=" + description + ']';
   }
 }

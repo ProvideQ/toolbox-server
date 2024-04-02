@@ -20,6 +20,11 @@ public class ProblemDto<InputT, ResultT> {
   private List<SubProblemReferenceDto> subProblems;
 
   /**
+   * Use {@link #fromProblem(Problem)} instead.
+   */
+  private ProblemDto() {}
+
+  /**
    * Creates a data transfer object for a given problem.
    */
   public static <InputT, ResultT> ProblemDto<InputT, ResultT> fromProblem(
