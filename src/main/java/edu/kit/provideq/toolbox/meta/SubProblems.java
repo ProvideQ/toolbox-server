@@ -10,9 +10,18 @@ import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
 /**
- * This class manages the mapping from sub-routine calls to problems.
+ * This internal class manages sub-problems and sub-routine calls of a {@link Problem}.
+ *
+ * @apiNote This class is neither intended to be used by other classes than {@link Problem} nor to
+ *     be extended or replaced.
+ * @implNote {@link SubProblems} is separate to {@link Problem} as it deals with another level of
+ *     abstraction.
+ *     {@link Problem} is essentially a state machine for the solution process of a problem and
+ *     {@link SubProblems} deals with the type-safe wiring between sub-routines and sub-problems.
+ *     Additionally, having {@link SubProblems} implement the {@link SubRoutineResolver} interface
+ *     avoids interface pollution in the {@link Problem} class.
  */
-public class SubProblems<InputT, ResultT>
+final class SubProblems<InputT, ResultT>
     implements SubRoutineResolver, ProblemObserver<InputT, ResultT> {
 
   private static class SubProblemEntry<SubInputT, SubResultT> {

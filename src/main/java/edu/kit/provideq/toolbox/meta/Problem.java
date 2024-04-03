@@ -12,6 +12,8 @@ import reactor.core.publisher.Mono;
 /**
  * A problem encapsulates an input for a given problem type.
  * The problem can be solved using a matching ProblemSolver.
+ * The {@link Problem} class is essentially a state machine allowing different operations like
+ * configuring the input and solver, and starting or stopping the solution process.
  *
  * @param <InputT> the data type of the problem's input.
  * @param <ResultT> the data type of the problem's solution.
@@ -38,6 +40,7 @@ public class Problem<InputT, ResultT> {
 
     this.observers = new HashSet<>();
 
+    // Sub-routine management and sub-routine-call handling are outsourced to the SubProblems class
     Consumer<Problem<?, ?>> notifyAdded = addedSubProblem -> this.observers.forEach(
         observer -> observer.onSubProblemAdded(this, addedSubProblem));
     Consumer<Problem<?, ?>> notifyRemoved = removedSubProblem -> this.observers.forEach(
