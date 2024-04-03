@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.convert.UvlToDimacsCnf;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -79,26 +80,10 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     }
 
     return Flux.fromIterable(dimacsCnf.getVariables())
-        .flatMap(variable -> {
-          // Use formula: ¬SAT (FM ∧ f) to check for a dead feature
-          // So add variable to the cnf of the feature model and check if there is a solution
-          // If there is a solution, the feature is not dead
-
-          var variableCheckCnf = dimacsCnf.addOrClause(new ArrayList<>(List.of(variable)));
-          return subRoutineResolver
-              .runSubRoutine(SAT_SUBROUTINE, variableCheckCnf.toString())
-              .map(variableCheckSolution -> DimacsCnfSolution.fromString(dimacsCnf, variableCheckSolution.getSolutionData().toString()))
-              .flatMap(dimacsCnfSolution -> {
-                if (dimacsCnfSolution.isVoid()) {
-                  return Mono.just(variable);
-                } else {
-                  return Mono.empty();
-                }
-              });
-        })
+        .filterWhen(feature -> checkFeatureDead(dimacsCnf, feature, subRoutineResolver))
         .reduceWith(
             StringBuilder::new,
-            (builder, variable) -> builder.append(variable.name()).append('\n')
+            (builder, feature) -> builder.append(feature.name()).append('\n')
         )
         .map(builder -> {
           if (builder.isEmpty()) {
@@ -112,5 +97,28 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
           solution.complete();
           return solution;
         });
+  }
+
+  /**
+   * Checks if a given {@code feature} is dead in a given DIMACS {@code cnf} formula.
+   *
+   * @param subRoutineResolver used to evaluate a SAT formula for the check.
+   * @return whether the given {@code feature} is dead.
+   */
+  private static Mono<Boolean> checkFeatureDead(
+      DimacsCnf cnf,
+      Variable feature,
+      SubRoutineResolver subRoutineResolver
+  ) {
+    // Use formula: ¬SAT (FM ∧ f) to check for a dead feature
+    // So add variable to the cnf of the feature model and check if there is a solution
+    // If there is a solution, the feature is not dead
+
+    var featureIsDeadCnf = cnf.addOrClause(new ArrayList<>(List.of(feature)));
+    return subRoutineResolver
+        .runSubRoutine(SAT_SUBROUTINE, featureIsDeadCnf.toString())
+        .map(featureIsDeadSolution ->
+            DimacsCnfSolution.fromString(cnf, featureIsDeadSolution.getSolutionData().toString()))
+        .map(DimacsCnfSolution::isVoid);
   }
 }
