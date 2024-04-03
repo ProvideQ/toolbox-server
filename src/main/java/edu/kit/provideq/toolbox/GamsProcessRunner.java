@@ -53,7 +53,7 @@ public class GamsProcessRunner extends ProcessRunner {
   }
 
   @Override
-  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+  public ProcessResult run(ProblemType<?, ?> problemType, long solutionId, String problemData) {
     var result = super.run(problemType, solutionId, problemData);
 
     var obfuscatedOutput = obfuscateGamsLicense(result.output());
