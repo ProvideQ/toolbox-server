@@ -11,7 +11,7 @@ public enum ProblemState {
   NEEDS_CONFIGURATION,
 
   /**
-   * The problem is configured and can be solved using the {@link #solve()} method.
+   * The problem is configured and can be solved using the {@link Problem#solve()} method.
    */
   READY_TO_SOLVE,
 
