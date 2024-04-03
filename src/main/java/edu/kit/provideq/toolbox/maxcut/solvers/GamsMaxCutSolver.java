@@ -46,15 +46,6 @@ public class GamsMaxCutSolver extends MaxCutSolver {
             "maxcut.gms")
         .run(getProblemType(), solution.getId(), input);
 
-    // Return if process failed
-    if (!processResult.success()) {
-      solution.setDebugData("GAMS process failed: " + processResult.output());
-      solution.fail();
-      return Mono.just(solution);
-    }
-
-    solution.setSolutionData(processResult.output());
-    solution.complete();
-    return Mono.just(solution);
+    return Mono.just(processResult.applyTo(solution));
   }
 }

@@ -50,14 +50,6 @@ public class QiskitQuboSolver extends QuboSolver {
         .run(getProblemType(), solution.getId(), input);
 
     // Return if process failed
-    if (!processResult.success()) {
-      solution.setDebugData(processResult.output());
-      solution.abort();
-      return Mono.just(solution);
-    }
-
-    solution.setSolutionData(processResult.output());
-    solution.complete();
-    return Mono.just(solution);
+    return Mono.just(processResult.applyTo(solution));
   }
 }

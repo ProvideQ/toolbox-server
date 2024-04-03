@@ -64,9 +64,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     // Return if process failed
     if (!processResult.success()) {
-      solution.setDebugData(processResult.output());
-      solution.fail();
-      return Mono.just(solution);
+      return Mono.just(processResult.applyTo(solution));
     }
 
     // Parse solution data and add partition data to GML

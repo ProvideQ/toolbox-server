@@ -46,14 +46,6 @@ public class CirqMaxCutSolver extends MaxCutSolver {
         .addSolutionFilePathToProcessCommand()
         .run(getProblemType(), solution.getId(), input);
 
-    if (!processResult.success()) {
-      solution.setDebugData(processResult.output());
-      solution.abort();
-      return Mono.just(solution);
-    }
-
-    solution.setSolutionData(processResult.output());
-    solution.complete();
-    return Mono.just(solution);
+    return Mono.just(processResult.applyTo(solution));
   }
 }
