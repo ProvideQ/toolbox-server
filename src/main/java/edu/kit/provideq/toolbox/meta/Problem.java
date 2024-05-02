@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -67,9 +66,6 @@ public class Problem<InputT, ResultT> {
     long start = System.currentTimeMillis();
 
     return solverT.get().solve(inputT.get(), subProblems)
-        .repeatWhen(flux -> flux.delayElements(Duration.ofSeconds(5)))
-        .takeUntil(sol -> sol.getStatus().isCompleted())
-        .last()
         .doOnNext(sol -> {
           long finish = System.currentTimeMillis();
           sol.setExecutionMilliseconds(finish - start);
