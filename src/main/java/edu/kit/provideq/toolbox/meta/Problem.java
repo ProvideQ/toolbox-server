@@ -56,7 +56,9 @@ public class Problem<InputT, ResultT> {
    * Once the problem is solved, the solution can be obtained using {@link #getSolution()}.
    */
   public Mono<Solution<ResultT>> solve() {
-    if (getSolver().isEmpty() || getInput().isEmpty()) {
+    Optional<ProblemSolver<InputT, ResultT>> solverT = getSolver();
+    Optional<InputT> inputT = getInput();
+    if (solverT.isEmpty() || inputT.isEmpty()) {
       throw new IllegalStateException("The problem is not fully configured!");
     }
 
@@ -64,7 +66,7 @@ public class Problem<InputT, ResultT> {
 
     long start = System.currentTimeMillis();
 
-    return getSolver().get().solve(getInput().get(), subProblems)
+    return solverT.get().solve(inputT.get(), subProblems)
         .repeatWhen(flux -> flux.delayElements(Duration.ofSeconds(5)))
         .takeUntil(sol -> sol.getStatus().isCompleted())
         .last()
