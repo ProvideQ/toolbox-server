@@ -14,6 +14,13 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.apache.commons:commons-text:1.10.0'
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'org.apache.xmlgraphics:batik-transcoder:1.17'
+    implementation 'org.apache.xmlgraphics:batik-svg-dom:1.17'
+    implementation 'org.apache.xmlgraphics:batik-anim:1.17'
+    implementation 'org.apache.xmlgraphics:fop:2.9'
+    implementation 'org.abego.treelayout:org.abego.treelayout.core:1.0.3'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4'
