@@ -17,6 +17,6 @@ public class FeatureNodeTree extends AbstractTreeForTreeLayout<FeatureNode> {
 
     @Override
     public List<FeatureNode> getChildrenList(FeatureNode featureNode) {
-        return (List<FeatureNode>) featureNode.getChildren();
+        return featureNode.getChildren();
     }
 }

@@ -4,7 +4,6 @@ import de.vill.model.Feature;
 import de.vill.model.Group;
 import edu.kit.provideq.toolbox.featuremodel.svgconvert.format.svg.image.SVGVector;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class FeatureNode implements IFeatureNode {
     private final String ID;
     private double width;
     private double height;
-    private SVGVector position;
+    private final SVGVector position;
 
     /**
      * Creates the root node and recursively creates all children from the given

@@ -7,7 +7,6 @@ import edu.kit.provideq.toolbox.featuremodel.svgconvert.format.svg.image.SVGImag
 import edu.kit.provideq.toolbox.featuremodel.svgconvert.format.svg.model.tree.*;
 import org.abego.treelayout.TreeLayout;
 
-
 import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public class SVGImageBuilder {
 
     private final String uvlText;
     private final FeatureModel featureModel;
-    private SVGImage svgImage;
+    private final SVGImage svgImage;
     private FeatureNode root;
 
     public SVGImageBuilder(String uvlText) {

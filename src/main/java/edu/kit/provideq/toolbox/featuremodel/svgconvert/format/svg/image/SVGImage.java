@@ -11,7 +11,6 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 import java.awt.geom.Point2D;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -25,7 +24,7 @@ public class SVGImage {
     private final Element svgRoot;
     private final Map<String, Boolean> legendFlags;
     public double imageWidth;
-    private double imageHeight;
+    private final double imageHeight;
     private Document document;
 
     public SVGImage(double width, double height) {

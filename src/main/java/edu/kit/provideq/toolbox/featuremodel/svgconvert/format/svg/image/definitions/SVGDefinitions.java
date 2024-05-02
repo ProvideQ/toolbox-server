@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox.featuremodel.svgconvert.format.svg.image.defini
 import edu.kit.provideq.toolbox.featuremodel.svgconvert.format.svg.image.SVGImage;
 import org.w3c.dom.Element;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,28 +22,21 @@ public class SVGDefinitions {
         this.legendFlags = legendFlags;
     }
 
-    //Needs to be replaced by loading a file
     public Element createDefinitions() {
+        // Definitions are used to define reusable elements like styles, markers, etc.
         var defs = createElement("defs");
         List<Element> definitionElements = new ArrayList<>();
         definitionElements.add(createStyleTag());
-
-        //Add Markers to definitions
         initializeMarkers(definitionElements);
-
-        //Add Legend Items to definitions
         definitionElements.add(createLegendItemMandatory());
         definitionElements.add(createLegendItemOptional());
         definitionElements.add(createLegendItemAbstract());
         definitionElements.add(createLegendItemConcrete());
         definitionElements.add(createLegendItemOr());
         definitionElements.add(createLegendItemAlternative());
-        //Add Legend to definitions
         definitionElements.add((createLegend()));
-
         definitionElements.forEach(defs::appendChild);
         return defs;
-//        document.getDocumentElement().appendChild(defs);
     }
 
     private Element createElement(String elementName) {
@@ -110,14 +102,10 @@ public class SVGDefinitions {
                         font-size: 12px;
                     }""";
         styleTag.setTextContent(style);
-
-//        System.out.println(styleTag.toString());
         return styleTag;
     }
 
     private void initializeMarkers(List<Element> definitionElements) {
-        // Config that is needed to create Markers:
-        // id, titleText, classType,
         definitionElements.add(createCircleSymbol("mandatoryCircle", "mandatory", "Mandatory"));
         definitionElements.add(createCircleSymbol("optionalCircle", "optional", "Optional"));
         definitionElements.add(createMarker(MANDATORY_MARKER_ID, "#mandatoryCircle"));
