@@ -12,6 +12,7 @@ import java.util.function.Function;
  * @param <S> the type of the generated solution data
  */
 public class Solution<S> {
+  // todo remove this/find usage?
   private final long id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
