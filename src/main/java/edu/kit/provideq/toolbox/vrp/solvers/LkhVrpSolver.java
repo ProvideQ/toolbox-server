@@ -47,7 +47,7 @@ public class LkhVrpSolver extends VrpSolver {
       var processResult = context.getBean(
           BinaryProcessRunner.class,
           scriptDir,
-          "../venv/bin/python",
+          "/Users/koalamitice/opt/anaconda3/bin/python",
           "vrp_lkh.py"
         )
         .addProblemFilePathToProcessCommand()

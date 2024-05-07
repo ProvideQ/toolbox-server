@@ -76,7 +76,7 @@ public class DwaveQuboSolver extends QuboSolver {
         var processRunner = context.getBean(
             BinaryProcessRunner.class,
             quboScriptPath,
-            "../venv/bin/python",
+            "/Users/koalamitice/opt/anaconda3/bin/python",
             "main.py",
             new String[] {"%1$s", dwaveAnnealingMethod, "--output-file", "%2$s"}
             )

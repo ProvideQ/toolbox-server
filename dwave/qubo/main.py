@@ -56,23 +56,22 @@ def main():
     last = datetime.now().timestamp()
     print("started")
 
-    with Client.from_config() as _:
-        now = datetime.now().timestamp()
-        print(f"connected after {now - last}. starting solver")
-        sampleset = solve_with(bqm, type, filename)
+    now = datetime.now().timestamp()
+    print(f"connected after {now - last}. starting solver")
+    sampleset = solve_with(bqm, type, filename)
 
-        # accessing the sampleset's properties await for the future
-        print(sampleset.info)
+    # accessing the sampleset's properties await for the future
+    print(sampleset.info)
 
-        now = datetime.now().timestamp()
-        print(f"ended {now - last}")
+    now = datetime.now().timestamp()
+    print(f"ended {now - last}")
 
-        if args.output_file:
-            with open(args.output_file, "w") as out:
-                out.writelines([f"{bin}\n" for bin in sampleset.first.sample.values()])
-        else:
-            print(sampleset.first.energy)
-            print(sampleset.first.sample)
+    if args.output_file:
+        with open(args.output_file, "w") as out:
+            out.writelines([f"{bin}\n" for bin in sampleset.first.sample.values()])
+    else:
+        print(sampleset.first.energy)
+        print(sampleset.first.sample)
 
     now = datetime.now().timestamp()
     print(f"connection closed after {now - last}")

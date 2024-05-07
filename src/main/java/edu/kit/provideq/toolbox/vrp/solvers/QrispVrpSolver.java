@@ -47,7 +47,7 @@ public class QrispVrpSolver extends VrpSolver {
       var processResult = context.getBean(
           BinaryProcessRunner.class,
           scriptDir,
-          "../venv/bin/python",
+          "/Users/koalamitice/opt/anaconda3/bin/python",
           "grover.py",
           new String[] {"--size-gate", "35"}
         )

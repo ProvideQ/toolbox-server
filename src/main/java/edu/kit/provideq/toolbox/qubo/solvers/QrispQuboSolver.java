@@ -45,9 +45,10 @@ public class QrispQuboSolver extends QuboSolver {
                     SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
     
     var processRunner = context.getBean(
+      //TODO: Change to PythonProcessRunner, Install Binaries (for other Solvers) on Server
         BinaryProcessRunner.class,
         vrpPath,
-        "../venv/bin/python",
+        "/Users/koalamitice/opt/anaconda3/bin/python",
         "qaoa.py",
         new String[] {"%1$s", "--output-file", "%2$s", "--size-gate", "4"}
         )
