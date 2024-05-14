@@ -55,11 +55,13 @@ public class ResourceProvider {
    * @return File object of the directory
    * @throws IOException when the directory couldn't be accessed or created
    */
-  public File getProblemDirectory(ProblemType problemType, long solutionId) throws IOException {
+  public <InputT, ResultT> File getProblemDirectory(
+          ProblemType<InputT, ResultT> problemType,
+          long solutionId) throws IOException {
     File workingDirectory = getWorkingDirectory();
 
     Path dir =
-        Paths.get(workingDirectory.toString(), problemType.toString(), String.valueOf(solutionId));
+        Paths.get(workingDirectory.toString(), problemType.getId(), String.valueOf(solutionId));
     Files.createDirectories(dir);
 
     return dir.toFile();
