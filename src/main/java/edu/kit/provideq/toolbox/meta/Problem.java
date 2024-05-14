@@ -58,7 +58,8 @@ public class Problem<InputT, ResultT> {
     Optional<ProblemSolver<InputT, ResultT>> solverT = getSolver();
     Optional<InputT> inputT = getInput();
     if (solverT.isEmpty() || inputT.isEmpty()) {
-      throw new IllegalStateException("The problem is not fully configured!");
+      throw new IllegalStateException(
+              "The problem %s is not fully configured!".formatted(toString()));
     }
 
     this.setState(ProblemState.SOLVING);
