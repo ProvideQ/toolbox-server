@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
 /**
@@ -120,6 +121,17 @@ public class Problem<InputT, ResultT> {
   @SuppressWarnings("java:S1452")
   public Set<Problem<?, ?>> getSubProblems() {
     return subProblems.getProblems();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <SubInputT, SubResultT> Set<Problem<SubInputT, SubResultT>> getSubProblems(
+          ProblemType<SubInputT, SubResultT> subProblemType) {
+    // problem type check guarantees correct type
+    return subProblems.getProblems()
+            .stream()
+            .filter(subProblem -> subProblem.getType().equals(subProblemType))
+            .map(subProblem -> (Problem<SubInputT, SubResultT>) subProblem)
+            .collect(Collectors.toSet());
   }
 
   public <SubInputT, SubResultT> Set<Problem<SubInputT, SubResultT>> getSubProblems(
