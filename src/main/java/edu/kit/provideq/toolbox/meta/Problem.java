@@ -117,6 +117,7 @@ public class Problem<InputT, ResultT> {
     return this.state;
   }
 
+  @SuppressWarnings("java:S1452")
   public Set<Problem<?, ?>> getSubProblems() {
     return subProblems.getProblems();
   }

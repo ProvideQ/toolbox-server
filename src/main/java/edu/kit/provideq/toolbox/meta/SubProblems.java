@@ -57,6 +57,7 @@ final class SubProblems<InputT, ResultT>
   /**
    * Returns all sub-problems.
    */
+  @SuppressWarnings("java:S1452")
   public Set<Problem<?, ?>> getProblems() {
     return this.entries.stream()
         .map(entry -> entry.problem)

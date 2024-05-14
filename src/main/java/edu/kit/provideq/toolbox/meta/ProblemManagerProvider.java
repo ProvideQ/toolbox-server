@@ -11,6 +11,7 @@ public interface ProblemManagerProvider {
   /**
    * Returns the problem managers of all registered problem types.
    */
+  @SuppressWarnings("java:S1452") // ProblemManager is a raw type
   Set<ProblemManager<?, ?>> getProblemManagers();
 
   /**

@@ -33,6 +33,7 @@ public interface ProblemSolver<InputT, ResultT> {
    *
    * @return list of sub problems
    */
+  @SuppressWarnings("java:S1452")
   default List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return Collections.emptyList();
   }
