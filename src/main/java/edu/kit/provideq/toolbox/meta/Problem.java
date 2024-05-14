@@ -139,4 +139,14 @@ public class Problem<InputT, ResultT> {
   public void removeObserver(ProblemObserver<InputT, ResultT> observer) {
     this.observers.remove(observer);
   }
+
+  @Override
+  public String toString() {
+    return "Problem{"
+            + "type=" + type
+            + ", id=" + id
+            + ", state=" + state
+            + ", solver=" + solver
+            + '}';
+  }
 }
