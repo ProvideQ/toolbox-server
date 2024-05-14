@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -57,11 +58,11 @@ public class ResourceProvider {
    */
   public <InputT, ResultT> File getProblemDirectory(
           ProblemType<InputT, ResultT> problemType,
-          long solutionId) throws IOException {
+          UUID solutionId) throws IOException {
     File workingDirectory = getWorkingDirectory();
 
     Path dir =
-        Paths.get(workingDirectory.toString(), problemType.getId(), String.valueOf(solutionId));
+        Paths.get(workingDirectory.toString(), problemType.getId(), solutionId.toString());
     Files.createDirectories(dir);
 
     return dir.toFile();

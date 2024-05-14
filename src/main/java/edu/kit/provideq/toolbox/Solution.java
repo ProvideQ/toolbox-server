@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -12,8 +13,7 @@ import java.util.function.Function;
  * @param <S> the type of the generated solution data
  */
 public class Solution<S> {
-  // todo remove this/find usage?
-  private final long id;
+  private final UUID id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
   private S solutionData;
@@ -25,14 +25,14 @@ public class Solution<S> {
    * Internal constructor, used for de-serialization.
    */
   public Solution() {
-    this.id = Long.MIN_VALUE;
+    this.id = UUID.randomUUID();
   }
 
-  public Solution(long id) {
+  public Solution(UUID id) {
     this.id = id;
   }
 
-  public long getId() {
+  public UUID getId() {
     return this.id;
   }
 
