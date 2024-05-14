@@ -37,6 +37,7 @@ final class SubProblems<InputT, ResultT>
   private final Set<SubProblemEntry<?, ?>> entries;
   private final Consumer<Problem<?, ?>> problemAddedObserver;
   private final Consumer<Problem<?, ?>> problemRemovedObserver;
+  private final Set<Consumer<Problem<?, ?>>> entryStateChangedObservers;
 
   /**
    * Initializes a new sub problem manager.
@@ -49,6 +50,7 @@ final class SubProblems<InputT, ResultT>
       Consumer<Problem<?, ?>> problemRemovedObserver
   ) {
     this.entries = new HashSet<>();
+    this.entryStateChangedObservers = new HashSet<>();
 
     this.problemAddedObserver = problemAddedObserver;
     this.problemRemovedObserver = problemRemovedObserver;
@@ -76,6 +78,7 @@ final class SubProblems<InputT, ResultT>
         .orElse(Collections.emptySet());
   }
 
+  @SuppressWarnings("unchecked") // Solution type is always correct
   @Override
   public <SubInputT, SubResultT> Mono<Solution<SubResultT>> runSubRoutine(
       SubRoutineDefinition<SubInputT, SubResultT> subRoutine,
@@ -85,7 +88,26 @@ final class SubProblems<InputT, ResultT>
         "The given sub-routine was not registered with the problem solver!"));
 
     entry.problem.setInput(input);
-    return entry.problem.solve();
+    if (entry.problem.getSolver().isPresent()) {
+      // In case there is a solver set, we can start the sub problem
+      return entry.problem.solve();
+    }
+
+    // Wait for the solver to be set which will run the solver
+    // Once the sub problem is solved, the state changes to SOLVED and at that point we can continue
+    return Mono.create(sink -> {
+      Consumer<Problem<?, ?>> observer = problem -> {
+        if (problem.getId() == entry.problem.getId()
+                && problem.getState() == ProblemState.SOLVED) {
+          sink.success((Solution<SubResultT>) problem.getSolution());
+        }
+      };
+
+      entryStateChangedObservers.add(observer);
+
+      // Remove the observer once this Mono is consumed and disposed
+      sink.onDispose(() -> entryStateChangedObservers.remove(observer));
+    });
   }
 
   @SuppressWarnings("unchecked") // Java cannot infer explicit type check in filter below
@@ -124,6 +146,38 @@ final class SubProblems<InputT, ResultT>
   ) {
     var entry = new SubProblemEntry<>(subRoutine);
     this.entries.add(entry);
+    entry.problem.addObserver(new ProblemObserver<>() {
+        @Override
+        public void onInputChanged(Problem<SubInputT, SubResultT> problem, SubInputT newInput) {
+          // do nothing
+        }
+
+        @Override
+        public void onSolverChanged(
+                Problem<SubInputT, SubResultT> problem,
+                ProblemSolver<SubInputT, SubResultT> newSolver) {
+          // do nothing
+        }
+
+        @Override
+        public void onStateChanged(Problem<SubInputT, SubResultT> problem, ProblemState newState) {
+            entryStateChangedObservers.forEach(observer -> observer.accept(problem));
+        }
+
+        @Override
+        public <NewSubInputT, NewSubResultT> void onSubProblemAdded(
+                Problem<SubInputT, SubResultT> problem,
+                Problem<NewSubInputT, NewSubResultT> addedSubProblem) {
+          // do nothing
+        }
+
+        @Override
+        public <NewSubInputT, NewSubResultT> void onSubProblemRemoved(
+                Problem<SubInputT, SubResultT> problem,
+                Problem<NewSubInputT, NewSubResultT> removedSubProblem) {
+          // do nothing
+        }
+    });
     return entry;
   }
 
