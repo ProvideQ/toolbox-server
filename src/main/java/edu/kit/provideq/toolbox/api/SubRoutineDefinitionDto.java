@@ -10,6 +10,15 @@ public final class SubRoutineDefinitionDto {
   private final String description;
 
   /**
+   * Internal constructor, used for de-serialization.
+   */
+  @SuppressWarnings("unused")
+  private SubRoutineDefinitionDto() {
+    this.typeId = null;
+    this.description = null;
+  }
+
+  /**
    * Use {@link #fromSubRoutineDefinition(SubRoutineDefinition)}.
    */
   private SubRoutineDefinitionDto(

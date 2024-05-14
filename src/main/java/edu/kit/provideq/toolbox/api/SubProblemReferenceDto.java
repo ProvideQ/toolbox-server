@@ -13,6 +13,14 @@ public final class SubProblemReferenceDto {
   private final SubRoutineDefinitionDto subRoutine;
   private final List<String> subProblemIds;
 
+  /**
+   * Internal constructor, used for de-serialization.
+   */
+  @SuppressWarnings("unused")
+  private SubProblemReferenceDto() {
+    this.subRoutine = null;
+    this.subProblemIds = List.of();
+  }
 
   /**
    * Use {@link #forSubRoutine(Problem, SubRoutineDefinition)}.
