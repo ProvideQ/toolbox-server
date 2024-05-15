@@ -1,8 +1,22 @@
 package edu.kit.provideq.toolbox.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.google.common.collect.Lists;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.meta.*;
+import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemManager;
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.meta.ProblemState;
+import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.core.ParameterizedTypeReference;
@@ -10,20 +24,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 public class ApiTestHelper {
-  public static Stream<List<Object>> getAllArgumentCombinations(ProblemManager<?, ?> problemManager) {
+  public static Stream<List<Object>> getAllArgumentCombinations(
+          ProblemManager<?, ?> problemManager) {
     return getAllArgumentCombinations(problemManager, List.of());
   }
 
-  public static Stream<List<Object>> getAllArgumentCombinations(ProblemManager<?, ?> problemManager, List<?>... lists) {
+  public static Stream<List<Object>> getAllArgumentCombinations(
+          ProblemManager<?, ?> problemManager,
+          List<?>... lists) {
     // Get all solvers
     var solvers = problemManager.getSolvers().stream().toList();
 
@@ -162,6 +171,7 @@ public class ApiTestHelper {
       try {
         Thread.sleep(waitMilliseconds);
       } catch (InterruptedException ignored) {
+        // Ignore
       }
 
       if (hasTimeout.get()) {
