@@ -1,105 +1,90 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
-import static org.hamcrest.Matchers.is;
+import static edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD;
+import static edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID;
+import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import edu.kit.provideq.toolbox.GamsProcessRunner;
-import edu.kit.provideq.toolbox.MetaSolverHelper;
-import edu.kit.provideq.toolbox.MetaSolverProvider;
-import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureConfiguration;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureMetaSolver;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.SatBasedDeadFeatureSolver;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.SatBasedVoidFeatureSolver;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidFeatureMetaSolver;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidModelConfiguration;
-import edu.kit.provideq.toolbox.meta.MetaSolver;
-import edu.kit.provideq.toolbox.meta.ProblemSolver;
-import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.sat.MetaSolverSat;
-import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.toolbox.meta.*;
+
+import java.time.Duration;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@WebFluxTest
-@Import(value = {
-    SolveRouter.class,
-    MetaSolverProvider.class,
-    DeadFeatureMetaSolver.class,
-    SatBasedDeadFeatureSolver.class,
-    VoidFeatureMetaSolver.class,
-    SatBasedVoidFeatureSolver.class,
-    SubRoutinePool.class,
-    MetaSolverSat.class,
-    GamsSatSolver.class,
-    GamsProcessRunner.class,
-    ResourceProvider.class,
-})
+@SpringBootTest
+@AutoConfigureMockMvc
 class FeatureModelAnomalySolverTest {
-  @Autowired
-  private WebTestClient client;
+    @Autowired
+    private WebTestClient client;
 
-  @Autowired
-  private VoidFeatureMetaSolver voidMetaSolver;
+    @Autowired
+    private ProblemManagerProvider problemManagerProvider;
 
-  @Autowired
-  private DeadFeatureMetaSolver deadFeatureMetaSolver;
+    @BeforeEach
+    void beforeEach() {
+        this.client = this.client.mutate()
+                .responseTimeout(Duration.ofSeconds(20))
+                .build();
+    }
 
-  Stream<Arguments> provideArguments() {
-    // Return combined stream
-    return Stream.concat(
-            getArguments(voidMetaSolver,
-                VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID),
-            getArguments(deadFeatureMetaSolver,
-                DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD));
-  }
+    Stream<Arguments> provideArguments() {
+        // Return combined stream
+        return ApiTestHelper.concatAll(
+                getArguments(FEATURE_MODEL_ANOMALY_VOID),
+                getArguments(FEATURE_MODEL_ANOMALY_DEAD));
+    }
 
-  static <InputT, ResultT> Stream<Arguments> getArguments(
-      MetaSolver<InputT, ResultT, ?> metaSolver,
-      ProblemType<InputT, ResultT> problemType
-  ) {
-    return MetaSolverHelper.getAllArgumentCombinations(metaSolver)
-            .map(list -> Arguments.of(
-                    list.get(0),
-                    problemType,
-                    SOLVED,
-                    list.get(1)));
-  }
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    <InputT, ResultT> Stream<Arguments> getArguments(
 
-  @ParameterizedTest
-  @MethodSource("provideArguments")
-  void testFeatureModelAnomalySolver(
-      Class<? extends ProblemSolver<String, String>> solver,
-      ProblemType<String, String> anomalyType,
-      SolutionStatus expectedStatus,
-      String content) {
-    var req = new SolveFeatureModelRequest();
-    req.requestedSolverId = solver.getName();
-    req.requestContent = content;
+            ProblemType<InputT, ResultT> problemType
+    ) {
+        var featureModelManager = problemManagerProvider.findProblemManagerForType(problemType).get();
+        var satManager = problemManagerProvider.findProblemManagerForType(SAT).get();
 
-    var response = client.post()
-        .uri("/solve/" + anomalyType.getId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(req)
-        .exchange();
+        var satSolver = satManager.getSolvers().stream().toList();
 
-    response.expectStatus().isOk();
-    response.expectBody(new ParameterizedTypeReference<Solution<String>>() {
-        })
-        .value(Solution::getStatus, is(expectedStatus));
-  }
+        return ApiTestHelper.getAllArgumentCombinations(featureModelManager, satSolver)
+                .map(list -> Arguments.of(
+                        list.get(0),
+                        problemType,
+                        list.get(1),
+                        list.get(2)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArguments")
+    void testFeatureModelAnomalySolver(
+            ProblemSolver<String, String> featureModelSolver,
+            ProblemType<String, String> problemType,
+            String input,
+            ProblemSolver<String, DimacsCnfSolution> satSolver) {
+        var problem = ApiTestHelper.createProblem(client, featureModelSolver, input, problemType);
+        assertEquals(ProblemState.SOLVING, problem.getState());
+
+        // Set solver for sat sub problem
+        for (SubProblemReferenceDto subProblem : problem.getSubProblems()) {
+            var subProblemTypeId = subProblem.getSubRoutine().getTypeId();
+            for (String subProblemId : subProblem.getSubProblemIds()) {
+                ApiTestHelper.setProblemSolver(client, satSolver, subProblemId, subProblemTypeId);
+            }
+        }
+
+        problem = ApiTestHelper.trySolveFor(15, client, problem.getId(), problemType);
+        assertNotNull(problem.getSolution());
+        assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
+    }
 }
