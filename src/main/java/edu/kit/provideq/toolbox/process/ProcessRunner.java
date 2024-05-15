@@ -1,14 +1,14 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.process;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -37,11 +37,14 @@ public class ProcessRunner {
    */
   private static final String SOLUTION_FILE_NAME = "solution";
 
+  /**
+   * Arguments that are passed to the command line call
+   */
+  private String[] arguments;
+
   protected final ProcessBuilder processBuilder;
   protected ResourceProvider resourceProvider;
 
-
-  private final String[] arguments;
   private HashMap<String, String> env;
 
   private String[] problemFilePathCommandFormat;
@@ -137,7 +140,6 @@ public class ProcessRunner {
 
   /**
    * Runs the process provided in the constructor.
-   * @param <T>
    *
    * @param problemType The type of the problem that is run
    * @param solutionId  The id of the resulting solution
@@ -151,7 +153,6 @@ public class ProcessRunner {
 
   /**
    * Runs the process provided in the constructor.
-   * @param <T>
    *
    * @param problemType The type of the problem that is run
    * @param solutionId  The id of the resulting solution
@@ -160,7 +161,7 @@ public class ProcessRunner {
    * @return Returns the process result, which contains the solution data
    *     or an error as output depending on the success of the process.
    */
-  public ProcessResult run(ProblemType<?, ?> problemType, UUID solutionId, String problemData, ProcessResultReader<T> reader) {
+  public <T> ProcessResult<T> run(ProblemType<?, ?> problemType, UUID solutionId, String problemData, ProcessResultReader<T> reader) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {
@@ -168,9 +169,10 @@ public class ProcessRunner {
           .getProblemDirectory(problemType, solutionId)
           .getAbsolutePath();
     } catch (IOException e) {
-      return new ProcessResult(
-          false,
-          "Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage())
+      return new ProcessResult<T>(
+              false,
+              Optional.empty(),
+              Optional.of("Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage()))
       );
     }
 
@@ -185,10 +187,11 @@ public class ProcessRunner {
     try {
       Files.writeString(problemFilePath, problemData);
     } catch (IOException e) {
-      return new ProcessResult(
-          false,
-          "Error: The problem data couldn't be written to %s:%n%s".formatted(
-              normalizedProblemFilePath, e.getMessage())
+      return new ProcessResult<T>(
+              false,
+              Optional.empty(),
+              Optional.of("Error: The problem data couldn't be written to %s:%n%s".formatted(
+                      normalizedProblemFilePath, e.getMessage()))
       );
     }
 
@@ -213,7 +216,7 @@ public class ProcessRunner {
         addCommand(format.formatted(normalizedSolutionFilePath));
       }
     }
-    
+
     // Run the process
     String processOutput;
     int processExitCode;
@@ -225,38 +228,36 @@ public class ProcessRunner {
 
       processExitCode = process.waitFor();
     } catch (IOException | InterruptedException e) {
-      return new ProcessResult(
-          false,
-          "Solving %s problem resulted in exception:%n%s"
-                  .formatted(problemType.getId(), e.getMessage())
+      return new ProcessResult<T>(
+              false,
+              Optional.empty(),
+              Optional.of(
+                      "Solving %s problem resulted in exception:%n%s".formatted(problemType.getId(), e.getMessage())
+              )
       );
     }
 
     // Return prematurely if the process failed
     if (processExitCode != 0) {
-      return new ProcessResult(
-          false,
-          "%s problem couldn't be solved:%n%s"
-                  .formatted(problemType.getId(), processOutput));
+      return new ProcessResult<T>(
+              false,
+              Optional.empty(),
+              Optional.of("%s problem couldn't be solved:%n%s".formatted(problemType.getId(), processOutput)));
     }
 
     // Read the solution file
-    String solutionText;
-    try {
-      solutionText = Files.readString(solutionFile);
-    } catch (IOException e) {
-      return new ProcessResult(
-          false,
-          "Error: The problem data couldn't be read from %s:%n%s".formatted(
-              normalizedProblemFilePath, e.getMessage())
+    ProcessResult<T> result = reader.read(solutionFile, problemFilePath, Path.of(problemDirectoryPath));
+
+    if (!result.success()) {
+      return new ProcessResult<T>(
+              result.success(),
+              result.output(),
+              result.errorOutput().isPresent() ? Optional.of(result.errorOutput().get() + "%nCommand Output: %s".formatted(processOutput)) : Optional.empty()
       );
     }
 
     // Return the solution
-    return new ProcessResult(
-        true,
-        solutionText
-    );
+    return result;
 
   }
 

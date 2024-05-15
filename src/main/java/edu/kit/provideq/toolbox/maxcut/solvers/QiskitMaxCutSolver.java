@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
@@ -68,7 +68,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     }
 
     // Parse solution data and add partition data to GML
-    Optional<String> solutionLine = processResult.output()
+    Optional<String> solutionLine = processResult.output().get()
             .lines()
             .filter(s -> s.startsWith(SOLUTION_LINE_PREFIX))
             .findFirst();

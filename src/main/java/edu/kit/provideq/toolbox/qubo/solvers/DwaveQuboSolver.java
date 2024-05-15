@@ -1,24 +1,19 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.meta.setting.Select;
-import edu.kit.provideq.toolbox.meta.setting.Text;
-
-import java.util.List;
-import java.util.Optional;
-
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 /**
- * {@link ProblemType#QUBO} solver using a Dwaves Quantum Annealer implementation.
+ * {@link QuboConfiguration#QUBO} solver using a Dwaves Quantum Annealer implementation.
  */
 @Component
 public class DwaveQuboSolver extends QuboSolver {
@@ -41,24 +36,21 @@ public class DwaveQuboSolver extends QuboSolver {
         return "Dwave QUBO Quantum Annealer";
     }
 
-    @Override
-    public boolean canSolve(Problem<String> problem) {
-        return problem.type() == ProblemType.QUBO;
-    }
-
+    /*
     @Override
     public List<MetaSolverSetting> getSettings() {
         return List.of(
             new Select<String>(METHOD_SETTING_NAME, "DWave Annealing Method", List.of("sim", "hybrid", "qbsolv", "direct"), "sim"),
             new Text(API_TOKEN_SETTING_NAME, "DWave API Token (required for non-sim methods)")
         );
-    }
+    }*/
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution,
-                        SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
-        
-        @SuppressWarnings("unchecked")
+    public Mono<Solution<String>> solve(
+            String input,
+            SubRoutineResolver subRoutineResolver
+    ) {
+        /*
         String dwaveAnnealingMethod = settings.stream()
             .filter(setting -> setting.name.equals(METHOD_SETTING_NAME))
             .map(setting -> ((Select<String>) setting))
@@ -71,12 +63,16 @@ public class DwaveQuboSolver extends QuboSolver {
             .map(setting -> ((Text) setting))
             .findFirst()
             .map(setting -> setting.text);
-            
+        */ //TODO: Add Setting again (currently not part of our model)
+
+        String dwaveAnnealingMethod = "sim"; //TODO: remove this again
+        Optional<String> dwaveToken = null; //TODO: remove this again
+
+        var solution = new Solution<String>();
 
         var processRunner = context.getBean(
-            BinaryProcessRunner.class,
+            PythonProcessRunner.class,
             quboScriptPath,
-            "/Users/koalamitice/opt/anaconda3/bin/python",
             "main.py",
             new String[] {"%1$s", dwaveAnnealingMethod, "--output-file", "%2$s"}
             )
@@ -88,15 +84,8 @@ public class DwaveQuboSolver extends QuboSolver {
         }
 
         var processResult = processRunner
-            .run(problem.type(), solution.getId(), problem.problemData());
+            .run(getProblemType(), solution.getId(), input);
             
-        if (!processResult.success()) {
-            solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
-            solution.abort();
-            return;
-        }
-
-        solution.setSolutionData(processResult.output().orElse("Empty Solution"));
-        solution.complete();
+       return Mono.just(processResult.applyTo(solution));
     }
 }

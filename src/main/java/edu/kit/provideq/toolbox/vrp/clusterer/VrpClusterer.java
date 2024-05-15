@@ -8,18 +8,16 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.kit.provideq.toolbox.meta.*;
+import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemSolver;
-import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
-import edu.kit.provideq.toolbox.process.ProcessResult;
+import reactor.core.publisher.Mono;
 
 /**
  * A solver for SAT problems.
@@ -41,37 +39,44 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
         this.context = context;
     }
 
+    @Override
+    public ProblemType<String, String> getProblemType() {
+        return ClusterVrpConfiguration.CLUSTER_VRP;
+    }
+
     @Autowired
     public void setResourceProvider(ResourceProvider resourceProvider) {
         this.resourceProvider = resourceProvider;
     }
 
     @Override
-    public List<SubRoutineDefinition> getSubRoutines() {
+    public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
         return List.of(
-            new SubRoutineDefinition(ProblemType.VRP,
+            new SubRoutineDefinition(VrpConfiguration.VRP,
                 "How should the clusters be solved?")
         );
     }
-    @Override
-    public boolean canSolve(Problem<String> problem) {
-        return problem.type() == ProblemType.CLUSTERABLE_VRP;
-    }
 
-    public void solveClusters(Problem<String> problem, Solution<String> solution, SubRoutinePool subRoutinePool, ProcessResult<HashMap<Path, String>> cluster) {
+    public Mono<Solution<String>> solveClusters(
+            Solution<String> solution,
+            SubRoutineResolver resolver,
+            ProcessResult<HashMap<Path, String>> cluster
+    ) {
 
         // Retrieve the problem directory
         String problemDirectoryPath;
         try {
             problemDirectoryPath = resourceProvider
-                .getProblemDirectory(problem.type(), solution.getId())
+                .getProblemDirectory(getProblemType(), solution.getId())
                 .getAbsolutePath();
         } catch (IOException e) {
             solution.setDebugData("Failed to retrieve problem directory.");
             solution.abort();
-            return;
+            return Mono.just(solution);
         }
 
+        //TODO: refactor the following code, needs to work with the new model
+        /*
         // solve each subproblem
         for (var subproblemEntry : cluster.output().orElse(new HashMap<>()).entrySet()) {
             var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
@@ -105,7 +110,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
         )
         .problemFileName("problem.vrp")
         .solutionFileName("problem.sol")
-        .run(problem.type(), solution.getId(), problem.problemData());
+        .run(getProblemType(), solution.getId(), input);
         
         
         if (!combineProcessRunner.success()) {
@@ -115,6 +120,9 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
         }
     
         solution.setSolutionData(combineProcessRunner.output().orElse("Empty Solution"));
+        */
+
         solution.complete();
+        return Mono.just(solution);
     }
 }

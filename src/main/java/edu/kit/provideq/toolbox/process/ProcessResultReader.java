@@ -4,5 +4,5 @@ import java.nio.file.Path;
 
 
 public interface ProcessResultReader<R> {
-    public ProcessResult<R> read(Path solutionPath, Path problemPath, Path problemDirectory);
+    public ProcessResult read(Path solutionPath, Path problemPath, Path problemDirectory);
 }

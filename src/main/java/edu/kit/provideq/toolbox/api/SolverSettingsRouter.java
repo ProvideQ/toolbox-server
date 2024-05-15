@@ -11,9 +11,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.provideq.toolbox.MetaSolverProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.meta.MetaSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
@@ -35,11 +33,11 @@ import reactor.core.publisher.Mono;
  * This router handles settings requests to the GET {@code /settings/{problemType}}
  * endpoints.
  * Responses are generated from the settings data reported by the given solver itself
- * (see {@link ProblemSolver#getSettings()}).
  */
 @Configuration
 @EnableWebFlux
 public class SolverSettingsRouter {
+  /*
   private final MetaSolverProvider metaSolverProvider;
 
   @Autowired
@@ -135,4 +133,5 @@ public class SolverSettingsRouter {
   private String getSettingsRouteForProblemType(ProblemType type) {
     return "/settings/" + type.getId();
   }
+*/
 }

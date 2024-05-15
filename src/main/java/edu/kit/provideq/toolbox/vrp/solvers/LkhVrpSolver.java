@@ -1,21 +1,18 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 
-import java.util.List;
-
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
- * {@link ProblemType#SAT} solver using a GAMS implementation.
+ * {@link VrpConfiguration#VRP} classical solver using the LKH-3 heuristic
  */
 @Component
 public class LkhVrpSolver extends VrpSolver {
@@ -36,33 +33,24 @@ public class LkhVrpSolver extends VrpSolver {
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    return problem.type() == ProblemType.VRP;
-  }
+  public Mono<Solution<String>> solve(
+          String input,
+          SubRoutineResolver resolver
+  ) {
 
-  @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
-      
-      var processResult = context.getBean(
-          BinaryProcessRunner.class,
-          scriptDir,
-          "/Users/koalamitice/opt/anaconda3/bin/python",
-          "vrp_lkh.py"
-        )
-        .addProblemFilePathToProcessCommand()
-        .addSolutionFilePathToProcessCommand("--output-file", "%s")
-        .problemFileName("problem.vrp")
-        .solutionFileName("problem.sol")
-        .run(problem.type(), solution.getId(), problem.problemData());
-        
-      if (!processResult.success()) {
-        solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
-        solution.abort();
-        return;
-      }
-  
-      solution.setSolutionData(processResult.output().orElse("Empty Solution"));
-      solution.complete();
+    var solution = new Solution<String>();
+
+    var processResult = context.getBean(
+                    PythonProcessRunner.class,
+                    scriptDir,
+                    "grover.py"
+            )
+            .addProblemFilePathToProcessCommand()
+            .addSolutionFilePathToProcessCommand("--output-file", "%s")
+            .problemFileName("problem.vrp")
+            .solutionFileName("problem.sol")
+            .run(getProblemType(), solution.getId(), input);
+
+    return Mono.just(processResult.applyTo(solution));
   }
 }

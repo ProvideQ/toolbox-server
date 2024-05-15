@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.SolutionStatus.SOLVED;
 import static org.hamcrest.Matchers.is;
 
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboMetaSolver;
 import edu.kit.provideq.toolbox.qubo.SolveQuboRequest;
 import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
@@ -14,16 +13,12 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.vrp.MetaSolverVrp;
-import edu.kit.provideq.toolbox.vrp.SolveVrpRequest;
-import edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpRequest;
+import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import edu.kit.provideq.toolbox.vrp.clusterer.KmeansClusterer;
-import edu.kit.provideq.toolbox.vrp.clusterer.MetaSolverClusterVrp;
-import edu.kit.provideq.toolbox.vrp.clusterer.NoClusteringClusterer;
 import edu.kit.provideq.toolbox.vrp.clusterer.TwoPhaseClusterer;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
-import edu.kit.provideq.toolbox.vrp.solvers.QuboTspSolver;
+import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
 
 import java.time.Duration;
 import java.util.List;
@@ -48,7 +43,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     SolveRouter.class,
     MetaSolverClusterVrp.class,
     MetaSolverProvider.class,
-    MetaSolverVrp.class,
+    VrpConfiguration.class,
     ClusterAndSolveVrpSolver.class,
     BinaryProcessRunner.class,
     LkhVrpSolver.class,
@@ -68,10 +63,10 @@ class VRPSolverTest {
   private WebTestClient client;
 
   @Autowired
-  private MetaSolverVrp metaSolverVrp;
+  private VrpConfiguration vrpConfiguration;
 
   Stream<Arguments> provideArguments() {
-    String exampleProblem = metaSolverVrp.getExampleProblems().get(0);
+    String exampleProblem = vrpConfiguration.getExampleProblems().get(0);
 
     var simpleLKHRequest = new SolveVrpRequest();
 
@@ -95,7 +90,7 @@ class VRPSolverTest {
 
 
 
-    String smallProblem = metaSolverVrp.getExampleProblems().get(1);
+    String smallProblem = vrpConfiguration.getExampleProblems().get(1);
 
     var clusterTspToQuboAndAnneal = new SolveVrpRequest();
     clusterTspToQuboAndAnneal.requestedSolverId = ClusterAndSolveVrpSolver.class.getName();

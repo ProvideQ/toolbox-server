@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;

@@ -1,15 +1,13 @@
-package edu.kit.provideq.toolbox.vrp.solvers;
+package edu.kit.provideq.toolbox.tsp.solvers;
 
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.tsp.TspConfiguration;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 
-/**
- * A solver for VRP problems.
- */
-public abstract class VrpSolver implements ProblemSolver<String, String> {
+public abstract class TspSolver implements ProblemSolver<String, String> {
     @Override
     public ProblemType<String, String> getProblemType() {
-        return VrpConfiguration.VRP;
+        return TspConfiguration.TSP;
     }
 }

@@ -1,23 +1,18 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
-import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-
-import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
-
-import java.util.List;
-
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-/**
- * {@link ProblemType#SAT} solver using a GAMS implementation.
- */
+import java.util.List;
+
+import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
+
 @Component
 public class ClusterAndSolveVrpSolver extends VrpSolver {
   private final ApplicationContext context;
@@ -30,36 +25,37 @@ public class ClusterAndSolveVrpSolver extends VrpSolver {
 
   @Override
   public String getName() {
-    return "Clustering VRP Solver";
+    return "Cluster before Solving";
+  }
+
+  private static final SubRoutineDefinition<String, String> CLUSTER_SUBROUTINE =
+          new SubRoutineDefinition<>(
+                  ClusterVrpConfiguration.CLUSTER_VRP,
+                  "Creates a cluster of multiple vehicle routing problems"
+          );
+
+  @Override
+  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
+    return List.of(CLUSTER_SUBROUTINE);
   }
 
   @Override
-  public List<SubRoutineDefinition> getSubRoutines() {
-    return List.of(
-        new SubRoutineDefinition(ProblemType.CLUSTERABLE_VRP,
-            "How should the VRP be clustered?"));
-  }
+  public Mono<Solution<String>> solve(
+          String input,
+          SubRoutineResolver resolver
+  ) {
+    return resolver.runSubRoutine(CLUSTER_SUBROUTINE, input)
+            .map(clusterSolution -> {
+              var solution = new Solution<String>();
+              //retreive clusters
+              //TODO ...
+              solution.setSolutionData("currently not implemented");
+              solution.setDebugData("currently not implemented");
 
-  @Override
-  public boolean canSolve(Problem<String> problem) {
-    return problem.type() == ProblemType.VRP;
-  }
+              //solve every cluster with a vrp solver
+              //TODO ...
 
-  @Override
-  public void solve(Problem<String> problem, Solution<String> solution,
-                    SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
-    var vrpClusterer = subRoutinePool.<String, String>getSubRoutine(ProblemType.CLUSTERABLE_VRP);
-
-    var vrpSolution = vrpClusterer.apply(problem.problemData());
-
-
-    if (vrpSolution.getStatus() == INVALID) {
-      solution.setDebugData(vrpSolution.getDebugData());
-      solution.abort();
-      return;
-    }
-
-    solution.setSolutionData(vrpSolution.getSolutionData());
-    solution.complete();
+              return solution;
+            });
   }
 }

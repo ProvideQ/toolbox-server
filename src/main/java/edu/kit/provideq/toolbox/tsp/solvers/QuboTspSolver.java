@@ -1,15 +1,17 @@
-package edu.kit.provideq.toolbox.vrp.solvers;
+package edu.kit.provideq.toolbox.tsp.solvers;
 
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
-import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
-import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-
-import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,16 +20,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
+import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
 
 /**
- * {@link ProblemType#SAT} solver using a GAMS implementation.
+ * Transforms TSP Problems into QUBOs
  */
 @Component
-public class QuboTspSolver extends VrpSolver {
+public class QuboTspSolver extends TspSolver {
     private final ApplicationContext context;
     private final String binaryDir;
     private final String binaryName;
@@ -35,7 +34,7 @@ public class QuboTspSolver extends VrpSolver {
 
     @Autowired
     public QuboTspSolver(
-        @Value("${vrp.directory}") String binaryDir,
+        @Value("${vrp.directory}") String binaryDir, //"vrp" value is correct because this uses the VRP framework from Lucas Bergers bachelor thesis
         @Value("${vrp.bin.meta-solver}") String binaryName,
         ApplicationContext context) {
         this.binaryName = binaryName;
@@ -51,25 +50,18 @@ public class QuboTspSolver extends VrpSolver {
 
     @Override
     public String getName() {
-        return "TSP to QUBO Solver (Classical)";
+        return "TSP to QUBO Transformation";
     }
 
+    private static final SubRoutineDefinition<String, String> QUBO_SUBROUTINE =
+            new SubRoutineDefinition(QuboConfiguration.QUBO, "How should the QUBO be solved?");
 
     @Override
-    public List<SubRoutineDefinition> getSubRoutines() {
-        return List.of(
-            new SubRoutineDefinition(ProblemType.QUBO,
-                "How should the QUBO be solved?")
-        );
+    public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
+        return List.of(QUBO_SUBROUTINE);
     }
 
-    @Override
-    public boolean canSolve(Problem<String> problem) {
-        boolean isTSP = checkVehicleCapacity(problem.problemData());
-        return problem.type() == ProblemType.VRP && isTSP;
-    }
-
-    public static boolean checkVehicleCapacity(String vrp) {
+    public static boolean checkVehicleCapacity(String tsp) {
         int capacity = 0;
         int totalDemand = 0;
         boolean demandSection = false;
@@ -77,7 +69,7 @@ public class QuboTspSolver extends VrpSolver {
         Pattern capacityPattern = Pattern.compile("CAPACITY\\s*:\\s*(\\d+)");
         Pattern demandPattern = Pattern.compile("^\\d+\\s*(\\d+)");
 
-        for ( String line : vrp.split("\n")) {
+        for ( String line : tsp.split("\n")) {
             Matcher capacityMatcher = capacityPattern.matcher(line);
             if (capacityMatcher.find()) {
                 capacity = Integer.parseInt(capacityMatcher.group(1));
@@ -101,8 +93,18 @@ public class QuboTspSolver extends VrpSolver {
     }
 
     @Override
-    public void solve(Problem<String> problem, Solution<String> solution,
-                        SubRoutinePool subRoutinePool, List<MetaSolverSetting> settings) {
+    public Mono<Solution<String>> solve(
+        String input,
+        SubRoutineResolver resolver
+    ) {
+        return resolver.runSubRoutine(QUBO_SUBROUTINE, input)
+                .map(quboSolution -> {
+                    //TODO: refactor old code and retrieve qubo solution here
+                   return new Solution<String>();
+                });
+
+        /* old code:
+        var solution = new Solution<String>();
 
         // translate into qubo in lp-file format with rust vrp meta solver
         var processResult = context.getBean(
@@ -114,12 +116,12 @@ public class QuboTspSolver extends VrpSolver {
             )
             .problemFileName("problem.vrp")
             .solutionFileName("problem.lp")
-            .run(problem.type(), solution.getId(), problem.problemData());
+            .run(getProblemType(), solution.getId(), input);
         
         if (!processResult.success() || processResult.output().isEmpty()) {
             solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
             solution.abort();
-            return;
+            return Mono.just(solution);
         }
 
         // solve qubo with sub-routine
@@ -128,7 +130,7 @@ public class QuboTspSolver extends VrpSolver {
         if (quboSolution.getStatus() == INVALID) {
             solution.setDebugData(quboSolution.getDebugData());
             solution.abort();
-            return;
+            return Mono.just(solution);
         }
 
         // write solution to current problem directory
@@ -140,7 +142,7 @@ public class QuboTspSolver extends VrpSolver {
         } catch (IOException e) {
             solution.setDebugData("Failed to retrieve problem directory.");
             solution.abort();
-            return;
+            return Mono.just(solution);
         }
 
         var quboSolutionFilePath = Path.of(problemDirectoryPath, "problem.bin");
@@ -150,7 +152,7 @@ public class QuboTspSolver extends VrpSolver {
         } catch (IOException e) {
             solution.setDebugData("Failed to write qubo solution file with path: " + quboSolutionFilePath.toString());
             solution.abort();
-            return;
+            return Mono.just(solution);
         }
         
         var processRetransformResult = context.getBean(
@@ -162,15 +164,16 @@ public class QuboTspSolver extends VrpSolver {
         )
         .problemFileName("problem.vrp")
         .solutionFileName("problem.sol")
-        .run(problem.type(), solution.getId(), problem.problemData());
+        .run(getProblemType(), solution.getId(), input);
     
         if (!processRetransformResult.success()) {
             solution.setDebugData(processRetransformResult.errorOutput().orElse("Unknown error occurred."));
             solution.abort();
-            return;
+            return Mono.just(solution);
         }
 
         solution.setSolutionData(processRetransformResult.output().orElse("Empty Solution"));
         solution.complete();
+        return Mono.just(solution);*/
     }
 }

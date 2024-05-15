@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +53,7 @@ public class GamsSatSolver extends SatSolver {
     }
 
     // Run SAT with GAMS via console
-    var processResult = context
+    ProcessResult<String> processResult = context
         .getBean(
             GamsProcessRunner.class,
             satPath,
@@ -70,4 +71,5 @@ public class GamsSatSolver extends SatSolver {
     }
     return Mono.just(solution);
   }
+
 }

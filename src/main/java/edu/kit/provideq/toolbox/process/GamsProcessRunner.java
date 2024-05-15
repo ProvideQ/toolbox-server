@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.process;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.UUID;
@@ -6,6 +6,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * Process runner with input & output post-processing specifically for invoking GAMS.
@@ -57,8 +59,8 @@ public class GamsProcessRunner extends ProcessRunner {
   public ProcessResult run(ProblemType<?, ?> problemType, UUID solutionId, String problemData) {
     var result = super.run(problemType, solutionId, problemData);
 
-    var obfuscatedOutput = obfuscateGamsLicense(result.output());
-    return new ProcessResult(result.success(), obfuscatedOutput);
+    var obfuscatedOutput = obfuscateGamsLicense(result.output().get());
+    return new ProcessResult(result.success(), Optional.of(obfuscatedOutput), Optional.empty());
   }
 
   /**
