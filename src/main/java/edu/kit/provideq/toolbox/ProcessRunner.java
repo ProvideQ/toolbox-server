@@ -1,12 +1,12 @@
 package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -40,7 +40,9 @@ public class ProcessRunner {
   private String problemFileName = PROBLEM_FILE_NAME;
   private String solutionFileName = SOLUTION_FILE_NAME;
 
-  public ProcessRunner(ProcessBuilder processBuilder) {
+  public ProcessRunner(
+          @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+          ProcessBuilder processBuilder) {
     this.processBuilder = processBuilder;
   }
 
@@ -130,7 +132,7 @@ public class ProcessRunner {
    * @return Returns the process result, which contains the solution data
    *     or an error as output depending on the success of the process.
    */
-  public ProcessResult run(ProblemType problemType, long solutionId, String problemData) {
+  public ProcessResult run(ProblemType<?, ?> problemType, UUID solutionId, String problemData) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {
@@ -185,7 +187,8 @@ public class ProcessRunner {
     } catch (IOException | InterruptedException e) {
       return new ProcessResult(
           false,
-          "Solving %s problem resulted in exception:%n%s".formatted(problemType, e.getMessage())
+          "Solving %s problem resulted in exception:%n%s"
+                  .formatted(problemType.getId(), e.getMessage())
       );
     }
 
@@ -193,7 +196,8 @@ public class ProcessRunner {
     if (processExitCode != 0) {
       return new ProcessResult(
           false,
-          "%s problem couldn't be solved:%n%s".formatted(problemType, processOutput));
+          "%s problem couldn't be solved:%n%s"
+                  .formatted(problemType.getId(), processOutput));
     }
 
     // Read the solution file

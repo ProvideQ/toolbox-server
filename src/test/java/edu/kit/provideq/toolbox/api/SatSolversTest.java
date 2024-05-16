@@ -1,10 +1,11 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration.MAX_CUT;
+import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import edu.kit.provideq.toolbox.SolutionStatus;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
@@ -23,7 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 @AutoConfigureMockMvc
-class MaxCutSolversTest {
+class SatSolversTest {
   @Autowired
   private WebTestClient client;
 
@@ -33,13 +34,13 @@ class MaxCutSolversTest {
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
-        .responseTimeout(Duration.ofSeconds(20))
-        .build();
+            .responseTimeout(Duration.ofSeconds(20))
+            .build();
   }
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   Stream<Arguments> provideArguments() {
-    var problemManager = problemManagerProvider.findProblemManagerForType(MAX_CUT).get();
+    var problemManager = problemManagerProvider.findProblemManagerForType(SAT).get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
             .map(list -> Arguments.of(list.get(0), list.get(1)));
@@ -47,8 +48,8 @@ class MaxCutSolversTest {
 
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testMaxCutSolver(ProblemSolver<String, String> solver, String input) {
-    var problem = ApiTestHelper.createProblem(client, solver, input, MAX_CUT);
+  void testMaxCutSolver(ProblemSolver<String, DimacsCnfSolution> solver, String input) {
+    var problem = ApiTestHelper.createProblem(client, solver, input, SAT);
     assertEquals(ProblemState.SOLVED, problem.getState());
     assertNotNull(problem.getSolution());
     assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
