@@ -54,7 +54,7 @@ public class QuboTspSolver extends TspSolver {
     }
 
     private static final SubRoutineDefinition<String, String> QUBO_SUBROUTINE =
-            new SubRoutineDefinition(QuboConfiguration.QUBO, "How should the QUBO be solved?");
+            new SubRoutineDefinition<>(QuboConfiguration.QUBO, "How should the QUBO be solved?");
 
     @Override
     public List<SubRoutineDefinition<?, ?>> getSubRoutines() {

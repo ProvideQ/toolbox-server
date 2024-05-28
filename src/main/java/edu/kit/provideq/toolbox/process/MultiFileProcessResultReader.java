@@ -15,7 +15,7 @@ public class MultiFileProcessResultReader implements ProcessResultReader<HashMap
         this.globPattern = globPattern;
     }
 
-    public ProcessResult read(Path solutionPath, Path problemPath, Path problemDirectory) {
+    public ProcessResult<HashMap<Path, String>> read(Path solutionPath, Path problemPath, Path problemDirectory) {
 
         HashMap<Path, String> solutions = new HashMap<>();
 
@@ -28,7 +28,7 @@ public class MultiFileProcessResultReader implements ProcessResultReader<HashMap
                 solutions.put(file, Files.readString(file));
             }
         } catch (IOException e) {
-            return new ProcessResult(
+            return new ProcessResult<>(
                     false,
                     Optional.empty(),
                     Optional.of("Error: The problem data couldn't be read from %s:%n%s%nCommand".formatted(
@@ -37,9 +37,9 @@ public class MultiFileProcessResultReader implements ProcessResultReader<HashMap
         }
 
         // Return the solution
-        return new ProcessResult(
+        return new ProcessResult<>(
                 true,
-                Optional.of(solutions.toString()),
+                Optional.of(solutions),
                 Optional.empty()
         );
     }

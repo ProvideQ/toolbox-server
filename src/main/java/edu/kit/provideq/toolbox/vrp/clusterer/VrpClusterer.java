@@ -52,7 +52,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
     @Override
     public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
         return List.of(
-            new SubRoutineDefinition(VrpConfiguration.VRP,
+            new SubRoutineDefinition<>(VrpConfiguration.VRP,
                 "How should the clusters be solved?")
         );
     }

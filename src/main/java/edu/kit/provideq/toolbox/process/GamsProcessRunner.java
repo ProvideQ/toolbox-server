@@ -50,17 +50,17 @@ public class GamsProcessRunner extends ProcessRunner {
    *                       solver.
    */
   public GamsProcessRunner(String directory, String scriptFileName, String... arguments) {
-    super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName, arguments));
+    super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName), arguments);
 
     addProblemFilePathToProcessCommand("--INPUT=\"%s\"");
   }
 
   @Override
-  public ProcessResult run(ProblemType<?, ?> problemType, UUID solutionId, String problemData) {
+  public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId, String problemData) {
     var result = super.run(problemType, solutionId, problemData);
 
     var obfuscatedOutput = obfuscateGamsLicense(result.output().get());
-    return new ProcessResult(result.success(), Optional.of(obfuscatedOutput), Optional.empty());
+    return new ProcessResult<>(result.success(), Optional.of(obfuscatedOutput), Optional.empty());
   }
 
   /**
