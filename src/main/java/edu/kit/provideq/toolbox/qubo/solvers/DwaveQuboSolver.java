@@ -66,7 +66,7 @@ public class DwaveQuboSolver extends QuboSolver {
         */ //TODO: Add Setting again (currently not part of our model)
 
         String dwaveAnnealingMethod = "sim"; //TODO: remove this again
-        Optional<String> dwaveToken = null; //TODO: remove this again
+        Optional<String> dwaveToken = Optional.empty(); //TODO: remove this again
 
         var solution = new Solution<String>();
 

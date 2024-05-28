@@ -58,11 +58,16 @@ public class VrpConfiguration {
           getClass().getResourceAsStream("SmallSample.vrp"),
           "Simple VRP SmallSample Problem unavailable!"
       );
+      var problemThreeStream = Objects.requireNonNull(
+              getClass().getResourceAsStream("VerySmallSampleForGrover.vrp"),
+              "Very Small Problem unavailable");
       var problem = new Problem<>(VRP);
       var problemTwo = new Problem<>(VRP);
+      var problemThree = new Problem<>(VRP);
       problem.setInput(resourceProvider.readStream(problemStream));
       problemTwo.setInput(resourceProvider.readStream(problemTwoStream));
-      return Set.of(problem, problemTwo);
+      problemThree.setInput(resourceProvider.readStream(problemThreeStream));
+      return Set.of(problem, problemTwo, problemThree);
     } catch (IOException e) {
       throw new MissingExampleException("Could not load example problems", e);
     }
