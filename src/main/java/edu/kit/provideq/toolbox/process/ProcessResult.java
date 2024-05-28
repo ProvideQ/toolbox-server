@@ -19,15 +19,15 @@ public record ProcessResult<T>(boolean success, Optional<T> output, Optional<Str
    */
   public Solution<T> applyTo(Solution<T> solution) {
     if (this.success) {
-      if(output().isPresent()) {
-        solution.setSolutionData(output().get());
-      } else {
-        solution.setDebugData("Solution was found, but could not retrieve Solution Data");
-      }
-      solution.complete();
+        if(output().isPresent()) {
+            solution.setSolutionData(output().get());
+        } else {
+            solution.setDebugData("Solution was found, but could not retrieve Solution Data");
+        }
+        solution.complete();
     } else {
-      solution.setDebugData(errorOutput().orElse("Unknown error occurred."));
-      solution.fail();
+        solution.setDebugData(errorOutput().orElse("Unknown error occurred."));
+        solution.fail();
     }
     return solution;
   }

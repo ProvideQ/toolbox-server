@@ -43,7 +43,7 @@ public class LkhVrpSolver extends VrpSolver {
     var processResult = context.getBean(
                     PythonProcessRunner.class,
                     scriptDir,
-                    "grover.py"
+                    "vrp_lkh.py"
             )
             .addProblemFilePathToProcessCommand()
             .addSolutionFilePathToProcessCommand("--output-file", "%s")

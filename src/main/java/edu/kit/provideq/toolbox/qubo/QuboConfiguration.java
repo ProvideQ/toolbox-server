@@ -4,10 +4,13 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
+
+import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,11 +34,13 @@ public class QuboConfiguration {
   @Bean
   ProblemManager<String, String> getQuboManager(
       QiskitQuboSolver qiskitSolver,
+      DwaveQuboSolver dwaveSolver,
+      QrispQuboSolver qrispSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         QUBO,
-        Set.of(qiskitSolver),
+        Set.of(qiskitSolver, dwaveSolver, qrispSolver),
         loadExampleProblems(resourceProvider)
     );
   }

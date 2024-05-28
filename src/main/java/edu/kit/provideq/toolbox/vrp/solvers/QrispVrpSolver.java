@@ -28,7 +28,7 @@ public class QrispVrpSolver extends VrpSolver {
 
   @Override
   public String getName() {
-    return "Qrisp VRP Solver (Grover)";
+    return "Grover-based VRP Solver (Qrisp)";
   }
 
   @Override
@@ -51,6 +51,6 @@ public class QrispVrpSolver extends VrpSolver {
             .solutionFileName("problem.sol")
             .run(getProblemType(), solution.getId(), input);
 
-      return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(solution));
   }
 }
