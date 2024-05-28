@@ -15,7 +15,6 @@ import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.content.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,7 +132,7 @@ public class SubRoutineRouter {
                     .name(manager.getType().getId())
                     .value(example))
             .array(arraySchemaBuilder().schema(
-                    schemaBuilder().implementation(SubRoutineDefinition.class)));
+                     schemaBuilder().implementation(SubRoutineDefinitionDto.class)));
   }
 
   private String getSubRoutinesRouteForProblemType(ProblemType<?, ?> type) {
