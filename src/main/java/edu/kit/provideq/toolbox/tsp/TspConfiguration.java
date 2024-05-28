@@ -8,7 +8,8 @@ import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashSet;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 
 @Configuration
@@ -35,7 +36,13 @@ public class TspConfiguration {
     }
 
     private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
-        //TODO: create an example problem
-        return new HashSet<>();
+        try {
+            var problemSteam = Objects.requireNonNull(getClass().getResourceAsStream("att48.tsp"));
+            var problem = new Problem<>(TSP);
+            problem.setInput(provider.readStream(problemSteam));
+            return Set.of(problem);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load example problems", e);
+        }
     }
 }
