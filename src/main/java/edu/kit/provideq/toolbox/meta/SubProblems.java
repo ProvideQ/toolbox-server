@@ -49,8 +49,8 @@ final class SubProblems<InputT, ResultT>
       Consumer<Problem<?, ?>> problemAddedObserver,
       Consumer<Problem<?, ?>> problemRemovedObserver
   ) {
-    this.entries = new HashSet<>();
-    this.entryStateChangedObservers = new HashSet<>();
+    this.entries = Collections.synchronizedSet(new HashSet<>());
+    this.entryStateChangedObservers = Collections.synchronizedSet(new HashSet<>());
 
     this.problemAddedObserver = problemAddedObserver;
     this.problemRemovedObserver = problemRemovedObserver;
@@ -161,7 +161,9 @@ final class SubProblems<InputT, ResultT>
 
         @Override
         public void onStateChanged(Problem<SubInputT, SubResultT> problem, ProblemState newState) {
-            entryStateChangedObservers.forEach(observer -> observer.accept(problem));
+          // Collect in list to avoid ConcurrentModificationException
+          var observers = entryStateChangedObservers.stream().toList();
+          observers.forEach(observer -> observer.accept(problem));
         }
 
         @Override
