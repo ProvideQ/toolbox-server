@@ -2,7 +2,6 @@ package edu.kit.provideq.toolbox.vrp.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
- * {@link VrpConfiguration#VRP} classical solver using the LKH-3 heuristic
+ * {@link VrpConfiguration#VRP} classical solver using the LKH-3 heuristic.
  */
 @Component
 public class LkhVrpSolver extends VrpSolver {
@@ -21,7 +20,7 @@ public class LkhVrpSolver extends VrpSolver {
 
   @Autowired
   public LkhVrpSolver(
-    @Value("${lkh.directory.vrp}") String scriptDir,
+      @Value("${lkh.directory.vrp}") String scriptDir,
       ApplicationContext context) {
     this.scriptDir = scriptDir;
     this.context = context;
@@ -34,25 +33,26 @@ public class LkhVrpSolver extends VrpSolver {
 
   @Override
   public Mono<Solution<String>> solve(
-          String input,
-          SubRoutineResolver resolver
+      String input,
+      SubRoutineResolver resolver
   ) {
 
     var solution = new Solution<String>();
 
     var processResult = context.getBean(
-                    PythonProcessRunner.class,
-                    scriptDir,
-                    "vrp_lkh.py"
-            )
-            .addProblemFilePathToProcessCommand()
-            .addSolutionFilePathToProcessCommand("--output-file", "%s")
-            .problemFileName("problem.vrp")
-            .solutionFileName("problem.sol")
-            .run(getProblemType(), solution.getId(), input);
+            PythonProcessRunner.class,
+            scriptDir,
+            "vrp_lkh.py"
+        )
+        .addProblemFilePathToProcessCommand()
+        .addSolutionFilePathToProcessCommand("--output-file", "%s")
+        .problemFileName("problem.vrp")
+        .solutionFileName("problem.sol")
+        .run(getProblemType(), solution.getId(), input);
 
-    System.out.println("Input: " + input);
-    System.out.println("Output: " + processResult.output().get());
+    System.out.println("Solved some LKH :)");
+    //System.out.println("Input: " + input);
+    //System.out.println("Output: " + processResult.output().get());
 
     return Mono.just(processResult.applyTo(solution));
   }

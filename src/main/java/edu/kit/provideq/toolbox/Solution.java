@@ -80,7 +80,7 @@ public class Solution<S> {
   }
 
   /**
-   * sets the status to 'invalid'. irreversible
+   * sets the status to 'error'. irreversible
    */
   public void fail() {
     if (!this.status.isCompleted()) {
@@ -161,6 +161,7 @@ public class Solution<S> {
         + "id=" + id + ", "
         + "status=" + status + ", "
         + "metaData=" + metaData + ", "
+        + "debugData=" + debugData + ", "
         + "solutionData" + solutionData + ']';
   }
 }

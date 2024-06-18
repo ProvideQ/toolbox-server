@@ -1,22 +1,20 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
-import static edu.kit.provideq.toolbox.SolutionStatus.INVALID;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-
-import edu.kit.provideq.toolbox.meta.*;
+import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-
-import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.Solution;
 import reactor.core.publisher.Mono;
 
 /**
@@ -24,107 +22,109 @@ import reactor.core.publisher.Mono;
  */
 public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
-    protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
-            new SubRoutineDefinition<>(
-                    VrpConfiguration.VRP,
-                    "Solve a VRP problem"
-            );
+  protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
+      new SubRoutineDefinition<>(
+          VrpConfiguration.VRP,
+          "Solve a VRP problem"
+      );
 
-    protected final ApplicationContext context;
-    protected final String binaryDir;
-    protected final String binaryName;
-    protected ResourceProvider resourceProvider;
+  protected final ApplicationContext context;
+  protected final String binaryDir;
+  protected final String binaryName;
+  protected ResourceProvider resourceProvider;
 
-    protected VrpClusterer(
-        String binaryDir,
-        String binaryName,
-        ApplicationContext context
-    ) {
-        this.binaryDir = binaryDir;
-        this.binaryName = binaryName;
-        this.context = context;
+  protected VrpClusterer(
+      String binaryDir,
+      String binaryName,
+      ApplicationContext context
+  ) {
+    this.binaryDir = binaryDir;
+    this.binaryName = binaryName;
+    this.context = context;
+  }
+
+  @Override
+  public ProblemType<String, String> getProblemType() {
+    return ClusterVrpConfiguration.CLUSTER_VRP;
+  }
+
+  @Autowired
+  public void setResourceProvider(ResourceProvider resourceProvider) {
+    this.resourceProvider = resourceProvider;
+  }
+
+  @Override
+  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
+    return List.of(VRP_SUBROUTINE);
+  }
+
+  public Mono<Solution<String>> solveClusters(
+      String input,
+      Solution<String> solution,
+      SubRoutineResolver resolver,
+      ProcessResult<HashMap<Path, String>> cluster
+  ) {
+    // Retrieve the problem directory
+    String problemDirectoryPath;
+    try {
+      problemDirectoryPath = resourceProvider
+          .getProblemDirectory(getProblemType(), solution.getId())
+          .getAbsolutePath();
+    } catch (IOException e) {
+      solution.setDebugData("Failed to retrieve problem directory.");
+      solution.abort();
+      return Mono.just(solution);
     }
 
-    @Override
-    public ProblemType<String, String> getProblemType() {
-        return ClusterVrpConfiguration.CLUSTER_VRP;
+    // solve each sub problem (cluster):
+    for (var subproblemEntry : cluster.output().orElse(new HashMap<>()).entrySet()) {
+
+//      var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
+//      var vrpSolution = vrpSolver.apply(subproblemEntry.getValue());
+//      if (vrpSolution.getStatus() == INVALID) {
+//        solution.setDebugData(vrpSolution.getDebugData());
+//        solution.abort();
+//        return;
+//      }
+//
+//
+//      var fileName = subproblemEntry.getKey().getFileName().toString().replace(".vrp", ".sol");
+//      var solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
+//
+//      try {
+//        Files.writeString(solutionFilePath, vrpSolution.getSolutionData());
+//      } catch (IOException e) {
+//        solution.setDebugData(
+//            "Failed to write solution file. Path: " + solutionFilePath.toString());
+//        solution.abort();
+//        return;
+//      }
+
     }
 
-    @Autowired
-    public void setResourceProvider(ResourceProvider resourceProvider) {
-        this.resourceProvider = resourceProvider;
-    }
-
-    @Override
-    public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
-        return List.of(VRP_SUBROUTINE);
-    }
-
-    public Mono<Solution<String>> solveClusters(
-            String input,
-            Solution<String> solution,
-            SubRoutineResolver resolver,
-            ProcessResult<HashMap<Path, String>> cluster
-    ) {
-        // Retrieve the problem directory
-        String problemDirectoryPath;
-        try {
-            problemDirectoryPath = resourceProvider
-                .getProblemDirectory(getProblemType(), solution.getId())
-                .getAbsolutePath();
-        } catch (IOException e) {
-            solution.setDebugData("Failed to retrieve problem directory.");
-            solution.abort();
-            return Mono.just(solution);
-        }
-
-        // solve each sub problem (cluster):
-        for (var subproblemEntry : cluster.output().orElse(new HashMap<>()).entrySet()) {
-            /*
-            var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
-            var vrpSolution = vrpSolver.apply(subproblemEntry.getValue());
-            if (vrpSolution.getStatus() == INVALID) {
-                solution.setDebugData(vrpSolution.getDebugData());
-                solution.abort();
-                return;
-            }*/
-
-            /*
-            var fileName = subproblemEntry.getKey().getFileName().toString().replace(".vrp", ".sol");
-            var solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
-
-            try {
-				Files.writeString(solutionFilePath, vrpSolution.getSolutionData());
-			} catch (IOException e) {
-				solution.setDebugData("Failed to write solution file. Path: " + solutionFilePath.toString());
-                solution.abort();
-                return;
-			}
-            */
-        }
-
-        // combine results from sub problems to retreive answer to the original problem:
-        var combineProcessRunner = context.getBean(
-          BinaryProcessRunner.class,
-          binaryDir,
-          binaryName,
-          "solve",
-          new String[] { "%1$s", "cluster-from-file", "solution-from-file", "--build-dir", "%3$s/.vrp", "--solution-dir", "%3$s/.vrp", "--cluster-file", "%3$s/.vrp/problem.map"}
+    // combine results from sub problems to retreive answer to the original problem:
+    var combineProcessRunner = context.getBean(
+            BinaryProcessRunner.class,
+            binaryDir,
+            binaryName,
+            "solve",
+            new String[] {"%1$s", "cluster-from-file", "solution-from-file", "--build-dir", "%3$s/.vrp",
+                "--solution-dir", "%3$s/.vrp", "--cluster-file", "%3$s/.vrp/problem.map"}
         )
         .problemFileName("problem.vrp")
         .solutionFileName("problem.sol")
         .run(getProblemType(), solution.getId(), problemDirectoryPath);
-        
-        
-        if (!combineProcessRunner.success()) {
-            solution.setDebugData(combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
-            solution.abort();
-            return Mono.just(solution);
-        }
-    
-        solution.setSolutionData(combineProcessRunner.output().orElse("Empty Solution"));
 
-        solution.complete();
-        return Mono.just(solution);
+
+    if (!combineProcessRunner.success()) {
+      solution.setDebugData(combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
+      solution.abort();
+      return Mono.just(solution);
     }
+
+    solution.setSolutionData(combineProcessRunner.output().orElse("Empty Solution"));
+
+    solution.complete();
+    return Mono.just(solution);
+  }
 }
