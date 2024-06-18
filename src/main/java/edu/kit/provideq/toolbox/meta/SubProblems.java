@@ -1,8 +1,11 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -26,11 +29,11 @@ final class SubProblems<InputT, ResultT>
 
   private static class SubProblemEntry<SubInputT, SubResultT> {
     SubRoutineDefinition<SubInputT, SubResultT> definition;
-    Problem<SubInputT, SubResultT> problem;
+    List<Problem<SubInputT, SubResultT>> problems;
 
     SubProblemEntry(SubRoutineDefinition<SubInputT, SubResultT> definition) {
       this.definition = definition;
-      this.problem = new Problem<>(definition.type());
+      this.problems = new ArrayList<>();
     }
   }
 
@@ -61,9 +64,10 @@ final class SubProblems<InputT, ResultT>
    */
   @SuppressWarnings("java:S1452")
   public Set<Problem<?, ?>> getProblems() {
-    return this.entries.stream()
-        .map(entry -> entry.problem)
-        .collect(Collectors.toUnmodifiableSet());
+    return entries.stream()
+            .map(entry -> entry.problems)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toUnmodifiableSet());
   }
 
   /**
@@ -74,7 +78,7 @@ final class SubProblems<InputT, ResultT>
     var optionalEntry = findEntry(subRoutineDefinition);
 
     return optionalEntry
-        .map(entry -> Set.of(entry.problem))
+        .map(entry -> (Set<Problem<SubInputT, SubResultT>>) new HashSet<>(entry.problems))
         .orElse(Collections.emptySet());
   }
 
@@ -87,17 +91,22 @@ final class SubProblems<InputT, ResultT>
     var entry = findEntry(subRoutine).orElseThrow(() -> new IllegalArgumentException(
         "The given sub-routine was not registered with the problem solver!"));
 
-    entry.problem.setInput(input);
-    if (entry.problem.getSolver().isPresent()) {
+    var subProblem = new Problem<>(subRoutine.type());
+    subProblem.setInput(input);
+    entry.problems.add(subProblem);
+    problemAddedObserver.accept(subProblem);
+    registerSubProblem(subProblem);
+
+    if (subProblem.getSolver().isPresent()) {
       // In case there is a solver set, we can start the sub problem
-      return entry.problem.solve();
+      return subProblem.solve();
     }
 
     // Wait for the solver to be set which will run the solver
     // Once the sub problem is solved, the state changes to SOLVED and at that point we can continue
     return Mono.create(sink -> {
       Consumer<Problem<?, ?>> observer = problem -> {
-        if (problem.getId() == entry.problem.getId()
+        if (problem.getId() == subProblem.getId()
                 && problem.getState() == ProblemState.SOLVED) {
           sink.success((Solution<SubResultT>) problem.getSolution());
         }
@@ -114,7 +123,7 @@ final class SubProblems<InputT, ResultT>
   private <SubInputT, SubResultT> Optional<SubProblemEntry<SubInputT, SubResultT>> findEntry(
       SubRoutineDefinition<SubInputT, SubResultT> definition
   ) {
-    return this.entries.stream()
+    return entries.stream()
         .filter(entry -> entry.definition.equals(definition)) // explicit type check
         .map(entry -> (SubProblemEntry<SubInputT, SubResultT>) entry)
         .findAny();
@@ -131,13 +140,17 @@ final class SubProblems<InputT, ResultT>
       ProblemSolver<InputT, ResultT> newSolver
   ) {
     for (var entry : entries) {
-      this.problemRemovedObserver.accept(entry.problem);
+      for (Problem<?, ?> subProblem : entry.problems) {
+        problemRemovedObserver.accept(subProblem);
+      }
     }
-    this.entries.clear();
+    entries.clear();
 
     for (var subRoutine : newSolver.getSubRoutines()) {
-      var entry = this.addEntry(subRoutine);
-      this.problemAddedObserver.accept(entry.problem);
+      var entry = addEntry(subRoutine);
+      for (Problem<?, ?> subProblem : entry.problems) {
+        problemAddedObserver.accept(subProblem);
+      }
     }
   }
 
@@ -145,42 +158,48 @@ final class SubProblems<InputT, ResultT>
       SubRoutineDefinition<SubInputT, SubResultT> subRoutine
   ) {
     var entry = new SubProblemEntry<>(subRoutine);
-    this.entries.add(entry);
-    entry.problem.addObserver(new ProblemObserver<>() {
-        @Override
-        public void onInputChanged(Problem<SubInputT, SubResultT> problem, SubInputT newInput) {
-          // do nothing
-        }
-
-        @Override
-        public void onSolverChanged(
-                Problem<SubInputT, SubResultT> problem,
-                ProblemSolver<SubInputT, SubResultT> newSolver) {
-          // do nothing
-        }
-
-        @Override
-        public void onStateChanged(Problem<SubInputT, SubResultT> problem, ProblemState newState) {
-          // Collect in list to avoid ConcurrentModificationException
-          var observers = entryStateChangedObservers.stream().toList();
-          observers.forEach(observer -> observer.accept(problem));
-        }
-
-        @Override
-        public <NewSubInputT, NewSubResultT> void onSubProblemAdded(
-                Problem<SubInputT, SubResultT> problem,
-                Problem<NewSubInputT, NewSubResultT> addedSubProblem) {
-          // do nothing
-        }
-
-        @Override
-        public <NewSubInputT, NewSubResultT> void onSubProblemRemoved(
-                Problem<SubInputT, SubResultT> problem,
-                Problem<NewSubInputT, NewSubResultT> removedSubProblem) {
-          // do nothing
-        }
-    });
+    entries.add(entry);
+    entry.problems.forEach(this::registerSubProblem);
     return entry;
+  }
+
+  private <SubInputT, SubResultT> void registerSubProblem(
+          Problem<SubInputT, SubResultT> subProblem
+  ) {
+    subProblem.addObserver(new ProblemObserver<>() {
+      @Override
+      public void onInputChanged(Problem<SubInputT, SubResultT> problem, SubInputT newInput) {
+        // do nothing
+      }
+
+      @Override
+      public void onSolverChanged(
+              Problem<SubInputT, SubResultT> problem,
+              ProblemSolver<SubInputT, SubResultT> newSolver) {
+        // do nothing
+      }
+
+      @Override
+      public void onStateChanged(Problem<SubInputT, SubResultT> problem, ProblemState newState) {
+        // Collect in list to avoid ConcurrentModificationException
+        var observers = entryStateChangedObservers.stream().toList();
+        observers.forEach(observer -> observer.accept(problem));
+      }
+
+      @Override
+      public <NewSubInputT, NewSubResultT> void onSubProblemAdded(
+              Problem<SubInputT, SubResultT> problem,
+              Problem<NewSubInputT, NewSubResultT> addedSubProblem) {
+        // do nothing
+      }
+
+      @Override
+      public <NewSubInputT, NewSubResultT> void onSubProblemRemoved(
+              Problem<SubInputT, SubResultT> problem,
+              Problem<NewSubInputT, NewSubResultT> removedSubProblem) {
+        // do nothing
+      }
+    });
   }
 
   @Override
