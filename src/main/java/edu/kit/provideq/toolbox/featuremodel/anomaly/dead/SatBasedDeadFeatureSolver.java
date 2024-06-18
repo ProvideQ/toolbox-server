@@ -16,6 +16,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 /**
  * This problem solver solves the {@link DeadFeatureConfiguration#FEATURE_MODEL_ANOMALY_DEAD}
@@ -80,20 +82,28 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     }
 
     return Flux.fromIterable(dimacsCnf.getVariables())
-        .filterWhen(feature -> checkFeatureDead(dimacsCnf, feature, subRoutineResolver))
-        .reduceWith(
-            StringBuilder::new,
-            (builder, feature) -> builder.append(feature.name()).append('\n')
-        )
-        .map(builder -> {
-          if (builder.isEmpty()) {
-            builder.append("No features are dead features!\n");
-          } else {
-            builder.insert(0, "The following features are dead features:\n");
+        .flatMap(feature -> checkFeatureDead(dimacsCnf, feature, subRoutineResolver)
+          .map(isVoid -> Tuples.of(feature, isVoid)))
+        .collectMap(Tuple2::getT1, Tuple2::getT2)
+        .map(featureIsVoidMap -> {
+          var stringBuilder = new StringBuilder();
+
+          for (var entry : featureIsVoidMap.entrySet()) {
+            Variable feature = entry.getKey();
+            boolean isVoid = entry.getValue();
+
+            if (isVoid) {
+              stringBuilder.append(feature.name()).append('\n');
+            }
           }
 
           var solution = new Solution<String>();
-          solution.setSolutionData(builder.toString());
+          if (stringBuilder.isEmpty()) {
+            solution.setSolutionData("No features are dead features!\n");
+          } else {
+            solution.setSolutionData("The following features are dead features:\n" + stringBuilder);
+          }
+
           solution.complete();
           return solution;
         });
@@ -103,7 +113,8 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
    * Checks if a given {@code feature} is dead in a given DIMACS {@code cnf} formula.
    *
    * @param subRoutineResolver used to evaluate a SAT formula for the check.
-   * @return whether the given {@code feature} is dead.
+   * @return the solution of the given {@code feature}.
+   *         Use {@link DimacsCnfSolution#isVoid()} to check the feature.
    */
   private static Mono<Boolean> checkFeatureDead(
       DimacsCnf cnf,
