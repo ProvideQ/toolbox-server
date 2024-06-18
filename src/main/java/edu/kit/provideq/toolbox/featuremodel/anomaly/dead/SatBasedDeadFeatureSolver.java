@@ -82,9 +82,9 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     }
 
     return Flux.fromIterable(dimacsCnf.getVariables())
-            .flatMap(x -> checkFeatureDead(dimacsCnf, x, subRoutineResolver)
-                    .map(isVoid -> Tuples.of(x, isVoid)))
-            .collectMap(Tuple2::getT1, Tuple2::getT2)
+        .flatMap(feature -> checkFeatureDead(dimacsCnf, feature, subRoutineResolver)
+          .map(isVoid -> Tuples.of(feature, isVoid)))
+        .collectMap(Tuple2::getT1, Tuple2::getT2)
         .map(featureIsVoidMap -> {
           var stringBuilder = new StringBuilder();
 
