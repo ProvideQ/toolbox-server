@@ -48,7 +48,7 @@ class SatSolversTest {
 
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testMaxCutSolver(ProblemSolver<String, DimacsCnfSolution> solver, String input) {
+  void testSatSolver(ProblemSolver<String, DimacsCnfSolution> solver, String input) {
     var problem = ApiTestHelper.createProblem(client, solver, input, SAT);
     assertEquals(ProblemState.SOLVED, problem.getState());
     assertNotNull(problem.getSolution());

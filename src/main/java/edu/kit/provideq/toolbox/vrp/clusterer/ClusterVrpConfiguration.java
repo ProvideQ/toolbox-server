@@ -5,11 +5,14 @@ import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
+@Configuration
 public class ClusterVrpConfiguration {
     /**
      * A Capacitated Vehicle Routing Problem
@@ -21,6 +24,7 @@ public class ClusterVrpConfiguration {
             String.class //TODO: Change output to something different than string. We get multiple files.
     );
 
+    @Bean
     ProblemManager<String, String> getClusterVrpManager(
             ResourceProvider resourceProvider,
             KmeansClusterer kmeans,
@@ -36,7 +40,7 @@ public class ClusterVrpConfiguration {
     ) {
         try {
             var problemStream = Objects.requireNonNull(
-                    getClass().getResourceAsStream("CMT1.vrp"),
+                    getClass().getResourceAsStream("../CMT1.vrp"),
                     "Simple VRP CMT1 Problem unavailable!"
             );
             var problem = new Problem<>(CLUSTER_VRP);

@@ -51,6 +51,9 @@ public class LkhVrpSolver extends VrpSolver {
             .solutionFileName("problem.sol")
             .run(getProblemType(), solution.getId(), input);
 
+    System.out.println("Input: " + input);
+    System.out.println("Output: " + processResult.output().get());
+
     return Mono.just(processResult.applyTo(solution));
   }
 }

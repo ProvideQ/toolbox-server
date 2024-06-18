@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.process;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ public class BinaryProcessRunner extends ProcessRunner {
      * @param arguments      extra arguments to pass to the binary. Use this to pass problem input to the
      *                       solver.
      */
+    @Autowired
     public BinaryProcessRunner(String directory, String executable, String command, String... arguments) {
         super(createGenericProcessBuilder(directory, executable, command), arguments);
     }

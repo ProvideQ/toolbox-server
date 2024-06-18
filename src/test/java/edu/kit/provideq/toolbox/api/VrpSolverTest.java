@@ -5,6 +5,8 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemState;
+import edu.kit.provideq.toolbox.vrp.clusterer.KmeansClusterer;
+import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static edu.kit.provideq.toolbox.vrp.VrpConfiguration.VRP;
+import static edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpConfiguration.CLUSTER_VRP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -35,8 +38,16 @@ public class VrpSolverTest {
     @Autowired
     private LkhVrpSolver lkh3Solver;
 
+    @Autowired
+    private ClusterAndSolveVrpSolver clusterer;
+
+    @Autowired
+    private KmeansClusterer kmeansSolver;
+
     private ProblemManager<String, String> problemManager;
     private List<String> problems;
+    @Autowired
+    private LkhVrpSolver lkhVrpSolver;
 
     @BeforeEach
     void beforeEach() {
@@ -76,4 +87,42 @@ public class VrpSolverTest {
         }
     }
 
+    @Test
+    void testKmeansWithLkh() {
+        for (String problem : problems) {
+            //create VRP problem, has Clusterable VRP as subproblem
+            var problemDto = ApiTestHelper.createProblem(client, clusterer, problem, VRP);
+            assertEquals(ProblemState.SOLVING, problemDto.getState());
+
+            //check if subproblem is set correctly
+            List<SubProblemReferenceDto> vrpSubProblems = problemDto.getSubProblems();
+            assertEquals(vrpSubProblems.size(), 1); //there should be exactly one subproblem, the vrp that needs to be clustered
+            SubProblemReferenceDto vrpProblem = vrpSubProblems.get(0);
+            List<String> clusterSubProblems = vrpProblem.getSubProblemIds();
+            assertEquals(clusterSubProblems.size(), 1); //there should also only one subproblem Id
+            assertEquals(vrpProblem.getSubRoutine().getTypeId(), CLUSTER_VRP.getId());
+
+            //set k-means as CLUSTER_VRP solver:
+            var clustererDto = ApiTestHelper.setProblemSolver(client, kmeansSolver, clusterSubProblems.get(0), CLUSTER_VRP.getId());
+            assertEquals(ProblemState.SOLVING, clustererDto.getState());
+
+            var vrpClusters = clustererDto.getSubProblems();
+            for (var cluster : vrpClusters) {
+                assertEquals(cluster.getSubRoutine().getTypeId(), VRP.getId()); //check if subproblem is VRP again
+                for (String problemId : cluster.getSubProblemIds()) {
+                    //set lkh-3 as solver:
+                    var vrpClusterProblem = ApiTestHelper.setProblemSolver(client, lkhVrpSolver, problemId, VRP.getId());
+                    assertNotNull(vrpClusterProblem.getInput());
+                    assertNotNull(vrpClusterProblem.getSolution());
+                    assertEquals(ProblemState.SOLVED, vrpClusterProblem.getState());
+                }
+            }
+
+            //solve the problem:
+            problemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
+            assertNotNull(problemDto.getSolution());
+            assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
+            assertEquals(ProblemState.SOLVED, problemDto.getState());
+        }
+    }
 }

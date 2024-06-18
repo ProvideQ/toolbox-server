@@ -24,6 +24,12 @@ import reactor.core.publisher.Mono;
  */
 public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
+    protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
+            new SubRoutineDefinition<>(
+                    VrpConfiguration.VRP,
+                    "Solve a VRP problem"
+            );
+
     protected final ApplicationContext context;
     protected final String binaryDir;
     protected final String binaryName;
@@ -51,18 +57,15 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
     @Override
     public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
-        return List.of(
-            new SubRoutineDefinition<>(VrpConfiguration.VRP,
-                "How should the clusters be solved?")
-        );
+        return List.of(VRP_SUBROUTINE);
     }
 
     public Mono<Solution<String>> solveClusters(
+            String input,
             Solution<String> solution,
             SubRoutineResolver resolver,
             ProcessResult<HashMap<Path, String>> cluster
     ) {
-
         // Retrieve the problem directory
         String problemDirectoryPath;
         try {
@@ -75,20 +78,19 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
             return Mono.just(solution);
         }
 
-        //TODO: refactor the following code, needs to work with the new model
-        /*
-        // solve each subproblem
+        // solve each sub problem (cluster):
         for (var subproblemEntry : cluster.output().orElse(new HashMap<>()).entrySet()) {
+            /*
             var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
             var vrpSolution = vrpSolver.apply(subproblemEntry.getValue());
             if (vrpSolution.getStatus() == INVALID) {
                 solution.setDebugData(vrpSolution.getDebugData());
                 solution.abort();
                 return;
-            }
+            }*/
 
+            /*
             var fileName = subproblemEntry.getKey().getFileName().toString().replace(".vrp", ".sol");
-
             var solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
 
             try {
@@ -98,9 +100,10 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
                 solution.abort();
                 return;
 			}
+            */
         }
 
-        // combine the solution paths
+        // combine results from sub problems to retreive answer to the original problem:
         var combineProcessRunner = context.getBean(
           BinaryProcessRunner.class,
           binaryDir,
@@ -110,17 +113,16 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
         )
         .problemFileName("problem.vrp")
         .solutionFileName("problem.sol")
-        .run(getProblemType(), solution.getId(), input);
+        .run(getProblemType(), solution.getId(), problemDirectoryPath);
         
         
         if (!combineProcessRunner.success()) {
             solution.setDebugData(combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
             solution.abort();
-            return;
+            return Mono.just(solution);
         }
     
         solution.setSolutionData(combineProcessRunner.output().orElse("Empty Solution"));
-        */
 
         solution.complete();
         return Mono.just(solution);
