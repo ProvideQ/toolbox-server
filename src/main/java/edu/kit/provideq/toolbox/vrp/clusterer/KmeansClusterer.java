@@ -75,6 +75,8 @@ public class KmeansClusterer extends VrpClusterer {
       return Mono.just(solution);
     }
 
+    System.out.println("Clusterer Solution: " + processResult.output().get());
+
     var mapOfClusters = processResult.output().get();
 
     // Retrieve the problem directory
@@ -97,15 +99,10 @@ public class KmeansClusterer extends VrpClusterer {
         .publishOn(Schedulers.boundedElastic())
         .map(clusterSolutionMap -> {
           // write solutions of the clusters into files:
-          System.out.println("ENTRYMAP SIZE: " + clusterSolutionMap.entrySet().size());
-
           for (var entry : clusterSolutionMap.entrySet()) {
             String fileName = entry.getKey().getFileName().toString().replace(".vrp", ".sol");
-            System.out.println("FileName: " + fileName);
             Path solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
-            System.out.println("SolutionFilePath: " + solutionFilePath);
             var clusterSolution = entry.getValue();
-            System.out.println("Cluster Solution: " + entry.getValue());
             try {
               Files.writeString(solutionFilePath, clusterSolution.getSolutionData());
             } catch (IOException e) {
@@ -115,7 +112,7 @@ public class KmeansClusterer extends VrpClusterer {
             }
           }
 
-          // use the combineProcessRunner to combine the solution from the written files into one solution
+          // use the combineProcessRunner to combine the solution from the written files
           // into one solution of the original problem
           var combineProcessRunner =
               context.getBean(BinaryProcessRunner.class, binaryDir, binaryName, "solve",
@@ -129,6 +126,7 @@ public class KmeansClusterer extends VrpClusterer {
 
           System.out.println("Solution From Combine Process Runner:");
           System.out.println(combineProcessRunner.output());
+          System.out.println("------------------------------------");
 
           if (combineProcessRunner.output().isEmpty() || !combineProcessRunner.success()) {
             solution.setDebugData(
