@@ -10,23 +10,23 @@ import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 /**
  * A solver for SAT problems.
  */
 public abstract class VrpClusterer implements ProblemSolver<String, String> {
-
-  protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
-      new SubRoutineDefinition<>(
-          VrpConfiguration.VRP,
-          "Solve a VRP problem"
-      );
 
   protected final ApplicationContext context;
   protected final String binaryDir;
@@ -53,78 +53,79 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
     this.resourceProvider = resourceProvider;
   }
 
-  @Override
-  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
-    return List.of(VRP_SUBROUTINE);
-  }
-
-  public Mono<Solution<String>> solveClusters(
+  protected Mono<Solution<String>> processResult(
       String input,
       Solution<String> solution,
+      ProcessResult<HashMap<Path, String>> processResult,
       SubRoutineResolver resolver,
-      ProcessResult<HashMap<Path, String>> cluster
-  ) {
+      SubRoutineDefinition<String, String> definition) {
+    if (processResult.output().isEmpty() || !processResult.success()) {
+      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
+      solution.abort();
+      return Mono.just(solution);
+    }
+
+    var mapOfClusters = processResult.output().get();
+
+    //solve TSP clusters:
+    return Flux.fromIterable(mapOfClusters.entrySet())
+        .flatMap(cluster -> resolver.runSubRoutine(definition, cluster.getValue())
+            .map(clusterSolution -> Tuples.of(cluster.getKey(), clusterSolution)))
+        .collectMap(Tuple2::getT1, Tuple2::getT2)
+        .publishOn(Schedulers.boundedElastic())
+        .map(clusterSolutionMap -> solveCluster(input, solution, clusterSolutionMap));
+  }
+
+  protected Solution<String> solveCluster(
+      String input,
+      Solution<String> solution,
+      Map<Path, Solution<String>> clusterSolutionMap) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {
-      problemDirectoryPath = resourceProvider
-          .getProblemDirectory(getProblemType(), solution.getId())
-          .getAbsolutePath();
+      problemDirectoryPath =
+          resourceProvider.getProblemDirectory(getProblemType(), solution.getId())
+              .getAbsolutePath();
     } catch (IOException e) {
       solution.setDebugData("Failed to retrieve problem directory.");
-      solution.abort();
-      return Mono.just(solution);
+      solution.fail();
+      return solution;
     }
 
-    // solve each sub problem (cluster):
-    for (var subproblemEntry : cluster.output().orElse(new HashMap<>()).entrySet()) {
-
-//      var vrpSolver = subRoutinePool.<String, String>getSubRoutine(ProblemType.VRP);
-//      var vrpSolution = vrpSolver.apply(subproblemEntry.getValue());
-//      if (vrpSolution.getStatus() == INVALID) {
-//        solution.setDebugData(vrpSolution.getDebugData());
-//        solution.abort();
-//        return;
-//      }
-//
-//
-//      var fileName = subproblemEntry.getKey().getFileName().toString().replace(".vrp", ".sol");
-//      var solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
-//
-//      try {
-//        Files.writeString(solutionFilePath, vrpSolution.getSolutionData());
-//      } catch (IOException e) {
-//        solution.setDebugData(
-//            "Failed to write solution file. Path: " + solutionFilePath.toString());
-//        solution.abort();
-//        return;
-//      }
-
+    // write solutions of the clusters into files:
+    for (var entry : clusterSolutionMap.entrySet()) {
+      String fileName = entry.getKey().getFileName().toString().replace(".vrp", ".sol");
+      Path solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
+      var clusterSolution = entry.getValue();
+      try {
+        Files.writeString(solutionFilePath, clusterSolution.getSolutionData());
+      } catch (IOException e) {
+        solution.setDebugData("Failed to write solution file. Path: " + solutionFilePath);
+        solution.fail();
+        return solution;
+      }
     }
 
-    // combine results from sub problems to retreive answer to the original problem:
-    var combineProcessRunner = context.getBean(
-            BinaryProcessRunner.class,
-            binaryDir,
-            binaryName,
-            "solve",
-            new String[] {"%1$s", "cluster-from-file", "solution-from-file", "--build-dir", "%3$s/.vrp",
-                "--solution-dir", "%3$s/.vrp", "--cluster-file", "%3$s/.vrp/problem.map"}
-        )
-        .problemFileName("problem.vrp")
-        .solutionFileName("problem.sol")
-        .run(getProblemType(), solution.getId(), problemDirectoryPath);
+    // use the combineProcessRunner to combine the solution from the written files
+    // into one solution of the original problem
+    var combineProcessRunner =
+        context.getBean(BinaryProcessRunner.class, binaryDir, binaryName, "solve",
+                new String[] {"%1$s", "cluster-from-file", "solution-from-file",
+                    "--build-dir",
+                    "%3$s/.vrp", "--solution-dir", "%3$s/.vrp", "--cluster-file",
+                    "%3$s/.vrp/problem.map"})
+            .problemFileName("problem.vrp")
+            .solutionFileName("problem.sol")
+            .run(getProblemType(), solution.getId(), input);
 
-
-    if (!combineProcessRunner.success()) {
-      solution.setDebugData(combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
-      solution.abort();
-      return Mono.just(solution);
+    if (combineProcessRunner.output().isEmpty() || !combineProcessRunner.success()) {
+      solution.setDebugData(
+          combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
+      solution.fail();
+      return solution;
     }
-
-    solution.setSolutionData(combineProcessRunner.output().orElse("Empty Solution"));
 
     solution.complete();
-    return Mono.just(solution);
+    return solution;
   }
 }

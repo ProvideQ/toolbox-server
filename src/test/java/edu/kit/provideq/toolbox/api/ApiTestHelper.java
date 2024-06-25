@@ -179,7 +179,6 @@ public class ApiTestHelper {
       }
     }
 
-    System.out.println(problemDto.getSolution());
     assertEquals(ProblemState.SOLVED, problemDto.getState());
     Assertions.assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
 

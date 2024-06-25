@@ -1,66 +1,72 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
+import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
+import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.tsp.TspConfiguration;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
-
-import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.setting.MetaSolverSetting;
-import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 @Component
 public class TwoPhaseClusterer extends VrpClusterer {
-    
-    @Autowired
-    public TwoPhaseClusterer(
-        @Value("${vrp.directory}") String binaryDir,
-        @Value("${vrp.bin.meta-solver}") String binaryName,
-        ApplicationContext context) {
-            super(binaryDir, binaryName, context);
-    }
 
+  protected static final SubRoutineDefinition<String, String> TSP_SUBROUTINE =
+      new SubRoutineDefinition<>(
+          TspConfiguration.TSP,
+          "Solve a TSP problem"
+      );
 
-    @Override
-    public String getName() {
-        return "Two Phase VRP To TSP Clusterer (Classical)";
-    }
+  @Autowired
+  public TwoPhaseClusterer(
+      @Value("${vrp.directory}") String binaryDir,
+      @Value("${vrp.bin.meta-solver}") String binaryName,
+      ApplicationContext context) {
+    super(binaryDir, binaryName, context);
+  }
 
-    @Override
-    public Mono<Solution<String>> solve(
-            String input,
-            SubRoutineResolver resolver
-    ) {
+  @Override
+  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
+    return List.of(TSP_SUBROUTINE);
+  }
 
-        var solution = new Solution<HashMap<Path, String>>();
+  @Override
+  public String getName() {
+    return "Two Phase Clustering (VRP -> Set of TSP)";
+  }
 
-        // cluster with tsp/two-phase clustering
-        var processResult = context.getBean(
-                        BinaryProcessRunner.class,
-                        binaryDir,
-                        binaryName,
-                        "partial",
-                        new String[]{"cluster", "%1$s", "tsp", "--build-dir", "%3$s/.vrp"}
-                )
-                .problemFileName("problem.vrp")
-                .run(getProblemType(), solution.getId(), input, new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
+  @Override
+  public Mono<Solution<String>> solve(
+      String input,
+      SubRoutineResolver resolver
+  ) {
 
-        processResult.applyTo(solution);
+    var solution = new Solution<String>();
 
-        // solve the clusters
-        //solveClusters();
+    // cluster with tsp/two-phase clustering
+    var processResult = context.getBean(
+            BinaryProcessRunner.class,
+            binaryDir,
+            binaryName,
+            "partial",
+            new String[] {"cluster", "%1$s", "tsp", "--build-dir", "%3$s/.vrp"}
+        )
+        .problemFileName("problem.vrp")
+        .run(getProblemType(), solution.getId(), input,
+            new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
 
-        //TODO: return something useful
-        return Mono.just(new Solution<String>());
-    }
-
+    return processResult(input, solution, processResult, resolver, TSP_SUBROUTINE);
+  }
 }

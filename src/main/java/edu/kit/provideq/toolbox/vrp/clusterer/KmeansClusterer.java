@@ -2,14 +2,15 @@ package edu.kit.provideq.toolbox.vrp.clusterer;
 
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.process.ProcessResult;
-import java.io.IOException;
-import java.nio.file.Files;
+import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +21,6 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-@SuppressWarnings("checkstyle:CommentsIndentation")
 @Component
 public class KmeansClusterer extends VrpClusterer {
 
@@ -33,9 +33,20 @@ public class KmeansClusterer extends VrpClusterer {
     super(binaryDir, binaryName, context);
   }
 
+  protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
+      new SubRoutineDefinition<>(
+          VrpConfiguration.VRP,
+          "Solve a VRP problem"
+      );
+
+  @Override
+  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
+    return List.of(VRP_SUBROUTINE);
+  }
+
   @Override
   public String getName() {
-    return "Kmeans VRP Clusterer (Classical)";
+    return "K-means Clustering (VRP -> Set of VRP)";
   }
 
 
@@ -69,74 +80,6 @@ public class KmeansClusterer extends VrpClusterer {
             .run(getProblemType(), solution.getId(), input,
                 new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
 
-    if (processResult.output().isEmpty() || !processResult.success()) {
-      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
-      solution.abort();
-      return Mono.just(solution);
-    }
-
-    System.out.println("Clusterer Solution: " + processResult.output().get());
-
-    var mapOfClusters = processResult.output().get();
-
-    // Retrieve the problem directory
-    String problemDirectoryPath;
-    try {
-      problemDirectoryPath =
-          resourceProvider.getProblemDirectory(getProblemType(), solution.getId())
-              .getAbsolutePath();
-    } catch (IOException e) {
-      solution.setDebugData("Failed to retrieve problem directory.");
-      solution.fail();
-      return Mono.just(solution);
-    }
-
-    //solve VRP clusters:
-    return Flux.fromIterable(mapOfClusters.entrySet())
-        .flatMap(cluster -> resolver.runSubRoutine(VRP_SUBROUTINE, cluster.getValue())
-            .map(clusterSolution -> Tuples.of(cluster.getKey(), clusterSolution)))
-        .collectMap(Tuple2::getT1, Tuple2::getT2)
-        .publishOn(Schedulers.boundedElastic())
-        .map(clusterSolutionMap -> {
-          // write solutions of the clusters into files:
-          for (var entry : clusterSolutionMap.entrySet()) {
-            String fileName = entry.getKey().getFileName().toString().replace(".vrp", ".sol");
-            Path solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
-            var clusterSolution = entry.getValue();
-            try {
-              Files.writeString(solutionFilePath, clusterSolution.getSolutionData());
-            } catch (IOException e) {
-              solution.setDebugData("Failed to write solution file. Path: " + solutionFilePath);
-              solution.fail();
-              return solution;
-            }
-          }
-
-          // use the combineProcessRunner to combine the solution from the written files
-          // into one solution of the original problem
-          var combineProcessRunner =
-              context.getBean(BinaryProcessRunner.class, binaryDir, binaryName, "solve",
-                      new String[] {"%1$s", "cluster-from-file", "solution-from-file",
-                          "--build-dir",
-                          "%3$s/.vrp", "--solution-dir", "%3$s/.vrp", "--cluster-file",
-                          "%3$s/.vrp/problem.map"})
-                  .problemFileName("problem.vrp")
-                  .solutionFileName("problem.sol")
-                  .run(getProblemType(), solution.getId(), input);
-
-          System.out.println("Solution From Combine Process Runner:");
-          System.out.println(combineProcessRunner.output());
-          System.out.println("------------------------------------");
-
-          if (combineProcessRunner.output().isEmpty() || !combineProcessRunner.success()) {
-            solution.setDebugData(
-                combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
-            solution.fail();
-            return solution;
-          }
-
-          solution.complete();
-          return solution;
-        });
+    return processResult(input, solution, processResult, resolver, VRP_SUBROUTINE);
   }
 }
