@@ -8,12 +8,10 @@ import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
-import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -53,7 +51,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
     this.resourceProvider = resourceProvider;
   }
 
-  protected Mono<Solution<String>> processResult(
+  protected Mono<Solution<String>> getSolutionForCluster(
       String input,
       Solution<String> solution,
       ProcessResult<HashMap<Path, String>> processResult,

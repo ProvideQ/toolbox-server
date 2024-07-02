@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
+import static edu.kit.provideq.toolbox.tsp.TspConfiguration.TSP;
 import static edu.kit.provideq.toolbox.vrp.VrpConfiguration.VRP;
 import static edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpConfiguration.CLUSTER_VRP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,6 +11,7 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemState;
+import edu.kit.provideq.toolbox.tsp.solvers.LkhTspSolver;
 import edu.kit.provideq.toolbox.vrp.clusterer.KmeansClusterer;
 import edu.kit.provideq.toolbox.vrp.clusterer.TwoPhaseClusterer;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
@@ -36,7 +38,10 @@ public class VrpSolverTest {
   private ProblemManagerProvider problemManagerProvider;
 
   @Autowired
-  private LkhVrpSolver lkh3Solver;
+  private LkhVrpSolver lkh3vrpSolver;
+
+  @Autowired
+  private LkhTspSolver lkh3tspSolver;
 
   @Autowired
   private ClusterAndSolveVrpSolver abstractClusterer;
@@ -69,7 +74,7 @@ public class VrpSolverTest {
   @Test
   void testLkh3SolverIsolated() {
     for (String problem : problems) {
-      var problemDto = ApiTestHelper.createProblem(client, lkh3Solver, problem, VRP);
+      var problemDto = ApiTestHelper.createProblem(client, lkh3vrpSolver, problem, VRP);
       assertEquals(ProblemState.SOLVED, problemDto.getState());
       assertNotNull(problemDto.getSolution());
       assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
@@ -81,7 +86,7 @@ public class VrpSolverTest {
     //only run on very small example:
     for (var problem : problems) {
       if (problem.contains("DIMENSION : 3")) {
-        var problemDto = ApiTestHelper.createProblem(client, lkh3Solver, problem, VRP);
+        var problemDto = ApiTestHelper.createProblem(client, lkh3vrpSolver, problem, VRP);
         assertEquals(ProblemState.SOLVED, problemDto.getState());
         assertNotNull(problemDto.getSolution());
         assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
@@ -91,10 +96,10 @@ public class VrpSolverTest {
   }
 
   /**
-    test LKH-3 solver in combination with k-means = 3
+   * test LKH-3 solver in combination with k-means = 3
    */
   @Test
-  void testKmeansWithLkh() {
+  void testKmeansWithLkhForVrp() {
     for (String problem : problems) {
       //skip the small "test" problem because clustering small problems
       //can lead to errors
@@ -137,9 +142,6 @@ public class VrpSolverTest {
 
       //solve the problem:
       problemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
-
-      System.out.println(problemDto.getSolution());
-
       assertNotNull(problemDto.getSolution());
       assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
       assertEquals(ProblemState.SOLVED, problemDto.getState());
@@ -151,16 +153,51 @@ public class VrpSolverTest {
    * Tests the two phase clusterer in combination with Lkh-3 tsp solver.
    */
   @Test
-  void testTwoPhaseWithLkh() {
-    //TODO: implement
+  void testTwoPhaseWithLkhForTsp() {
+    for (String problem : problems) {
+      var problemDto = ApiTestHelper.createProblem(client, abstractClusterer, problem, VRP);
+      assertEquals(ProblemState.SOLVING, problemDto.getState());
+
+      //set two-phase as CLUSTER_VRP solver:
+      var clusterSubProblems = problemDto.getSubProblems().get(0).getSubProblemIds();
+      var clustererDto = ApiTestHelper.setProblemSolver(
+          client,
+          twoPhaseClusterer,
+          clusterSubProblems.get(0),
+          CLUSTER_VRP.getId());
+
+      //solve sub-problems (clusters):
+      var tspClusters = clustererDto.getSubProblems();
+      for (var cluster : tspClusters) {
+        //check if subproblem is TSP now
+        assertEquals(cluster.getSubRoutine().getTypeId(), TSP.getId());
+        for (String problemId : cluster.getSubProblemIds()) {
+          //set lkh-3 as solver:
+          var tspClusterProblem = ApiTestHelper.setProblemSolver(
+              client,
+              lkh3tspSolver,
+              problemId,
+              TSP.getId());
+
+          assertNotNull(tspClusterProblem.getInput());
+          assertNotNull(tspClusterProblem.getSolution());
+          assertEquals(ProblemState.SOLVED, tspClusterProblem.getState());
+        }
+      }
+
+      //solve the problem:
+      var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
+      assertNotNull(solvedProblemDto.getSolution());
+      assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
+      assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
+    }
   }
 
   /**
-   * tests the TSP QUBO solver,
-   * the TSP is transformed into a QUBO problem which is then solved with QAOA.
+   * Tests the two phase clusterer in combination with a qubo transformation and quantum annealer
    */
   @Test
-  void testTSPtoQuboSolver() {
-    //TODO: make new TSP solver
+  void testTwoPhaseWithAnnealer() {
+    //TODO: implement
   }
 }

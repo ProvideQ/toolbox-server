@@ -28,7 +28,7 @@ public class LkhVrpSolver extends VrpSolver {
 
   @Override
   public String getName() {
-    return "LKH-3 VRP Solver (Classical)";
+    return "LKH-3 VRP Solver";
   }
 
   @Override

@@ -15,11 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 @Component
 public class KmeansClusterer extends VrpClusterer {
@@ -80,6 +76,6 @@ public class KmeansClusterer extends VrpClusterer {
             .run(getProblemType(), solution.getId(), input,
                 new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
 
-    return processResult(input, solution, processResult, resolver, VRP_SUBROUTINE);
+    return getSolutionForCluster(input, solution, processResult, resolver, VRP_SUBROUTINE);
   }
 }

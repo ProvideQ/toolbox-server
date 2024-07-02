@@ -5,20 +5,13 @@ import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
-import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.tsp.TspConfiguration;
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 @Component
 public class TwoPhaseClusterer extends VrpClusterer {
@@ -67,6 +60,8 @@ public class TwoPhaseClusterer extends VrpClusterer {
         .run(getProblemType(), solution.getId(), input,
             new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
 
-    return processResult(input, solution, processResult, resolver, TSP_SUBROUTINE);
+    System.out.println(processResult.output().get());
+
+    return getSolutionForCluster(input, solution, processResult, resolver, TSP_SUBROUTINE);
   }
 }
