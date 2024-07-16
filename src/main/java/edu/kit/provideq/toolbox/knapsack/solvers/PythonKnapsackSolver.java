@@ -39,6 +39,8 @@ public class PythonKnapsackSolver extends KnapsackSolver {
                     PythonProcessRunner.class,
                     knapsackPath,
                     "knapsack.py")
+            .addProblemFilePathToProcessCommand()
+            .addSolutionFilePathToProcessCommand()
             .run(getProblemType(), solution.getId(), input);
 
     return Mono.just(processResult.applyTo(solution));
