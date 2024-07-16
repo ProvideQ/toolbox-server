@@ -1,6 +1,8 @@
 package edu.kit.provideq.toolbox.knapsack;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.knapsack.solvers.KnapsackSolver;
+import edu.kit.provideq.toolbox.knapsack.solvers.PythonKnapsackSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -28,11 +30,12 @@ public class KnapsackConfiguration {
 
   @Bean
   ProblemManager<String, String> getKnapsackManager(
+          PythonKnapsackSolver pythonKnapsackSolver,
           ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
             KNAPSACK,
-            Set.of(),
+            Set.of(pythonKnapsackSolver),
             loadExampleProblems(resourceProvider)
     );
   }
