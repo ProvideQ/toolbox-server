@@ -13,3 +13,4 @@ source /opt/conda/bin/activate gams
 pip install -r "$REPO_DIR/gams/requirements.txt"
 pip install -r "$REPO_DIR/qiskit/requirements.txt"
 pip install -r "$REPO_DIR/cirq/requirements.txt"
+pip install -r "$REPO_DIR/python/requirements.txt"
