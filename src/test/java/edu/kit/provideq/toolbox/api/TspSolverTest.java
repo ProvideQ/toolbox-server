@@ -117,7 +117,7 @@ public class TspSolverTest {
     assertTrue(problem.isPresent());
 
     var problemDto = ApiTestHelper.createProblem(client, quboTspSolver, problem.get(), TSP);
-    //assertEquals(ProblemState.SOLVING, problemDto.getState());
+    assertEquals(ProblemState.SOLVING, problemDto.getState());
 
     //Set a QUBO solver:
     var quboSubProblem = problemDto.getSubProblems().get(0).getSubProblemIds();

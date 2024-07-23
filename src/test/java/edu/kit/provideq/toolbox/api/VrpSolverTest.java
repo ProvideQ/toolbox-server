@@ -1,17 +1,21 @@
 package edu.kit.provideq.toolbox.api;
 
+import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
 import static edu.kit.provideq.toolbox.tsp.TspConfiguration.TSP;
 import static edu.kit.provideq.toolbox.vrp.VrpConfiguration.VRP;
 import static edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpConfiguration.CLUSTER_VRP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemState;
+import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.tsp.solvers.LkhTspSolver;
+import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
 import edu.kit.provideq.toolbox.vrp.clusterer.KmeansClusterer;
 import edu.kit.provideq.toolbox.vrp.clusterer.TwoPhaseClusterer;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
@@ -51,6 +55,12 @@ public class VrpSolverTest {
 
   @Autowired
   private TwoPhaseClusterer twoPhaseClusterer;
+
+  @Autowired
+  private QuboTspSolver quboTspSolver;
+
+  @Autowired
+  private DwaveQuboSolver dwaveQuboSolver;
 
   private ProblemManager<String, String> problemManager;
   private List<String> problems;
@@ -198,6 +208,47 @@ public class VrpSolverTest {
    */
   @Test
   void testTwoPhaseWithAnnealer() {
-    //TODO: implement
+    //get the small problem, cause quantum simulation is used:
+    var problem = problems.stream().filter(element -> element.contains("NAME : small sample")).findFirst();
+    assertTrue(problem.isPresent());
+
+    var problemDto = ApiTestHelper.createProblem(client, abstractClusterer, problem.get(), VRP);
+    assertEquals(ProblemState.SOLVING, problemDto.getState());
+
+    //set two-phase as CLUSTER_VRP solver:
+    var clusterSubProblems = problemDto.getSubProblems().get(0).getSubProblemIds();
+    var clustererDto = ApiTestHelper.setProblemSolver(
+        client,
+        twoPhaseClusterer,
+        clusterSubProblems.get(0),
+        CLUSTER_VRP.getId());
+
+    //solve sub-problems (clusters):
+    var tspClusters = clustererDto.getSubProblems();
+    for (var cluster : tspClusters) {
+      //check if subproblem is TSP now
+      assertEquals(cluster.getSubRoutine().getTypeId(), TSP.getId());
+      for (String problemId : cluster.getSubProblemIds()) {
+        //set QUBO tsp as solver:
+        var tspClusterProblem = ApiTestHelper.setProblemSolver(
+            client,
+            quboTspSolver,
+            problemId,
+            TSP.getId());
+
+        //set d-wave annealer as qubo solver:
+        assertEquals(tspClusterProblem.getSubProblems().size(), 1);
+        var quboProblem = tspClusterProblem.getSubProblems().get(0);
+        assertEquals(quboProblem.getSubProblemIds().size(), 1);
+        assertEquals(quboProblem.getSubRoutine().getTypeId(), QUBO.getId());
+        ApiTestHelper.setProblemSolver(client, dwaveQuboSolver, quboProblem.getSubProblemIds().get(0), QUBO.getId());
+      }
+    }
+
+    //solve the problem:
+    var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
+    assertNotNull(solvedProblemDto.getSolution());
+    assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
+    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
   }
 }
