@@ -110,6 +110,13 @@ public class QuboTspSolver extends TspSolver {
   ) {
     var solution = new Solution<String>();
 
+    // change "TYPE" keyword from "TSP" to "CVRP"
+    // add capacity declaration of "0" (is ignored later)
+    // this is theoretically wrong, but needed for Lucas' QUBO converter to work
+    if (input.contains("TYPE : TSP")) {
+      input = input.replace("TYPE : TSP", "TYPE : CVRP\nCAPACITY : 0");
+    }
+
     // translate into qubo in lp-file format with rust vrp meta solver
     var processResult = context.getBean(
             BinaryProcessRunner.class,
@@ -128,9 +135,17 @@ public class QuboTspSolver extends TspSolver {
       return Mono.just(solution);
     }
 
+    String finalInput = input;
     return resolver.runSubRoutine(QUBO_SUBROUTINE, processResult.output().get())
         .publishOn(Schedulers.boundedElastic())
         .map(subRoutineSolution -> {
+          if (subRoutineSolution.getSolutionData() == null
+              || subRoutineSolution.getSolutionData().isEmpty()) {
+            solution.setDebugData("Unable to solve Subroutine");
+            solution.abort();
+            return solution;
+          }
+
           String problemDirectoryPath = getProblemDirectory(solution);
           if (problemDirectoryPath == null) {
             return solution;
@@ -156,7 +171,7 @@ public class QuboTspSolver extends TspSolver {
               )
               .problemFileName("problem.vrp")
               .solutionFileName("problem.sol")
-              .run(getProblemType(), solution.getId(), input);
+              .run(getProblemType(), solution.getId(), finalInput);
 
           if (!processRetransformResult.success()) {
             solution.setDebugData(

@@ -38,6 +38,7 @@ public class LkhTspSolver extends TspSolver {
   @Override
   public Mono<Solution<String>> solve(String input, SubRoutineResolver subRoutineResolver) {
     var solution = new Solution<String>();
+
     var processResult = context.getBean(
             PythonProcessRunner.class,
             scriptDir,
@@ -48,6 +49,9 @@ public class LkhTspSolver extends TspSolver {
         .problemFileName("problem.vrp")
         .solutionFileName("problem.sol")
         .run(getProblemType(), solution.getId(), input);
+
+    //TODO: write new wrapper that solves TSP problems with LKH-3
+    //TODO: change ProcessRunner call to new wrapper
 
     return Mono.just(processResult.applyTo(solution));
   }

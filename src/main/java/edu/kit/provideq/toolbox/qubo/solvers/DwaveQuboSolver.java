@@ -31,7 +31,7 @@ public class DwaveQuboSolver extends QuboSolver {
 
   @Override
   public String getName() {
-    return "Dwave QUBO Quantum Annealer";
+    return "(D-Wave) Annealing QUBO Solver";
   }
 
     /*

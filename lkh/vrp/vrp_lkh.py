@@ -18,7 +18,6 @@ parser.add_argument("-r", "--runs", default=10)
 
 args = parser.parse_args()
 
-
 problem = LKHProblem.load(args.tsplib_file)
 
 print(f"solving {args.tsplib_file}")

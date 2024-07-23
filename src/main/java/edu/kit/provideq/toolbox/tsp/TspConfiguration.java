@@ -8,6 +8,8 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.tsp.solvers.LkhTspSolver;
 import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
@@ -39,15 +41,19 @@ public class TspConfiguration {
 
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
     try {
-      var bigProblemStream = Objects.requireNonNull(getClass().getResourceAsStream("att48.tsp"));
-      var bigProblem = new Problem<>(TSP);
-      bigProblem.setInput(provider.readStream(bigProblemStream));
+      String[] problemNames = new String[]{
+          "att48.tsp", "SmallSampleTSP.tsp", "VerySmallSampleTSP.tsp"
+      };
 
-      var smallProblemStream = Objects.requireNonNull(getClass().getResourceAsStream("SmallSampleTSP.tsp"));
-      var smallProblem = new Problem<>(TSP);
-      smallProblem.setInput(provider.readStream(smallProblemStream));
-
-      return Set.of(bigProblem, smallProblem);
+      var problemSet = new HashSet<Problem<String, String>>();
+      for (var problemName : problemNames) {
+        var problemStream = Objects.requireNonNull(getClass().getResourceAsStream(problemName),
+            "Problem " + problemName + " not found");
+        var problem = new Problem<>(TSP);
+        problem.setInput(provider.readStream(problemStream));
+        problemSet.add(problem);
+      }
+      return problemSet;
     } catch (IOException e) {
       throw new MissingExampleException("Could not load example problems", e);
     }

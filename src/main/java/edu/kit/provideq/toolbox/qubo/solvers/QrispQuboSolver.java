@@ -28,26 +28,24 @@ public class QrispQuboSolver extends QuboSolver {
 
   @Override
   public String getName() {
-    return "Qrisp QAOA VRP QUBO Solver";
+    return "(Qrisp) QAOA Solver for QUBOs";
   }
 
   @Override
   public Mono<Solution<String>> solve(
-          String input,
-          SubRoutineResolver subRoutineResolver
+      String input,
+      SubRoutineResolver subRoutineResolver
   ) {
     var solution = new Solution<String>();
 
-    var processRunner = context.getBean(
-        PythonProcessRunner.class,
-        vrpPath,
-        "qaoa.py",
-        new String[] {"%1$s", "--output-file", "%2$s", "--size-gate", "4"}
+    var processResult = context.getBean(
+            PythonProcessRunner.class,
+            vrpPath,
+            "qaoa.py",
+            new String[] {"%1$s", "--output-file", "%2$s", "--size-gate", "4"}
         )
         .problemFileName("problem.lp")
-        .solutionFileName("problem.bin");
-
-    var processResult = processRunner
+        .solutionFileName("problem.bin")
         .run(getProblemType(), solution.getId(), input);
 
     return Mono.just(processResult.applyTo(solution));
