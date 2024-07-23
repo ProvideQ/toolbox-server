@@ -60,6 +60,8 @@ public class TwoPhaseClusterer extends VrpClusterer {
         .run(getProblemType(), solution.getId(), input,
             new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
 
+    System.out.print(processResult.output());
+
     return getSolutionForCluster(input, solution, processResult, resolver, TSP_SUBROUTINE);
   }
 }

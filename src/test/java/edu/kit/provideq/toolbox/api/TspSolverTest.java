@@ -71,9 +71,6 @@ public class TspSolverTest {
   void testLkhTspSolver() {
     for (String problem : problems) {
       var problemDto = ApiTestHelper.createProblem(client, lkhTspSolver, problem, TSP);
-
-      System.out.println(problemDto.getSolution());
-
       assertEquals(ProblemState.SOLVED, problemDto.getState());
       assertNotNull(problemDto.getSolution());
       assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());

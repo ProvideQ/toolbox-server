@@ -37,8 +37,41 @@ public class LkhTspSolver extends TspSolver {
 
   @Override
   public Mono<Solution<String>> solve(String input, SubRoutineResolver subRoutineResolver) {
-    var solution = new Solution<String>();
 
+    // the following code will transform the TSP problem into a VRP problem
+    // dummy demand and depot sections are added, every city has a demand of 1.
+    // this is not an elegant way to solve TSP, but needed to make Lucas' code work.
+
+    // read dimension from input:
+    int dimension = 0;
+    String[] lines = input.split("\n");
+    for (String line : lines) {
+      if (line.contains("DIMENSION")) {
+        dimension = Integer.parseInt(line.split(":")[1].trim());
+        break;
+      }
+    }
+    System.out.println("dimension: " + dimension);
+    int capacity = dimension - 1;
+
+    if (input.contains("TYPE : TSP")) {
+      input = input.replace("TYPE : TSP", "TYPE : CVRP\nCAPACITY : " + capacity);
+    }
+
+    if (!input.contains("DEPOT_SECTION:") && !input.contains("DEMAND_SECTION:")) {
+      if (input.contains("EOF")) {
+        input = input.replace("EOF", "");
+      }
+      // add depot section dummy:
+      input = input.concat("DEPOT_SECTION:\n1\n-1\n");
+      // add dummy for demands:
+      input = input.concat("DEMAND_SECTION:\n1 0\n");
+      for (int i = 2; i <= dimension; i++) {
+        input = input.concat(i + " 1\n");
+      }
+    }
+
+    var solution = new Solution<String>();
     var processResult = context.getBean(
             PythonProcessRunner.class,
             scriptDir,
@@ -49,9 +82,6 @@ public class LkhTspSolver extends TspSolver {
         .problemFileName("problem.vrp")
         .solutionFileName("problem.sol")
         .run(getProblemType(), solution.getId(), input);
-
-    //TODO: write new wrapper that solves TSP problems with LKH-3
-    //TODO: change ProcessRunner call to new wrapper
 
     return Mono.just(processResult.applyTo(solution));
   }
