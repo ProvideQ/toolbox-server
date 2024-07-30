@@ -111,7 +111,11 @@ public class Problem<InputT, ResultT> {
   public void setSolver(ProblemSolver<InputT, ResultT> newSolver) {
     this.solver = newSolver;
 
-    this.observers.forEach(observer -> observer.onSolverChanged(this, newSolver));
+    Consumer<ProblemObserver<InputT, ResultT>> update = newSolver == null
+        ? observer -> observer.onSolverReset(this)
+        : observer -> observer.onSolverChanged(this, newSolver);
+
+    this.observers.forEach(update);
   }
 
   public ProblemState getState() {

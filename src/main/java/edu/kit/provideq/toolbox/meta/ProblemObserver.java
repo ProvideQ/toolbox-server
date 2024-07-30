@@ -15,10 +15,17 @@ public interface ProblemObserver<InputT, ResultT> {
   /**
    * Called when the solver of an observed problem changes.
    *
-   * @param problem the problem whose input changed.
+   * @param problem the problem whose solver changed.
    * @param newSolver the new solver of the problem.
    */
   void onSolverChanged(Problem<InputT, ResultT> problem, ProblemSolver<InputT, ResultT> newSolver);
+
+  /**
+   * Called when the solver of an observed problem is reset to null.
+   *
+   * @param problem the problem whose solver changed to null.
+   */
+  void onSolverReset(Problem<InputT, ResultT> problem);
 
   /**
    * Called when the state of an observed problem changes.

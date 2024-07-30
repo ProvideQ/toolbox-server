@@ -147,6 +147,11 @@ public class ProblemManager<InputT, ResultT> {
       }
 
       @Override
+      public void onSolverReset(Problem<InputT, ResultT> problem) {
+        // do nothing
+      }
+
+      @Override
       public void onStateChanged(Problem<InputT, ResultT> problem, ProblemState newState) {
         // do nothing
       }

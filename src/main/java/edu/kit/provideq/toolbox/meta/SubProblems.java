@@ -139,12 +139,7 @@ final class SubProblems<InputT, ResultT>
       Problem<InputT, ResultT> problem,
       ProblemSolver<InputT, ResultT> newSolver
   ) {
-    for (var entry : entries) {
-      for (Problem<?, ?> subProblem : entry.problems) {
-        problemRemovedObserver.accept(subProblem);
-      }
-    }
-    entries.clear();
+    onSolverReset(problem);
 
     for (var subRoutine : newSolver.getSubRoutines()) {
       var entry = addEntry(subRoutine);
@@ -152,6 +147,16 @@ final class SubProblems<InputT, ResultT>
         problemAddedObserver.accept(subProblem);
       }
     }
+  }
+
+  @Override
+  public void onSolverReset(Problem<InputT, ResultT> problem) {
+    for (var entry : entries) {
+      for (Problem<?, ?> subProblem : entry.problems) {
+        problemRemovedObserver.accept(subProblem);
+      }
+    }
+    entries.clear();
   }
 
   private <SubInputT, SubResultT> SubProblemEntry<SubInputT, SubResultT> addEntry(
@@ -176,6 +181,11 @@ final class SubProblems<InputT, ResultT>
       public void onSolverChanged(
               Problem<SubInputT, SubResultT> problem,
               ProblemSolver<SubInputT, SubResultT> newSolver) {
+        // do nothing
+      }
+
+      @Override
+      public void onSolverReset(Problem<SubInputT, SubResultT> problem) {
         // do nothing
       }
 
