@@ -139,6 +139,10 @@ public class ProblemRouter {
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
     var problem = findProblemOrThrow(manager, problemId);
+    if (problem.getState() == ProblemState.SOLVING || problem.getState() == ProblemState.SOLVED) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Problems that are currently being solved or have been solved cannot be updated!");
+    }
 
     var updatedProblemDto = req
         .bodyToMono(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {})
