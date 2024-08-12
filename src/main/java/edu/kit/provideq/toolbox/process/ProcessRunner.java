@@ -157,7 +157,7 @@ public class ProcessRunner {
    * @param solutionId  The id of the resulting solution
    * @param problemData The problem data that should be solved
    * @return Returns the process result, which contains the solution data
-   *     or an error as output depending on the success of the process.
+   * or an error as output depending on the success of the process.
    */
   public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId,
                                    String problemData) {
@@ -172,7 +172,7 @@ public class ProcessRunner {
    * @param problemData The problem data that should be solved
    * @param reader      The reader that retrieves the output of the process
    * @return Returns the process result, which contains the solution data
-   *     or an error as output depending on the success of the process.
+   * or an error as output depending on the success of the process.
    */
   public <T> ProcessResult<T> run(ProblemType<?, ?> problemType, UUID solutionId,
                                   String problemData, ProcessResultReader<T> reader) {
@@ -243,14 +243,22 @@ public class ProcessRunner {
           + resourceProvider.readStream(process.errorReader());
 
       processExitCode = process.waitFor();
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       return new ProcessResult<>(
           false,
           Optional.empty(),
           Optional.of(
-              "Solving %s problem resulted in exception:%n%s".formatted(problemType.getId(),
+              "Solving %s problem resulted in IO Exception:%n%s".formatted(problemType.getId(),
                   e.getMessage())
           )
+      );
+    } catch (InterruptedException e) {
+      // interrupt current thread:
+      Thread.currentThread().interrupt();
+      return new ProcessResult<>(
+          false, Optional.empty(),
+          Optional.of("Thread InterruptedException while Solving Problem, no solution found\n"
+              + e.getMessage())
       );
     }
 
