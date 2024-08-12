@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class QuboSolverTest {
+class QuboSolverTest {
     @Autowired
     private WebTestClient client;
 

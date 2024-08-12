@@ -8,7 +8,6 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.tsp.solvers.LkhTspSolver;
 import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -41,7 +40,7 @@ public class TspConfiguration {
 
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
     try {
-      String[] problemNames = new String[]{
+      String[] problemNames = new String[] {
           "att48.tsp", "SmallSampleTSP.tsp", "VerySmallSampleTSP.tsp"
       };
 

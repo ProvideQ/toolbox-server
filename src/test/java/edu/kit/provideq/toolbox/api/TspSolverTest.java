@@ -30,7 +30,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TspSolverTest {
+class TspSolverTest {
 
   @Autowired
   private WebTestClient client;

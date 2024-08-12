@@ -13,10 +13,10 @@ public class BooleanState extends MetaSolverSetting {
   }
 
   public boolean getState() {
-      return state;
+    return state;
   }
 
   public void setState(boolean state) {
-      this.state = state;
+    this.state = state;
   }
 }

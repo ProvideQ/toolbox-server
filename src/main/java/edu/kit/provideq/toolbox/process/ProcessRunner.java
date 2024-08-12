@@ -183,7 +183,7 @@ public class ProcessRunner {
           .getProblemDirectory(problemType, solutionId)
           .getAbsolutePath();
     } catch (IOException e) {
-      return new ProcessResult<T>(
+      return new ProcessResult<>(
           false,
           Optional.empty(),
           Optional.of(
@@ -202,7 +202,7 @@ public class ProcessRunner {
     try {
       Files.writeString(problemFilePath, problemData);
     } catch (IOException e) {
-      return new ProcessResult<T>(
+      return new ProcessResult<>(
           false,
           Optional.empty(),
           Optional.of("Error: The problem data couldn't be written to %s:%n%s".formatted(
@@ -244,7 +244,7 @@ public class ProcessRunner {
 
       processExitCode = process.waitFor();
     } catch (IOException | InterruptedException e) {
-      return new ProcessResult<T>(
+      return new ProcessResult<>(
           false,
           Optional.empty(),
           Optional.of(
@@ -256,7 +256,7 @@ public class ProcessRunner {
 
     // Return prematurely if the process failed
     if (processExitCode != 0) {
-      return new ProcessResult<T>(
+      return new ProcessResult<>(
           false,
           Optional.empty(),
           Optional.of(
@@ -268,7 +268,7 @@ public class ProcessRunner {
         reader.read(solutionFile, problemFilePath, Path.of(problemDirectoryPath));
 
     if (!result.success()) {
-      return new ProcessResult<T>(
+      return new ProcessResult<>(
           result.success(),
           result.output(),
           result.errorOutput().isPresent() ? Optional.of(

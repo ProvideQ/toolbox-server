@@ -20,8 +20,6 @@ import reactor.core.publisher.Mono;
 @Component
 public class KmeansClusterer extends VrpClusterer {
 
-  private static final String CLUSTER_SETTING_NAME = "kmeans-cluster-number";
-
   @Autowired
   public KmeansClusterer(@Value("${vrp.directory}") String binaryDir,
                          @Value("${vrp.bin.meta-solver}") String binaryName,
@@ -45,25 +43,13 @@ public class KmeansClusterer extends VrpClusterer {
     return "K-means Clustering (VRP -> Set of VRP)";
   }
 
-
-//  @Override
-//  public List<MetaSolverSetting> getSettings() {
-//    return List.of(
-//        new IntegerSetting(CLUSTER_SETTING_NAME, "Number of Kmeans Cluster (default: 3)", 3));
-//  }
-
   @Override
   public Mono<Solution<String>> solve(String input, SubRoutineResolver resolver) {
-    //TODO: add setting again once architecture allows it
 
-//    int clusterNumber = settings.stream()
-//        .filter(setting -> setting.name.equals(CLUSTER_SETTING_NAME))
-//        .map(setting -> (IntegerSetting) setting)
-//        .findFirst()
-//        .map(setting -> setting.getNumber())
-//        .orElse(3);
-
-    int clusterNumber = 3; //TODO: remove later
+    // for now, set the cluster number to three. Our architecture currently does not allow settings.
+    // we will change this in the future, cluster numbers can be any positive integer (>0)
+    // called in python script via "kmeans-cluster-number"
+    int clusterNumber = 3;
 
     var solution = new Solution<String>();
 

@@ -34,7 +34,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class VrpSolverTest {
+class VrpSolverTest {
   @Autowired
   private WebTestClient client;
 
@@ -123,11 +123,11 @@ public class VrpSolverTest {
 
       //check if subproblem is set correctly
       List<SubProblemReferenceDto> vrpSubProblems = problemDto.getSubProblems();
-      assertEquals(vrpSubProblems.size(),
-          1); //there should be exactly one subproblem, the vrp that needs to be clustered
+      //there should be exactly one subproblem, the vrp that needs to be clustered:
+      assertEquals(1, vrpSubProblems.size());
       SubProblemReferenceDto vrpProblem = vrpSubProblems.get(0);
       List<String> clusterSubProblems = vrpProblem.getSubProblemIds();
-      assertEquals(clusterSubProblems.size(), 1); //there should also only one subproblem Id
+      assertEquals(1, clusterSubProblems.size()); //there should also only one subproblem Id
       assertEquals(vrpProblem.getSubRoutine().getTypeId(), CLUSTER_VRP.getId());
 
       //set k-means as CLUSTER_VRP solver:
@@ -237,9 +237,9 @@ public class VrpSolverTest {
             TSP.getId());
 
         //set d-wave annealer as qubo solver:
-        assertEquals(tspClusterProblem.getSubProblems().size(), 1);
+        assertEquals(1, tspClusterProblem.getSubProblems().size());
         var quboProblem = tspClusterProblem.getSubProblems().get(0);
-        assertEquals(quboProblem.getSubProblemIds().size(), 1);
+        assertEquals(1, quboProblem.getSubProblemIds().size());
         assertEquals(quboProblem.getSubRoutine().getTypeId(), QUBO.getId());
         ApiTestHelper.setProblemSolver(client, dwaveQuboSolver, quboProblem.getSubProblemIds().get(0), QUBO.getId());
       }

@@ -16,8 +16,6 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class DwaveQuboSolver extends QuboSolver {
-  private static final String METHOD_SETTING_NAME = "method";
-  private static final String API_TOKEN_SETTING_NAME = "dwave-token";
   private final String quboScriptPath;
   private final ApplicationContext context;
 
@@ -34,37 +32,20 @@ public class DwaveQuboSolver extends QuboSolver {
     return "(D-Wave) Annealing QUBO Solver";
   }
 
-    /*
-    @Override
-    public List<MetaSolverSetting> getSettings() {
-        return List.of(
-            new Select<String>(METHOD_SETTING_NAME, "DWave Annealing Method", List.of("sim", "hybrid", "qbsolv", "direct"), "sim"),
-            new Text(API_TOKEN_SETTING_NAME, "DWave API Token (required for non-sim methods)")
-        );
-    }*/
-
   @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-        /*
-        String dwaveAnnealingMethod = settings.stream()
-            .filter(setting -> setting.name.equals(METHOD_SETTING_NAME))
-            .map(setting -> ((Select<String>) setting))
-            .findFirst()
-            .map(setting -> setting.selectedOption)
-            .orElse("sim");
 
-        Optional<String> dwaveToken = settings.stream()
-            .filter(setting -> setting.name.equals(API_TOKEN_SETTING_NAME))
-            .map(setting -> ((Text) setting))
-            .findFirst()
-            .map(setting -> setting.text);
-        */ //TODO: Add Setting again (currently not part of our model)
+    // there is currently no field where a token can be added by the user
+    // this field is kept because it was used in Lucas implementation and will be added back later
+    Optional<String> dwaveToken = Optional.empty();
 
-    String dwaveAnnealingMethod = "sim"; //TODO: remove this again
-    Optional<String> dwaveToken = Optional.empty(); //TODO: remove this again
+    // this field is only relevant when a dwaveToken is added
+    // (a token is needed to access the d-wave hardware)
+    // options are: sim, hybrid, absolv, direct
+    String dwaveAnnealingMethod = "sim";
 
     var solution = new Solution<String>();
 

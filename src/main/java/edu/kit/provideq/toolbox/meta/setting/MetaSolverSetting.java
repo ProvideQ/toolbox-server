@@ -4,20 +4,37 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(using = MetaSolverSettingDeserializer.class)
 public abstract class MetaSolverSetting {
-  public String name;
+  private String name;
+  private MetaSolverSettingType type;
   private String title;
-  public MetaSolverSettingType type;
-
-  public MetaSolverSetting() {
-  }
 
   protected MetaSolverSetting(String name, String title, MetaSolverSettingType type) {
-    this.name = name;
-    this.type = type;
-    this.title = title;
+    this.setName(name);
+    this.setType(type);
+    this.setTitle(title);
   }
 
   public String getTitle() {
-      return title;
+    return title;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public MetaSolverSettingType getType() {
+    return type;
+  }
+
+  public void setType(MetaSolverSettingType type) {
+    this.type = type;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 }

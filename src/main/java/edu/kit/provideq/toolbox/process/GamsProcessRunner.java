@@ -1,13 +1,12 @@
 package edu.kit.provideq.toolbox.process;
 
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Process runner with input & output post-processing specifically for invoking GAMS.
@@ -55,14 +54,6 @@ public class GamsProcessRunner extends ProcessRunner {
     addProblemFilePathToProcessCommand("--INPUT=\"%s\"");
   }
 
-  @Override
-  public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId, String problemData) {
-    var result = super.run(problemType, solutionId, problemData);
-
-    var obfuscatedOutput = obfuscateGamsLicense(result.output().get());
-    return new ProcessResult<>(result.success(), Optional.of(obfuscatedOutput), Optional.empty());
-  }
-
   /**
    * Removes GAMS' license output from an output log.
    */
@@ -89,5 +80,14 @@ public class GamsProcessRunner extends ProcessRunner {
    */
   private static String obfuscateLine(String line) {
     return Strings.repeat("*", line.length());
+  }
+
+  @Override
+  public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId,
+                                   String problemData) {
+    var result = super.run(problemType, solutionId, problemData);
+
+    var obfuscatedOutput = obfuscateGamsLicense(result.output().orElse("no license found"));
+    return new ProcessResult<>(result.success(), Optional.of(obfuscatedOutput), Optional.empty());
   }
 }
