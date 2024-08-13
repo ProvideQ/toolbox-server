@@ -51,6 +51,7 @@ ENV PATH="${PATH}:/opt/java/bin"
 COPY gams gams
 COPY qiskit qiskit
 COPY cirq cirq
+COPY python python
 RUN scripts/install-solver-dependencies.sh
 COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
 
