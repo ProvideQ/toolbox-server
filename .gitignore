@@ -54,5 +54,5 @@ gamslice.txt
 # Listing files compiled from our GAMS scripts
 *.lst
 *.op2
-gams/**/225a
+solvers/gams/**/225a
 *.out

@@ -44,8 +44,6 @@ class TspSolverTest {
   private DwaveQuboSolver dwaveQuboSolver;
   @Autowired
   private QrispQuboSolver qrispQuboSolver;
-  @Autowired
-  private QiskitQuboSolver qiskitQuboSolver;
 
   private ProblemManager<String, String> problemManager;
   private List<String> problems;

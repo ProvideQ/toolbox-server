@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -24,7 +25,7 @@ public class LkhTspSolver extends TspSolver {
        * uses the LKH script dir because it is the same as LKH-3 for VRP
        * (LKH can solve VRP and TSP)
        */
-      @Value("${lkh.directory.vrp}") String scriptDir,
+      @Value("${custom.lkh.directory}") String scriptDir,
       ApplicationContext context) {
     this.scriptDir = scriptDir;
     this.context = context;

@@ -34,9 +34,9 @@ public class QuboTspSolver extends TspSolver {
 
   @Autowired
   public QuboTspSolver(
-      @Value("${vrp.directory}") String binaryDir,
       //"vrp" value is correct because this uses the VRP framework from Lucas Bergers thesis
-      @Value("${vrp.bin.meta-solver}") String binaryName,
+      @Value("${custom.berger-vrp.directory}") String binaryDir,
+      @Value("${custom.berger-vrp.solver}") String binaryName,
       ApplicationContext context) {
     this.binaryName = binaryName;
     this.binaryDir = binaryDir;

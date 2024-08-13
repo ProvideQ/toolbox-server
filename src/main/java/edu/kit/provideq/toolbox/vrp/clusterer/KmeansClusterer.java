@@ -21,8 +21,8 @@ import reactor.core.publisher.Mono;
 public class KmeansClusterer extends VrpClusterer {
 
   @Autowired
-  public KmeansClusterer(@Value("${vrp.directory}") String binaryDir,
-                         @Value("${vrp.bin.meta-solver}") String binaryName,
+  public KmeansClusterer(@Value("${custom.berger-vrp.directory}") String binaryDir,
+                         @Value("${custom.berger-vrp.solver}") String binaryName,
                          ApplicationContext context) {
     super(binaryDir, binaryName, context);
   }

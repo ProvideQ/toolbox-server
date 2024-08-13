@@ -20,7 +20,7 @@ public class LkhVrpSolver extends VrpSolver {
 
   @Autowired
   public LkhVrpSolver(
-      @Value("${lkh.directory.vrp}") String scriptDir,
+      @Value("${custom.lkh.directory}") String scriptDir,
       ApplicationContext context) {
     this.scriptDir = scriptDir;
     this.context = context;

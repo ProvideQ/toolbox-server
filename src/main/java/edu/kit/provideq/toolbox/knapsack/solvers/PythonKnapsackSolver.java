@@ -16,7 +16,7 @@ public class PythonKnapsackSolver extends KnapsackSolver {
 
   @Autowired
   public PythonKnapsackSolver(
-          @Value("${python.directory}/knapsack") String knapsackPath,
+          @Value("${custom.hs_knapsack.directory}") String knapsackPath,
           ApplicationContext context) {
     this.knapsackPath = knapsackPath;
     this.context = context;
@@ -24,7 +24,7 @@ public class PythonKnapsackSolver extends KnapsackSolver {
 
   @Override
   public String getName() {
-    return "Python Knapsack";
+    return "Horowitz-Sahni Knapsack";
   }
 
   @Override
