@@ -1,4 +1,5 @@
 #!/bin/bash
+# this script is made for the CI-pipeline, do not use this to install dependencies on your private machine!
 
 # exit on error
 set -e
@@ -10,7 +11,12 @@ REPO_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
 source /opt/conda/bin/activate gams
 
 # install solver dependencies
-pip install -r "$REPO_DIR/gams/requirements.txt"
-pip install -r "$REPO_DIR/qiskit/requirements.txt"
-pip install -r "$REPO_DIR/cirq/requirements.txt"
-pip install -r "$REPO_DIR/python/requirements.txt"
+pip install -r "$REPO_DIR/solvers/gams/requirements.txt"
+# quantum frameworks:
+pip install -r "$REPO_DIR/solvers/qiskit/requirements.txt"
+pip install -r "$REPO_DIR/solvers/cirq/requirements.txt"
+pip install -r "$REPO_DIR/solvers/dwave/requirements.txt"
+pip install -r "$REPO_DIR/solvers/qrisp/requirements.txt"
+# custom solvers with python wrapper:
+pip install -r "$REPO_DIR/solvers/custom/hs-knapsack/requirements.txt"
+pip install -r "$REPO_DIR/solvers/custom/lkh/requirements.txt"
