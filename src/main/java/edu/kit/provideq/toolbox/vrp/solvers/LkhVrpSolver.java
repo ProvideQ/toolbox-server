@@ -17,12 +17,15 @@ import reactor.core.publisher.Mono;
 public class LkhVrpSolver extends VrpSolver {
   private final String scriptDir;
   private final ApplicationContext context;
+  private final String solverBinary;
 
   @Autowired
   public LkhVrpSolver(
       @Value("${custom.lkh.directory}") String scriptDir,
+      @Value("${custom.lkh.solver}") String solverBinary,
       ApplicationContext context) {
     this.scriptDir = scriptDir;
+    this.solverBinary = solverBinary;
     this.context = context;
   }
 
@@ -42,7 +45,8 @@ public class LkhVrpSolver extends VrpSolver {
     var processResult = context.getBean(
             PythonProcessRunner.class,
             scriptDir,
-            "vrp_lkh.py"
+            "vrp_lkh.py",
+            new String[] {"--lkh-instance", solverBinary}
         )
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand("--output-file", "%s")
