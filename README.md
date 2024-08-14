@@ -7,28 +7,44 @@ A web-based user interface can be found in our
 [ProvideQ/ProvideQ repository](https://github.com/ProvideQ/ProvideQ).
 
 ## Development setup
-1. Install Java 17 (check with `java -version`)
+1. Install Java 17 or newer (check with `java -version`)
 2. Clone this repository
-3. Install a python env that works with GAMS (skip this step if you don't need GAMS)
-   1. Install GAMS.
-   2. Install miniconda (or anaconda, if you prefer that):
-      https://conda.io/projects/conda/en/stable/user-guide/install/index.html
-   3. Create a GAMS conda environment: `conda create --name gams python=3.10 --yes`
-   4. Activate your conda environment: `conda activate gams`.
-   5. Make GAMS use that python environment by setting the `GMSPYTHONLIB=<path-to-conda>/envs/gams/lib/libpython3.10.so`
-      environment variable.
-   6. Install GAMS packages to the GAMS conda env:
-      `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
-      * If you get an error building `psycopg2`, try to install these postgres packages:
-        `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
-   7. Install the python dependencies we use in our python packages: `pip install -r gams/requirements.txt`
-4. Install solver dependencies (skip this step if you don't want to use the solvers):
-   * Note that these dependencies must be installed to the gams conda env if you want to use GAMS and other solvers from
-     the same toolbox installation!
-   1. Install GAMS solver dependencies: `pip install -r gams/requirements.txt`
-   2. Install Qiskit solver dependencies: `pip install -r qiskit/requirements.txt`
-   3. Install Cirq solver dependencies: `pip install -r cirq/requirements.txt`
-5. Run the server using `./gradlew bootRun`
+3. [Optional, Solver Installation - install the Solvers that you want/need]
+    * We hope to provide an automated script for most of this in the future.  
+   1. Python-based Solvers (Qiskit, Cirq, Dwave, Qrisp)
+      1. Install Python and the required libraries by using `pip install -r [path to requirements.txt]`
+      2. Example for Qiskit: `pip install -r solvers/qiskit/requirements.txt`
+      * Note: These dependencies must be installed to the gams conda env if you want to use GAMS and other solvers from
+        the same toolbox installation!
+   2. Compiled Solvers (e.g. used for VRP and TSP)
+      1. Solvers implemented in compiled languages must be executed via binaries that are compiled for your operating system. For those types of solvers we usually include pre-compiled binaries for windows, mac (only arm), and unix.
+      2. In case the pre-compiled versions do not work on your machine: re-compile them:
+      * LKH-3:
+        1. Build LKH-3 using the offical guide: http://webhotel4.ruc.dk/~keld/research/LKH-3/
+        2. Put the build binary in `solvers/lkh/bin`, replace the binary that matches your OS.
+      * VRP-Pipeline (used for K-means, Two Phase Clustering, VRP to QUBO convertion):
+        1. Install Rust: https://www.rust-lang.org/tools/install
+        2. Install a specific Rust nightly build (needed cause the solver uses experimental features): `rustup install nightly-2023-07-01`
+        3. Check how the nightly build is called on your machine (this is shown when running the install command, on Mac it is called *nightly-2023-07-01-aarch64-apple-darwin*)
+        4. Set the nightly build as default: `rustup default nightly-2023-07-01(... specific version name on machine)`
+        5. Download source code of the VRP-Pipeline: https://github.com/ProvideQ/hybrid-vrp-solver
+        6. build the source code using `cargo build`
+        7. Put the build binary in `solvers/berger-vrp/bin`, replace the binary that matches your OS.
+   3. GAMS (multiple solvers are build on this):
+      1. Install a python env that works with GAMS (skip this step if you don't need GAMS)
+      2. Install GAMS. (https://www.gams.com/download/)
+      3. Install miniconda (or anaconda, if you prefer that):
+         https://conda.io/projects/conda/en/stable/user-guide/install/index.html
+      4. Create a GAMS conda environment: `conda create --name gams python=3.10 --yes`
+      5. Activate your conda environment: `conda activate gams`.
+      6. Make GAMS use that python environment by setting the `GMSPYTHONLIB=<path-to-conda>/envs/gams/lib/libpython3.10.so`
+            environment variable.
+      7. Install GAMS packages to the GAMS conda env:
+            `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
+            * If you get an error building `psycopg2`, try to install these postgres packages:
+              `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
+      8. Install the python dependencies we use in our python packages: `pip install -r gams/requirements.txt`
+4. Run the server using `./gradlew bootRun`
 
 ## Deployment
 This repository is designed to be deployed with [Dokku](https://dokku.com/), but you can also run 
