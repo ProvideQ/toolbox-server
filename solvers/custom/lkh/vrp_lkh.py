@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(
 
 
 parser.add_argument("tsplib_file")
-parser.add_argument("--lkh-instance", default="./bin/LKH-mac")
+parser.add_argument("--lkh-instance", default="./bin/LKH-unix")
 parser.add_argument("--output-file")
 parser.add_argument("-t", "--max-trials", default=1000)
 parser.add_argument("-r", "--runs", default=10)

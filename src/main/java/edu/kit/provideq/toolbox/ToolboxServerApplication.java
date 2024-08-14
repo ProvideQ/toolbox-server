@@ -19,7 +19,7 @@ public class ToolboxServerApplication {
     } else if (osName.contains("mac")) {
       return "mac";
     } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {
-      return "unix";
+      return "linux";
     } else {
       throw new MissingSpringProfileException("Could not start Toolbox, "
               + "there is no Spring Profile that matches your OS specification.");
