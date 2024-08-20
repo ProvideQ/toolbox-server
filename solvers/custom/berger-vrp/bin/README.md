@@ -25,7 +25,7 @@ linker = "x86_64-w64-mingw32-gcc"
 * only gnu is supported, Lucas Bergers code does not support static linking
 1. Target for Linux: `rustup target add 86_64-unknown-linux-gnu`
 2. Toolchain: `arch -arm64 brew install SergioBenitez/osxct/x86_64-unknown-linux-gnu`
-3. Create .cargo/config.toml and add the following lines: (Path for linker: `which 86_64-unknown-linux-gnu`)<br>
+3. Create .cargo/config.toml and add the following lines: (Path for linker: `which x86_64-unknown-linux-gnu`)<br>
 ```
 [target.x86_64-pc-windows-gnu]
 linker = "/opt/homebrew/bin/x86_64-unknown-linux-gnu-gcc"
