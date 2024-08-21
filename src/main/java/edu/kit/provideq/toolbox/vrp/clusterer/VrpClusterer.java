@@ -43,7 +43,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
   @Override
   public ProblemType<String, String> getProblemType() {
-    return ClusterVrpConfiguration.CLUSTER_VRP;
+    return VrpClustererConfiguration.CLUSTER_VRP;
   }
 
   @Autowired
@@ -58,7 +58,8 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
       SubRoutineResolver resolver,
       SubRoutineDefinition<String, String> definition) {
     if (processResult.output().isEmpty() || !processResult.success()) {
-      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
+      solution.setDebugData(processResult.errorOutput()
+          .orElse("Unknown Error Occured: Map of Cluster could not be retrieved."));
       solution.abort();
       return Mono.just(solution);
     }
@@ -118,7 +119,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
     if (combineProcessRunner.output().isEmpty() || !combineProcessRunner.success()) {
       solution.setDebugData(
-          combineProcessRunner.errorOutput().orElse("Unknown error occurred."));
+          combineProcessRunner.errorOutput().orElse("Unknown Error: Could not combine clusters."));
       solution.fail();
       return solution;
     }

@@ -1,9 +1,9 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -39,9 +39,9 @@ public class CirqMaxCutSolver extends MaxCutSolver {
     var solution = new Solution<String>();
 
     var processResult = context.getBean(
-        PythonProcessRunner.class,
-        scriptDir,
-        "max_cut_cirq.py")
+            PythonProcessRunner.class,
+            scriptDir,
+            "max_cut_cirq.py")
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand()
         .run(getProblemType(), solution.getId(), input);

@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -41,37 +39,6 @@ public class QuboTspSolver extends TspSolver {
     this.binaryName = binaryName;
     this.binaryDir = binaryDir;
     this.context = context;
-  }
-
-  public static boolean checkVehicleCapacity(String tsp) {
-    int capacity = 0;
-    int totalDemand = 0;
-    boolean demandSection = false;
-
-    Pattern capacityPattern = Pattern.compile("CAPACITY\\s*:\\s*(\\d+)");
-    Pattern demandPattern = Pattern.compile("^\\d+\\s*(\\d+)");
-
-    for (String line : tsp.split("\n")) {
-      Matcher capacityMatcher = capacityPattern.matcher(line);
-      if (capacityMatcher.find()) {
-        capacity = Integer.parseInt(capacityMatcher.group(1));
-      }
-      if (line.startsWith("DEMAND_SECTION")) {
-        demandSection = true;
-        continue;
-      }
-      if (line.startsWith("EOF")) {
-        demandSection = false;
-      }
-      if (demandSection) {
-        Matcher demandMatcher = demandPattern.matcher(line);
-        if (demandMatcher.find()) {
-          totalDemand += Integer.parseInt(demandMatcher.group(1));
-        }
-      }
-    }
-
-    return totalDemand <= capacity;
   }
 
   @Autowired
@@ -113,9 +80,8 @@ public class QuboTspSolver extends TspSolver {
     // change "TYPE" keyword from "TSP" to "CVRP"
     // add capacity declaration of "0" (is ignored later)
     // this is theoretically wrong, but needed for Lucas' QUBO converter to work
-    if (input.contains("TYPE : TSP")) {
-      input = input.replace("TYPE : TSP", "TYPE : CVRP\nCAPACITY : 0");
-    }
+    String typeRegex = "(?i)\\btype\\s*:\\s*tsp\\b";
+    input = input.replaceAll(typeRegex, "TYPE : CVRP\nCAPACITY : 0");
 
     // translate into qubo in lp-file format with rust vrp meta solver
     var processResult = context.getBean(
@@ -135,22 +101,25 @@ public class QuboTspSolver extends TspSolver {
       return Mono.just(solution);
     }
 
+    String problemDirectoryPath = getProblemDirectory(solution);
+    if (problemDirectoryPath == null) {
+      solution.setDebugData("Unable to solve Problem, the problemDirectoryPath is null.");
+      solution.abort();
+      return Mono.just(solution);
+    }
+    Path quboSolutionFilePath = Path.of(problemDirectoryPath, "problem.bin");
+
     String finalInput = input;
     return resolver.runSubRoutine(QUBO_SUBROUTINE, processResult.output().get())
-        .publishOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.boundedElastic()) //avoids block from Files.writeString() in try/catch
         .map(subRoutineSolution -> {
           if (subRoutineSolution.getSolutionData() == null
               || subRoutineSolution.getSolutionData().isEmpty()) {
-            solution.setDebugData("Unable to solve Subroutine");
+            solution.setDebugData("Unable to process at least one Subroutine, "
+                + "because its SolutionData does not exist");
             solution.abort();
             return solution;
           }
-
-          String problemDirectoryPath = getProblemDirectory(solution);
-          if (problemDirectoryPath == null) {
-            return solution;
-          }
-          Path quboSolutionFilePath = Path.of(problemDirectoryPath, "problem.bin");
 
           try {
             Files.writeString(quboSolutionFilePath, subRoutineSolution.getSolutionData());
@@ -175,7 +144,7 @@ public class QuboTspSolver extends TspSolver {
 
           if (!processRetransformResult.success()) {
             solution.setDebugData(
-                processRetransformResult.errorOutput().orElse("Unknown error occurred."));
+                processRetransformResult.errorOutput().orElse("Unable to retransform result."));
             solution.abort();
             return solution;
           }

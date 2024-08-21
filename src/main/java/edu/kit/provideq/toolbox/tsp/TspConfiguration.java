@@ -19,7 +19,8 @@ public class TspConfiguration {
 
   /**
    * A Traveling Sales Person Problem.
-   * Optimization Problem with the goal of find an optimal route between a given set of connected cities.
+   * Optimization Problem with the goal of find an optimal route
+   *     between a given set of connected cities.
    */
   public static final ProblemType<String, String> TSP = new ProblemType<>(
       "tsp",

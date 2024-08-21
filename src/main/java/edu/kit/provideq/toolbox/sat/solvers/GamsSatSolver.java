@@ -1,11 +1,11 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
-import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,8 @@ public class GamsSatSolver extends SatSolver {
         .run(getProblemType(), solution.getId(), dimacsCnf.toString());
 
     if (processResult.success()) {
-      var dimacsCnfSolution = DimacsCnfSolution.fromString(dimacsCnf, processResult.output().orElse(""));
+      var dimacsCnfSolution =
+          DimacsCnfSolution.fromString(dimacsCnf, processResult.output().orElse(""));
 
       solution.setSolutionData(dimacsCnfSolution);
       solution.complete();
@@ -71,5 +72,4 @@ public class GamsSatSolver extends SatSolver {
     }
     return Mono.just(solution);
   }
-
 }

@@ -40,6 +40,7 @@ public class DwaveQuboSolver extends QuboSolver {
 
     // there is currently no field where a token can be added by the user
     // this field is kept because it was used in Lucas implementation and will be added back later
+    // TODO: add user setting that allows passing Tokens
     Optional<String> dwaveToken = Optional.empty();
 
     // this field is only relevant when a dwaveToken is added

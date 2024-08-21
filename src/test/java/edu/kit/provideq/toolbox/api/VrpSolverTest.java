@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
 import static edu.kit.provideq.toolbox.tsp.TspConfiguration.TSP;
 import static edu.kit.provideq.toolbox.vrp.VrpConfiguration.VRP;
-import static edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpConfiguration.CLUSTER_VRP;
+import static edu.kit.provideq.toolbox.vrp.clusterer.VrpClustererConfiguration.CLUSTER_VRP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -62,10 +62,11 @@ class VrpSolverTest {
   @Autowired
   private DwaveQuboSolver dwaveQuboSolver;
 
-  private ProblemManager<String, String> problemManager;
-  private List<String> problems;
   @Autowired
   private LkhVrpSolver lkhVrpSolver;
+
+  private ProblemManager<String, String> problemManager;
+  private List<String> problems;
 
   @BeforeEach
   void beforeEach() {
@@ -91,20 +92,6 @@ class VrpSolverTest {
     }
   }
 
-  @Test
-  void testQrispGroverIsolated() {
-    //only run on very small example:
-    for (var problem : problems) {
-      if (problem.contains("DIMENSION : 3")) {
-        var problemDto = ApiTestHelper.createProblem(client, lkh3vrpSolver, problem, VRP);
-        assertEquals(ProblemState.SOLVED, problemDto.getState());
-        assertNotNull(problemDto.getSolution());
-        assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
-        break;
-      }
-    }
-  }
-
   /**
    * test LKH-3 solver in combination with k-means = 3
    */
@@ -113,7 +100,7 @@ class VrpSolverTest {
     for (String problem : problems) {
       //skip the small "test" problem because clustering small problems
       //can lead to errors
-      if (problem.contains("NAME : test")) {
+      if (problem.contains("DIMENSION : 3")) {
         continue;
       }
 
@@ -209,7 +196,8 @@ class VrpSolverTest {
   @Test
   void testTwoPhaseWithAnnealer() {
     //get the small problem, cause quantum simulation is used:
-    var problem = problems.stream().filter(element -> element.contains("NAME : small sample")).findFirst();
+    var problem =
+        problems.stream().filter(element -> element.contains("NAME : small sample")).findFirst();
     assertTrue(problem.isPresent());
 
     var problemDto = ApiTestHelper.createProblem(client, abstractClusterer, problem.get(), VRP);
@@ -241,7 +229,8 @@ class VrpSolverTest {
         var quboProblem = tspClusterProblem.getSubProblems().get(0);
         assertEquals(1, quboProblem.getSubProblemIds().size());
         assertEquals(quboProblem.getSubRoutine().getTypeId(), QUBO.getId());
-        ApiTestHelper.setProblemSolver(client, dwaveQuboSolver, quboProblem.getSubProblemIds().get(0), QUBO.getId());
+        ApiTestHelper.setProblemSolver(client, dwaveQuboSolver,
+            quboProblem.getSubProblemIds().get(0), QUBO.getId());
       }
     }
 

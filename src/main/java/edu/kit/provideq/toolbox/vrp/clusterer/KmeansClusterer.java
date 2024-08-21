@@ -47,7 +47,7 @@ public class KmeansClusterer extends VrpClusterer {
   public Mono<Solution<String>> solve(String input, SubRoutineResolver resolver) {
 
     // for now, set the cluster number to three. Our architecture currently does not allow settings.
-    // we will change this in the future, cluster numbers can be any positive integer (>0)
+    // TODO: change this in the future, cluster numbers can be any positive integer (>0)
     // called in python script via "kmeans-cluster-number"
     int clusterNumber = 3;
 

@@ -13,10 +13,11 @@ public class IntegerSetting extends MetaSolverSetting {
     this.number = defaultValue;
   }
 
-  public void setNumber(int number) {
-      this.number = number;
-  }
   public int getNumber() {
-      return number;
+    return number;
+  }
+
+  public void setNumber(int number) {
+    this.number = number;
   }
 }

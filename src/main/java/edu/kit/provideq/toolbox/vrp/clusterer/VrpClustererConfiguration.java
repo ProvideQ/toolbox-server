@@ -12,10 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ClusterVrpConfiguration {
+public class VrpClustererConfiguration {
   /**
-   * A Capacitated Vehicle Routing Problem
-   * Optimization Problem with the goal to find a minimal route for a given set of trucks and cities with demand.
+   * A Configuration for Vehicle Routing Problem Clusterer.
    */
   public static final ProblemType<String, String> CLUSTER_VRP = new ProblemType<>(
       "cluster-vrp",

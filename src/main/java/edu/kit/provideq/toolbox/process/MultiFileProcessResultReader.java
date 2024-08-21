@@ -7,6 +7,10 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Optional;
 
+/**
+ * A reader that reads the output of a ProcessRunner that created multiple files.
+ * The content of the files is combined to a HashMap (File path : File content (String)).
+ */
 public class MultiFileProcessResultReader implements ProcessResultReader<HashMap<Path, String>> {
 
   private final String globPattern;

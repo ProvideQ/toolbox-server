@@ -50,7 +50,6 @@ public class ProcessRunner {
   private String solutionFileName = SOLUTION_FILE_NAME;
 
   public ProcessRunner(
-      @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
       ProcessBuilder processBuilder,
       String[] arguments) {
     this.processBuilder = processBuilder;
@@ -157,7 +156,7 @@ public class ProcessRunner {
    * @param solutionId  The id of the resulting solution
    * @param problemData The problem data that should be solved
    * @return Returns the process result, which contains the solution data
-   * or an error as output depending on the success of the process.
+   *     or an error as output depending on the success of the process.
    */
   public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId,
                                    String problemData) {
@@ -166,13 +165,14 @@ public class ProcessRunner {
 
   /**
    * Runs the process provided in the constructor.
+   * TODO: split this method into prepareRun, executeRun, and readResults.
    *
    * @param problemType The type of the problem that is run
    * @param solutionId  The id of the resulting solution
    * @param problemData The problem data that should be solved
    * @param reader      The reader that retrieves the output of the process
-   * @return Returns the process result, which contains the solution data
-   * or an error as output depending on the success of the process.
+   * @return Returns the process result, which contains the solution data,
+   *     or an error as output depending on the success of the process.
    */
   public <T> ProcessResult<T> run(ProblemType<?, ?> problemType, UUID solutionId,
                                   String problemData, ProcessResultReader<T> reader) {

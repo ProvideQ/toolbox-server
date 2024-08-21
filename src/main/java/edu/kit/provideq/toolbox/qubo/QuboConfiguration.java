@@ -7,11 +7,10 @@ import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
-
-import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

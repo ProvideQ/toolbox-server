@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.vrp.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.vrp.clusterer.ClusterVrpConfiguration;
+import edu.kit.provideq.toolbox.vrp.clusterer.VrpClustererConfiguration;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class ClusterAndSolveVrpSolver extends VrpSolver {
   private static final SubRoutineDefinition<String, String> CLUSTER_SUBROUTINE =
       new SubRoutineDefinition<>(
-          ClusterVrpConfiguration.CLUSTER_VRP,
+          VrpClustererConfiguration.CLUSTER_VRP,
           "Creates a cluster of multiple vehicle routing problems"
       );
   private final ApplicationContext context;

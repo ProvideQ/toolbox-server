@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
- * {@link VrpConfiguration#VRP} solver using Qrisp QAOA implementation
+ * {@link VrpConfiguration#VRP} solver using Qrisp QAOA implementation.
  */
 @Component
 public class QrispVrpSolver extends VrpSolver {
@@ -20,7 +20,7 @@ public class QrispVrpSolver extends VrpSolver {
 
   @Autowired
   public QrispVrpSolver(
-    @Value("${qrisp.directory.vrp}") String scriptDir,
+      @Value("${qrisp.directory.vrp}") String scriptDir,
       ApplicationContext context) {
     this.scriptDir = scriptDir;
     this.context = context;
@@ -33,23 +33,23 @@ public class QrispVrpSolver extends VrpSolver {
 
   @Override
   public Mono<Solution<String>> solve(
-          String input,
-          SubRoutineResolver resolver
+      String input,
+      SubRoutineResolver resolver
   ) {
 
     var solution = new Solution<String>();
 
     var processResult = context.getBean(
-                    PythonProcessRunner.class,
-                    scriptDir,
-                    "grover.py",
-                    new String[]{"--size-gate", "35"}
-            )
-            .addProblemFilePathToProcessCommand()
-            .addSolutionFilePathToProcessCommand("--output-file", "%s")
-            .problemFileName("problem.vrp")
-            .solutionFileName("problem.sol")
-            .run(getProblemType(), solution.getId(), input);
+            PythonProcessRunner.class,
+            scriptDir,
+            "grover.py",
+            new String[] {"--size-gate", "35"}
+        )
+        .addProblemFilePathToProcessCommand()
+        .addSolutionFilePathToProcessCommand("--output-file", "%s")
+        .problemFileName("problem.vrp")
+        .solutionFileName("problem.sol")
+        .run(getProblemType(), solution.getId(), input);
 
     return Mono.just(processResult.applyTo(solution));
   }
