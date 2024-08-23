@@ -37,13 +37,19 @@ public class QrispVrpSolver extends VrpSolver {
       SubRoutineResolver resolver
   ) {
 
+    // This value will be passed to the python script,
+    // it is used to prevent denial of service issues for large simulations.
+    // Default value is 35, higher values are possible but might take much longer to simulate.
+    // TODO: allow user to pass a custom gate size as a solver setting
+    int maxNumberOfUsedQubits = 35;
+
     var solution = new Solution<String>();
 
     var processResult = context.getBean(
             PythonProcessRunner.class,
             scriptDir,
             "grover.py",
-            new String[] {"--size-gate", "35"}
+            new String[] {"--size-gate", String.valueOf(maxNumberOfUsedQubits)}
         )
         .addProblemFilePathToProcessCommand()
         .addSolutionFilePathToProcessCommand("--output-file", "%s")

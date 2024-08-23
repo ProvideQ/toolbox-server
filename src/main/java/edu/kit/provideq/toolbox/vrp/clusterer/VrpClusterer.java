@@ -93,8 +93,14 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
     // write solutions of the clusters into files:
     for (var entry : clusterSolutionMap.entrySet()) {
+      // get file name of the entry and replace .vrp with .sol
+      // (making clear that this file is a solution)
       String fileName = entry.getKey().getFileName().toString().replace(".vrp", ".sol");
+
+      // get path for the solution file: [problemDirectoryPath]/.vrp/[fileName]
       Path solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
+
+      // create the solution file at the associated path:
       var clusterSolution = entry.getValue();
       try {
         Files.writeString(solutionFilePath, clusterSolution.getSolutionData());

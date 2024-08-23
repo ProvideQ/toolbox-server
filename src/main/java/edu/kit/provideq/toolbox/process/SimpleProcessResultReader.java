@@ -5,6 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+/**
+ * Basic reader for results of ProcessRunners.
+ * Reads the content of the file associated with the solutionPath.
+ * No specialized processing is done.
+ */
 public class SimpleProcessResultReader implements ProcessResultReader<String> {
   public ProcessResult<String> read(Path solutionPath, Path problemPath, Path problemDirectory) {
     // Read the solution file

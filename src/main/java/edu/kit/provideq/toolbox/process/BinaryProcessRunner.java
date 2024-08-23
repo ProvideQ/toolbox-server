@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * Process runner with output post-processing specifically for invoking Python scripts.
+ * General process runner for any type of binaries.
+ * Starts the binary with the given args. No specialized processing.
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
