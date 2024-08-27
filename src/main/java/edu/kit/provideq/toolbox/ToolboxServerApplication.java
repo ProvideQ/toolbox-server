@@ -15,7 +15,7 @@ public class ToolboxServerApplication {
   private static String getSpringProfileForOs() throws MissingSpringProfileException {
     String osName = System.getProperty("os.name").toLowerCase();
     if (osName.contains("win")) {
-      return "win";
+      return "windows";
     } else if (osName.contains("mac")) {
       return "mac";
     } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {

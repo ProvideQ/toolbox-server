@@ -47,11 +47,6 @@ class QuboSolverTest {
   @MethodSource("provideArguments")
   void testQuboSolvers(ProblemSolver<String, String> solver, String input) {
     var problemDto = ApiTestHelper.createProblem(client, solver, input, QUBO);
-
-    System.out.println("Solver: " + solver);
-    System.out.println("Solution: " + problemDto.getSolution());
-    System.out.println("Debug Data: " + problemDto.getSolution().getDebugData());
-
     assertEquals(ProblemState.SOLVED, problemDto.getState());
     assertNotNull(problemDto.getSolution());
     assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
