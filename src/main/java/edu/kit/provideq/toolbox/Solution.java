@@ -25,11 +25,11 @@ public class Solution<S> {
   /**
    * Internal constructor, used for de-serialization.
    */
-  public Solution() {
+  private Solution() {
     this.id = UUID.randomUUID();
   }
 
-  public Solution(UUID id) {
+  private Solution(UUID id) {
     this.id = id;
   }
 
