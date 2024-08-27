@@ -45,8 +45,7 @@ public class TwoPhaseClusterer extends VrpClusterer {
       String input,
       SubRoutineResolver resolver
   ) {
-
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     // cluster with tsp/two-phase clustering
     var processResult = context.getBean(

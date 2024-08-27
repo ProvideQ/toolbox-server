@@ -36,7 +36,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     // Run MaxCut with GAMS via console
     var processResult = context

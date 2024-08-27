@@ -75,7 +75,7 @@ public class QuboTspSolver extends TspSolver {
       String input,
       SubRoutineResolver resolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     // change "TYPE" keyword from "TSP" to "CVRP"
     // add capacity declaration of "0" (is ignored later)

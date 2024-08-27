@@ -51,7 +51,7 @@ public class KmeansClusterer extends VrpClusterer {
     // called in python script via "kmeans-cluster-number"
     int clusterNumber = 3;
 
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     // cluster with kmeans
     ProcessResult<HashMap<Path, String>> processResult =

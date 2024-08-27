@@ -52,7 +52,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     try {
       cnf = UvlToDimacsCnf.convert(input);
     } catch (ConversionException e) {
-      var solution = new Solution<String>();
+      var solution = new Solution<>(this);
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
       return Mono.just(solution);
@@ -66,7 +66,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     return DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD;
   }
 
-  private static Mono<Solution<String>> checkDeadFeatures(
+  private Mono<Solution<String>> checkDeadFeatures(
       String cnf,
       SubRoutineResolver subRoutineResolver
   ) {
@@ -75,7 +75,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
     try {
       dimacsCnf = DimacsCnf.fromDimacsCnfString(cnf);
     } catch (ConversionException e) {
-      var solution = new Solution<String>();
+      var solution = new Solution<>(this);
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
       return Mono.just(solution);
@@ -97,7 +97,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
             }
           }
 
-          var solution = new Solution<String>();
+          var solution = new Solution<>(this);
           if (stringBuilder.isEmpty()) {
             solution.setSolutionData("No features are dead features!\n");
           } else {

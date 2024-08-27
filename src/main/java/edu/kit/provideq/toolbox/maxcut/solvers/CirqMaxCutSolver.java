@@ -36,7 +36,7 @@ public class CirqMaxCutSolver extends MaxCutSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     var processResult = context.getBean(
             PythonProcessRunner.class,

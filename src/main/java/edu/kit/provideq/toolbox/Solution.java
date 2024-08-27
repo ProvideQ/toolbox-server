@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.UUID;
@@ -30,6 +31,11 @@ public class Solution<S> {
 
   public Solution(UUID id) {
     this.id = id;
+  }
+
+  public <InputT> Solution(ProblemSolver<InputT, S> problemSolver) {
+    this.id = UUID.randomUUID();
+    this.solverName = problemSolver.getName();
   }
 
   public UUID getId() {

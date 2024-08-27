@@ -3,8 +3,6 @@ package edu.kit.provideq.toolbox.tsp.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -42,7 +40,7 @@ public class LkhTspSolver extends TspSolver {
 
   @Override
   public Mono<Solution<String>> solve(String input, SubRoutineResolver subRoutineResolver) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
     var processResult = context.getBean(
             PythonProcessRunner.class,
             scriptDir,

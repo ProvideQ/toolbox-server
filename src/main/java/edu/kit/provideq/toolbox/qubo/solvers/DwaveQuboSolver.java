@@ -48,7 +48,7 @@ public class DwaveQuboSolver extends QuboSolver {
     // options are: sim, hybrid, absolv, direct
     String dwaveAnnealingMethod = "sim";
 
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     var processRunner = context.getBean(
             PythonProcessRunner.class,

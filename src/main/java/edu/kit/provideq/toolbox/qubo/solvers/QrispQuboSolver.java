@@ -36,7 +36,7 @@ public class QrispQuboSolver extends QuboSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     // This value will be passed to the python script,
     // it is used to prevent denial of service issues for large simulations.

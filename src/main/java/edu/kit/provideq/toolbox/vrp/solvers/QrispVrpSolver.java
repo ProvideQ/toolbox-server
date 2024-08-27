@@ -36,8 +36,7 @@ public class QrispVrpSolver extends VrpSolver {
       String input,
       SubRoutineResolver resolver
   ) {
-
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     var processResult = context.getBean(
             PythonProcessRunner.class,

@@ -41,7 +41,8 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
+
     // Parse GML to add partition data to
     Gml gml;
     try {

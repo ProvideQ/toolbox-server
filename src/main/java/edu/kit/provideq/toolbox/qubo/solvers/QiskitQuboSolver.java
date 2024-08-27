@@ -36,7 +36,7 @@ public class QiskitQuboSolver extends QuboSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     // Run Qiskit solver via console
     var processResult = context

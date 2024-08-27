@@ -45,7 +45,7 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
     try {
       cnf = UvlToDimacsCnf.convert(input);
     } catch (ConversionException e) {
-      var solution = new Solution<String>();
+      var solution = new Solution<>(this);
       solution.setDebugData("Conversion error: " + e.getMessage());
       solution.abort();
       return Mono.just(solution);
@@ -54,14 +54,14 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
     return checkVoidFeatureModel(cnf, subRoutineResolver);
   }
 
-  private static Mono<Solution<String>> checkVoidFeatureModel(
+  private Mono<Solution<String>> checkVoidFeatureModel(
       String cnf,
       SubRoutineResolver subRoutineResolver
   ) {
     // Check if the feature model is not a void feature model
     return subRoutineResolver.runSubRoutine(SAT_SUBROUTINE, cnf)
         .map(voidSolution -> {
-          var solution = new Solution<String>();
+          var solution = new Solution<>(this);
           solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
           // If there is a valid configuration, the feature model is not a void feature model
           var dimacsCnfSolution = voidSolution.getSolutionData();

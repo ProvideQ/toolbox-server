@@ -40,7 +40,7 @@ public class GamsSatSolver extends SatSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<DimacsCnfSolution>();
+    var solution = new Solution<>(this);
 
     DimacsCnf dimacsCnf;
     try {
