@@ -93,7 +93,7 @@ class VrpSolverTest {
   }
 
   /**
-   * test LKH-3 solver in combination with k-means = 3
+   * test LKH-3 solver in combination with k-means = 3.
    */
   @Test
   void testKmeansWithLkhForVrp() {
@@ -191,7 +191,7 @@ class VrpSolverTest {
   }
 
   /**
-   * Tests the two phase clusterer in combination with a qubo transformation and quantum annealer
+   * Tests the two phase clusterer in combination with a qubo transformation and quantum annealer.
    */
   @Test
   void testTwoPhaseWithAnnealer() {
