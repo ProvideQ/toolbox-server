@@ -17,8 +17,9 @@ from pygmlparser.Graph import Graph
 # Qiskit
 from qiskit import Aer
 from qiskit.circuit.library import TwoLocal
+from qiskit.primitives import Sampler
 from qiskit_optimization.applications import Maxcut
-from qiskit_algorithms import VQE
+from qiskit_algorithms import SamplingVQE
 from qiskit_algorithms.optimizers import SPSA
 from qiskit.utils import algorithm_globals, QuantumInstance
 
@@ -26,9 +27,8 @@ from qiskit.utils import algorithm_globals, QuantumInstance
 #if len(sys.argv) != 3:
 #    raise TypeError('This script expects exactly 2 arguments. Input file (argument 1) and output file (argument 2).')
 
-#input_path = sys.argv[1]
-input_path = '/Users/koalamitice/Desktop/toolbox-server/src/main/resources/edu/kit/provideq/toolbox/maxcut/3-nodes-3-edges.txt'
-#output_path = sys.argv[2]
+input_path = sys.argv[1]
+output_path = sys.argv[2]
 
 # To include the weight information, we'll need to map the weight to the label
 # so the parser can read it. Therefore, remove all existing "label" lines and
@@ -86,18 +86,15 @@ qubitOp, offset = qp.to_ising()
 
 algorithm_globals.random_seed = 123
 seed = 10598
-backend = Aer.get_backend("aer_simulator_statevector")
-quantum_instance = QuantumInstance(backend, seed_simulator=seed, seed_transpiler=seed)
 
 # construct VQE
-spsa = SPSA(maxiter=300)
+optimizer=SPSA(maxiter=300)
 ry = TwoLocal(qubitOp.num_qubits, "ry", "cz", reps=5, entanglement="linear")
-vqe = VQE(ry, optimizer=spsa, quantum_instance=quantum_instance)
+vqe = SamplingVQE(sampler=Sampler(), ansatz=ry, optimizer=optimizer)
 
 # run VQE
 result = vqe.compute_minimum_eigenvalue(qubitOp)
 
-exit()
 # save results
 x = max_cut.sample_most_likely(result.eigenstate)
 f = open(output_path, 'w')
