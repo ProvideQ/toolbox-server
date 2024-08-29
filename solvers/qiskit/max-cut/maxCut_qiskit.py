@@ -13,23 +13,22 @@ import pygmlparser as pygmlparser
 # gml parsing
 from pygmlparser.Parser import Parser
 from pygmlparser.Graph import Graph
-from pygmlparser.Edge import Edge
-from pygmlparser.Node import Node
 
 # Qiskit
 from qiskit import Aer
 from qiskit.circuit.library import TwoLocal
-from qiskit_optimization.applications import Maxcut, Tsp
-from qiskit.algorithms import VQE, NumPyMinimumEigensolver
-from qiskit.algorithms.optimizers import SPSA
+from qiskit_optimization.applications import Maxcut
+from qiskit_algorithms import VQE
+from qiskit_algorithms.optimizers import SPSA
 from qiskit.utils import algorithm_globals, QuantumInstance
 
 
-if len(sys.argv) != 3:
-    raise TypeError('This script expects exactly 2 arguments. Input file (argument 1) and output file (argument 2).')
+#if len(sys.argv) != 3:
+#    raise TypeError('This script expects exactly 2 arguments. Input file (argument 1) and output file (argument 2).')
 
-input_path = sys.argv[1]
-output_path = sys.argv[2]
+#input_path = sys.argv[1]
+input_path = '/Users/koalamitice/Desktop/toolbox-server/src/main/resources/edu/kit/provideq/toolbox/maxcut/3-nodes-3-edges.txt'
+#output_path = sys.argv[2]
 
 # To include the weight information, we'll need to map the weight to the label
 # so the parser can read it. Therefore, remove all existing "label" lines and
@@ -98,6 +97,7 @@ vqe = VQE(ry, optimizer=spsa, quantum_instance=quantum_instance)
 # run VQE
 result = vqe.compute_minimum_eigenvalue(qubitOp)
 
+exit()
 # save results
 x = max_cut.sample_most_likely(result.eigenstate)
 f = open(output_path, 'w')
