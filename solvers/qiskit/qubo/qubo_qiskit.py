@@ -1,9 +1,9 @@
 import sys
+from qp_converter import QpConverter
 
-from qiskit.algorithms.minimum_eigensolvers import QAOA
-from qiskit.algorithms.optimizers import COBYLA
 from qiskit.primitives import Sampler
-from qiskit_optimization import QuadraticProgram
+from qiskit_algorithms import QAOA
+from qiskit_algorithms.optimizers import COBYLA
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
 
 if len(sys.argv) != 3:
@@ -12,14 +12,18 @@ if len(sys.argv) != 3:
 input_path = sys.argv[1]
 output_path = sys.argv[2]
 
-qp = QuadraticProgram()
-qp.read_from_lp_file(input_path)
+qubo = QpConverter.convert_to_quadratic_program(input_path)
+# parse LP file:
+print(qubo.prettyprint())
 
-qaoa_mes = QAOA(Sampler(), optimizer=COBYLA(), initial_point=[0.0, 1.0])
-
+# TODO: Sampler() has to be replaces with StatevectorSampler() in newer versions. 
+# (currently not yet supported by qiskit-optimization)
+# TODO: add a dedicated mixer
+qaoa_mes = QAOA(sampler=Sampler(), optimizer=COBYLA())
 qaoa = MinimumEigenOptimizer(qaoa_mes)
+qaoa.solve(qubo)
 
-qaoa_result = qaoa.solve(qp)
+qaoa_result = qaoa.solve(qubo)
 print(qaoa_result.prettyprint())
 
 f = open(output_path, 'w')

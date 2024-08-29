@@ -4,9 +4,9 @@ from math import ceil, factorial
 
 import numpy as np
 from qrisp.grover import grovers_alg
-from qrisp_solver.oracle import eval_distance_threshold
-from qrisp_solver.permutation import create_perm_specifiers, eval_perm
-from qrisp_solver.vrp import calc_paths, normalize_vrp
+from qrisp_vrp_util.oracle import eval_distance_threshold
+from qrisp_vrp_util.permutation import create_perm_specifiers, eval_perm
+from qrisp_vrp_util.vrp import calc_paths, normalize_vrp
 from tsplib95 import load
 from tsplib95.models import StandardProblem
 

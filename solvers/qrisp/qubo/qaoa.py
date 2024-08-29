@@ -12,7 +12,7 @@ from qrisp.qaoa import (
     create_QUBO_cost_operator,
     def_backend,
 )
-from qrisp_solver.permutation import create_perm_specifiers, eval_perm_old
+from qrisp_qubo_util.permutation import create_perm_specifiers, eval_perm_old
 
 from qrisp import QuantumArray, QuantumFloat, QuantumVariable, cyclic_shift, h, x
 
