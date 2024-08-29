@@ -2,6 +2,8 @@
 # supported by ProvideQ
 
 # required for Qiskit MaxCut solver
-numpy
+numpy == 1.26.*
 pygmlparser == 1.0.*
+qiskit == 0.45.*
 qiskit-optimization == 0.6.*
+qiskit-aer == 0.13.*
