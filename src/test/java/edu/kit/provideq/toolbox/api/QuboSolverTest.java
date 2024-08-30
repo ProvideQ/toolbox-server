@@ -9,8 +9,8 @@ import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.xmlunit.builder.Input;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
@@ -31,6 +30,7 @@ class QuboSolverTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
+  @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
         .responseTimeout(Duration.ofSeconds(60))
@@ -57,12 +57,6 @@ class QuboSolverTest {
     if (problemDto.getSolution().getStatus() != SolutionStatus.SOLVED) {
       System.out.println("Test Failed, Input was: " + problemDto.getInput());
       System.out.println("Error Message: " + problemDto.getSolution().getDebugData());
-    } else {
-      try {
-        TimeUnit.SECONDS.sleep(1);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
     }
   }
 }
