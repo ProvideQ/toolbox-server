@@ -2,9 +2,7 @@
 # supported by ProvideQ
 
 # required for Qiskit MaxCut solver
-numpy == 1.26.*
-pygmlparser == 1.0.*
-qiskit == 0.45.1
+pygmlparser == 1.0.1
+
+#required for MaxCut and QUBO Solver, will automatically download a matching Qiskit, NumPy, and Qiskit-Algorithms version.
 qiskit-optimization == 0.6.1
-qiskit-algorithms==0.2.2
-qiskit-aer == 0.13.3

@@ -15,13 +15,11 @@ from pygmlparser.Parser import Parser
 from pygmlparser.Graph import Graph
 
 # Qiskit
-from qiskit import Aer
 from qiskit.circuit.library import TwoLocal
 from qiskit.primitives import Sampler
 from qiskit_optimization.applications import Maxcut
 from qiskit_algorithms import SamplingVQE
 from qiskit_algorithms.optimizers import SPSA
-from qiskit.utils import algorithm_globals, QuantumInstance
 
 
 #if len(sys.argv) != 3:
@@ -83,9 +81,6 @@ for i in range(n):
 max_cut = Maxcut(w)
 qp = max_cut.to_quadratic_program()
 qubitOp, offset = qp.to_ising()
-
-algorithm_globals.random_seed = 123
-seed = 10598
 
 # construct VQE
 optimizer=SPSA(maxiter=300)
