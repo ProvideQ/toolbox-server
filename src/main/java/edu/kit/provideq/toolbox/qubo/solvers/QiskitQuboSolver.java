@@ -38,8 +38,6 @@ public class QiskitQuboSolver extends QuboSolver {
   ) {
     var solution = new Solution<>(this);
 
-    System.out.println("input: " + input);
-
     // Run Qiskit solver via console
     var processResult = context
         .getBean(
@@ -50,8 +48,6 @@ public class QiskitQuboSolver extends QuboSolver {
         .addSolutionFilePathToProcessCommand()
         .problemFileName("problem.lp")
         .run(getProblemType(), solution.getId(), input);
-
-    System.out.println("errorOutput: " + processResult.errorOutput());
 
     // Return if process failed
     return Mono.just(processResult.applyTo(solution));
