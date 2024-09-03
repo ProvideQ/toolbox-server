@@ -7,12 +7,14 @@ import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
  * {@link KnapsackConfiguration#KNAPSACK} solver using a Qiskit implementation.
  */
-public class QiskitKnapsackSolver extends KnapsackSolver{
+@Component
+public class QiskitKnapsackSolver extends KnapsackSolver {
   private final String knapsackPath;
   private final ApplicationContext context;
 
