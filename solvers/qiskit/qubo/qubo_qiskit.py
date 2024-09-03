@@ -16,15 +16,13 @@ qubo = QpConverter.convert_to_quadratic_program(input_path)
 # parse LP file:
 print(qubo.prettyprint())
 
-# TODO: Sampler() has to be replaces with StatevectorSampler() in newer versions. 
+# TODO: Sampler() has to be replaces with StatevectorSampler() in newer versions.
 # (currently not yet supported by qiskit-optimization)
 # TODO: add a dedicated mixer
 qaoa_mes = QAOA(sampler=Sampler(), optimizer=COBYLA())
 qaoa = MinimumEigenOptimizer(qaoa_mes)
-qaoa.solve(qubo)
 
 qaoa_result = qaoa.solve(qubo)
-print(qaoa_result.prettyprint())
 
 f = open(output_path, 'w')
 f.write(qaoa_result.prettyprint())
