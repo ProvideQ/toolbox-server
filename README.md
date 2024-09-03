@@ -18,6 +18,7 @@ A web-based user interface can be found in our
         the same toolbox installation!
    2. Compiled Solvers (e.g. used for VRP and TSP)
       1. Solvers implemented in compiled languages must be executed via binaries that are compiled for your operating system. For those types of solvers we usually include pre-compiled binaries for windows, mac (only arm), and unix.
+      * General Note: Solvers might be programmed in different languages. E.g., LKH-3 is implemented in C. Make sure that the solver-specific language is installed on your system.
       2. In case the pre-compiled versions do not work on your machine: re-compile them:
       * LKH-3:
         1. Build LKH-3 using the offical guide: http://webhotel4.ruc.dk/~keld/research/LKH-3/
