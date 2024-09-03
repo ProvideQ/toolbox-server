@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.knapsack.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.knapsack.KnapsackConfiguration;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ * {@link KnapsackConfiguration#KNAPSACK} solver using a Horowitz-Sahni implementation.
+ */
 @Component
 public class PythonKnapsackSolver extends KnapsackSolver {
   private final String knapsackPath;
