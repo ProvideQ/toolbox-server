@@ -30,8 +30,8 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 /**
- * This router handles sub-routine discovery requests to the GET {@code /sub-routines/{problemType}}
- * endpoints.
+ * This router handles sub-routine discovery requests to the
+ * GET {@code /solvers/{problemType}/{solverId}/sub-routines} endpoints.
  * Responses are generated from the sub-routine data reported by the given solver itself
  * (see {@link ProblemSolver#getSubRoutines()}).
  */
@@ -39,6 +39,7 @@ import reactor.core.publisher.Mono;
 @EnableWebFlux
 public class SubRoutineRouter {
   private ProblemManagerProvider problemManagerProvider;
+  private static final String SOLVER_ID_PARAM_NAME = "solverId";
 
   @Bean
   RouterFunction<ServerResponse> getSubRoutineRoutes() {
@@ -62,8 +63,8 @@ public class SubRoutineRouter {
       ProblemManager<?, ?> manager,
       ServerRequest req
   ) {
-    var solver = req.queryParam("id")
-        .flatMap(manager::findSolverById)
+    var solverId = req.pathVariable(SOLVER_ID_PARAM_NAME);
+    var solver = manager.findSolverById(solverId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Could not find a solver for this problem with this solver id!"));
 
@@ -97,8 +98,8 @@ public class SubRoutineRouter {
   private static org.springdoc.core.fn.builders.parameter.Builder
       getParameterBuilder(ProblemManager<?, ?> manager) {
     return parameterBuilder()
-            .in(ParameterIn.QUERY)
-            .name("id")
+            .in(ParameterIn.PATH)
+            .name(SOLVER_ID_PARAM_NAME)
             .description("The id of the solver to get the sub-routines from."
                     + " Use the endpoint GET /solvers/" + manager.getType().getId()
                     + " to get a list of available solver ids.")
@@ -136,7 +137,7 @@ public class SubRoutineRouter {
   }
 
   private String getSubRoutinesRouteForProblemType(ProblemType<?, ?> type) {
-    return "/sub-routines/" + type.getId();
+    return "/solvers/" + type.getId() + "/{" + SOLVER_ID_PARAM_NAME + "}/sub-routines";
   }
 
   @Autowired
