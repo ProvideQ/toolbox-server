@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,12 +25,17 @@ public class Solution<S> {
   /**
    * Internal constructor, used for de-serialization.
    */
-  public Solution() {
+  private Solution() {
     this.id = UUID.randomUUID();
   }
 
-  public Solution(UUID id) {
+  private Solution(UUID id) {
     this.id = id;
+  }
+
+  public <InputT> Solution(ProblemSolver<InputT, S> problemSolver) {
+    this.id = UUID.randomUUID();
+    this.solverName = problemSolver.getName();
   }
 
   public UUID getId() {
@@ -80,7 +86,7 @@ public class Solution<S> {
   }
 
   /**
-   * sets the status to 'invalid'. irreversible
+   * sets the status to 'error'. irreversible
    */
   public void fail() {
     if (!this.status.isCompleted()) {
@@ -161,6 +167,7 @@ public class Solution<S> {
         + "id=" + id + ", "
         + "status=" + status + ", "
         + "metaData=" + metaData + ", "
+        + "debugData=" + debugData + ", "
         + "solutionData" + solutionData + ']';
   }
 }

@@ -139,6 +139,10 @@ public class ProblemRouter {
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
     var problem = findProblemOrThrow(manager, problemId);
+    if (problem.getState() == ProblemState.SOLVING || problem.getState() == ProblemState.SOLVED) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Problems that are currently being solved or have been solved cannot be updated!");
+    }
 
     var updatedProblemDto = req
         .bodyToMono(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {})
@@ -175,11 +179,15 @@ public class ProblemRouter {
   ) {
     // update solver first as this can fail and we want to avoid partial updates
     if (patch.getSolverId() != null) {
-      var solver = manager.findSolverById(patch.getSolverId())
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-              "The provided solver ID is invalid!"));
+      if (patch.getSolverId().isEmpty()) {
+        problem.setSolver(null);
+      } else {
+        var solver = manager.findSolverById(patch.getSolverId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "The provided solver ID is invalid!"));
 
-      problem.setSolver(solver);
+        problem.setSolver(solver);
+      }
     }
 
     if (patch.getInput() != null) {

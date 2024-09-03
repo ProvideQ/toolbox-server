@@ -1,11 +1,11 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +41,8 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
+
     // Parse GML to add partition data to
     Gml gml;
     try {
@@ -68,19 +69,19 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
     }
 
     // Parse solution data and add partition data to GML
-    Optional<String> solutionLine = processResult.output()
-            .lines()
-            .filter(s -> s.startsWith(SOLUTION_LINE_PREFIX))
-            .findFirst();
+    Optional<String> solutionLine = processResult.output().get()
+        .lines()
+        .filter(s -> s.startsWith(SOLUTION_LINE_PREFIX))
+        .findFirst();
 
     if (solutionLine.isPresent()) {
       // Prepare solution data from python output
       String s = solutionLine.get();
       var solutionData = s
-              // Remove brackets around the solution data
-              .substring(SOLUTION_LINE_PREFIX.length() + 1, s.length() - 1)
-              .trim()
-              .split("\\.");
+          // Remove brackets around the solution data
+          .substring(SOLUTION_LINE_PREFIX.length() + 1, s.length() - 1)
+          .trim()
+          .split("\\.");
 
       // Add partition data to each node in GML
       // We're expecting that the nodes are in the same order as in the solution data

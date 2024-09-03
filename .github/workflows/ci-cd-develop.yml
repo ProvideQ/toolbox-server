@@ -33,7 +33,7 @@ jobs:
         shell: bash # required for the source command
         run: |
           source /opt/conda/bin/activate gams
-          ./gradlew check
+          ./gradlew check --info
       - name: Archive test reports
         if: always()
         uses: actions/upload-artifact@v3

@@ -1,10 +1,12 @@
 HELP.md
+*.DS_Store
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-*.DS_Store
+### Solution Files from Vehicle Routing Solver:
+*.sol
 
 ### STS ###
 .apt_generated
@@ -14,7 +16,8 @@ build/
 .settings
 .springBeans
 .sts4-cache
-bin/
+bin/main
+bin/test
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
@@ -38,6 +41,9 @@ out/
 .vscode/
 
 
+### virtual envs and python ###
+venv/
+__pycache__/
 
 ### ProvideQ toolbox-server ###
 # input, output and temporary files for solving problems with our solvers
@@ -49,5 +55,5 @@ gamslice.txt
 # Listing files compiled from our GAMS scripts
 *.lst
 *.op2
-gams/**/225a
+solvers/gams/**/225a
 *.out

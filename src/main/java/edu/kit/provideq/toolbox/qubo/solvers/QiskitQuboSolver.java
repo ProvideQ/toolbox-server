@@ -1,8 +1,8 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,7 @@ public class QiskitQuboSolver extends QuboSolver {
 
   @Override
   public String getName() {
-    return "Qiskit QUBO";
+    return "(Qiskit) QAOA Solver for QUBOs";
   }
 
   @Override
@@ -36,7 +36,7 @@ public class QiskitQuboSolver extends QuboSolver {
       String input,
       SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     // Run Qiskit solver via console
     var processResult = context

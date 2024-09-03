@@ -4,5 +4,6 @@ public enum MetaSolverSettingType {
   RANGE,
   CHECKBOX,
   TEXT,
-  SELECT
+  SELECT,
+  INTEGER,
 }

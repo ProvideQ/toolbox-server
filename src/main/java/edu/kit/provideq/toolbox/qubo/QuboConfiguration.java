@@ -1,10 +1,13 @@
 package edu.kit.provideq.toolbox.qubo;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -31,11 +34,13 @@ public class QuboConfiguration {
   @Bean
   ProblemManager<String, String> getQuboManager(
       QiskitQuboSolver qiskitSolver,
+      DwaveQuboSolver dwaveSolver,
+      QrispQuboSolver qrispSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         QUBO,
-        Set.of(qiskitSolver),
+        Set.of(qiskitSolver, dwaveSolver, qrispSolver),
         loadExampleProblems(resourceProvider)
     );
   }
@@ -43,14 +48,14 @@ public class QuboConfiguration {
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("linear-problem.txt"),
-          "linear-problem example for QUBO is unavailable!"
+          getClass().getResourceAsStream("quadratic-problem.txt"),
+          "quadratic-problem example for QUBO is unavailable!"
       );
       var problem = new Problem<>(QUBO);
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new RuntimeException("Could not load example problems", e);
+      throw new MissingExampleException("Could not load example problems", e);
     }
   }
 }

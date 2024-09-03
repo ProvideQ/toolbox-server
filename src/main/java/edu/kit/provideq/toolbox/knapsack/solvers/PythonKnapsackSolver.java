@@ -1,8 +1,8 @@
 package edu.kit.provideq.toolbox.knapsack.solvers;
 
-import edu.kit.provideq.toolbox.PythonProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -16,7 +16,7 @@ public class PythonKnapsackSolver extends KnapsackSolver {
 
   @Autowired
   public PythonKnapsackSolver(
-          @Value("${python.directory}/knapsack") String knapsackPath,
+          @Value("${custom.hs_knapsack.directory}") String knapsackPath,
           ApplicationContext context) {
     this.knapsackPath = knapsackPath;
     this.context = context;
@@ -24,7 +24,7 @@ public class PythonKnapsackSolver extends KnapsackSolver {
 
   @Override
   public String getName() {
-    return "Python Knapsack";
+    return "Horowitz-Sahni Knapsack";
   }
 
   @Override
@@ -32,7 +32,7 @@ public class PythonKnapsackSolver extends KnapsackSolver {
           String input,
           SubRoutineResolver subRoutineResolver
   ) {
-    var solution = new Solution<String>();
+    var solution = new Solution<>(this);
 
     var processResult = context
             .getBean(

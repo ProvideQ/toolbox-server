@@ -1,3 +1,0 @@
-# This file describes the python package requirements for the knapsack problem solver
-
-knapsack-pip

@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.maxcut;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.maxcut.solvers.QiskitMaxCutSolver;
@@ -53,7 +54,7 @@ public class MaxCutConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new RuntimeException("Could not load example problems", e);
+      throw new MissingExampleException("Could not load example problems", e);
     }
   }
 }

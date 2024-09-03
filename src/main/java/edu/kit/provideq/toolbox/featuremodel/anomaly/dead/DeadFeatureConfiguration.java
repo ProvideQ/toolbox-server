@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.dead;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -20,7 +21,7 @@ public class DeadFeatureConfiguration {
    * For a given feature model, check if the model contains dead features.
    *
    * @see <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">
-   *      "Explaining Anomalies in Feature Models", Kowal et al., 2016</a>
+   * "Explaining Anomalies in Feature Models", Kowal et al., 2016</a>
    */
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_DEAD = new ProblemType<>(
       "feature-model-anomaly-dead",
@@ -50,7 +51,7 @@ public class DeadFeatureConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new RuntimeException("Could not load example problems", e);
+      throw new MissingExampleException("Could not load example problems", e);
     }
   }
 }

@@ -48,10 +48,7 @@ COPY --from=builder /app/build/jre /opt/java
 ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
-COPY gams gams
-COPY qiskit qiskit
-COPY cirq cirq
-COPY python python
+COPY solvers solvers
 RUN scripts/install-solver-dependencies.sh
 COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
 
