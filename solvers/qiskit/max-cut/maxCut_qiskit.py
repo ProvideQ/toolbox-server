@@ -76,7 +76,8 @@ for i in range(n):
     for j in range(n):
         temp = G.get_edge_data(i, j, default=0)
         if temp != 0:
-            w[i, j] = temp["weight"]
+            weight = temp["weight"]
+            w[i, j] = 1 if weight is None else weight
 
 max_cut = Maxcut(w)
 qp = max_cut.to_quadratic_program()
