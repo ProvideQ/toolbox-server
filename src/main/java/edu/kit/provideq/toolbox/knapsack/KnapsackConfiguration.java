@@ -47,8 +47,8 @@ public class KnapsackConfiguration {
   ) {
     try {
       var problemInputStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("10-items.txt"),
-          "10-items example for Knapsack is unavailable!"
+          getClass().getResourceAsStream("4-items.txt"),
+          "4-items example for Knapsack is unavailable!"
       );
       var problem = new Problem<>(KNAPSACK);
       problem.setInput(resourceProvider.readStream(problemInputStream));
