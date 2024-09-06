@@ -7,8 +7,16 @@ public class BooleanState extends SolverSetting {
     this(name, description, false);
   }
 
+  public BooleanState(boolean required, String name, String description) {
+    this(required, name, description, false);
+  }
+
   public BooleanState(String name, String description, boolean state) {
-    super(name, description, SolverSettingType.CHECKBOX);
+    this(false, name, description, state);
+  }
+
+  public BooleanState(boolean required, String name, String description, boolean state) {
+    super(name, description, SolverSettingType.CHECKBOX, required);
     this.state = state;
   }
 
