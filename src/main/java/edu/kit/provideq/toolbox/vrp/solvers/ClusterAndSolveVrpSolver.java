@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.vrp.clusterer.VrpClustererConfiguration;
@@ -38,7 +39,8 @@ public class ClusterAndSolveVrpSolver extends VrpSolver {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver resolver
+      SubRoutineResolver resolver,
+      SolvingProperties properties
   ) {
     return resolver.runSubRoutine(CLUSTER_SUBROUTINE, input);
   }

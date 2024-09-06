@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.knapsack.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ public class PythonKnapsackSolver extends KnapsackSolver {
   @Override
   public Mono<Solution<String>> solve(
           String input,
-          SubRoutineResolver subRoutineResolver
+          SubRoutineResolver subRoutineResolver,
+          SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 

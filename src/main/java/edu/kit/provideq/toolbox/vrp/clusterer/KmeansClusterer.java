@@ -2,8 +2,11 @@ package edu.kit.provideq.toolbox.vrp.clusterer;
 
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.meta.setting.BoundedInteger;
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.process.ProcessResult;
@@ -19,6 +22,8 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class KmeansClusterer extends VrpClusterer {
+  private static final String SETTING_CLUSTER_NUMBER = "Cluster Number";
+  private static final int DEFAULT_CLUSTER_NUMBER = 3;
 
   @Autowired
   public KmeansClusterer(@Value("${custom.berger-vrp.directory}") String binaryDir,
@@ -34,22 +39,37 @@ public class KmeansClusterer extends VrpClusterer {
       );
 
   @Override
-  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
-    return List.of(VRP_SUBROUTINE);
-  }
-
-  @Override
   public String getName() {
     return "K-means Clustering (VRP -> Set of VRP)";
   }
 
   @Override
-  public Mono<Solution<String>> solve(String input, SubRoutineResolver resolver) {
+  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
+    return List.of(VRP_SUBROUTINE);
+  }
+
+  @Override
+  public List<SolverSetting> getSolverSettings() {
+    return List.of(
+        new BoundedInteger(SETTING_CLUSTER_NUMBER, "The number of clusters to create", 1, 1000, DEFAULT_CLUSTER_NUMBER)
+    );
+  }
+
+  @Override
+  public Mono<Solution<String>> solve(
+      String input,
+      SubRoutineResolver resolver,
+      SolvingProperties properties) {
 
     // for now, set the cluster number to three. Our architecture currently does not allow settings.
-    // TODO: change this in the future, cluster numbers can be any positive integer (>0)
     // called in python script via "kmeans-cluster-number"
-    int clusterNumber = 3;
+    int clusterNumber = properties.<BoundedInteger>getSetting(SETTING_CLUSTER_NUMBER)
+        .map(BoundedInteger::getValue)
+        .orElse(DEFAULT_CLUSTER_NUMBER);
+
+    if (clusterNumber < 1) {
+      throw new IllegalArgumentException("Cluster number must be greater than 0");
+    }
 
     var solution = new Solution<>(this);
 

@@ -1,9 +1,9 @@
 package edu.kit.provideq.toolbox.meta.setting;
 
-public enum MetaSolverSettingType {
-  RANGE,
+public enum SolverSettingType {
+  INTEGER,
+  DOUBLE,
   CHECKBOX,
   TEXT,
   SELECT,
-  INTEGER,
 }

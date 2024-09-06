@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
@@ -43,7 +44,8 @@ public class TwoPhaseClusterer extends VrpClusterer {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver resolver
+      SubRoutineResolver resolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 

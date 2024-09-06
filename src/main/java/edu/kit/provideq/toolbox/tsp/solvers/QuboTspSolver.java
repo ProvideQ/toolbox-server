@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.tsp.solvers;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
@@ -73,7 +74,8 @@ public class QuboTspSolver extends TspSolver {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver resolver
+      SubRoutineResolver resolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 

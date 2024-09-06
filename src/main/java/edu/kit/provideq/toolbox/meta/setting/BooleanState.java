@@ -1,14 +1,14 @@
 package edu.kit.provideq.toolbox.meta.setting;
 
-public class BooleanState extends MetaSolverSetting {
+public class BooleanState extends SolverSetting {
   private boolean state;
 
-  public BooleanState(String name, String title) {
-    this(name, title, false);
+  public BooleanState(String name, String description) {
+    this(name, description, false);
   }
 
-  public BooleanState(String name, String title, boolean state) {
-    super(name, title, MetaSolverSettingType.CHECKBOX);
+  public BooleanState(String name, String description, boolean state) {
+    super(name, description, SolverSettingType.CHECKBOX);
     this.state = state;
   }
 
