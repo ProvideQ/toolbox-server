@@ -117,13 +117,16 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
             .solutionFileName("problem.sol")
             .run(getProblemType(), solution.getId(), input);
 
-    if (combineProcessRunner.output().isEmpty() || !combineProcessRunner.success()) {
+    var result = combineProcessRunner.output();
+
+    if (result.isEmpty() || !combineProcessRunner.success()) {
       solution.setDebugData(
           combineProcessRunner.errorOutput().orElse("Unknown Error: Could not combine clusters."));
       solution.fail();
       return solution;
     }
 
+    solution.setSolutionData(result.get());
     solution.complete();
     return solution;
   }
