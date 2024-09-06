@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
@@ -37,7 +38,8 @@ public class LkhVrpSolver extends VrpSolver {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver resolver
+      SubRoutineResolver resolver,
+      SolvingProperties properties
   ) {
 
     var solution = new Solution<>(this);

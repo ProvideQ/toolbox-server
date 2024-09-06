@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
@@ -34,7 +35,8 @@ public class QiskitQuboSolver extends QuboSolver {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 

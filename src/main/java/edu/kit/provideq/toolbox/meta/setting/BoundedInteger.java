@@ -1,30 +1,30 @@
 package edu.kit.provideq.toolbox.meta.setting;
 
-public class BoundedInteger extends MetaSolverSetting {
-  private double min;
-  private double max;
-  private double value;
+public class BoundedInteger extends SolverSetting {
+  private final int min;
+  private final int max;
+  private final int value;
 
-  public BoundedInteger(String name, String title, double min, double max) {
-    this(name, title, min, max, (max - min) / 2);
+  public BoundedInteger(String name, String description, int min, int max) {
+    this(name, description, min, max, (max - min) / 2);
   }
 
-  public BoundedInteger(String name, String title, double min, double max, double value) {
-    super(name, title, MetaSolverSettingType.RANGE);
+  public BoundedInteger(String name, String description, int min, int max, int value) {
+    super(name, description, SolverSettingType.INTEGER);
     this.min = min;
     this.max = max;
     this.value = value;
   }
 
-  public double getMin() {
+  public int getMin() {
     return min;
   }
 
-  public double getMax() {
+  public int getMax() {
     return max;
   }
 
-  public double getValue() {
+  public int getValue() {
     return value;
   }
 }

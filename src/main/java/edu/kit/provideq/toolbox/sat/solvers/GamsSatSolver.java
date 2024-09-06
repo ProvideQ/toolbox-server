@@ -4,6 +4,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
@@ -38,7 +39,8 @@ public class GamsSatSolver extends SatSolver {
   @Override
   public Mono<Solution<DimacsCnfSolution>> solve(
       String input,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 
