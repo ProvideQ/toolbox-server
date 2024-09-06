@@ -22,7 +22,7 @@ public class CirqMaxCutSolver extends MaxCutSolver {
 
   @Autowired
   public CirqMaxCutSolver(
-      @Value("${cirq.directory.max-cut}") String scriptPath,
+      @Value("${cirq.script.max-cut}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

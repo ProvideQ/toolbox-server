@@ -26,8 +26,8 @@ public class LkhTspSolver extends TspSolver {
        * uses the LKH script dir because it is the same as LKH-3 for VRP
        * (LKH can solve VRP and TSP)
        */
-      @Value("${custom.directory.lkh}") String pythonWrapperScriptPath,
-      @Value("${custom.lkh.solver}") String lkhBinaryPath,
+      @Value("${custom.script.lkh}") String pythonWrapperScriptPath,
+      @Value("${custom.binary.lkh}") String lkhBinaryPath,
       ApplicationContext context) {
     this.pythonWrapperScriptPath = pythonWrapperScriptPath;
     this.binaryPath = lkhBinaryPath;

@@ -32,7 +32,7 @@ public class QuboTspSolver extends TspSolver {
 
   @Autowired
   public QuboTspSolver(
-      @Value("${custom.berger-vrp.solver}") String binaryPath,
+      @Value("${custom.binary.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     this.binaryPath = binaryPath;
     this.context = context;

@@ -22,7 +22,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
   @Autowired
   public GamsMaxCutSolver(
-      @Value("${gams.directory.max-cut}") String scriptPath,
+      @Value("${gams.script.max-cut}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

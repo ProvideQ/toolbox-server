@@ -48,7 +48,7 @@ public class DwaveQuboSolver extends QuboSolver {
 
   @Autowired
   public DwaveQuboSolver(
-      @Value("${dwave.directory.qubo}") String scriptPath,
+      @Value("${dwave.script.qubo}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

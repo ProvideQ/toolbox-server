@@ -22,7 +22,7 @@ public class QiskitQuboSolver extends QuboSolver {
 
   @Autowired
   public QiskitQuboSolver(
-      @Value("${qiskit.directory.qubo}") String scriptPath,
+      @Value("${qiskit.script.qubo}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

@@ -28,7 +28,7 @@ public class QrispQuboSolver extends QuboSolver {
 
   @Autowired
   public QrispQuboSolver(
-      @Value("${qrisp.directory.qubo}") String scriptPath,
+      @Value("${qrisp.script.qubo}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

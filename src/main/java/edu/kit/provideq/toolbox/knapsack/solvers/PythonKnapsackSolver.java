@@ -22,7 +22,7 @@ public class PythonKnapsackSolver extends KnapsackSolver {
 
   @Autowired
   public PythonKnapsackSolver(
-          @Value("${custom.directory.hs_knapsack}") String scriptPath,
+          @Value("${custom.script.hs_knapsack}") String scriptPath,
           ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

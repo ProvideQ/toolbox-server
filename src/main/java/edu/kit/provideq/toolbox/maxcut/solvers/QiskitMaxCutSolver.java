@@ -27,7 +27,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
   @Autowired
   public QiskitMaxCutSolver(
-      @Value("${qiskit.directory.max-cut}") String scriptPath,
+      @Value("${qiskit.script.max-cut}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

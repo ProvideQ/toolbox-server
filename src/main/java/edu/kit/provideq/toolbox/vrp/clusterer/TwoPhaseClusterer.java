@@ -26,7 +26,7 @@ public class TwoPhaseClusterer extends VrpClusterer {
 
   @Autowired
   public TwoPhaseClusterer(
-      @Value("${custom.berger-vrp.solver}") String binaryPath,
+      @Value("${custom.binary.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     super(binaryPath, context);
   }

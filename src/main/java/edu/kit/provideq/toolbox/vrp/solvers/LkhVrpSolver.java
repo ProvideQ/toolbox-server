@@ -23,8 +23,8 @@ public class LkhVrpSolver extends VrpSolver {
 
   @Autowired
   public LkhVrpSolver(
-      @Value("${custom.directory.lkh}") String scriptPath,
-      @Value("${custom.lkh.solver}") String solverBinary,
+      @Value("${custom.script.lkh}") String scriptPath,
+      @Value("${custom.binary.lkh}") String solverBinary,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.solverBinary = solverBinary;

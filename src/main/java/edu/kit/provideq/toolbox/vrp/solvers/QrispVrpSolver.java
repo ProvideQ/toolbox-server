@@ -22,7 +22,7 @@ public class QrispVrpSolver extends VrpSolver {
 
   @Autowired
   public QrispVrpSolver(
-      @Value("${qrisp.directory.vrp}") String scriptPath,
+      @Value("${qrisp.script.vrp}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

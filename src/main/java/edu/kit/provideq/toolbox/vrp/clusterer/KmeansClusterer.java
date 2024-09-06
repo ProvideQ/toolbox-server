@@ -28,7 +28,7 @@ public class KmeansClusterer extends VrpClusterer {
 
   @Autowired
   public KmeansClusterer(
-      @Value("${custom.berger-vrp.solver}") String binaryPath,
+      @Value("${custom.binary.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     super(binaryPath, context);
   }
