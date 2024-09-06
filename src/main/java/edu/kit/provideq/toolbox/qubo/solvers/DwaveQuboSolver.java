@@ -64,7 +64,7 @@ public class DwaveQuboSolver extends QuboSolver {
     return  List.of(
         new TextSetting(
             SETTING_DWAVE_TOKEN,
-            "The D-Wave token to use, only relevant when a token is added"
+            "The D-Wave token to use, needed to access the D-Wave hardware"
         ),
         new SelectSetting<>(
             SETTING_ANNNEALING_METHOD,
