@@ -67,6 +67,11 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
           solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
           // If there is a valid configuration, the feature model is not a void feature model
           var dimacsCnfSolution = voidSolution.getSolutionData();
+          if (dimacsCnfSolution == null) {
+            solution.setDebugData("No solution found for the feature model.");
+            solution.abort();
+            return solution;
+          }
 
           solution.setSolutionData(dimacsCnfSolution.isVoid()
               ? "The feature model is a void feature model. The configuration is never valid."

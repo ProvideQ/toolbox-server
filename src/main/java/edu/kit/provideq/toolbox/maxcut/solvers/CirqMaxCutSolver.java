@@ -4,6 +4,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,13 +18,13 @@ import reactor.core.publisher.Mono;
 @Component
 public class CirqMaxCutSolver extends MaxCutSolver {
   private final ApplicationContext context;
-  private final String scriptDir;
+  private final String scriptPath;
 
   @Autowired
   public CirqMaxCutSolver(
-      @Value("${cirq.directory.max-cut}") String scriptDir,
+      @Value("${cirq.directory.max-cut}") String scriptPath,
       ApplicationContext context) {
-    this.scriptDir = scriptDir;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -40,13 +41,15 @@ public class CirqMaxCutSolver extends MaxCutSolver {
   ) {
     var solution = new Solution<>(this);
 
-    var processResult = context.getBean(
-            PythonProcessRunner.class,
-            scriptDir,
-            "max_cut_cirq.py")
-        .addProblemFilePathToProcessCommand()
-        .addSolutionFilePathToProcessCommand()
-        .run(getProblemType(), solution.getId(), input);
+    var processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .withInputFile(input)
+        .withOutputFile()
+        .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
   }

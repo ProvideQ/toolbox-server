@@ -22,7 +22,12 @@ public class SelectSetting<T> extends SolverSetting {
     this(false, name, description, options, selectedOption);
   }
 
-  public SelectSetting(boolean required, String name, String description, List<T> options, T selectedOption) {
+  public SelectSetting(
+      boolean required,
+      String name,
+      String description,
+      List<T> options,
+      T selectedOption) {
     super(name, description, SolverSettingType.SELECT, required);
 
     this.setOptions(options);

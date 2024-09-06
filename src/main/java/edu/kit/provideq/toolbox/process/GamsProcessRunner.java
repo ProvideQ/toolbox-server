@@ -1,8 +1,7 @@
 package edu.kit.provideq.toolbox.process;
 
-import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.function.BiFunction;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -33,25 +32,15 @@ public class GamsProcessRunner extends ProcessRunner {
   /**
    * Creates a process runner for a GAMS task.
    *
-   * @param directory      the working directory to run GAMS in.
-   * @param scriptFileName the filename of the GAMS script to run.
+   * @param gameScriptPath the filepath of the GAMS script to run.
    */
-  public GamsProcessRunner(String directory, String scriptFileName) {
-    this(directory, scriptFileName, new String[0]);
-  }
+  public GamsProcessRunner(String gameScriptPath) {
+    super(new ProcessBuilder());
 
-  /**
-   * Creates a process runner for a GAMS task.
-   *
-   * @param directory      the working directory to run GAMS in.
-   * @param scriptFileName the filename of the GAMS script to run.
-   * @param arguments      extra arguments to pass to GAMS. Use this to pass problem input to the
-   *                       solver.
-   */
-  public GamsProcessRunner(String directory, String scriptFileName, String... arguments) {
-    super(createGenericProcessBuilder(directory, GAMS_EXECUTABLE_NAME, scriptFileName), arguments);
-
-    addProblemFilePathToProcessCommand("--INPUT=\"%s\"");
+    withArguments(
+        GAMS_EXECUTABLE_NAME,
+        gameScriptPath,
+        "--INPUT=\"" + ProcessRunner.INPUT_FILE_PATH + "\"");
   }
 
   /**
@@ -83,11 +72,25 @@ public class GamsProcessRunner extends ProcessRunner {
   }
 
   @Override
-  public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId,
-                                   String problemData) {
-    var result = super.run(problemType, solutionId, problemData);
+  protected <T> ProcessRunnerExecutor<T> getExecutor(
+      BiFunction<String, String, ProcessResult<T>> outputProcessor) {
+    return (problemType, solutionId) -> {
+      if (problemType.getResultClass() == String.class) {
+        var processRunner = super.getExecutor(outputProcessor);
+        var result = processRunner.run(problemType, solutionId);
 
-    var obfuscatedOutput = obfuscateGamsLicense(result.output().orElse("no license found"));
-    return new ProcessResult<>(result.success(), Optional.of(obfuscatedOutput), Optional.empty());
+        String output = result.output().isPresent()
+            ? String.valueOf(result.output())
+            : "no license found";
+        @SuppressWarnings("unchecked") // we know that T is a String
+        var obfuscatedOutput = (T) obfuscateGamsLicense(output);
+        return new ProcessResult<>(
+            result.success(),
+            Optional.of(obfuscatedOutput),
+            Optional.empty());
+      }
+
+      return super.getExecutor(outputProcessor).run(problemType, solutionId);
+    };
   }
 }

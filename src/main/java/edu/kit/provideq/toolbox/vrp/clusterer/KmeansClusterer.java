@@ -5,11 +5,12 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
+import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -26,10 +27,10 @@ public class KmeansClusterer extends VrpClusterer {
   private static final int DEFAULT_CLUSTER_NUMBER = 3;
 
   @Autowired
-  public KmeansClusterer(@Value("${custom.berger-vrp.directory}") String binaryDir,
-                         @Value("${custom.berger-vrp.solver}") String binaryName,
-                         ApplicationContext context) {
-    super(binaryDir, binaryName, context);
+  public KmeansClusterer(
+      @Value("${custom.berger-vrp.solver}") String binaryPath,
+      ApplicationContext context) {
+    super(binaryPath, context);
   }
 
   protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
@@ -51,7 +52,12 @@ public class KmeansClusterer extends VrpClusterer {
   @Override
   public List<SolverSetting> getSolverSettings() {
     return List.of(
-        new IntegerSetting(SETTING_CLUSTER_NUMBER, "The number of clusters to create", 1, 1000, DEFAULT_CLUSTER_NUMBER)
+        new IntegerSetting(
+            SETTING_CLUSTER_NUMBER,
+            "The number of clusters to create",
+            1,
+            1000,
+            DEFAULT_CLUSTER_NUMBER)
     );
   }
 
@@ -74,13 +80,19 @@ public class KmeansClusterer extends VrpClusterer {
     var solution = new Solution<>(this);
 
     // cluster with kmeans
-    ProcessResult<HashMap<Path, String>> processResult =
-        context.getBean(BinaryProcessRunner.class, binaryDir, binaryName, "partial",
-                new String[] {"cluster", "%1$s", "kmeans", "--build-dir", "%3$s/.vrp",
-                    "--cluster-number", String.valueOf(clusterNumber)})
-            .problemFileName("problem.vrp")
-            .run(getProblemType(), solution.getId(), input,
-                new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
+    ProcessResult<HashMap<Path, String>> processResult = context
+        .getBean(DefaultProcessRunner.class)
+        .withArguments(
+            binaryPath,
+            "partial",
+            "cluster",
+            ProcessRunner.INPUT_FILE_PATH, "kmeans", "--build-dir",
+            ProcessRunner.OUTPUT_FILE_PATH + "/.vrp",
+            "--cluster-number", String.valueOf(clusterNumber)
+        )
+        .withInputFile(input)
+        .withOutputFile("problem.vrp", new MultiFileProcessResultReader("./.vrp/problem_*.vrp"))
+        .run(getProblemType(), solution.getId());
 
     return getSolutionForCluster(input, solution, processResult, resolver, VRP_SUBROUTINE);
   }

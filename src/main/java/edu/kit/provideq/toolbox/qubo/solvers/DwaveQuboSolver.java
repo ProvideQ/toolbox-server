@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
 import java.util.Optional;
@@ -17,14 +18,14 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class DwaveQuboSolver extends QuboSolver {
-  private final String quboScriptPath;
+  private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
   public DwaveQuboSolver(
-      @Value("${dwave.directory.qubo}") String quboScriptPath,
+      @Value("${dwave.directory.qubo}") String scriptPath,
       ApplicationContext context) {
-    this.quboScriptPath = quboScriptPath;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -52,21 +53,21 @@ public class DwaveQuboSolver extends QuboSolver {
 
     var solution = new Solution<>(this);
 
-    var processRunner = context.getBean(
-            PythonProcessRunner.class,
-            quboScriptPath,
-            "main.py",
-            new String[] {"%1$s", dwaveAnnealingMethod, "--output-file", "%2$s"}
-        )
-        .problemFileName("problem.lp")
-        .solutionFileName("problem.bin");
+    var processRunner = context.getBean(PythonProcessRunner.class, scriptPath);
 
     if (dwaveToken.isPresent()) {
-      processRunner.addEnvironmentVariable("DWAVE_API_TOKEN", dwaveToken.get());
+      processRunner.withEnvironmentVariable("DWAVE_API_TOKEN", dwaveToken.get());
     }
 
     var processResult = processRunner
-        .run(getProblemType(), solution.getId(), input);
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            dwaveAnnealingMethod,
+            "--output-file", ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .withInputFile(input, "problem.lp")
+        .withOutputFile("problem.bin")
+        .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
   }

@@ -5,7 +5,8 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,19 +27,14 @@ public class QuboTspSolver extends TspSolver {
   private static final SubRoutineDefinition<String, String> QUBO_SUBROUTINE =
       new SubRoutineDefinition<>(QuboConfiguration.QUBO, "How should the QUBO be solved?");
   private final ApplicationContext context;
-  private final String binaryDir;
-  private final String binaryName;
+  private final String binaryPath;
   private ResourceProvider resourceProvider;
-
 
   @Autowired
   public QuboTspSolver(
-      //"vrp" value is correct because this uses the VRP framework from Lucas Bergers thesis
-      @Value("${custom.berger-vrp.directory}") String binaryDir,
-      @Value("${custom.berger-vrp.solver}") String binaryName,
+      @Value("${custom.berger-vrp.solver}") String binaryPath,
       ApplicationContext context) {
-    this.binaryName = binaryName;
-    this.binaryDir = binaryDir;
+    this.binaryPath = binaryPath;
     this.context = context;
   }
 
@@ -86,16 +82,18 @@ public class QuboTspSolver extends TspSolver {
     input = input.replaceAll(typeRegex, "TYPE : CVRP\nCAPACITY : 0");
 
     // translate into qubo in lp-file format with rust vrp meta solver
-    var processResult = context.getBean(
-            BinaryProcessRunner.class,
-            binaryDir,
-            binaryName,
+    var processResult = context
+        .getBean(DefaultProcessRunner.class)
+        .withArguments(
+            binaryPath,
             "partial",
-            new String[] {"solve", "%1$s", "simulated", "--transform-only"}
+            "solve", ProcessRunner.INPUT_FILE_PATH,
+            "simulated",
+            "--transform-only"
         )
-        .problemFileName("problem.vrp")
-        .solutionFileName("problem.lp")
-        .run(getProblemType(), solution.getId(), input);
+        .withInputFile(input, "problem.vrp")
+        .withOutputFile("problem.lp")
+        .run(getProblemType(), solution.getId());
 
     if (!processResult.success() || processResult.output().isEmpty()) {
       solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
@@ -132,17 +130,18 @@ public class QuboTspSolver extends TspSolver {
             return solution;
           }
 
-          var processRetransformResult = context.getBean(
-                  BinaryProcessRunner.class,
-                  binaryDir,
-                  binaryName,
+          var processRetransformResult = context
+              .getBean(DefaultProcessRunner.class)
+              .withArguments(
+                  binaryPath,
                   "partial",
-                  new String[] {"solve", "%1$s", "simulated", "--qubo-solution",
-                      quboSolutionFilePath.toString()}
+                  "solve", ProcessRunner.INPUT_FILE_PATH,
+                  "simulated",
+                  "--qubo-solution", quboSolutionFilePath.toString()
               )
-              .problemFileName("problem.vrp")
-              .solutionFileName("problem.sol")
-              .run(getProblemType(), solution.getId(), finalInput);
+              .withInputFile(finalInput, "problem.vrp")
+              .withOutputFile("problem.sol")
+              .run(getProblemType(), solution.getId());
 
           if (!processRetransformResult.success()) {
             solution.setDebugData(

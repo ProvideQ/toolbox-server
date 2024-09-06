@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.tsp.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +16,9 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class LkhTspSolver extends TspSolver {
-
-  private final String scriptDir;
+  private final String pythonWrapperScriptPath;
   private final ApplicationContext context;
-  private final String solverBinary;
+  private final String binaryPath;
 
   @Autowired
   public LkhTspSolver(
@@ -26,11 +26,11 @@ public class LkhTspSolver extends TspSolver {
        * uses the LKH script dir because it is the same as LKH-3 for VRP
        * (LKH can solve VRP and TSP)
        */
-      @Value("${custom.lkh.directory}") String scriptDir,
-      @Value("${custom.lkh.solver}") String solverBinary,
+      @Value("${custom.directory.lkh}") String pythonWrapperScriptPath,
+      @Value("${custom.lkh.solver}") String lkhBinaryPath,
       ApplicationContext context) {
-    this.scriptDir = scriptDir;
-    this.solverBinary = solverBinary;
+    this.pythonWrapperScriptPath = pythonWrapperScriptPath;
+    this.binaryPath = lkhBinaryPath;
     this.context = context;
   }
 
@@ -46,17 +46,16 @@ public class LkhTspSolver extends TspSolver {
       SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
-    var processResult = context.getBean(
-            PythonProcessRunner.class,
-            scriptDir,
-            "vrp_lkh.py",
-            new String[] {"--lkh-instance", solverBinary}
+    var processResult = context
+        .getBean(PythonProcessRunner.class, pythonWrapperScriptPath)
+        .withArguments(
+            "--lkh-instance", binaryPath,
+            ProcessRunner.INPUT_FILE_PATH,
+            "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .addProblemFilePathToProcessCommand()
-        .addSolutionFilePathToProcessCommand("--output-file", "%s")
-        .problemFileName("problem.vrp")
-        .solutionFileName("problem.sol")
-        .run(getProblemType(), solution.getId(), adaptInput(input));
+        .withInputFile("problem.vrp", adaptInput(input))
+        .withOutputFile("problem.sol")
+        .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
   }
