@@ -3,9 +3,9 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.process.ProcessRunner;
-import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
+import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
 import java.util.List;
@@ -23,14 +23,14 @@ public class QrispQuboSolver extends QuboSolver {
   private static final String SETTING_MAX_NUMBER_OF_VARS = "Max Number of Variables";
   private static final int DEFAULT_MAX_NUMBER_OF_VARS = 4;
 
-  private final String vrpPath;
   private final ApplicationContext context;
+  private final String scriptPath;
 
   @Autowired
   public QrispQuboSolver(
-      @Value("${qrisp.directory.qubo}") String vrpPath,
+      @Value("${qrisp.directory.qubo}") String scriptPath,
       ApplicationContext context) {
-    this.vrpPath = vrpPath;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -72,16 +72,16 @@ public class QrispQuboSolver extends QuboSolver {
       return Mono.error(new IllegalArgumentException("Max number of variables must be at least 1"));
     }
 
-    var processResult = context.getBean(
-            PythonProcessRunner.class,
-            vrpPath,
-            "qaoa.py",
-            new String[] {"%1$s", "--output-file", "%2$s",
-                "--size-gate", String.valueOf(maxNumberOfVariables)}
+    var processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            "--output-file", ProcessRunner.OUTPUT_FILE_PATH,
+            "--size-gate", String.valueOf(maxNumberOfVariables)
         )
-        .problemFileName("problem.lp")
-        .solutionFileName("problem.bin")
-        .run(getProblemType(), solution.getId(), input);
+        .withInputFile(input, "problem.lp")
+        .withOutputFile("problem.bin")
+        .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
   }

@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.vrp.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +17,16 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class LkhVrpSolver extends VrpSolver {
-  private final String scriptDir;
+  private final String scriptPath;
   private final ApplicationContext context;
   private final String solverBinary;
 
   @Autowired
   public LkhVrpSolver(
-      @Value("${custom.lkh.directory}") String scriptDir,
+      @Value("${custom.directory.lkh}") String scriptPath,
       @Value("${custom.lkh.solver}") String solverBinary,
       ApplicationContext context) {
-    this.scriptDir = scriptDir;
+    this.scriptPath = scriptPath;
     this.solverBinary = solverBinary;
     this.context = context;
   }
@@ -41,20 +42,18 @@ public class LkhVrpSolver extends VrpSolver {
       SubRoutineResolver resolver,
       SolvingProperties properties
   ) {
-
     var solution = new Solution<>(this);
 
-    var processResult = context.getBean(
-            PythonProcessRunner.class,
-            scriptDir,
-            "vrp_lkh.py",
-            new String[] {"--lkh-instance", solverBinary}
+    var processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath)
+        .withArguments(
+            "--lkh-instance", solverBinary,
+            ProcessRunner.INPUT_FILE_PATH,
+            "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .addProblemFilePathToProcessCommand()
-        .addSolutionFilePathToProcessCommand("--output-file", "%s")
-        .problemFileName("problem.vrp")
-        .solutionFileName("problem.sol")
-        .run(getProblemType(), solution.getId(), input);
+        .withInputFile(input, "problem.vrp")
+        .withOutputFile("problem.sol")
+        .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
   }

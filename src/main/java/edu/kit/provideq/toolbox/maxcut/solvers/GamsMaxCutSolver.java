@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -16,14 +17,14 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class GamsMaxCutSolver extends MaxCutSolver {
-  private final String maxCutPath;
+  private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
   public GamsMaxCutSolver(
-      @Value("${gams.directory.max-cut}") String maxCutPath,
+      @Value("${gams.directory.max-cut}") String scriptPath,
       ApplicationContext context) {
-    this.maxCutPath = maxCutPath;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -42,11 +43,14 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
     // Run MaxCut with GAMS via console
     var processResult = context
-        .getBean(
-            GamsProcessRunner.class,
-            maxCutPath,
-            "maxcut.gms")
-        .run(getProblemType(), solution.getId(), input);
+        .getBean(GamsProcessRunner.class, scriptPath)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .withInputFile(input)
+        .withOutputFile()
+        .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
   }

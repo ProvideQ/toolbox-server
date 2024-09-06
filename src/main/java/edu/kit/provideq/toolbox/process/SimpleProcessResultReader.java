@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class SimpleProcessResultReader implements ProcessResultReader<String> {
-  public ProcessResult<String> read(Path solutionPath, Path problemPath, Path problemDirectory) {
+  public ProcessResult<String> read(Path solutionPath, Path problemDirectory) {
     // Read the solution file
     String solutionText;
     try {
