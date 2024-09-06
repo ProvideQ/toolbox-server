@@ -9,11 +9,19 @@ public class Select<T> extends SolverSetting {
   private T selectedOption;
 
   public Select(String name, String description, List<T> options) {
-    this(name, description, options, null);
+    this(false, name, description, options);
+  }
+
+  public Select(boolean required, String name, String description, List<T> options) {
+    this(required, name, description, options, null);
   }
 
   public Select(String name, String description, List<T> options, T selectedOption) {
-    super(name, description, SolverSettingType.SELECT);
+    this(false, name, description, options, selectedOption);
+  }
+
+  public Select(boolean required, String name, String description, List<T> options, T selectedOption) {
+    super(name, description, SolverSettingType.SELECT, required);
 
     this.setOptions(options);
     this.setSelectedOption(selectedOption);
