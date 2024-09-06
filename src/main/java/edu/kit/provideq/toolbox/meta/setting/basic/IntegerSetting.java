@@ -1,23 +1,26 @@
-package edu.kit.provideq.toolbox.meta.setting;
+package edu.kit.provideq.toolbox.meta.setting.basic;
 
-public class BoundedInteger extends SolverSetting {
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
+import edu.kit.provideq.toolbox.meta.setting.SolverSettingType;
+
+public class IntegerSetting extends SolverSetting {
   private final int min;
   private final int max;
   private final int value;
 
-  public BoundedInteger(String name, String description, int min, int max) {
+  public IntegerSetting(String name, String description, int min, int max) {
     this(false, name, description, min, max);
   }
 
-  public BoundedInteger(boolean required, String name, String description, int min, int max) {
+  public IntegerSetting(boolean required, String name, String description, int min, int max) {
     this(required, name, description, min, max, (max - min) / 2);
   }
 
-  public BoundedInteger(String name, String description, int min, int max, int value) {
+  public IntegerSetting(String name, String description, int min, int max, int value) {
     this(false, name, description, min, max, value);
   }
 
-  public BoundedInteger(
+  public IntegerSetting(
       boolean required,
       String name,
       String description,

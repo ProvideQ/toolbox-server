@@ -1,23 +1,26 @@
-package edu.kit.provideq.toolbox.meta.setting;
+package edu.kit.provideq.toolbox.meta.setting.basic;
 
-public class BoundedDouble extends SolverSetting {
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
+import edu.kit.provideq.toolbox.meta.setting.SolverSettingType;
+
+public class DoubleSetting extends SolverSetting {
   private final double min;
   private final double max;
   private final double value;
 
-  public BoundedDouble(String name, String description, double min, double max) {
+  public DoubleSetting(String name, String description, double min, double max) {
     this(false, name, description, min, max);
   }
 
-  public BoundedDouble(boolean required, String name, String description, double min, double max) {
+  public DoubleSetting(boolean required, String name, String description, double min, double max) {
     this(required, name, description, min, max, (max - min) / 2);
   }
 
-  public BoundedDouble(String name, String description, double min, double max, double value) {
+  public DoubleSetting(String name, String description, double min, double max, double value) {
     this(false, name, description, min, max, value);
   }
 
-  public BoundedDouble(
+  public DoubleSetting(
       boolean required,
       String name,
       String description,

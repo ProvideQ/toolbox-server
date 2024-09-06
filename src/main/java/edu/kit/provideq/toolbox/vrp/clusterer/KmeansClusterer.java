@@ -5,7 +5,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.meta.setting.BoundedInteger;
+import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
@@ -51,7 +51,7 @@ public class KmeansClusterer extends VrpClusterer {
   @Override
   public List<SolverSetting> getSolverSettings() {
     return List.of(
-        new BoundedInteger(SETTING_CLUSTER_NUMBER, "The number of clusters to create", 1, 1000, DEFAULT_CLUSTER_NUMBER)
+        new IntegerSetting(SETTING_CLUSTER_NUMBER, "The number of clusters to create", 1, 1000, DEFAULT_CLUSTER_NUMBER)
     );
   }
 
@@ -63,8 +63,8 @@ public class KmeansClusterer extends VrpClusterer {
 
     // for now, set the cluster number to three. Our architecture currently does not allow settings.
     // called in python script via "kmeans-cluster-number"
-    int clusterNumber = properties.<BoundedInteger>getSetting(SETTING_CLUSTER_NUMBER)
-        .map(BoundedInteger::getValue)
+    int clusterNumber = properties.<IntegerSetting>getSetting(SETTING_CLUSTER_NUMBER)
+        .map(IntegerSetting::getValue)
         .orElse(DEFAULT_CLUSTER_NUMBER);
 
     if (clusterNumber < 1) {

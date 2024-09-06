@@ -7,6 +7,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import edu.kit.provideq.toolbox.meta.setting.basic.BooleanSetting;
+import edu.kit.provideq.toolbox.meta.setting.basic.DoubleSetting;
+import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
+import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
+import edu.kit.provideq.toolbox.meta.setting.basic.TextSetting;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +42,7 @@ public class SolverSettingDeserializer extends JsonDeserializer<SolverSetting> {
     // Create subclass based on the type
     switch (type) {
       case CHECKBOX -> {
-        return new BooleanState(
+        return new BooleanSetting(
             name,
             description,
             node.get("state").asBoolean());
@@ -50,7 +55,7 @@ public class SolverSettingDeserializer extends JsonDeserializer<SolverSetting> {
           throw new IllegalArgumentException("Value must be between min and max");
         }
 
-        return new BoundedInteger(
+        return new IntegerSetting(
             name,
             description,
             min,
@@ -65,7 +70,7 @@ public class SolverSettingDeserializer extends JsonDeserializer<SolverSetting> {
           throw new IllegalArgumentException("Value must be between min and max");
         }
 
-        return new BoundedDouble(
+        return new DoubleSetting(
             name,
             description,
             min,
@@ -78,14 +83,14 @@ public class SolverSettingDeserializer extends JsonDeserializer<SolverSetting> {
         for (JsonNode optionNode : optionsNode) {
           options.add(codec.treeToValue(optionNode, Object.class).toString());
         }
-        return new Select<>(
+        return new SelectSetting<>(
             name,
             description,
             options,
             codec.treeToValue(node.get("selectedOption"), Object.class).toString());
       }
       case TEXT -> {
-        return new Text(
+        return new TextSetting(
             name,
             description,
             node.get("text").asText());
