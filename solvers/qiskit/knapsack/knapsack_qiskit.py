@@ -1,6 +1,4 @@
-
-
-# useful additional packages
+# to check argument count
 import sys
 
 # Qiskit
@@ -28,7 +26,7 @@ indexes: list[int] = []
 values: list[int] = []
 weights: list[int] = []
 
-# read items into profits, weights lists
+# read items into value, weight lists
 for i in range(number_items):
     item = lines[i + 1].split(' ')
     indexes.append(int(item[0]))
