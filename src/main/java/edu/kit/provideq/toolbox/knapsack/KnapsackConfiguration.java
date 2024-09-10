@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.knapsack;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.knapsack.solvers.PythonKnapsackSolver;
+import edu.kit.provideq.toolbox.knapsack.solvers.QiskitKnapsackSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -31,11 +32,12 @@ public class KnapsackConfiguration {
   @Bean
   ProblemManager<String, String> getKnapsackManager(
           PythonKnapsackSolver pythonKnapsackSolver,
+          QiskitKnapsackSolver qiskitKnapsackSolver,
           ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
             KNAPSACK,
-            Set.of(pythonKnapsackSolver),
+            Set.of(pythonKnapsackSolver, qiskitKnapsackSolver),
             loadExampleProblems(resourceProvider)
     );
   }
@@ -45,8 +47,8 @@ public class KnapsackConfiguration {
   ) {
     try {
       var problemInputStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("10-items.txt"),
-          "10-items example for Knapsack is unavailable!"
+          getClass().getResourceAsStream("4-items.txt"),
+          "4-items example for Knapsack is unavailable!"
       );
       var problem = new Problem<>(KNAPSACK);
       problem.setInput(resourceProvider.readStream(problemInputStream));
