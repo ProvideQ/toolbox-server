@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox;
 
 import edu.kit.provideq.toolbox.exception.MissingSpringProfileException;
+import java.util.stream.Stream;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -9,7 +10,13 @@ public class ToolboxServerApplication {
 
   public static void main(String[] args) throws MissingSpringProfileException {
     String springProfileArg = "--spring.profiles.active=" + getSpringProfileForOs();
-    SpringApplication.run(ToolboxServerApplication.class, springProfileArg);
+    // merge args and springProfileArg:
+    String[] mergedArgs = Stream.concat(
+        Stream.of(args),
+        Stream.of(springProfileArg))
+        .toArray(String[]::new);
+
+    SpringApplication.run(ToolboxServerApplication.class, mergedArgs);
   }
 
   private static String getSpringProfileForOs() throws MissingSpringProfileException {
@@ -22,7 +29,7 @@ public class ToolboxServerApplication {
       return "linux";
     } else {
       throw new MissingSpringProfileException("Could not start Toolbox, "
-              + "there is no Spring Profile that matches your OS specification.");
+          + "there is no Spring Profile that matches your OS specification.");
     }
   }
 
