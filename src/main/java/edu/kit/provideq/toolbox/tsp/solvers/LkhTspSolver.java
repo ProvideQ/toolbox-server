@@ -22,10 +22,6 @@ public class LkhTspSolver extends TspSolver {
 
   @Autowired
   public LkhTspSolver(
-      /*
-       * uses the LKH script dir because it is the same as LKH-3 for VRP
-       * (LKH can solve VRP and TSP)
-       */
       @Value("${custom.script.lkh}") String pythonWrapperScriptPath,
       @Value("${custom.binary.lkh}") String lkhBinaryPath,
       ApplicationContext context) {
@@ -53,7 +49,7 @@ public class LkhTspSolver extends TspSolver {
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .withInputFile("problem.vrp", adaptInput(input))
+        .withInputFile(adaptInput(input), "problem.vrp")
         .withOutputFile("problem.sol")
         .run(getProblemType(), solution.getId());
 
