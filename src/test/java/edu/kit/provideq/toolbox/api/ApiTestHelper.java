@@ -184,4 +184,16 @@ public class ApiTestHelper {
 
     return problemDto;
   }
+
+  public static <InputT, ResulT> String getDebugText(ProblemDto<InputT, ResulT> problemDto) {
+    StringBuilder debugBuilder = new StringBuilder();
+    debugBuilder.append("Test Failed, Input was: ").append(problemDto.getInput());
+    debugBuilder.append("\nError Message: ");
+    if (problemDto.getSolution() != null) {
+      debugBuilder.append(problemDto.getSolution().getDebugData());
+    } else {
+      debugBuilder.append("No Solution present!");
+    }
+    return debugBuilder.toString();
+  }
 }
