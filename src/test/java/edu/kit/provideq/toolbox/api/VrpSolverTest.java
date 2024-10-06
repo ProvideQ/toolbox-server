@@ -240,6 +240,7 @@ class VrpSolverTest {
     assertNotNull(solvedProblemDto.getSolution(), ApiTestHelper.getDebugText(problemDto));
     assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus(),
             ApiTestHelper.getDebugText(problemDto));
-    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState(), ApiTestHelper.getDebugText(problemDto));
+    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState(),
+            ApiTestHelper.getDebugText(problemDto));
   }
 }

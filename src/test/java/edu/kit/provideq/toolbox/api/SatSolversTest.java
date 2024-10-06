@@ -52,6 +52,7 @@ class SatSolversTest {
     var problem = ApiTestHelper.createProblem(client, solver, input, SAT);
     assertEquals(ProblemState.SOLVED, problem.getState(), ApiTestHelper.getDebugText(problem));
     assertNotNull(problem.getSolution(), ApiTestHelper.getDebugText(problem));
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus(), ApiTestHelper.getDebugText(problem));
+    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus(),
+            ApiTestHelper.getDebugText(problem));
   }
 }

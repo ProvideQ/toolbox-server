@@ -50,8 +50,10 @@ class QuboSolverTest {
   void testQuboSolvers(ProblemSolver<String, String> solver, String input) {
     System.out.println("Testing Solver: " + solver.getName());
     var problemDto = ApiTestHelper.createProblem(client, solver, input, QUBO);
-    assertEquals(ProblemState.SOLVED, problemDto.getState(), ApiTestHelper.getDebugText(problemDto));
+    assertEquals(ProblemState.SOLVED, problemDto.getState(),
+            ApiTestHelper.getDebugText(problemDto));
     assertNotNull(problemDto.getSolution(), ApiTestHelper.getDebugText(problemDto));
-    assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus(), ApiTestHelper.getDebugText(problemDto));
+    assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus(),
+            ApiTestHelper.getDebugText(problemDto));
   }
 }

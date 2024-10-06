@@ -86,6 +86,7 @@ class FeatureModelAnomalySolversTest {
 
     problem = ApiTestHelper.trySolveFor(15, client, problem.getId(), problemType);
     assertNotNull(problem.getSolution(), ApiTestHelper.getDebugText(problem));
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus(), ApiTestHelper.getDebugText(problem));
+    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus(),
+            ApiTestHelper.getDebugText(problem));
   }
 }
