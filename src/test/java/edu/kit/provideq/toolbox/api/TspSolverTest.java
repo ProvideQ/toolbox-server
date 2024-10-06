@@ -73,9 +73,9 @@ class TspSolverTest {
   void testLkhTspSolver() {
     for (String problem : problems) {
       var problemDto = ApiTestHelper.createProblem(client, lkhTspSolver, problem, TSP);
-      assertEquals(ProblemState.SOLVED, problemDto.getState());
-      assertNotNull(problemDto.getSolution());
-      assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
+      assertEquals(ProblemState.SOLVED, problemDto.getState(), ApiTestHelper.getDebugText(problemDto));
+      assertNotNull(problemDto.getSolution(), ApiTestHelper.getDebugText(problemDto));
+      assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus(), ApiTestHelper.getDebugText(problemDto));
     }
   }
 
@@ -112,8 +112,9 @@ class TspSolverTest {
     var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), TSP);
 
     //validate result:
-    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
-    assertNotNull(solvedProblemDto.getSolution());
-    assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
+    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState(), ApiTestHelper.getDebugText(problemDto));
+    assertNotNull(solvedProblemDto.getSolution(), ApiTestHelper.getDebugText(problemDto));
+    assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus(),
+            ApiTestHelper.getDebugText(problemDto));
   }
 }

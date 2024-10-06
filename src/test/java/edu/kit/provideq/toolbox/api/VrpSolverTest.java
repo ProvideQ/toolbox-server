@@ -140,8 +140,8 @@ class VrpSolverTest {
       //solve the problem:
       problemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
       assertNotNull(problemDto.getSolution());
-      assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
-      assertEquals(ProblemState.SOLVED, problemDto.getState());
+      assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus(), ApiTestHelper.getDebugText(problemDto));
+      assertEquals(ProblemState.SOLVED, problemDto.getState(), ApiTestHelper.getDebugText(problemDto));
     }
   }
 
@@ -184,9 +184,10 @@ class VrpSolverTest {
 
       //solve the problem:
       var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
-      assertNotNull(solvedProblemDto.getSolution());
-      assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
-      assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
+      assertNotNull(solvedProblemDto.getSolution(), ApiTestHelper.getDebugText(problemDto));
+      assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus(),
+              ApiTestHelper.getDebugText(problemDto));
+      assertEquals(ProblemState.SOLVED, solvedProblemDto.getState(), ApiTestHelper.getDebugText(problemDto));
     }
   }
 
@@ -236,8 +237,9 @@ class VrpSolverTest {
 
     //solve the problem:
     var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
-    assertNotNull(solvedProblemDto.getSolution());
-    assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
-    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
+    assertNotNull(solvedProblemDto.getSolution(), ApiTestHelper.getDebugText(problemDto));
+    assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus(),
+            ApiTestHelper.getDebugText(problemDto));
+    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState(), ApiTestHelper.getDebugText(problemDto));
   }
 }

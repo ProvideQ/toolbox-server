@@ -49,8 +49,8 @@ class MaxCutSolversTest {
   @MethodSource("provideArguments")
   void testMaxCutSolver(ProblemSolver<String, String> solver, String input) {
     var problem = ApiTestHelper.createProblem(client, solver, input, MAX_CUT);
-    assertEquals(ProblemState.SOLVED, problem.getState());
-    assertNotNull(problem.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
+    assertEquals(ProblemState.SOLVED, problem.getState(), ApiTestHelper.getDebugText(problem));
+    assertNotNull(problem.getSolution(), ApiTestHelper.getDebugText(problem));
+    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus(), ApiTestHelper.getDebugText(problem));
   }
 }

@@ -74,7 +74,7 @@ class FeatureModelAnomalySolversTest {
         String input,
         ProblemSolver<String, DimacsCnfSolution> satSolver) {
     var problem = ApiTestHelper.createProblem(client, featureModelSolver, input, problemType);
-    assertEquals(ProblemState.SOLVING, problem.getState());
+    assertEquals(ProblemState.SOLVING, problem.getState(), ApiTestHelper.getDebugText(problem));
 
     // Set solver for sat sub problem
     for (SubProblemReferenceDto subProblem : problem.getSubProblems()) {
@@ -85,7 +85,7 @@ class FeatureModelAnomalySolversTest {
     }
 
     problem = ApiTestHelper.trySolveFor(15, client, problem.getId(), problemType);
-    assertNotNull(problem.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
+    assertNotNull(problem.getSolution(), ApiTestHelper.getDebugText(problem));
+    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus(), ApiTestHelper.getDebugText(problem));
   }
 }
