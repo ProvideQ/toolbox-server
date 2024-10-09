@@ -143,6 +143,7 @@ public class ApiTestHelper {
               })
               .returnResult()
               .getResponseBody();
+      System.out.println("Fetched problem: " + problemDto);
 
       assertNotNull(problemDto);
 
@@ -161,6 +162,7 @@ public class ApiTestHelper {
                   })
                   .returnResult()
                   .getResponseBody();
+          System.out.println("Fetched sub problem: " + subProblemDto);
 
           assertNotNull(subProblemDto);
         }

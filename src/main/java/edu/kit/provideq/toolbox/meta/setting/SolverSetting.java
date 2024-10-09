@@ -58,4 +58,14 @@ public abstract class SolverSetting {
   public void setRequired(boolean required) {
     this.required = required;
   }
+
+  @Override
+  public String toString() {
+    return "SolverSetting{"
+        + "name=" + name
+        + ", type=" + type
+        + ", description=" + description
+        + ", required=" + required
+        + '}';
+  }
 }

@@ -51,6 +51,6 @@ class MaxCutSolversTest {
     var problem = ApiTestHelper.createProblem(client, solver, input, MAX_CUT);
     assertEquals(ProblemState.SOLVED, problem.getState());
     assertNotNull(problem.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
+    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus(), "Solution: " + problem.getSolution());
   }
 }

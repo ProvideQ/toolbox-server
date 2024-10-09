@@ -90,4 +90,18 @@ public class ProblemDto<InputT, ResultT> {
 
     return Collections.unmodifiableList(subProblems);
   }
+
+  @Override
+  public String toString() {
+    return "ProblemDto{"
+        + "typeId=" + typeId
+        + ", id=" + id
+        + ", state=" + state
+        + ", solverId=" + solverId
+        + ", input=" + input
+        + ", solution=" + solution
+        + ", solverSettings=" + solverSettings
+        + ", subProblems=" + subProblems
+        + '}';
+  }
 }

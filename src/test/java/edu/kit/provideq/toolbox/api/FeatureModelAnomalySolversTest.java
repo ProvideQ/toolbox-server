@@ -50,7 +50,6 @@ class FeatureModelAnomalySolversTest {
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   <InputT, ResultT> Stream<Arguments> getArguments(
-
           ProblemType<InputT, ResultT> problemType
   ) {
     var featureModelManager = problemManagerProvider.findProblemManagerForType(problemType).get();
