@@ -45,7 +45,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
     var processResult = context
         .getBean(GamsProcessRunner.class, scriptPath)
         .withArguments(
-            ProcessRunner.INPUT_FILE_PATH,
+            "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
         .withInputFile(input)

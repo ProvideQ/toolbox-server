@@ -59,8 +59,8 @@ public class GamsSatSolver extends SatSolver {
     ProcessResult<String> processResult = context
         .getBean(GamsProcessRunner.class, scriptPath)
         .withArguments(
-            ProcessRunner.INPUT_FILE_PATH,
-            ProcessRunner.OUTPUT_FILE_PATH
+            "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
+            "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
         )
         .withInputFile(dimacsCnf.toString())
         .withOutputFile()

@@ -39,8 +39,7 @@ public class GamsProcessRunner extends ProcessRunner {
 
     withArguments(
         GAMS_EXECUTABLE_NAME,
-        gameScriptPath,
-        "--INPUT=\"" + ProcessRunner.INPUT_FILE_PATH + "\"");
+        gameScriptPath);
   }
 
   /**
