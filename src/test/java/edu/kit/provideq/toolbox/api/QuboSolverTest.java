@@ -1,13 +1,10 @@
 package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
-import edu.kit.provideq.toolbox.meta.ProblemState;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,9 +47,7 @@ class QuboSolverTest {
   void testQuboSolvers(ProblemSolver<String, String> solver, String input) {
     System.out.println("Testing Solver: " + solver.getName());
     var problemDto = ApiTestHelper.createProblem(client, solver, input, QUBO);
-    assertEquals(ProblemState.SOLVED, problemDto.getState());
-    assertNotNull(problemDto.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
+    ApiTestHelper.testSolution(problemDto);
 
     if (problemDto.getSolution().getStatus() != SolutionStatus.SOLVED) {
       System.out.println("Test Failed, Input was: " + problemDto.getInput());

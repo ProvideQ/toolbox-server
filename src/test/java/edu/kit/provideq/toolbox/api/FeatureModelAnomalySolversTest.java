@@ -4,9 +4,7 @@ import static edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureConf
 import static edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID;
 import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -84,7 +82,6 @@ class FeatureModelAnomalySolversTest {
     }
 
     problem = ApiTestHelper.trySolveFor(15, client, problem.getId(), problemType);
-    assertNotNull(problem.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
+    ApiTestHelper.testSolution(problem);
   }
 }
