@@ -55,12 +55,15 @@ qaoa_result = qaoa.solve(qubo)
 z = knapsack.interpret(qaoa_result)
 
 # format results for output
-achieved_sum : int = 0
 included_indexes : list[int] = []
 
 for i in z:
-    achieved_sum += values[i]
-    included_indexes.append(indexes[i])
+    # prevent misinterpreted indices from appearing in result
+    if i < number_items and indexes[i] not in included_indexes:
+        included_indexes.append(indexes[i])
+
+# grab optimal result from calculated result, negate because it got turned negative for the minimizing algorithm
+achieved_sum : int = -int(qaoa_result.fval)
 
 with open(output_path, 'w') as f:
     f.write(str(achieved_sum) + "\n")
