@@ -51,8 +51,8 @@ public class LkhVrpSolver extends VrpSolver {
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .withInputFile(input, "problem.vrp")
-        .withOutputFile("problem.sol")
+        .writeInputFile(input, "problem.vrp")
+        .readOutputFile("problem.sol")
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));

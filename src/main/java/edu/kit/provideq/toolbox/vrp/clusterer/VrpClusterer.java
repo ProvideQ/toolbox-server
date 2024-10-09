@@ -120,8 +120,8 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
             "--cluster-file",
             ProcessRunner.OUTPUT_FILE_PATH + "/.vrp/problem.map"
         )
-        .withInputFile(input, "problem.vrp")
-        .withOutputFile("problem.sol")
+        .writeInputFile(input, "problem.vrp")
+        .readOutputFile("problem.sol")
         .run(getProblemType(), solution.getId());
 
     var result = combineProcessRunner.output();

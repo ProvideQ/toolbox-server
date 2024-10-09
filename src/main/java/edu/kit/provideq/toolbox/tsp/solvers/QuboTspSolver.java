@@ -91,8 +91,8 @@ public class QuboTspSolver extends TspSolver {
             "simulated",
             "--transform-only"
         )
-        .withInputFile(input, "problem.vrp")
-        .withOutputFile("problem.lp")
+        .writeInputFile(input, "problem.vrp")
+        .readOutputFile("problem.lp")
         .run(getProblemType(), solution.getId());
 
     if (!processResult.success() || processResult.output().isEmpty()) {
@@ -139,8 +139,8 @@ public class QuboTspSolver extends TspSolver {
                   "simulated",
                   "--qubo-solution", quboSolutionFilePath.toString()
               )
-              .withInputFile(finalInput, "problem.vrp")
-              .withOutputFile("problem.sol")
+              .writeInputFile(finalInput, "problem.vrp")
+              .readOutputFile("problem.sol")
               .run(getProblemType(), solution.getId());
 
           if (!processRetransformResult.success()) {

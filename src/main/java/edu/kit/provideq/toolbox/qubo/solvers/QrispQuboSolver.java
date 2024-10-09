@@ -79,8 +79,8 @@ public class QrispQuboSolver extends QuboSolver {
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH,
             "--size-gate", String.valueOf(maxNumberOfVariables)
         )
-        .withInputFile(input, "problem.lp")
-        .withOutputFile("problem.bin")
+        .writeInputFile(input, "problem.lp")
+        .readOutputFile("problem.bin")
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));

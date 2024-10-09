@@ -62,8 +62,8 @@ public class GamsSatSolver extends SatSolver {
             "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
             "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
         )
-        .withInputFile(dimacsCnf.toString())
-        .withOutputFile()
+        .writeInputFile(dimacsCnf.toString())
+        .readOutputFile()
         .run(getProblemType(), solution.getId());
 
     if (processResult.success()) {

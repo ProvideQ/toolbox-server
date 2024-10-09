@@ -91,7 +91,7 @@ public class CplexMipDemonstrator implements Demonstrator {
     var processResult = context
         .getBean(PythonProcessRunner.class, scriptPath)
         .withArguments(maxNumberVariables.toString(), stepSize.toString(), repetitions.toString())
-        .withOutputString()
+        .readOutputString()
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));

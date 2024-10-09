@@ -49,8 +49,8 @@ public class LkhTspSolver extends TspSolver {
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .withInputFile(adaptInput(input), "problem.vrp")
-        .withOutputFile("problem.sol")
+        .writeInputFile(adaptInput(input), "problem.vrp")
+        .readOutputFile("problem.sol")
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));

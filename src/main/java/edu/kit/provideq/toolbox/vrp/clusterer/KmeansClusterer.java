@@ -90,8 +90,8 @@ public class KmeansClusterer extends VrpClusterer {
             ProcessRunner.OUTPUT_FILE_PATH + "/.vrp",
             "--cluster-number", String.valueOf(clusterNumber)
         )
-        .withInputFile(input)
-        .withOutputFile("problem.vrp", new MultiFileProcessResultReader("./.vrp/problem_*.vrp"))
+        .writeInputFile(input)
+        .readOutputFile("problem.vrp", new MultiFileProcessResultReader("./.vrp/problem_*.vrp"))
         .run(getProblemType(), solution.getId());
 
     return getSolutionForCluster(input, solution, processResult, resolver, VRP_SUBROUTINE);

@@ -63,8 +63,8 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
-        .withInputFile(input)
-        .withOutputFile()
+        .writeInputFile(input)
+        .readOutputFile()
         .run(getProblemType(), solution.getId());
 
     // Return if process failed

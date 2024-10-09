@@ -48,8 +48,8 @@ public class QiskitQuboSolver extends QuboSolver {
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
-        .withInputFile(input, "problem.lp")
-        .withOutputFile()
+        .writeInputFile(input, "problem.lp")
+        .readOutputFile()
         .run(getProblemType(), solution.getId());
 
     // Return if process failed

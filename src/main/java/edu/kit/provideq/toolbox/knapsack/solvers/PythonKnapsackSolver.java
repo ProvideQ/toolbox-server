@@ -46,8 +46,8 @@ public class PythonKnapsackSolver extends KnapsackSolver {
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH)
-        .withInputFile(input)
-        .withOutputFile()
+        .writeInputFile(input)
+        .readOutputFile()
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));

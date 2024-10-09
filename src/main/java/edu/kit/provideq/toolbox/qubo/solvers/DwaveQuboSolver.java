@@ -107,8 +107,8 @@ public class DwaveQuboSolver extends QuboSolver {
             dwaveAnnealingMethod.value,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .withInputFile(input, "problem.lp")
-        .withOutputFile("problem.bin")
+        .writeInputFile(input, "problem.lp")
+        .readOutputFile("problem.bin")
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));

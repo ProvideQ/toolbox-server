@@ -79,11 +79,11 @@ public class ProcessRunner {
     this.resourceProvider = resourceProvider;
   }
 
-  public ProcessRunner withInputFile(String inputData) {
-    return withInputFile(inputData, INPUT_FILE_NAME);
+  public ProcessRunner writeInputFile(String inputData) {
+    return writeInputFile(inputData, INPUT_FILE_NAME);
   }
 
-  public ProcessRunner withInputFile(String inputData, String problemFileName) {
+  public ProcessRunner writeInputFile(String inputData, String problemFileName) {
     // Add at the beginning of the pre-processors list
     // This ensures that the argument transformers are applied for every argument
     preProcessors.add(0, (problemType, solutionId) -> {
@@ -110,7 +110,7 @@ public class ProcessRunner {
     return this;
   }
 
-  public ProcessRunnerExecutor<String> withOutputString() {
+  public ProcessRunnerExecutor<String> readOutputString() {
     return getExecutor((processOutput, processError) -> new ProcessResult<>(
             true,
             Optional.of(processOutput),
@@ -119,19 +119,19 @@ public class ProcessRunner {
     );
   }
 
-  public ProcessRunnerExecutor<String> withOutputFile() {
-    return withOutputFile(OUTPUT_FILE_NAME);
+  public ProcessRunnerExecutor<String> readOutputFile() {
+    return readOutputFile(OUTPUT_FILE_NAME);
   }
 
-  public ProcessRunnerExecutor<String> withOutputFile(String outputFileName) {
-    return withOutputFile(outputFileName, new SimpleProcessResultReader());
+  public ProcessRunnerExecutor<String> readOutputFile(String outputFileName) {
+    return readOutputFile(outputFileName, new SimpleProcessResultReader());
   }
 
-  public <T> ProcessRunnerExecutor<T> withOutputFile(ProcessResultReader<T> reader) {
-    return withOutputFile(OUTPUT_FILE_NAME, reader);
+  public <T> ProcessRunnerExecutor<T> readOutputFile(ProcessResultReader<T> reader) {
+    return readOutputFile(OUTPUT_FILE_NAME, reader);
   }
 
-  public <T> ProcessRunnerExecutor<T> withOutputFile(String outputFileName,
+  public <T> ProcessRunnerExecutor<T> readOutputFile(String outputFileName,
                                                      ProcessResultReader<T> reader) {
     // Add at the beginning of the pre-processors list
     // This ensures that the argument transformers are applied for every argument
@@ -244,6 +244,9 @@ public class ProcessRunner {
       String processError;
       int processExitCode;
       try {
+        System.out.println("Running process in directory: " + processBuilder.directory());
+        System.out.println("should Running process in directory: " + problemDirectory);
+        System.out.println("process: " + processBuilder.toString());
         Process process = processBuilder.start();
 
         processOutput = resourceProvider.readStream(process.inputReader());

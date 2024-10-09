@@ -48,8 +48,8 @@ public class QrispVrpSolver extends VrpSolver {
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH,
             "--size-gate", "35"
         )
-        .withInputFile(input, "problem.vrp")
-        .withOutputFile()
+        .writeInputFile(input, "problem.vrp")
+        .readOutputFile()
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
