@@ -49,7 +49,7 @@ ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
 COPY solvers solvers
-RUN scripts/ci-setup-gams.sh
+RUN scripts/ci-setup-solvers.sh
 COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port
