@@ -79,10 +79,23 @@ public class ProcessRunner {
     this.resourceProvider = resourceProvider;
   }
 
+  /**
+   * Writes the input data to a default input file.
+   *
+   * @param inputData The input data to be written to the input file.
+   * @return ProcessRunner instance for chaining.
+   */
   public ProcessRunner writeInputFile(String inputData) {
     return writeInputFile(inputData, INPUT_FILE_NAME);
   }
 
+  /**
+   * Writes the input data to a specific input file.
+   *
+   * @param inputData The input data to be written to the input file.
+   * @param problemFileName The name of the file to write the input data to.
+   * @return ProcessRunner instance for chaining.
+   */
   public ProcessRunner writeInputFile(String inputData, String problemFileName) {
     // Add at the beginning of the pre-processors list
     // This ensures that the argument transformers are applied for every argument
@@ -110,6 +123,11 @@ public class ProcessRunner {
     return this;
   }
 
+  /**
+   * Reads the output data from the process console output.
+   *
+   * @return ProcessRunner instance for chaining.
+   */
   public ProcessRunnerExecutor<String> readOutputString() {
     return getExecutor((processOutput, processError) -> new ProcessResult<>(
             true,
@@ -119,18 +137,44 @@ public class ProcessRunner {
     );
   }
 
+  /**
+   * Reads the output data from a default output file.
+   *
+   * @return ProcessRunner instance for chaining.
+   */
   public ProcessRunnerExecutor<String> readOutputFile() {
     return readOutputFile(OUTPUT_FILE_NAME);
   }
 
+  /**
+   * Reads the output data from a specific output file.
+   *
+   * @param outputFileName The name of the file to read the output data from.
+   * @return ProcessRunner instance for chaining.
+   */
   public ProcessRunnerExecutor<String> readOutputFile(String outputFileName) {
     return readOutputFile(outputFileName, new SimpleProcessResultReader());
   }
 
+  /**
+   * Reads the output data from a default output file using a custom reader.
+   *
+   * @param reader The reader to use to read the output data.
+   * @param <T> The type of the output data.
+   * @return ProcessRunner instance for chaining.
+   */
   public <T> ProcessRunnerExecutor<T> readOutputFile(ProcessResultReader<T> reader) {
     return readOutputFile(OUTPUT_FILE_NAME, reader);
   }
 
+  /**
+   * Reads the output data from a specific output file using a custom reader.
+   *
+   * @param outputFileName The name of the file to read the output data from.
+   * @param reader The reader to use to read the output data.
+   * @param <T> The type of the output data.
+   * @return ProcessRunner instance for chaining.
+   */
   public <T> ProcessRunnerExecutor<T> readOutputFile(String outputFileName,
                                                      ProcessResultReader<T> reader) {
     // Add at the beginning of the pre-processors list
@@ -178,6 +222,13 @@ public class ProcessRunner {
     });
   }
 
+  /**
+   * Adds an environment variable to the process.
+   *
+   * @param key The key of the environment variable.
+   * @param value The value of the environment variable.
+   * @return ProcessRunner instance for chaining.
+   */
   public ProcessRunner withEnvironmentVariable(String key, String value) {
     preProcessors.add((problemType, solutionId) -> {
       processBuilder.environment().put(key, value);
@@ -187,6 +238,12 @@ public class ProcessRunner {
     return this;
   }
 
+  /**
+   * Adds arguments to the process.
+   *
+   * @param arguments The arguments to add to the process.
+   * @return ProcessRunner instance for chaining.
+   */
   public ProcessRunner withArguments(String... arguments) {
     preProcessors.add((problemType, solutionId) -> {
       for (String argument : arguments) {
