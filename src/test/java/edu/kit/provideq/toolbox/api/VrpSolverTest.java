@@ -139,7 +139,6 @@ class VrpSolverTest {
     }
   }
 
-
   /**
    * Tests the two phase clusterer in combination with Lkh-3 tsp solver.
    */

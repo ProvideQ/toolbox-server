@@ -20,7 +20,6 @@ public class MultiFileProcessResultReader implements ProcessResultReader<HashMap
   }
 
   public ProcessResult<HashMap<Path, String>> read(Path solutionPath, Path problemDirectory) {
-
     HashMap<Path, String> solutions = new HashMap<>();
 
     // Split globPattern at the last slash
