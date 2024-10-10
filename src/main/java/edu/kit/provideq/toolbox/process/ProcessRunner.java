@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProcessRunner {
+  public static final String PROBLEM_DIRECTORY_PATH = "PROBLEM_DIRECTORY_PATH";
   public static final String INPUT_FILE_PATH = "INPUT_FILE_PATH";
   public static final String OUTPUT_FILE_PATH = "OUTPUT_FILE_PATH";
 
@@ -59,6 +60,7 @@ public class ProcessRunner {
     this.preProcessors = new ArrayList<>();
     this.postProcessors = new ArrayList<>();
     this.argumentTransformers = new ArrayList<>();
+    argumentTransformers.add(x -> x.replace(PROBLEM_DIRECTORY_PATH, problemDirectory));
   }
 
   protected static ProcessBuilder createGenericProcessBuilder(
@@ -180,19 +182,7 @@ public class ProcessRunner {
     // Add at the beginning of the pre-processors list
     // This ensures that the argument transformers are applied for every argument
     preProcessors.add(0, (problemType, solutionId) -> {
-      // Retrieve the problem directory
-      String problemDirectoryPath;
-      try {
-        problemDirectoryPath = resourceProvider
-            .getProblemDirectory(problemType, solutionId)
-            .getAbsolutePath();
-      } catch (IOException e) {
-        return Optional.of(new IOException(
-            "Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage()),
-            e));
-      }
-
-      var outputFile = Paths.get(problemDirectoryPath, outputFileName);
+      var outputFile = Paths.get(problemDirectory, outputFileName);
       var normalizedOutputFilePath = outputFile.toString().replace("\\", "/");
 
       // Add support for replacing the output file path in the arguments

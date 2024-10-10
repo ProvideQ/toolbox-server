@@ -58,10 +58,10 @@ public class TwoPhaseClusterer extends VrpClusterer {
             "cluster",
             ProcessRunner.INPUT_FILE_PATH,
             "tsp",
-            "--build-dir", ProcessRunner.OUTPUT_FILE_PATH + "/.vrp"
+            "--build-dir", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp"
         )
         .writeInputFile(input, "problem.vrp")
-        .readOutputFile(new MultiFileProcessResultReader("./.vrp/problem_*.vrp"))
+        .readOutputFile(new MultiFileProcessResultReader("/.vrp/problem_*.vrp"))
         .run(getProblemType(), solution.getId());
 
     return getSolutionForCluster(input, solution, processResult, resolver, TSP_SUBROUTINE);

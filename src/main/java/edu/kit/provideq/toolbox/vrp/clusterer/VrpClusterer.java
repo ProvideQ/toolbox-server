@@ -113,12 +113,9 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
             ProcessRunner.INPUT_FILE_PATH,
             "cluster-from-file",
             "solution-from-file",
-            "--build-dir",
-            ProcessRunner.OUTPUT_FILE_PATH + "/.vrp",
-            "--solution-dir",
-            ProcessRunner.OUTPUT_FILE_PATH + "/.vrp",
-            "--cluster-file",
-            ProcessRunner.OUTPUT_FILE_PATH + "/.vrp/problem.map"
+            "--build-dir", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp",
+            "--solution-dir", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp",
+            "--cluster-file", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp/problem.map"
         )
         .writeInputFile(input, "problem.vrp")
         .readOutputFile("problem.sol")
