@@ -10,12 +10,10 @@ A web-based user interface can be found in our
 1. Install Java 17 or newer (check with `java -version`)
 2. Clone this repository
 3. [Optional, Solver Installation - install the Solvers that you want/need]
-    * We hope to provide an automated script for most of this in the future.  
    1. Python-based Solvers (Qiskit, Cirq, Dwave, Qrisp)
-      1. Install Python and the required libraries by using `pip install -r [path to requirements.txt]`
-      2. Example for Qiskit: `pip install -r solvers/qiskit/requirements.txt`
-      * Note: These dependencies must be installed to the gams conda env if you want to use GAMS and other solvers from
-        the same toolbox installation!
+      1. Install Python
+      2. Install Python dependencies by running `python scripts/install-python-dependencies.py` <br>
+         Alternatively, run `pip install -r requirements.txt` on all requirement.txt files in the /solvers directory.
    2. Compiled Solvers (e.g. used for VRP and TSP)
       1. Solvers implemented in compiled languages must be executed via binaries that are compiled for your operating system. For those types of solvers we usually include pre-compiled binaries for windows, mac (only arm), and unix.
       * General Note: Solvers might be programmed in different languages. E.g., LKH-3 is implemented in C. Make sure that the solver-specific language is installed on your system.
