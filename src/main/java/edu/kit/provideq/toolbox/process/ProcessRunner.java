@@ -100,12 +100,12 @@ public class ProcessRunner {
     // Add at the beginning of the pre-processors list
     // This ensures that the argument transformers are applied for every argument
     preProcessors.add(0, (problemType, solutionId) -> {
-      var problemFilePath = Paths.get(problemDirectory, problemFileName);
-      var normalizedProblemFilePath = problemFilePath.toString().replace("\\", "/");
+      var inputFilePath = Paths.get(problemDirectory, problemFileName);
+      var normalizedProblemFilePath = inputFilePath.toString().replace("\\", "/");
 
       // Write the input data to an input file
       try {
-        Files.writeString(problemFilePath, inputData);
+        Files.writeString(inputFilePath, inputData);
       } catch (IOException e) {
         return Optional.of(new IOException(
             "Error: The input data couldn't be written to %s:%n%s".formatted(
