@@ -322,7 +322,9 @@ public class ProcessRunner {
             false,
             Optional.empty(),
             Optional.of(
-                "%s problem couldn't be solved:%n%s".formatted(problemType.getId(),
+                "%s problem couldn't be solved, process failed with exit code %s:%n%s".formatted(
+                    processExitCode,
+                    problemType.getId(),
                     processOutput + processError)));
       }
 
