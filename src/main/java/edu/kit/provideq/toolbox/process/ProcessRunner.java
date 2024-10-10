@@ -95,15 +95,15 @@ public class ProcessRunner {
    * Writes the input data to a specific input file.
    *
    * @param inputData The input data to be written to the input file.
-   * @param problemFileName The name of the file to write the input data to.
+   * @param inputFileName The name of the file to write the input data to.
    * @return ProcessRunner instance for chaining.
    */
-  public ProcessRunner writeInputFile(String inputData, String problemFileName) {
+  public ProcessRunner writeInputFile(String inputData, String inputFileName) {
     // Add at the beginning of the pre-processors list
     // This ensures that the argument transformers are applied for every argument
     preProcessors.add(0, (problemType, solutionId) -> {
-      var inputFilePath = Paths.get(problemDirectory, problemFileName);
-      var normalizedProblemFilePath = inputFilePath.toString().replace("\\", "/");
+      var inputFilePath = Paths.get(problemDirectory, inputFileName);
+      var normalizedInputFilePath = inputFilePath.toString().replace("\\", "/");
 
       // Write the input data to an input file
       try {
@@ -111,13 +111,13 @@ public class ProcessRunner {
       } catch (IOException e) {
         return Optional.of(new IOException(
             "Error: The input data couldn't be written to %s:%n%s".formatted(
-                normalizedProblemFilePath, e.getMessage()),
+                normalizedInputFilePath, e.getMessage()),
             e));
       }
 
       // Add support for replacing the input file path in the arguments
       argumentTransformers.add(
-          argument -> argument.replace(INPUT_FILE_PATH, normalizedProblemFilePath));
+          argument -> argument.replace(INPUT_FILE_PATH, normalizedInputFilePath));
 
       return Optional.empty();
     });
