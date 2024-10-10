@@ -291,9 +291,6 @@ public class ProcessRunner {
       String processError;
       int processExitCode;
       try {
-        System.out.println("Running process in directory: " + processBuilder.directory());
-        System.out.println("should Running process in directory: " + problemDirectory);
-        System.out.println("process: " + processBuilder.toString());
         Process process = processBuilder.start();
 
         processOutput = resourceProvider.readStream(process.inputReader());
