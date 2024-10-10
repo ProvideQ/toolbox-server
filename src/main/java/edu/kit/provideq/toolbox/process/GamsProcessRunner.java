@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.process;
 
-import java.util.Optional;
 import java.util.function.BiFunction;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -78,15 +77,17 @@ public class GamsProcessRunner extends ProcessRunner {
         var processRunner = super.getExecutor(outputProcessor);
         var result = processRunner.run(problemType, solutionId);
 
-        String output = result.output().isPresent()
-            ? String.valueOf(result.output())
-            : "no license found";
         @SuppressWarnings("unchecked") // we know that T is a String
-        var obfuscatedOutput = (T) obfuscateGamsLicense(output);
-        return new ProcessResult<>(
-            result.success(),
-            Optional.of(obfuscatedOutput),
-            Optional.empty());
+        var obfuscatedOutput = result
+            .output()
+            .map(String::valueOf)
+            .map(x -> (T) obfuscateGamsLicense(x));
+
+        var obfuscatedErrorOutput = result
+            .errorOutput()
+            .map(GamsProcessRunner::obfuscateGamsLicense);
+
+        return new ProcessResult<>(result.success(), obfuscatedOutput, obfuscatedErrorOutput);
       }
 
       return super.getExecutor(outputProcessor).run(problemType, solutionId);
