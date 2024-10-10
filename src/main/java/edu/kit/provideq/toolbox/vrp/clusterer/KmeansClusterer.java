@@ -67,8 +67,7 @@ public class KmeansClusterer extends VrpClusterer {
       SubRoutineResolver resolver,
       SolvingProperties properties) {
 
-    // for now, set the cluster number to three. Our architecture currently does not allow settings.
-    // called in python script via "kmeans-cluster-number"
+    // retrieves the number of clusters from the solver setting
     int clusterNumber = properties.<IntegerSetting>getSetting(SETTING_CLUSTER_NUMBER)
         .map(IntegerSetting::getValue)
         .orElse(DEFAULT_CLUSTER_NUMBER);
