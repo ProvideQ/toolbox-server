@@ -111,7 +111,8 @@ class VrpSolverTest {
       assertEquals(1, vrpSubProblems.size(), vrpSubProblems.toString());
       SubProblemReferenceDto vrpProblem = vrpSubProblems.get(0);
       List<String> clusterSubProblems = vrpProblem.getSubProblemIds();
-      assertEquals(1, clusterSubProblems.size(), clusterSubProblems.toString()); //there should also only one subproblem Id
+      //there should also only one subproblem Id
+      assertEquals(1, clusterSubProblems.size(), clusterSubProblems.toString());
       assertEquals(vrpProblem.getSubRoutine().getTypeId(), CLUSTER_VRP.getId());
 
       //set k-means as CLUSTER_VRP solver:

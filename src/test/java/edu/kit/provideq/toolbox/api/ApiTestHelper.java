@@ -58,7 +58,10 @@ public class ApiTestHelper {
   public static void testSolution(ProblemDto<?, ?> problemDto) {
     assertEquals(ProblemState.SOLVED, problemDto.getState(), problemDto.toString());
     assertNotNull(problemDto.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus(), problemDto.toString());
+    assertEquals(
+        SolutionStatus.SOLVED,
+        problemDto.getSolution().getStatus(),
+        problemDto.toString());
   }
 
   @SafeVarargs
