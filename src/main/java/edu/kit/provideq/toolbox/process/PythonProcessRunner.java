@@ -18,23 +18,11 @@ public class PythonProcessRunner extends ProcessRunner {
   /**
    * Creates a process runner for a Python script.
    *
-   * @param directory      the working directory to run Python in.
-   * @param scriptFileName the filename of the Python script to run.
+   * @param scriptPath the filepath of the Python script to run.
    */
-  public PythonProcessRunner(String directory, String scriptFileName) {
-    this(directory, scriptFileName, new String[0]);
-  }
+  public PythonProcessRunner(String scriptPath) {
+    super(new ProcessBuilder());
 
-  /**
-   * Creates a process runner for a Python script.
-   *
-   * @param directory      the working directory to run Python in.
-   * @param scriptFileName the filename of the Python script to run.
-   * @param arguments      extra arguments to pass to Python. Use this to pass problem input to the
-   *                       solver.
-   */
-  public PythonProcessRunner(String directory, String scriptFileName, String... arguments) {
-    super(
-        createGenericProcessBuilder(directory, PYTHON_EXECUTABLE_NAME, scriptFileName), arguments);
+    withArguments(PYTHON_EXECUTABLE_NAME, scriptPath);
   }
 }

@@ -1,7 +1,9 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +17,14 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class QiskitQuboSolver extends QuboSolver {
-  private final String quboPath;
+  private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
   public QiskitQuboSolver(
-      @Value("${qiskit.directory.qubo}") String quboPath,
+      @Value("${qiskit.script.qubo}") String scriptPath,
       ApplicationContext context) {
-    this.quboPath = quboPath;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -34,20 +36,21 @@ public class QiskitQuboSolver extends QuboSolver {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 
     // Run Qiskit solver via console
     var processResult = context
-        .getBean(
-            PythonProcessRunner.class,
-            quboPath,
-            "qubo_qiskit.py")
-        .addProblemFilePathToProcessCommand()
-        .addSolutionFilePathToProcessCommand()
-        .problemFileName("problem.lp")
-        .run(getProblemType(), solution.getId(), input);
+        .getBean(PythonProcessRunner.class, scriptPath)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(input, "problem.lp")
+        .readOutputFile()
+        .run(getProblemType(), solution.getId());
 
     // Return if process failed
     return Mono.just(processResult.applyTo(solution));

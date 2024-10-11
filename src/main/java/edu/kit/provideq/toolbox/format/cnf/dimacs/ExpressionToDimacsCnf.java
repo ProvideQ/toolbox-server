@@ -67,21 +67,20 @@ class ExpressionToDimacsCnf {
   }
 
   Variable getVariable(String name, boolean isNegated) {
-    // Try to get variable from parsed variables
-    Variable var = parsedVariables.get(name);
-    if (var == null) {
-      // If variable is not parsed yet, create new variable
-      var = new Variable(nextVariable, name, isNegated);
-      nextVariable++;
-
-      // Add variable to parsed variables - the negation state doesn't matter here
-      parsedVariables.put(name, var);
-
-      // Return the new variable
-      return var;
+    // Try to get variable value from parsed variables
+    Variable variable = parsedVariables.get(name);
+    if (variable != null) {
+      return new Variable(variable.number(), name, isNegated);
     }
 
-    // Otherwise, return variable with correct negation state
-    return new Variable(var.number(), name, isNegated);
+    // If variable is not parsed yet, create new variable
+    variable = new Variable(nextVariable, name, isNegated);
+    nextVariable++;
+
+    // Add variable to parsed variables - the negation state doesn't matter here
+    parsedVariables.put(name, variable);
+
+    // Return the new variable
+    return variable;
   }
 }

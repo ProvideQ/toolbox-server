@@ -6,8 +6,9 @@ import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,17 +28,14 @@ import reactor.util.function.Tuples;
 public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
   protected final ApplicationContext context;
-  protected final String binaryDir;
-  protected final String binaryName;
+  protected final String binaryPath;
   protected ResourceProvider resourceProvider;
 
   protected VrpClusterer(
-      String binaryDir,
-      String binaryName,
+      String binaryPath,
       ApplicationContext context
   ) {
-    this.binaryDir = binaryDir;
-    this.binaryName = binaryName;
+    this.binaryPath = binaryPath;
     this.context = context;
   }
 
@@ -107,15 +105,21 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
     // use the combineProcessRunner to combine the solution from the written files
     // into one solution of the original problem
-    var combineProcessRunner =
-        context.getBean(BinaryProcessRunner.class, binaryDir, binaryName, "solve",
-                new String[] {"%1$s", "cluster-from-file", "solution-from-file",
-                    "--build-dir",
-                    "%3$s/.vrp", "--solution-dir", "%3$s/.vrp", "--cluster-file",
-                    "%3$s/.vrp/problem.map"})
-            .problemFileName("problem.vrp")
-            .solutionFileName("problem.sol")
-            .run(getProblemType(), solution.getId(), input);
+    var combineProcessRunner = context
+        .getBean(DefaultProcessRunner.class)
+        .withArguments(
+            binaryPath,
+            "solve",
+            ProcessRunner.INPUT_FILE_PATH,
+            "cluster-from-file",
+            "solution-from-file",
+            "--build-dir", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp",
+            "--solution-dir", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp",
+            "--cluster-file", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp/problem.map"
+        )
+        .writeInputFile(input, "problem.vrp")
+        .readOutputFile("problem.sol")
+        .run(getProblemType(), solution.getId());
 
     var result = combineProcessRunner.output();
 

@@ -168,6 +168,6 @@ public class Solution<S> {
         + "status=" + status + ", "
         + "metaData=" + metaData + ", "
         + "debugData=" + debugData + ", "
-        + "solutionData" + solutionData + ']';
+        + "solutionData=" + solutionData + ']';
   }
 }

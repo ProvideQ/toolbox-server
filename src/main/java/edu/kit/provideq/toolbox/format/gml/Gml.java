@@ -104,15 +104,12 @@ public class Gml {
           edges.add(Edge.parseEdge(scanner));
           scanner.next(Gml.CLOSE);
         }
-        case Gml.OPEN_REGEX -> {
-          throw new ConversionException("Unexpected opening bracket in node/edge list");
-        }
-        case Gml.CLOSE -> {
-          throw new ConversionException("Unexpected closing bracket in node/edge list");
-        }
-        case Gml.GRAPH_IDENTIFIER -> {
-          throw new ConversionException("Unexpected graph identifier in node/edge list");
-        }
+        case Gml.OPEN_REGEX ->
+            throw new ConversionException("Unexpected opening bracket in node/edge list");
+        case Gml.CLOSE ->
+            throw new ConversionException("Unexpected closing bracket in node/edge list");
+        case Gml.GRAPH_IDENTIFIER ->
+            throw new ConversionException("Unexpected graph identifier in node/edge list");
         default -> {
           // ignore custom attributes for the graph directly
         }

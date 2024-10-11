@@ -1,14 +1,10 @@
 package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
-import edu.kit.provideq.toolbox.meta.ProblemState;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,8 +46,6 @@ class SatSolversTest {
   @MethodSource("provideArguments")
   void testSatSolver(ProblemSolver<String, DimacsCnfSolution> solver, String input) {
     var problem = ApiTestHelper.createProblem(client, solver, input, SAT);
-    assertEquals(ProblemState.SOLVED, problem.getState());
-    assertNotNull(problem.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
+    ApiTestHelper.testSolution(problem);
   }
 }

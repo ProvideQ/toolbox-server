@@ -55,6 +55,15 @@ public class ApiTestHelper {
     return Lists.cartesianProduct(arguments).stream();
   }
 
+  public static void testSolution(ProblemDto<?, ?> problemDto) {
+    assertEquals(ProblemState.SOLVED, problemDto.getState(), problemDto.toString());
+    assertNotNull(problemDto.getSolution());
+    assertEquals(
+        SolutionStatus.SOLVED,
+        problemDto.getSolution().getStatus(),
+        problemDto.toString());
+  }
+
   @SafeVarargs
   public static <T> Stream<T> concatAll(Stream<T>... streams) {
     return Arrays.stream(streams).reduce(Stream::concat).orElseThrow();
@@ -143,6 +152,7 @@ public class ApiTestHelper {
               })
               .returnResult()
               .getResponseBody();
+      System.out.println("Fetched problem: " + problemDto);
 
       assertNotNull(problemDto);
 
@@ -161,6 +171,7 @@ public class ApiTestHelper {
                   })
                   .returnResult()
                   .getResponseBody();
+          System.out.println("Fetched sub problem: " + subProblemDto);
 
           assertNotNull(subProblemDto);
         }

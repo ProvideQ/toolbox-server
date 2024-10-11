@@ -1,10 +1,12 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.process.BinaryProcessRunner;
+import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.tsp.TspConfiguration;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,9 @@ public class TwoPhaseClusterer extends VrpClusterer {
 
   @Autowired
   public TwoPhaseClusterer(
-      @Value("${custom.berger-vrp.directory}") String binaryDir,
-      @Value("${custom.berger-vrp.solver}") String binaryName,
+      @Value("${custom.binary.berger-vrp}") String binaryPath,
       ApplicationContext context) {
-    super(binaryDir, binaryName, context);
+    super(binaryPath, context);
   }
 
   @Override
@@ -43,21 +44,25 @@ public class TwoPhaseClusterer extends VrpClusterer {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver resolver
+      SubRoutineResolver resolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 
     // cluster with tsp/two-phase clustering
-    var processResult = context.getBean(
-            BinaryProcessRunner.class,
-            binaryDir,
-            binaryName,
+    var processResult = context
+        .getBean(DefaultProcessRunner.class)
+        .withArguments(
+            binaryPath,
             "partial",
-            new String[] {"cluster", "%1$s", "tsp", "--build-dir", "%3$s/.vrp"}
+            "cluster",
+            ProcessRunner.INPUT_FILE_PATH,
+            "tsp",
+            "--build-dir", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp"
         )
-        .problemFileName("problem.vrp")
-        .run(getProblemType(), solution.getId(), input,
-            new MultiFileProcessResultReader("./.vrp/problem_*.vrp"));
+        .writeInputFile(input, "problem.vrp")
+        .readOutputFile(new MultiFileProcessResultReader("/.vrp/problem_*.vrp"))
+        .run(getProblemType(), solution.getId());
 
     return getSolutionForCluster(input, solution, processResult, resolver, TSP_SUBROUTINE);
   }

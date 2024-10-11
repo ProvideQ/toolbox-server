@@ -1,7 +1,10 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +31,7 @@ public class Problem<InputT, ResultT> {
   private Solution<ResultT> solution;
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
+  private List<SolverSetting> solverSettings;
 
   /**
    * Creates a new problem of a given {@link ProblemType}.
@@ -39,6 +43,7 @@ public class Problem<InputT, ResultT> {
     this.type = type;
 
     this.observers = new HashSet<>();
+    this.solverSettings = List.of();
 
     // Sub-routine management and sub-routine-call handling are outsourced to the SubProblems class
     Consumer<Problem<?, ?>> notifyAdded = addedSubProblem -> this.observers.forEach(
@@ -67,7 +72,8 @@ public class Problem<InputT, ResultT> {
 
     long start = System.currentTimeMillis();
 
-    return solverT.get().solve(inputT.get(), subProblems)
+    var properties = new SolvingProperties(getSolverSettings());
+    return solverT.get().solve(inputT.get(), subProblems, properties)
         .doOnNext(sol -> {
           long finish = System.currentTimeMillis();
           sol.setExecutionMilliseconds(finish - start);
@@ -149,6 +155,40 @@ public class Problem<InputT, ResultT> {
     this.state = newState;
 
     this.observers.forEach(observer -> observer.onStateChanged(this, newState));
+  }
+
+  public List<SolverSetting> getSolverSettings() {
+    return Collections.unmodifiableList(solverSettings);
+  }
+
+  public void setSolverSettings(List<SolverSetting> solverSettings) {
+    // Always allow clearing the settings
+    if (solverSettings.isEmpty()) {
+      this.solverSettings = solverSettings;
+      return;
+    }
+
+    var optionalSolver = getSolver();
+    if (optionalSolver.isEmpty()) {
+      throw new IllegalStateException("Cannot set solver settings without a solver!");
+    }
+
+    var actualSolver = optionalSolver.get();
+
+    // Check if the solver supports all the settings
+    var availableSettings = actualSolver.getSolverSettings()
+        .stream()
+        .map(SolverSetting::getName)
+        .collect(Collectors.toSet());
+
+    for (SolverSetting setting : solverSettings) {
+      if (!availableSettings.contains(setting.getName())) {
+        throw new IllegalArgumentException("The solver %s does not support the setting %s!"
+            .formatted(actualSolver.getName(), setting.getName()));
+      }
+    }
+
+    this.solverSettings = solverSettings;
   }
 
   public void addObserver(ProblemObserver<InputT, ResultT> observer) {

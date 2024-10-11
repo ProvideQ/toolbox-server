@@ -4,6 +4,7 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class ProblemDto<InputT, ResultT> {
   private Solution<ResultT> solution;
   private ProblemState state;
   private String solverId;
+  private List<SolverSetting> solverSettings;
   private List<SubProblemReferenceDto> subProblems;
 
   /**
@@ -40,6 +42,7 @@ public class ProblemDto<InputT, ResultT> {
     dto.solverId = problem.getSolver()
         .map(ProblemSolver::getId)
         .orElse(null);
+    dto.solverSettings = problem.getSolverSettings().stream().toList();
     dto.subProblems = problem.getSolver().stream()
         .flatMap(solver -> solver.getSubRoutines().stream())
         .map(subRoutine -> SubProblemReferenceDto.forSubRoutine(problem, subRoutine))
@@ -72,7 +75,33 @@ public class ProblemDto<InputT, ResultT> {
     return solverId;
   }
 
+  public List<SolverSetting> getSolverSettings() {
+    if (solverSettings == null) {
+      return Collections.emptyList();
+    }
+
+    return Collections.unmodifiableList(solverSettings);
+  }
+
   public List<SubProblemReferenceDto> getSubProblems() {
+    if (solverSettings == null) {
+      return Collections.emptyList();
+    }
+
     return Collections.unmodifiableList(subProblems);
+  }
+
+  @Override
+  public String toString() {
+    return "ProblemDto{"
+        + "typeId=" + typeId
+        + ", id=" + id
+        + ", state=" + state
+        + ", solverId=" + solverId
+        + ", input=" + input
+        + ", solution=" + solution
+        + ", solverSettings=" + solverSettings
+        + ", subProblems=" + subProblems
+        + '}';
   }
 }

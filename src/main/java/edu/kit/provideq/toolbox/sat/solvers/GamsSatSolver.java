@@ -4,9 +4,11 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,14 +21,14 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class GamsSatSolver extends SatSolver {
-  private final String satPath;
+  private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
   public GamsSatSolver(
-      @Value("${gams.directory.sat}") String satPath,
+      @Value("${gams.script.sat}") String scriptPath,
       ApplicationContext context) {
-    this.satPath = satPath;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -38,7 +40,8 @@ public class GamsSatSolver extends SatSolver {
   @Override
   public Mono<Solution<DimacsCnfSolution>> solve(
       String input,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 
@@ -54,11 +57,14 @@ public class GamsSatSolver extends SatSolver {
 
     // Run SAT with GAMS via console
     ProcessResult<String> processResult = context
-        .getBean(
-            GamsProcessRunner.class,
-            satPath,
-            "sat.gms")
-        .run(getProblemType(), solution.getId(), dimacsCnf.toString());
+        .getBean(GamsProcessRunner.class, scriptPath)
+        .withArguments(
+            "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
+            "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(dimacsCnf.toString())
+        .readOutputFile()
+        .run(getProblemType(), solution.getId());
 
     if (processResult.success()) {
       var dimacsCnfSolution =

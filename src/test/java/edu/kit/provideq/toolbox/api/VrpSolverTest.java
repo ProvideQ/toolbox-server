@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -86,9 +85,7 @@ class VrpSolverTest {
   void testLkh3SolverIsolated() {
     for (String problem : problems) {
       var problemDto = ApiTestHelper.createProblem(client, lkh3vrpSolver, problem, VRP);
-      assertEquals(ProblemState.SOLVED, problemDto.getState());
-      assertNotNull(problemDto.getSolution());
-      assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
+      ApiTestHelper.testSolution(problemDto);
     }
   }
 
@@ -106,15 +103,16 @@ class VrpSolverTest {
 
       //create VRP problem, has Clusterable VRP as subproblem
       var problemDto = ApiTestHelper.createProblem(client, abstractClusterer, problem, VRP);
-      assertEquals(ProblemState.SOLVING, problemDto.getState());
+      assertEquals(ProblemState.SOLVING, problemDto.getState(), problemDto.toString());
 
       //check if subproblem is set correctly
       List<SubProblemReferenceDto> vrpSubProblems = problemDto.getSubProblems();
       //there should be exactly one subproblem, the vrp that needs to be clustered:
-      assertEquals(1, vrpSubProblems.size());
+      assertEquals(1, vrpSubProblems.size(), vrpSubProblems.toString());
       SubProblemReferenceDto vrpProblem = vrpSubProblems.get(0);
       List<String> clusterSubProblems = vrpProblem.getSubProblemIds();
-      assertEquals(1, clusterSubProblems.size()); //there should also only one subproblem Id
+      //there should also only one subproblem Id
+      assertEquals(1, clusterSubProblems.size(), clusterSubProblems.toString());
       assertEquals(vrpProblem.getSubRoutine().getTypeId(), CLUSTER_VRP.getId());
 
       //set k-means as CLUSTER_VRP solver:
@@ -132,19 +130,15 @@ class VrpSolverTest {
           var vrpClusterProblem =
               ApiTestHelper.setProblemSolver(client, lkhVrpSolver, problemId, VRP.getId());
           assertNotNull(vrpClusterProblem.getInput());
-          assertNotNull(vrpClusterProblem.getSolution());
-          assertEquals(ProblemState.SOLVED, vrpClusterProblem.getState());
+          ApiTestHelper.testSolution(vrpClusterProblem);
         }
       }
 
       //solve the problem:
       problemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
-      assertNotNull(problemDto.getSolution());
-      assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
-      assertEquals(ProblemState.SOLVED, problemDto.getState());
+      ApiTestHelper.testSolution(problemDto);
     }
   }
-
 
   /**
    * Tests the two phase clusterer in combination with Lkh-3 tsp solver.
@@ -153,7 +147,7 @@ class VrpSolverTest {
   void testTwoPhaseWithLkhForTsp() {
     for (String problem : problems) {
       var problemDto = ApiTestHelper.createProblem(client, abstractClusterer, problem, VRP);
-      assertEquals(ProblemState.SOLVING, problemDto.getState());
+      assertEquals(ProblemState.SOLVING, problemDto.getState(), problemDto.toString());
 
       //set two-phase as CLUSTER_VRP solver:
       var clusterSubProblems = problemDto.getSubProblems().get(0).getSubProblemIds();
@@ -177,16 +171,13 @@ class VrpSolverTest {
               TSP.getId());
 
           assertNotNull(tspClusterProblem.getInput());
-          assertNotNull(tspClusterProblem.getSolution());
-          assertEquals(ProblemState.SOLVED, tspClusterProblem.getState());
+          ApiTestHelper.testSolution(tspClusterProblem);
         }
       }
 
       //solve the problem:
       var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
-      assertNotNull(solvedProblemDto.getSolution());
-      assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
-      assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
+      ApiTestHelper.testSolution(solvedProblemDto);
     }
   }
 
@@ -201,7 +192,7 @@ class VrpSolverTest {
     assertTrue(problem.isPresent());
 
     var problemDto = ApiTestHelper.createProblem(client, abstractClusterer, problem.get(), VRP);
-    assertEquals(ProblemState.SOLVING, problemDto.getState());
+    assertEquals(ProblemState.SOLVING, problemDto.getState(), problemDto.toString());
 
     //set two-phase as CLUSTER_VRP solver:
     var clusterSubProblems = problemDto.getSubProblems().get(0).getSubProblemIds();
@@ -225,10 +216,10 @@ class VrpSolverTest {
             TSP.getId());
 
         //set d-wave annealer as qubo solver:
-        assertEquals(1, tspClusterProblem.getSubProblems().size());
+        assertEquals(1, tspClusterProblem.getSubProblems().size(), tspClusterProblem.toString());
         var quboProblem = tspClusterProblem.getSubProblems().get(0);
-        assertEquals(1, quboProblem.getSubProblemIds().size());
-        assertEquals(quboProblem.getSubRoutine().getTypeId(), QUBO.getId());
+        assertEquals(1, quboProblem.getSubProblemIds().size(), quboProblem.toString());
+        assertEquals(quboProblem.getSubRoutine().getTypeId(), QUBO.getId(), quboProblem.toString());
         ApiTestHelper.setProblemSolver(client, dwaveQuboSolver,
             quboProblem.getSubProblemIds().get(0), QUBO.getId());
       }
@@ -236,8 +227,6 @@ class VrpSolverTest {
 
     //solve the problem:
     var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
-    assertNotNull(solvedProblemDto.getSolution());
-    assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
-    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
+    ApiTestHelper.testSolution(solvedProblemDto);
   }
 }

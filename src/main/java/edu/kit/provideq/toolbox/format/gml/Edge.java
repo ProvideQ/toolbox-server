@@ -29,12 +29,8 @@ public record Edge(int source, int target, Map<String, String> attributes) {
     while (!scanner.hasNext(Gml.CLOSE)) {
       String token = scanner.next();
       switch (token) {
-        case Gml.SOURCE_IDENTIFIER -> {
-          source = scanner.nextInt();
-        }
-        case Gml.TARGET_IDENTIFIER -> {
-          target = scanner.nextInt();
-        }
+        case Gml.SOURCE_IDENTIFIER -> source = scanner.nextInt();
+        case Gml.TARGET_IDENTIFIER -> target = scanner.nextInt();
         default -> attributes.put(token, scanner.next());
       }
     }
@@ -68,11 +64,11 @@ public record Edge(int source, int target, Map<String, String> attributes) {
             .append(Gml.LINE_SEPARATOR);
 
     // optional attributes
-    for (String key : attributes.keySet()) {
+    for (var entry : attributes.entrySet()) {
       builder.append(Gml.INDENTATION_STEP)
-              .append(key)
+              .append(entry.getKey())
               .append(Gml.SEPARATOR)
-              .append(attributes.get(key))
+              .append(entry.getValue())
               .append(Gml.LINE_SEPARATOR);
     }
 

@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.List;
 import reactor.core.publisher.Mono;
@@ -39,6 +40,15 @@ public interface ProblemSolver<InputT, ResultT> {
   }
 
   /**
+   * Returns the solver settings that can be used to configure this solver.
+   *
+   * @return list of solver settings
+   */
+  default List<SolverSetting> getSolverSettings() {
+    return Collections.emptyList();
+  }
+
+  /**
    * Solves a given problem instance, current status and final results as well as debug information
    * is stored in the provided {@link Solution} object.
    *
@@ -48,7 +58,8 @@ public interface ProblemSolver<InputT, ResultT> {
    */
   Mono<Solution<ResultT>> solve(
       InputT input,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
   );
 
   /**

@@ -29,12 +29,8 @@ public record Node(int id, String label, Map<String, String> attributes) {
     while (!scanner.hasNext(Gml.CLOSE)) {
       String token = scanner.next();
       switch (token) {
-        case Gml.ID_IDENTIFIER -> {
-          id = scanner.nextInt();
-        }
-        case Gml.LABEL_IDENTIFIER -> {
-          label = scanner.next();
-        }
+        case Gml.ID_IDENTIFIER -> id = scanner.nextInt();
+        case Gml.LABEL_IDENTIFIER -> label = scanner.next();
         default -> attributes.put(token, scanner.next());
       }
     }
@@ -61,7 +57,7 @@ public record Node(int id, String label, Map<String, String> attributes) {
             .append(Gml.LINE_SEPARATOR);
 
     // optional label
-    if (label != null && !label.equals("")) {
+    if (label != null && !label.isEmpty()) {
       builder.append(Gml.INDENTATION_STEP)
               .append(Gml.LABEL_IDENTIFIER)
               .append(Gml.SEPARATOR)
@@ -70,11 +66,11 @@ public record Node(int id, String label, Map<String, String> attributes) {
     }
 
     // optional attributes
-    for (String key : attributes.keySet()) {
+    for (var entry : attributes.entrySet()) {
       builder.append(Gml.INDENTATION_STEP)
-              .append(key)
+              .append(entry.getKey())
               .append(Gml.SEPARATOR)
-              .append(attributes.get(key))
+              .append(entry.getValue())
               .append(Gml.LINE_SEPARATOR);
     }
 
