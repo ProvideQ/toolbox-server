@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -50,7 +51,7 @@ public class VoidModelConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new RuntimeException("Could not load example problems", e);
+      throw new MissingExampleException("Could not load example problems", e);
     }
   }
 }
