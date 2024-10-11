@@ -13,7 +13,11 @@ public final class SolvingProperties {
     this.settings = settings;
   }
 
-  @SuppressWarnings("unchecked") // caller must ensure correct type
+  /**
+   * Get a setting by name.
+   * Note: Make sure to specify the correct type parameter {@code T} for you setting you choose.
+   */
+  @SuppressWarnings("unchecked")
   public <T extends SolverSetting> Optional<T> getSetting(String name) {
     return settings.stream()
         .filter(setting -> setting.getName().equals(name))
