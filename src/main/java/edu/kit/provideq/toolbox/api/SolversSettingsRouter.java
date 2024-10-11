@@ -19,6 +19,7 @@ import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.content.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
@@ -118,7 +119,7 @@ public class SolversSettingsRouter {
               try {
                 return new ObjectMapper().writeValueAsString(solverSettingsDtos);
               } catch (JsonProcessingException e) {
-                throw new RuntimeException("example could not be parsed", e);
+                throw new JsonParseException(e);
               }
             })
             .orElseThrow(() -> new RuntimeException("no solver found"));
