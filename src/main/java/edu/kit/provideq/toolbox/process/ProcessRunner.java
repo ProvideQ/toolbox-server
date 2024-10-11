@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -274,16 +275,19 @@ public class ProcessRunner {
       }
 
       // Run pre-processors
-      for (var preProcessor : preProcessors) {
-        Optional<Exception> exception = preProcessor.apply(problemType, solutionId);
-        if (exception.isPresent()) {
-          return new ProcessResult<>(
-              false,
-              Optional.empty(),
-              Optional.of("Error: %s problem couldn't be prepared:%n%s".formatted(
-                  problemType.getId(), exception.get().getMessage()))
-          );
-        }
+      var exceptions = preProcessors.stream()
+          .map(preProcessor -> preProcessor.apply(problemType, solutionId))
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .toList();
+
+      if (!exceptions.isEmpty()) {
+        var msg = String.join(", ", exceptions.stream().map(Throwable::getMessage).toList());
+        return new ProcessResult<>(
+            false,
+            Optional.empty(),
+            Optional.of("Error: %s problem couldn't be prepared:%n%s".formatted(
+                problemType.getId(), msg)));
       }
 
       // Run the process
