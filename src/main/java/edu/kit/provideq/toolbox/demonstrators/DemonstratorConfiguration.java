@@ -10,9 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DemonstratorConfiguration {
   /**
-   * A Traveling Sales Person Problem.
-   * Optimization Problem with the goal of find an optimal route
-   * between a given set of connected cities.
+   * A demonstrator is a broad group of processes that
+   * demonstrate certain aspects of quantum computing.
    */
   public static final ProblemType<String, String> DEMONSTRATOR = new ProblemType<>(
       "demonstrator",
