@@ -20,3 +20,4 @@ pip install -r "$REPO_DIR/solvers/qrisp/requirements.txt"
 # custom solvers with python wrapper:
 pip install -r "$REPO_DIR/solvers/custom/hs-knapsack/requirements.txt"
 pip install -r "$REPO_DIR/solvers/custom/lkh/requirements.txt"
+pip install -r "$REPO_DIR/demonstrators/cplex/requirements.txt"
