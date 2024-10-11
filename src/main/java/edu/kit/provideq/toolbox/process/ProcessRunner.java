@@ -326,8 +326,8 @@ public class ProcessRunner {
             Optional.empty(),
             Optional.of(
                 "%s problem couldn't be solved, process failed with exit code %s:%n%s".formatted(
-                    processExitCode,
                     problemType.getId(),
+                    processExitCode,
                     processOutput + processError)));
       }
 
