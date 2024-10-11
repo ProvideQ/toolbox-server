@@ -36,8 +36,6 @@ class CplexMipDemonstratorTest {
   @Test
   void testCplexMipDemonstrator() {
     var problem = ApiTestHelper.createProblem(client, cplexMipDemonstrator, "", DEMONSTRATOR);
-    assertEquals(ProblemState.SOLVED, problem.getState());
-    assertNotNull(problem.getSolution());
-    assertEquals(SolutionStatus.SOLVED, problem.getSolution().getStatus());
+    ApiTestHelper.testSolution(problem);
   }
 }
