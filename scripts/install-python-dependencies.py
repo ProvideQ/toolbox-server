@@ -1,7 +1,8 @@
 import os
 import subprocess
 
-base_dir = os.path.join(os.path.dirname(os.getcwd()), 'solvers')
+script_dir = os.path.dirname(os.path.realpath(__file__))
+base_dir = os.path.join(script_dir, '..', 'solvers')
 
 for root, dirs, files in os.walk(base_dir):
     if root == base_dir:  # iterate only one level deep
