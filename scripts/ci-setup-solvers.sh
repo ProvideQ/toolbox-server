@@ -11,5 +11,5 @@ REPO_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
 source /opt/conda/bin/activate gams
 
 # install solver dependencies / quantum frameworks and python wrappers
-python3 "$REPO_DIR/scripts/ci-setup-solvers.py"
+python3 "$REPO_DIR/scripts/install-python-dependencies.py"
 
