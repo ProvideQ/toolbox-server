@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,47 +26,50 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProcessRunner {
-  /**
-   * The name of the input file that contains the problem data.
-   * Note that the executed process NEEDs to use this exact name.
-   */
-  private static final String PROBLEM_FILE_NAME = "problem";
+  public static final String PROBLEM_DIRECTORY_PATH = "PROBLEM_DIRECTORY_PATH";
+  public static final String INPUT_FILE_PATH = "INPUT_FILE_PATH";
+  public static final String OUTPUT_FILE_PATH = "OUTPUT_FILE_PATH";
 
   /**
-   * The name of the output file that contains the solution data.
+   * The default name of the input file.
    * Note that the executed process NEEDs to use this exact name.
    */
-  private static final String SOLUTION_FILE_NAME = "solution";
+  private static final String INPUT_FILE_NAME = "input";
+
+  /**
+   * The default name of the output file.
+   * Note that the executed process NEEDs to use this exact name.
+   */
+  private static final String OUTPUT_FILE_NAME = "output";
+
   protected final ProcessBuilder processBuilder;
   protected ResourceProvider resourceProvider;
+
+  private final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> preProcessors;
+  private final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> postProcessors;
+  private final List<UnaryOperator<String>> argumentTransformers;
+
   /**
-   * Arguments that are passed to the command line call.
+   * The directory of the problem that is being solved.
+   * Only set when the run method is called.
    */
-  private String[] arguments;
-  private HashMap<String, String> env;
+  private String problemDirectory;
 
-  private String[] problemFilePathCommandFormat;
-  private String[] solutionFilePathCommandFormat;
-  private String problemFileName = PROBLEM_FILE_NAME;
-  private String solutionFileName = SOLUTION_FILE_NAME;
-
-  public ProcessRunner(
-      ProcessBuilder processBuilder,
-      String[] arguments) {
+  public ProcessRunner(ProcessBuilder processBuilder) {
     this.processBuilder = processBuilder;
-    this.arguments = arguments;
-    this.env = new HashMap<>();
+    this.preProcessors = new ArrayList<>();
+    this.postProcessors = new ArrayList<>();
+    this.argumentTransformers = new ArrayList<>();
+    argumentTransformers.add(x -> x.replace(PROBLEM_DIRECTORY_PATH, problemDirectory));
   }
 
   protected static ProcessBuilder createGenericProcessBuilder(
-      String directory,
       String executableName,
-      String scriptName,
-      String... arguments) {
-    String[] commands = new String[arguments.length + 2];
+      String directory,
+      String scriptName) {
+    String[] commands = new String[2];
     commands[0] = executableName;
     commands[1] = scriptName;
-    System.arraycopy(arguments, 0, commands, 2, arguments.length);
 
     return new ProcessBuilder()
         .directory(new File(directory))
@@ -78,216 +82,172 @@ public class ProcessRunner {
   }
 
   /**
-   * Adds another command to the process builder.
-   * This command is the path a file that contains the problem data.
+   * Writes the input data to a default input file.
    *
-   * @return Returns this instance for chaining.
+   * @param inputData The input data to be written to the input file.
+   * @return ProcessRunner instance for chaining.
    */
-  public ProcessRunner addProblemFilePathToProcessCommand() {
-    return addProblemFilePathToProcessCommand("%s");
+  public ProcessRunner writeInputFile(String inputData) {
+    return writeInputFile(inputData, INPUT_FILE_NAME);
   }
 
   /**
-   * Adds another command to the process builder.
+   * Writes the input data to a specific input file.
    *
-   * @param inputPathCommandFormat Format string of the command.
-   *                               One %s should be included which will be replaced with
-   *                               the path to a file that contains the problem data.
-   * @return Returns this instance for chaining.
+   * @param inputData The input data to be written to the input file.
+   * @param inputFileName The name of the file to write the input data to.
+   * @return ProcessRunner instance for chaining.
    */
-  public ProcessRunner addProblemFilePathToProcessCommand(String... inputPathCommandFormat) {
-    this.problemFilePathCommandFormat = inputPathCommandFormat;
+  public ProcessRunner writeInputFile(String inputData, String inputFileName) {
+    // Add at the beginning of the pre-processors list
+    // This ensures that the argument transformers are applied for every argument
+    preProcessors.add(0, (problemType, solutionId) -> {
+      var inputFilePath = Paths.get(problemDirectory, inputFileName);
+      var normalizedInputFilePath = inputFilePath.toString().replace("\\", "/");
 
-    return this;
-  }
-
-  /**
-   * Adds another command to the process builder.
-   * This command is the path a file that contains the solution data.
-   *
-   * @return Returns this instance for chaining.
-   */
-  public ProcessRunner addSolutionFilePathToProcessCommand() {
-    return addSolutionFilePathToProcessCommand("%s");
-  }
-
-  /**
-   * Adds another command to the process builder.
-   *
-   * @param outputPathCommandFormat Format string of the command.
-   *                                One %s should be included which will be replaced with
-   *                                the path to a file that contains the solution data.
-   * @return Returns this instance for chaining.
-   */
-  public ProcessRunner addSolutionFilePathToProcessCommand(String... outputPathCommandFormat) {
-    this.solutionFilePathCommandFormat = outputPathCommandFormat;
-
-    return this;
-  }
-
-  /**
-   * Sets a custom name for the file that contains the problem data.
-   *
-   * @param fileName The name of the file.
-   * @return Returns this instance for chaining.
-   */
-  public ProcessRunner problemFileName(String fileName) {
-    this.problemFileName = fileName;
-
-    return this;
-  }
-
-  /**
-   * Sets a custom name for the file that contains the solution data.
-   *
-   * @param fileName The name of the file.
-   * @return Returns this instance for chaining.
-   */
-  public ProcessRunner solutionFileName(String fileName) {
-    this.solutionFileName = fileName;
-
-    return this;
-  }
-
-  /**
-   * Runs the process provided in the constructor.
-   *
-   * @param problemType The type of the problem that is run
-   * @param solutionId  The id of the resulting solution
-   * @param problemData The problem data that should be solved
-   * @return Returns the process result, which contains the solution data
-   *     or an error as output depending on the success of the process.
-   */
-  public ProcessResult<String> run(ProblemType<?, ?> problemType, UUID solutionId,
-                                   String problemData) {
-    return run(problemType, solutionId, problemData, new SimpleProcessResultReader());
-  }
-
-  /**
-   * Runs the process provided in the constructor.
-   * TODO: split this method into prepareRun, executeRun, and readResults.
-   *
-   * @param problemType The type of the problem that is run
-   * @param solutionId  The id of the resulting solution
-   * @param problemData The problem data that should be solved
-   * @param reader      The reader that retrieves the output of the process
-   * @return Returns the process result, which contains the solution data,
-   *     or an error as output depending on the success of the process.
-   */
-  public <T> ProcessResult<T> run(ProblemType<?, ?> problemType, UUID solutionId,
-                                  String problemData, ProcessResultReader<T> reader) {
-    // Retrieve the problem directory
-    String problemDirectoryPath;
-    try {
-      problemDirectoryPath = resourceProvider
-          .getProblemDirectory(problemType, solutionId)
-          .getAbsolutePath();
-    } catch (IOException e) {
-      return new ProcessResult<>(
-          false,
-          Optional.empty(),
-          Optional.of(
-              "Error: The problem directory couldn't be retrieved:%n%s".formatted(e.getMessage()))
-      );
-    }
-
-    // Build the problem and solution file paths
-    var problemFilePath = Paths.get(problemDirectoryPath, problemFileName);
-    var normalizedProblemFilePath = problemFilePath.toString().replace("\\", "/");
-
-    var solutionFile = Paths.get(problemDirectoryPath, solutionFileName);
-    var normalizedSolutionFilePath = solutionFile.toString().replace("\\", "/");
-
-    // Write the problem data to the problem file
-    try {
-      Files.writeString(problemFilePath, problemData);
-    } catch (IOException e) {
-      return new ProcessResult<>(
-          false,
-          Optional.empty(),
-          Optional.of("Error: The problem data couldn't be written to %s:%n%s".formatted(
-              normalizedProblemFilePath, e.getMessage()))
-      );
-    }
-
-    for (String argument : arguments) {
-      addCommand(argument.formatted(normalizedProblemFilePath, normalizedSolutionFilePath,
-          problemDirectoryPath));
-    }
-
-    for (Entry<String, String> entry : env.entrySet()) {
-      addEnvironmentVariableToBuilder(entry.getKey(), entry.getValue());
-    }
-
-    // Optionally add the problem file path to the command
-    if (problemFilePathCommandFormat != null) {
-      for (String format : problemFilePathCommandFormat) {
-        addCommand(format.formatted(normalizedProblemFilePath));
+      // Write the input data to an input file
+      try {
+        Files.writeString(inputFilePath, inputData);
+      } catch (IOException e) {
+        return Optional.of(new IOException(
+            "Error: The input data couldn't be written to %s:%n%s".formatted(
+                normalizedInputFilePath, e.getMessage()),
+            e));
       }
-    }
 
-    // Optionally add the solution path to the command
-    if (solutionFilePathCommandFormat != null) {
-      for (String format : solutionFilePathCommandFormat) {
-        addCommand(format.formatted(normalizedSolutionFilePath));
+      // Add support for replacing the input file path in the arguments
+      argumentTransformers.add(
+          argument -> argument.replace(INPUT_FILE_PATH, normalizedInputFilePath));
+
+      return Optional.empty();
+    });
+
+    return this;
+  }
+
+  /**
+   * Reads the output data from the process console output.
+   *
+   * @return ProcessRunner instance for chaining.
+   */
+  public ProcessRunnerExecutor<String> readOutputString() {
+    return getExecutor((processOutput, processError) -> new ProcessResult<>(
+            true,
+            Optional.of(processOutput),
+            Optional.empty()
+        )
+    );
+  }
+
+  /**
+   * Reads the output data from a default output file.
+   *
+   * @return ProcessRunner instance for chaining.
+   */
+  public ProcessRunnerExecutor<String> readOutputFile() {
+    return readOutputFile(OUTPUT_FILE_NAME);
+  }
+
+  /**
+   * Reads the output data from a specific output file.
+   *
+   * @param outputFileName The name of the file to read the output data from.
+   * @return ProcessRunner instance for chaining.
+   */
+  public ProcessRunnerExecutor<String> readOutputFile(String outputFileName) {
+    return readOutputFile(outputFileName, new SimpleProcessResultReader());
+  }
+
+  /**
+   * Reads the output data from a default output file using a custom reader.
+   *
+   * @param reader The reader to use to read the output data.
+   * @param <T> The type of the output data.
+   * @return ProcessRunner instance for chaining.
+   */
+  public <T> ProcessRunnerExecutor<T> readOutputFile(ProcessResultReader<T> reader) {
+    return readOutputFile(OUTPUT_FILE_NAME, reader);
+  }
+
+  /**
+   * Reads the output data from a specific output file using a custom reader.
+   *
+   * @param outputFileName The name of the file to read the output data from.
+   * @param reader The reader to use to read the output data.
+   * @param <T> The type of the output data.
+   * @return ProcessRunner instance for chaining.
+   */
+  public <T> ProcessRunnerExecutor<T> readOutputFile(String outputFileName,
+                                                     ProcessResultReader<T> reader) {
+    // Add at the beginning of the pre-processors list
+    // This ensures that the argument transformers are applied for every argument
+    preProcessors.add(0, (problemType, solutionId) -> {
+      var outputFile = Paths.get(problemDirectory, outputFileName);
+      var normalizedOutputFilePath = outputFile.toString().replace("\\", "/");
+
+      // Add support for replacing the output file path in the arguments
+      argumentTransformers.add(
+          argument -> argument.replace(OUTPUT_FILE_PATH, normalizedOutputFilePath));
+
+      return Optional.empty();
+    });
+
+    return getExecutor((processOutput, processError) -> {
+      Path outputFilePath = Path.of(problemDirectory, outputFileName);
+      ProcessResult<T> result = reader.read(outputFilePath, Path.of(problemDirectory));
+
+      if (!result.success()) {
+        return new ProcessResult<>(
+            false,
+            result.output(),
+            result.errorOutput().isPresent()
+                ? Optional.of(result.errorOutput().get()
+                + "%nCommand Output: %s".formatted(processOutput))
+                : Optional.empty()
+        );
       }
-    }
 
-    // Run the process
-    String processOutput;
-    int processExitCode;
-    try {
-      Process process = processBuilder.start();
+      // Return the output
+      return result;
+    });
+  }
 
-      processOutput = resourceProvider.readStream(process.inputReader())
-          + resourceProvider.readStream(process.errorReader());
+  /**
+   * Adds an environment variable to the process.
+   *
+   * @param key The key of the environment variable.
+   * @param value The value of the environment variable.
+   * @return ProcessRunner instance for chaining.
+   */
+  public ProcessRunner withEnvironmentVariable(String key, String value) {
+    preProcessors.add((problemType, solutionId) -> {
+      processBuilder.environment().put(key, value);
+      return Optional.empty();
+    });
 
-      processExitCode = process.waitFor();
-    } catch (IOException e) {
-      return new ProcessResult<>(
-          false,
-          Optional.empty(),
-          Optional.of(
-              "Solving %s problem resulted in IO Exception:%n%s".formatted(problemType.getId(),
-                  e.getMessage())
-          )
-      );
-    } catch (InterruptedException e) {
-      // interrupt current thread:
-      Thread.currentThread().interrupt();
-      return new ProcessResult<>(
-          false, Optional.empty(),
-          Optional.of("Thread InterruptedException while Solving Problem, no solution found\n"
-              + e.getMessage())
-      );
-    }
+    return this;
+  }
 
-    // Return prematurely if the process failed
-    if (processExitCode != 0) {
-      return new ProcessResult<>(
-          false,
-          Optional.empty(),
-          Optional.of(
-              "%s problem couldn't be solved:%n%s".formatted(problemType.getId(), processOutput)));
-    }
+  /**
+   * Adds arguments to the process.
+   *
+   * @param arguments The arguments to add to the process.
+   * @return ProcessRunner instance for chaining.
+   */
+  public ProcessRunner withArguments(String... arguments) {
+    preProcessors.add((problemType, solutionId) -> {
+      for (String argument : arguments) {
+        for (var transformer : argumentTransformers) {
+          argument = transformer.apply(argument);
+        }
 
-    // Read the solution file
-    ProcessResult<T> result =
-        reader.read(solutionFile, problemFilePath, Path.of(problemDirectoryPath));
+        addCommand(argument);
+      }
 
-    if (!result.success()) {
-      return new ProcessResult<>(
-          result.success(),
-          result.output(),
-          result.errorOutput().isPresent() ? Optional.of(
-              result.errorOutput().get() + "%nCommand Output: %s".formatted(processOutput)) :
-              Optional.empty()
-      );
-    }
+      return Optional.empty();
+    });
 
-    // Return the solution
-    return result;
-
+    return this;
   }
 
   private void addCommand(String command) {
@@ -296,11 +256,95 @@ public class ProcessRunner {
     processBuilder.command(existingCommands);
   }
 
-  public void addEnvironmentVariable(String key, String value) {
-    env.put(key, value);
-  }
+  protected <T> ProcessRunnerExecutor<T> getExecutor(
+      BiFunction<String, String, ProcessResult<T>> outputProcessor) {
+    return (problemType, solutionId) -> {
+      // Retrieve the problem directory
+      try {
+        problemDirectory = resourceProvider
+            .getProblemDirectory(problemType, solutionId)
+            .getAbsolutePath();
+      } catch (IOException e) {
+        return new ProcessResult<>(
+            false,
+            Optional.empty(),
+            Optional.of("Error: The problem directory couldn't be retrieved:%n%s".formatted(
+                e.getMessage()))
+        );
+      }
 
-  private void addEnvironmentVariableToBuilder(String key, String value) {
-    processBuilder.environment().put(key, value);
+      // Run pre-processors
+      var exceptions = preProcessors.stream()
+          .map(preProcessor -> preProcessor.apply(problemType, solutionId))
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .toList();
+
+      if (!exceptions.isEmpty()) {
+        var msg = String.join(", ", exceptions.stream().map(Throwable::getMessage).toList());
+        return new ProcessResult<>(
+            false,
+            Optional.empty(),
+            Optional.of("Error: %s problem couldn't be prepared:%n%s".formatted(
+                problemType.getId(), msg)));
+      }
+
+      // Run the process
+      String processOutput;
+      String processError;
+      int processExitCode;
+      try {
+        Process process = processBuilder.start();
+
+        processOutput = resourceProvider.readStream(process.inputReader());
+        processError = resourceProvider.readStream(process.errorReader());
+
+        processExitCode = process.waitFor();
+      } catch (IOException e) {
+        return new ProcessResult<>(
+            false,
+            Optional.empty(),
+            Optional.of(
+                "Solving %s problem resulted in IO Exception:%n%s".formatted(problemType.getId(),
+                    e.getMessage())
+            )
+        );
+      } catch (InterruptedException e) {
+        // interrupt current thread:
+        Thread.currentThread().interrupt();
+        return new ProcessResult<>(
+            false, Optional.empty(),
+            Optional.of("Thread InterruptedException while running process\n"
+                + e.getMessage())
+        );
+      }
+
+      // Return prematurely if the process failed
+      if (processExitCode != 0) {
+        return new ProcessResult<>(
+            false,
+            Optional.empty(),
+            Optional.of(
+                "%s problem couldn't be solved, process failed with exit code %s:%n%s".formatted(
+                    problemType.getId(),
+                    processExitCode,
+                    processOutput + processError)));
+      }
+
+      // Run pre-processors
+      for (var postProcessor : postProcessors) {
+        Optional<Exception> exception = postProcessor.apply(problemType, solutionId);
+        if (exception.isPresent()) {
+          return new ProcessResult<>(
+              false,
+              Optional.empty(),
+              Optional.of("Error: %s problem couldn't be post-processed:%n%s".formatted(
+                  problemType.getId(), exception.get().getMessage()))
+          );
+        }
+      }
+
+      return outputProcessor.apply(processOutput, processError);
+    };
   }
 }

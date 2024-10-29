@@ -3,10 +3,8 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
 import static edu.kit.provideq.toolbox.tsp.TspConfiguration.TSP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -73,9 +71,7 @@ class TspSolverTest {
   void testLkhTspSolver() {
     for (String problem : problems) {
       var problemDto = ApiTestHelper.createProblem(client, lkhTspSolver, problem, TSP);
-      assertEquals(ProblemState.SOLVED, problemDto.getState());
-      assertNotNull(problemDto.getSolution());
-      assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
+      ApiTestHelper.testSolution(problemDto);
     }
   }
 
@@ -97,7 +93,7 @@ class TspSolverTest {
     assertTrue(problem.isPresent());
 
     var problemDto = ApiTestHelper.createProblem(client, quboTspSolver, problem.get(), TSP);
-    assertEquals(ProblemState.SOLVING, problemDto.getState());
+    assertEquals(ProblemState.SOLVING, problemDto.getState(), problemDto.toString());
 
     //Set a QUBO solver:
     var quboSubProblem = problemDto.getSubProblems().get(0).getSubProblemIds();
@@ -110,10 +106,6 @@ class TspSolverTest {
 
     //solve problem:
     var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), TSP);
-
-    //validate result:
-    assertEquals(ProblemState.SOLVED, solvedProblemDto.getState());
-    assertNotNull(solvedProblemDto.getSolution());
-    assertEquals(SolutionStatus.SOLVED, solvedProblemDto.getSolution().getStatus());
+    ApiTestHelper.testSolution(solvedProblemDto);
   }
 }

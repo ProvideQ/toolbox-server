@@ -190,6 +190,11 @@ public class ProblemRouter {
       }
     }
 
+    var solverSettings = patch.getSolverSettings();
+    if (solverSettings != null && !solverSettings.isEmpty()) {
+      problem.setSolverSettings(solverSettings);
+    }
+
     if (patch.getInput() != null) {
       problem.setInput(patch.getInput());
     }

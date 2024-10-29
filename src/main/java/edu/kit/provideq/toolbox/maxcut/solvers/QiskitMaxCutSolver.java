@@ -4,7 +4,9 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +22,14 @@ import reactor.core.publisher.Mono;
 public class QiskitMaxCutSolver extends MaxCutSolver {
   private static final String SOLUTION_LINE_PREFIX = "solution:";
 
-  private final String maxCutPath;
+  private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
   public QiskitMaxCutSolver(
-      @Value("${qiskit.directory.max-cut}") String maxCutPath,
+      @Value("${qiskit.script.max-cut}") String scriptPath,
       ApplicationContext context) {
-    this.maxCutPath = maxCutPath;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -39,7 +41,8 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
 
@@ -55,13 +58,14 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     // Run Qiskit solver via console
     var processResult = context
-        .getBean(
-            PythonProcessRunner.class,
-            maxCutPath,
-            "maxCut_qiskit.py")
-        .addProblemFilePathToProcessCommand()
-        .addSolutionFilePathToProcessCommand()
-        .run(getProblemType(), solution.getId(), input);
+        .getBean(PythonProcessRunner.class, scriptPath)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(input)
+        .readOutputFile()
+        .run(getProblemType(), solution.getId());
 
     // Return if process failed
     if (!processResult.success()) {

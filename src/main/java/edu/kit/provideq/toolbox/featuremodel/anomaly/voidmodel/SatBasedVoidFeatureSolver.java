@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
@@ -38,7 +39,8 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
   @Override
   public Mono<Solution<String>> solve(
       String input,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
   ) {
     // Convert uvl to cnf
     String cnf;
@@ -65,6 +67,11 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
           solution.setDebugData("Dimacs CNF of Feature Model:\n" + cnf);
           // If there is a valid configuration, the feature model is not a void feature model
           var dimacsCnfSolution = voidSolution.getSolutionData();
+          if (dimacsCnfSolution == null) {
+            solution.setDebugData("No solution found for the feature model.");
+            solution.abort();
+            return solution;
+          }
 
           solution.setSolutionData(dimacsCnfSolution.isVoid()
               ? "The feature model is a void feature model. The configuration is never valid."

@@ -19,9 +19,7 @@ public class MultiFileProcessResultReader implements ProcessResultReader<HashMap
     this.globPattern = globPattern;
   }
 
-  public ProcessResult<HashMap<Path, String>> read(Path solutionPath, Path problemPath,
-                                                   Path problemDirectory) {
-
+  public ProcessResult<HashMap<Path, String>> read(Path solutionPath, Path problemDirectory) {
     HashMap<Path, String> solutions = new HashMap<>();
 
     // Split globPattern at the last slash
