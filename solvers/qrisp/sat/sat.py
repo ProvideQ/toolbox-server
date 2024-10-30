@@ -118,6 +118,8 @@ def xnor_gate(x: QuantumBool, y: QuantumBool):
 num_vars, clauses = parse_dimacs(args.input_file)
 qvars = [QuantumBool() for _ in range(num_vars)]
 
+# TODO: implement exact grover variant, which won't measure impossible states (e.g. dead features).
+# TODO: This would help differentiate between dead features and valid 50% true 50% false assignments.
 grovers_alg(
     qvars,
     sat_oracle,
