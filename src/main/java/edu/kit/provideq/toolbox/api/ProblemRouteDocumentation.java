@@ -68,8 +68,8 @@ final class ProblemRouteDocumentation {
         .operationId(getOperationId(type, "update"))
         .description("Updates the problem of type '" + type.getId() + "' with the given problem "
             + "ID."
-            + "Only the 'input', 'solverId', and 'state' fields can be updated; all other fields "
-            + "will be ignored."
+            + "Only the 'input', 'solverId', 'solverSettings', and 'state' fields can be updated; "
+            + "all other fields will be ignored. "
             + "Changes to the input or solver will reset the problem state to 'READY_TO_SOLVE'. "
             + "If the problem is fully configured, changing the state to 'SOLVING' will start the "
             + "solution process. "
