@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
+import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -8,6 +9,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +21,8 @@ public class VrpClustererConfiguration {
   public static final ProblemType<String, String> CLUSTER_VRP = new ProblemType<>(
       "cluster-vrp",
       String.class,
-      String.class
+      String.class,
+      clusterVrpEstimator()
   );
 
   @Bean
@@ -32,6 +35,10 @@ public class VrpClustererConfiguration {
         Set.of(kmeans, twoPhase),
         loadExampleProblems(resourceProvider)
     );
+  }
+
+  private static Function<String, Bound> clusterVrpEstimator() {
+    throw new UnsupportedOperationException("Estimation of this problem type is not supported yet");
   }
 
   private Set<Problem<String, String>> loadExampleProblems(
