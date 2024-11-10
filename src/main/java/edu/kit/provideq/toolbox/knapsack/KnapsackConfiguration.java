@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.knapsack;
 
+import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.knapsack.solvers.PythonKnapsackSolver;
@@ -10,6 +11,8 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,7 +30,8 @@ public class KnapsackConfiguration {
   public static final ProblemType<String, String> KNAPSACK = new ProblemType<>(
       "knapsack",
         String.class,
-        String.class
+        String.class,
+        knapsackEstimator()
     );
 
   @Bean
@@ -41,6 +45,10 @@ public class KnapsackConfiguration {
             Set.of(pythonKnapsackSolver, qiskitKnapsackSolver),
             loadExampleProblems(resourceProvider)
     );
+  }
+
+  private static Function<String, Bound> knapsackEstimator() {
+    throw new UnsupportedOperationException("Estimation of this problem type is not supported yet");
   }
 
   private Set<Problem<String, String>> loadExampleProblems(

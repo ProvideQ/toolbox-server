@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel;
 
+import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -8,6 +9,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,7 +28,8 @@ public class VoidModelConfiguration {
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_VOID = new ProblemType<>(
       "feature-model-anomaly-void",
       String.class,
-      String.class
+      String.class,
+      voidModelEstimator()
   );
 
   @Bean
@@ -39,6 +42,10 @@ public class VoidModelConfiguration {
         Set.of(satSolver),
         loadExampleProblems(resourceProvider)
     );
+  }
+
+  private static Function<String, Bound> voidModelEstimator() {
+    throw new UnsupportedOperationException("Estimation of this problem type is not supported yet");
   }
 
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
