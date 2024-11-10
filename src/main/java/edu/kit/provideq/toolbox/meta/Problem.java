@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
@@ -29,6 +30,7 @@ public class Problem<InputT, ResultT> {
 
   private InputT input;
   private Solution<ResultT> solution;
+  private Bound bound;
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
   private List<SolverSetting> solverSettings;
@@ -80,6 +82,19 @@ public class Problem<InputT, ResultT> {
           this.solution = sol;
           this.setState(ProblemState.SOLVED);
         });
+  }
+
+  public Mono<Bound> estimateBound() {
+    if (this.bound != null) {
+      return Mono.just(this.bound);
+    }
+
+    if (this.input == null) {
+      throw new IllegalStateException("Cannot estimate bound without input!");
+    }
+
+    return Mono.just(this.type.getEstimator().apply(this.input))
+        .doOnNext(bound -> this.bound = bound);
   }
 
   public UUID getId() {
@@ -207,5 +222,9 @@ public class Problem<InputT, ResultT> {
             + ", state=" + state
             + ", solver=" + solver
             + '}';
+  }
+
+  public Bound getBound() {
+    return bound;
   }
 }
