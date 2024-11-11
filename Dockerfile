@@ -48,10 +48,9 @@ COPY --from=builder /app/build/jre /opt/java
 ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
-COPY gams gams
-COPY qiskit qiskit
-COPY cirq cirq
-RUN scripts/install-solver-dependencies.sh
+COPY solvers solvers
+COPY demonstrators demonstrators
+RUN scripts/ci-setup-solvers.sh
 COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port

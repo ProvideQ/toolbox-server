@@ -1,3 +1,0 @@
-# Cirq MaxCut
-matplotlib
-cirq

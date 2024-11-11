@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'edu.kit.provideq'
-version = '0.3.0'
+version = '0.4.0'
 sourceCompatibility = '17'
 
 repositories {
@@ -20,6 +20,7 @@ dependencies {
     implementation 'com.bpodgursky:jbool_expressions:1.24'
     implementation files('lib/de.ovgu.featureide.lib.fm-v3.9.1.jar', 'lib/uvl-parser.jar')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.+'
 }
 
 jar {
@@ -27,10 +28,20 @@ jar {
     enabled = false
 }
 
+// inject JUnit into test task
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// set Java language level
 targetCompatibility = JavaVersion.VERSION_17
+
+tasks.withType(JavaCompile).configureEach {
+    // treat "unchecked" warnings as errors
+    options.compilerArgs << '-Xlint:unchecked'
+    options.compilerArgs << '-Xlint:deprecation'
+    options.compilerArgs << '-Werror'
+}
 
 checkstyle {
     toolVersion = '10.12.0'

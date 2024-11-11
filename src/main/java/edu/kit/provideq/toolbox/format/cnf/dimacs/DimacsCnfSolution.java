@@ -77,7 +77,7 @@ public class DimacsCnfSolution {
     for (Map.Entry<Variable, Boolean> variableBooleanEntry : variableMap.entrySet()) {
 
       var number = variableBooleanEntry.getKey().number();
-      var variable = variableBooleanEntry.getValue()
+      var variable = Boolean.TRUE.equals(variableBooleanEntry.getValue())
           ? number
           : String.valueOf(NEGATION_PREFIX) + number;
 

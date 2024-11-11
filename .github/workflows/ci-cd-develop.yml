@@ -28,12 +28,12 @@ jobs:
           echo "$GAMS_PATH" >> "$GITHUB_PATH"
           echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
       - name: Install solver dependencies
-        run: ./scripts/install-solver-dependencies.sh
+        run: ./scripts/ci-setup-solvers.sh
       - name: Run checks
         shell: bash # required for the source command
         run: |
           source /opt/conda/bin/activate gams
-          ./gradlew check
+          ./gradlew check --info
       - name: Archive test reports
         if: always()
         uses: actions/upload-artifact@v3

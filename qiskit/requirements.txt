@@ -1,9 +1,0 @@
-# This file describes the python package requirements for all Qiskit scripts
-# supported by ProvideQ
-
-# required for Qiskit MaxCut solver
-numpy
-pygmlparser
-qiskit == 0.44.*
-qiskit_optimization
-qiskit-aer

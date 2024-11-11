@@ -1,19 +1,20 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
- * A solution holds all information concerning a specific
- * {@link edu.kit.provideq.toolbox.meta.Problem} solving process triggered by a
+ * A solution holds all information concerning a specific problem-solving process triggered by a
  * {@link edu.kit.provideq.toolbox.meta.ProblemSolver}. This includes metadata, debug data,
  * the current status of the process, as well as the eventually generated solution data
  *
  * @param <S> the type of the generated solution data
  */
 public class Solution<S> {
-  private final long id;
+  private final UUID id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
   private S solutionData;
@@ -25,14 +26,19 @@ public class Solution<S> {
    * Internal constructor, used for de-serialization.
    */
   private Solution() {
-    this.id = Long.MIN_VALUE;
+    this.id = UUID.randomUUID();
   }
 
-  public Solution(long id) {
+  private Solution(UUID id) {
     this.id = id;
   }
 
-  public long getId() {
+  public <InputT> Solution(ProblemSolver<InputT, S> problemSolver) {
+    this.id = UUID.randomUUID();
+    this.solverName = problemSolver.getName();
+  }
+
+  public UUID getId() {
     return this.id;
   }
 
@@ -80,7 +86,7 @@ public class Solution<S> {
   }
 
   /**
-   * sets the status to 'invalid'. irreversible
+   * sets the status to 'error'. irreversible
    */
   public void fail() {
     if (!this.status.isCompleted()) {
@@ -145,7 +151,7 @@ public class Solution<S> {
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
-    var that = (Solution<S>) obj;
+    var that = (Solution<?>) obj;
     return this.id == that.id
         && Objects.equals(this.status, that.status);
   }
@@ -161,6 +167,7 @@ public class Solution<S> {
         + "id=" + id + ", "
         + "status=" + status + ", "
         + "metaData=" + metaData + ", "
-        + "solutionData" + solutionData + ']';
+        + "debugData=" + debugData + ", "
+        + "solutionData=" + solutionData + ']';
   }
 }

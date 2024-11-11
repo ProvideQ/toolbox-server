@@ -1,0 +1,60 @@
+package edu.kit.provideq.toolbox.vrp.solvers;
+
+import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+/**
+ * {@link VrpConfiguration#VRP} classical solver using the LKH-3 heuristic.
+ */
+@Component
+public class LkhVrpSolver extends VrpSolver {
+  private final String scriptPath;
+  private final ApplicationContext context;
+  private final String solverBinary;
+
+  @Autowired
+  public LkhVrpSolver(
+      @Value("${custom.script.lkh}") String scriptPath,
+      @Value("${custom.binary.lkh}") String solverBinary,
+      ApplicationContext context) {
+    this.scriptPath = scriptPath;
+    this.solverBinary = solverBinary;
+    this.context = context;
+  }
+
+  @Override
+  public String getName() {
+    return "LKH-3 VRP Solver";
+  }
+
+  @Override
+  public Mono<Solution<String>> solve(
+      String input,
+      SubRoutineResolver resolver,
+      SolvingProperties properties
+  ) {
+    var solution = new Solution<>(this);
+
+    var processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath)
+        .withArguments(
+            "--lkh-instance", solverBinary,
+            ProcessRunner.INPUT_FILE_PATH,
+            "--output-file", ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(input, "problem.vrp")
+        .readOutputFile("problem.sol")
+        .run(getProblemType(), solution.getId());
+
+    return Mono.just(processResult.applyTo(solution));
+  }
+}

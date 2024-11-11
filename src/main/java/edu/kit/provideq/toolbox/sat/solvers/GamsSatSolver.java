@@ -1,31 +1,34 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
-import edu.kit.provideq.toolbox.GamsProcessRunner;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SubRoutinePool;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.GamsProcessRunner;
+import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
+import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
- * {@link ProblemType#SAT} solver using a GAMS implementation.
+ * {@link SatConfiguration#SAT} solver using a GAMS implementation.
  */
 @Component
 public class GamsSatSolver extends SatSolver {
-  private final String satPath;
+  private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
   public GamsSatSolver(
-      @Value("${gams.directory.sat}") String satPath,
+      @Value("${gams.script.sat}") String scriptPath,
       ApplicationContext context) {
-    this.satPath = satPath;
+    this.scriptPath = scriptPath;
     this.context = context;
   }
 
@@ -35,40 +38,44 @@ public class GamsSatSolver extends SatSolver {
   }
 
   @Override
-  public boolean canSolve(Problem<String> problem) {
-    //TODO: assess problemData
-    return problem.type() == ProblemType.SAT;
-  }
+  public Mono<Solution<DimacsCnfSolution>> solve(
+      String input,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
+  ) {
+    var solution = new Solution<>(this);
 
-  @Override
-  public void solve(Problem<String> problem, Solution<DimacsCnfSolution> solution,
-                    SubRoutinePool subRoutinePool) {
     DimacsCnf dimacsCnf;
     try {
-      dimacsCnf = DimacsCnf.fromString(problem.problemData());
+      dimacsCnf = DimacsCnf.fromString(input);
       solution.setDebugData("Using cnf input: " + dimacsCnf);
     } catch (ConversionException | RuntimeException e) {
       solution.setDebugData("Parsing error: " + e.getMessage());
       solution.abort();
-      return;
+      return Mono.just(solution);
     }
 
     // Run SAT with GAMS via console
-    var processResult = context
-        .getBean(
-            GamsProcessRunner.class,
-            satPath,
-            "sat.gms")
-        .run(problem.type(), solution.getId(), dimacsCnf.toString());
+    ProcessResult<String> processResult = context
+        .getBean(GamsProcessRunner.class, scriptPath)
+        .withArguments(
+            "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
+            "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(dimacsCnf.toString())
+        .readOutputFile()
+        .run(getProblemType(), solution.getId());
 
     if (processResult.success()) {
-      var dimacsCnfSolution = DimacsCnfSolution.fromString(dimacsCnf, processResult.output());
+      var dimacsCnfSolution =
+          DimacsCnfSolution.fromString(dimacsCnf, processResult.output().orElse(""));
 
       solution.setSolutionData(dimacsCnfSolution);
       solution.complete();
     } else {
-      solution.setDebugData(processResult.output());
+      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.fail();
     }
+    return Mono.just(solution);
   }
 }
