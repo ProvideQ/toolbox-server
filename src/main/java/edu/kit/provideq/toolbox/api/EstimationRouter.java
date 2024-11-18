@@ -43,7 +43,7 @@ public class EstimationRouter {
   @Bean
   RouterFunction<ServerResponse> getEstimationRoutes() {
     return managerProvider.getProblemManagers().stream()
-            .filter(manager -> manager.getType().getEstimator() != null)
+            .filter(manager -> manager.getType().getEstimator().isPresent())
             .map(this::defineGetRoute)
             .reduce(RouterFunction::and)
             .orElse(null);
