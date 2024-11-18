@@ -1,6 +1,8 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Bound;
+
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -57,8 +59,8 @@ public class ProblemType<InputT, ResultT> {
   /**
    * Returns the bound estimator for this problem type.
    */
-  public Function<InputT, Bound> getEstimator() {
-    return estimator;
+  public Optional<Function<InputT, Bound>> getEstimator() {
+    return Optional.ofNullable(estimator);
   }
 
   @Override

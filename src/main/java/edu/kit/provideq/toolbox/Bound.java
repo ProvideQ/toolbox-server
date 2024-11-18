@@ -8,4 +8,7 @@ package edu.kit.provideq.toolbox;
  * @param executionTime the time it took to estimate the bound
  */
 public record Bound(String bound, BoundType boundType, long executionTime) {
+  public Bound(String bound, BoundType boundType) {
+    this(bound, boundType, -1);
+  }
 }
