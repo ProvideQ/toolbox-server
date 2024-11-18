@@ -37,7 +37,7 @@ public class ProblemDto<InputT, ResultT> {
     dto.id = problem.getId().toString();
     dto.typeId = problem.getType().getId();
     dto.input = problem.getInput().orElse(null);
-    dto.solution = problem.getSolution();
+    dto.solution = problem.getSolution().orElse(null);
     dto.state = problem.getState();
     dto.solverId = problem.getSolver()
         .map(ProblemSolver::getId)

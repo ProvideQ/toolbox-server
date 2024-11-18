@@ -108,7 +108,7 @@ final class SubProblems<InputT, ResultT>
       Consumer<Problem<?, ?>> observer = problem -> {
         if (problem.getId() == subProblem.getId()
                 && problem.getState() == ProblemState.SOLVED) {
-          sink.success((Solution<SubResultT>) problem.getSolution());
+          sink.success((Solution<SubResultT>) problem.getSolution().orElseThrow());
         }
       };
 

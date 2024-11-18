@@ -103,8 +103,8 @@ public class Problem<InputT, ResultT> {
     this.observers.forEach(observer -> observer.onInputChanged(this, newInput));
   }
 
-  public Solution<ResultT> getSolution() {
-    return this.solution;
+  public Optional<Solution<ResultT>> getSolution() {
+    return Optional.ofNullable(this.solution);
   }
 
   public Optional<ProblemSolver<InputT, ResultT>> getSolver() {
