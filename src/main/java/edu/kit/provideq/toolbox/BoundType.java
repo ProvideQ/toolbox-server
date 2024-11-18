@@ -1,7 +1,7 @@
 package edu.kit.provideq.toolbox;
 
 /**
- * Represents the bound type of a bound.
+ * Represents the bound type of bounds.
  */
 public enum BoundType {
   /**

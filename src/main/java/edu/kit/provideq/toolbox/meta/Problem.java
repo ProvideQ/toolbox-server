@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
-import edu.kit.provideq.toolbox.Bound;
+import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +30,7 @@ public class Problem<InputT, ResultT> {
 
   private InputT input;
   private Solution<ResultT> solution;
-  private Bound bound;
+  private BoundWithInfo bound;
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
   private List<SolverSetting> solverSettings;
@@ -85,9 +84,9 @@ public class Problem<InputT, ResultT> {
         });
   }
 
-  public Mono<Bound> estimateBound() {
+  public Mono<BoundWithInfo> estimateBound() {
     if (this.input == null) {
-      throw new IllegalStateException("Cannot estimate bound without input!");
+      throw new IllegalStateException("Cannot estimate value without input!");
     }
     
     Function<InputT, Bound> estimator;
@@ -101,7 +100,8 @@ public class Problem<InputT, ResultT> {
     var bound = estimator.apply(this.input);
     long finish = System.currentTimeMillis();
     var executionTime = finish - start;
-    var boundWithExecutionTime = new Bound(bound.bound(), bound.boundType(), executionTime);
+
+    var boundWithExecutionTime = new BoundWithInfo(bound, executionTime);
 
     return Mono.just(boundWithExecutionTime)
         .doOnNext(boundValue -> this.bound = boundValue);

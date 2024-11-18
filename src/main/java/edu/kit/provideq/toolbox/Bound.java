@@ -1,14 +1,10 @@
 package edu.kit.provideq.toolbox;
 
 /**
- * Represents a bound estimation for the solution of a problem.
+ * Represents a bound value with its type.
  *
- * @param bound the bound value
+ * @param value the estimated value
  * @param boundType the type of the bound
- * @param executionTime the time it took to estimate the bound
  */
-public record Bound(String bound, BoundType boundType, long executionTime) {
-  public Bound(String bound, BoundType boundType) {
-    this(bound, boundType, -1);
-  }
+public record Bound(String value, BoundType boundType) {
 }
