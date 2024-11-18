@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.maxcut;
 
-import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.maxcut.solvers.CirqMaxCutSolver;
@@ -12,7 +11,6 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,7 +28,7 @@ public class MaxCutConfiguration {
       "max-cut",
       String.class,
       String.class,
-      maxCutEstimator()
+      null
   );
 
   @Bean
@@ -45,10 +43,6 @@ public class MaxCutConfiguration {
         Set.of(qiskitSolver, gamsSolver, cirqSolver),
         loadExampleProblems(resourceProvider)
     );
-  }
-
-  private static Function<String, Bound> maxCutEstimator() {
-    throw new UnsupportedOperationException("Estimation of this problem type is not supported yet");
   }
 
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {

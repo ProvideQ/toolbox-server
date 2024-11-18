@@ -32,6 +32,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * This router handles requests regarding {@link Problem} instance solution bound estimations.
+ * The /bound endpoint is only available for problem types that have an estimator.
  */
 @Configuration
 @EnableWebFlux
@@ -42,9 +43,10 @@ public class EstimationRouter {
   @Bean
   RouterFunction<ServerResponse> getEstimationRoutes() {
     return managerProvider.getProblemManagers().stream()
+            .filter(manager -> manager.getType().getEstimator() != null)
             .map(this::defineGetRoute)
             .reduce(RouterFunction::and)
-            .orElseThrow();
+            .orElse(null);
   }
 
   private RouterFunction<ServerResponse> defineGetRoute(ProblemManager<?, ?> manager) {
@@ -62,7 +64,13 @@ public class EstimationRouter {
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
     var problem = findProblemOrThrow(manager, problemId);
-    var bound = problem.estimateBound();
+
+    Mono<Bound> bound;
+    try {
+      bound = problem.estimateBound();
+    } catch (IllegalStateException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
 
     return ok().body(bound, new ParameterizedTypeReference<>() {
     });
@@ -80,13 +88,11 @@ public class EstimationRouter {
         .parameter(parameterBuilder().in(ParameterIn.PATH).name(PROBLEM_ID_PARAM_NAME))
         .response(responseBuilder()
               .responseCode(String.valueOf(HttpStatus.OK.value()))
-              .content(getOkResponseContent(manager))
+              .content(getOkResponseContent())
         );
   }
 
-  private static org.springdoc.core.fn.builders.content.Builder getOkResponseContent(
-          ProblemManager<?, ?> manager
-  ) {
+  private static org.springdoc.core.fn.builders.content.Builder getOkResponseContent() {
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)
             .schema(schemaBuilder().implementation(Bound.class));

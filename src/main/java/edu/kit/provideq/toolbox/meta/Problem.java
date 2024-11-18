@@ -85,10 +85,6 @@ public class Problem<InputT, ResultT> {
   }
 
   public Mono<Bound> estimateBound() {
-    if (this.bound != null) {
-      return Mono.just(this.bound);
-    }
-
     if (this.input == null) {
       throw new IllegalStateException("Cannot estimate bound without input!");
     }
@@ -106,7 +102,6 @@ public class Problem<InputT, ResultT> {
 
     return Mono.just(boundWithExecutionTime)
         .doOnNext(boundValue -> this.bound = boundValue);
-
   }
 
   public UUID getId() {
