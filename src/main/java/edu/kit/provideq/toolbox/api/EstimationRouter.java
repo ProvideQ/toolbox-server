@@ -49,6 +49,9 @@ public class EstimationRouter {
             .orElse(null);
   }
 
+  /**
+   * Estimate Operation: GET /problems/TYPE/{problemId}/bound.
+   */
   private RouterFunction<ServerResponse> defineGetRoute(ProblemManager<?, ?> manager) {
     return route().GET(
             getEstimationRouteForProblemType(manager.getType()),
@@ -67,8 +70,9 @@ public class EstimationRouter {
 
     Mono<BoundDto> bound;
     try {
-      bound = Mono.just(new BoundDto(Objects.requireNonNull(problem.estimateBound().block())));
-    } catch (IllegalStateException | NullPointerException e) {
+      problem.estimateBound();
+      bound = Mono.just(new BoundDto(problem.getBound().orElseThrow()));
+    } catch (IllegalStateException | NoSuchElementException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
