@@ -92,9 +92,21 @@ public class Problem<InputT, ResultT> {
     if (this.input == null) {
       throw new IllegalStateException("Cannot estimate bound without input!");
     }
+    
+    if (this.type.getEstimator() == null) {
+      throw new IllegalStateException("Cannot estimate bound without an estimator!");
+    }
 
-    return Mono.just(this.type.getEstimator().apply(this.input))
-        .doOnNext(bound -> this.bound = bound);
+    long start = System.currentTimeMillis();
+
+    var bound = this.type.getEstimator().apply(this.input);
+    long finish = System.currentTimeMillis();
+    var executionTime = finish - start;
+    var boundWithExecutionTime = new Bound(bound.bound(), bound.boundType(), executionTime);
+
+    return Mono.just(boundWithExecutionTime)
+        .doOnNext(boundValue -> this.bound = boundValue);
+
   }
 
   public UUID getId() {
