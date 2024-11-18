@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Bound;
-
 import java.util.Optional;
 import java.util.function.Function;
 

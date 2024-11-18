@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.Bound;
+import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;

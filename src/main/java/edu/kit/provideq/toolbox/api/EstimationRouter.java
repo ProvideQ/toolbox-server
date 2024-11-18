@@ -10,12 +10,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
-import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.util.Objects;
 import java.util.UUID;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +65,10 @@ public class EstimationRouter {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
     var problem = findProblemOrThrow(manager, problemId);
 
-    Mono<Bound> bound;
+    Mono<BoundDto> bound;
     try {
-      bound = problem.estimateBound();
-    } catch (IllegalStateException e) {
+      bound = Mono.just(new BoundDto(Objects.requireNonNull(problem.estimateBound().block())));
+    } catch (IllegalStateException | NullPointerException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
@@ -95,7 +95,7 @@ public class EstimationRouter {
   private static org.springdoc.core.fn.builders.content.Builder getOkResponseContent() {
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)
-            .schema(schemaBuilder().implementation(Bound.class));
+            .schema(schemaBuilder().implementation(BoundDto.class));
   }
 
   private <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(
