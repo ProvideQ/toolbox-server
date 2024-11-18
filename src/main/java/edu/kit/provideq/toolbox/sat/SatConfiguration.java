@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.sat;
 
-import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
@@ -11,7 +10,6 @@ import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,7 +26,7 @@ public class SatConfiguration {
       "sat",
       String.class,
       DimacsCnfSolution.class,
-      satEstimator()
+      null
   );
 
   @Bean
@@ -41,10 +39,6 @@ public class SatConfiguration {
         Set.of(gamsSolver),
         loadExampleProblems(resourceProvider)
     );
-  }
-
-  private static Function<String, Bound> satEstimator() {
-    throw new UnsupportedOperationException("Estimation of this problem type is not supported yet");
   }
 
   private Set<Problem<String, DimacsCnfSolution>> loadExampleProblems(

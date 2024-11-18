@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.Bound;
-
 import java.util.function.Function;
 
 /**
@@ -16,9 +15,11 @@ public class ProblemType<InputT, ResultT> {
   /**
    * Defines a new problem type.
    *
-   * @param id a unique string identifier for this type of problem.
-   * @param inputClass the Java class object corresponding to the {@link InputT} type parameter.
+   * @param id          a unique string identifier for this type of problem.
+   * @param inputClass  the Java class object corresponding to the {@link InputT} type parameter.
    * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
+   * @param estimator   the bound estimator for this problem type.
+   *                    null if estimation is not supported.
    */
   public ProblemType(
       String id,
@@ -66,6 +67,7 @@ public class ProblemType<InputT, ResultT> {
         + "id='%s'".formatted(id)
         + ", inputClass=%s".formatted(inputClass)
         + ", resultClass=%s".formatted(resultClass)
+        + ", estimator?=%s".formatted(estimator != null)
         + '}';
   }
 }
