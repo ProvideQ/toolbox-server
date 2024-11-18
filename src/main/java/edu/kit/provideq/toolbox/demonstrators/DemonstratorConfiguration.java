@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.demonstrators;
 
 import edu.kit.provideq.toolbox.Bound;
+import edu.kit.provideq.toolbox.BoundType;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -19,10 +20,10 @@ public class DemonstratorConfiguration {
       "demonstrator",
       String.class,
       String.class,
-      demonstratorEstimator()
+      null
   );
 
-  private static Function<String, Bound> demonstratorEstimator() {
+  private Function<String, Bound> demonstratorEstimator() {
     throw new UnsupportedOperationException("Estimation of this problem type is not supported");
   }
 

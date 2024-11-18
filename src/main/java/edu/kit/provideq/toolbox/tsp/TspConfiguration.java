@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.tsp;
 
-import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,7 +26,7 @@ public class TspConfiguration {
       "tsp",
       String.class,
       String.class,
-      tspEstimator()
+      null
   );
 
   @Bean
@@ -40,10 +38,6 @@ public class TspConfiguration {
     return new ProblemManager<>(TSP,
         Set.of(quboTspSolver, lkhTspSolver),
         loadExampleProblems(provider));
-  }
-
-  private static Function<String, Bound> tspEstimator() {
-    throw new UnsupportedOperationException("Estimation of this problem type is not supported yet");
   }
 
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {

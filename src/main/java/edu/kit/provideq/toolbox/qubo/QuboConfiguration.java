@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.qubo;
 
-import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -12,7 +11,6 @@ import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,7 +30,7 @@ public class QuboConfiguration {
       "qubo",
       String.class,
       String.class,
-      quboEstimator()
+      null
   );
 
   @Bean
@@ -47,10 +45,6 @@ public class QuboConfiguration {
         Set.of(qiskitSolver, dwaveSolver, qrispSolver),
         loadExampleProblems(resourceProvider)
     );
-  }
-
-  private static Function<String, Bound> quboEstimator() {
-    throw new UnsupportedOperationException("Estimation of this problem type is not supported yet");
   }
 
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
