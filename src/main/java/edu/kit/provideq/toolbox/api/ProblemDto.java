@@ -8,6 +8,7 @@ import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Data transfer object for {@link Problem problems}, used in REST API request bodies and responses.
@@ -17,7 +18,7 @@ public class ProblemDto<InputT, ResultT> {
   private String typeId;
   private InputT input;
   private Solution<ResultT> solution;
-  private Bound bound;
+  private Optional<BoundWithInfo> bound;
   private ProblemState state;
   private String solverId;
   private List<SolverSetting> solverSettings;
@@ -70,7 +71,7 @@ public class ProblemDto<InputT, ResultT> {
     return solution;
   }
 
-  public Bound getBound() {
+  public Optional<BoundWithInfo> getBound() {
     return bound;
   }
 
@@ -107,7 +108,7 @@ public class ProblemDto<InputT, ResultT> {
         + ", solverId=" + solverId
         + ", input=" + input
         + ", solution=" + solution
-        + ", bound=" + bound
+        + ", value=" + bound
         + ", solverSettings=" + solverSettings
         + ", subProblems=" + subProblems
         + '}';
