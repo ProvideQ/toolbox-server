@@ -88,12 +88,12 @@ public class Problem<InputT, ResultT> {
     if (this.input == null) {
       throw new IllegalStateException("Cannot estimate value without input!");
     }
-    
-    Function<InputT, Bound> estimator;
-    if (this.type.getEstimator().isEmpty()) {
-      throw new IllegalStateException("Cannot estimate bound without an estimator!");
+
+    var optionalEstimator = this.type.getEstimator();
+    if (optionalEstimator.isEmpty()) {
+      throw new IllegalStateException("Cannot estimate value without an estimator!");
     }
-    estimator = this.type.getEstimator().get();
+    var estimator = optionalEstimator.get();
 
     long start = System.currentTimeMillis();
 
@@ -234,7 +234,7 @@ public class Problem<InputT, ResultT> {
             + '}';
   }
 
-  public Bound getBound() {
-    return bound;
+  public Optional<BoundWithInfo> getBound() {
+    return Optional.ofNullable(bound);
   }
 }
