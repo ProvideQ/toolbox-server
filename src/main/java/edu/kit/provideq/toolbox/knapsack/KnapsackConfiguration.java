@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
