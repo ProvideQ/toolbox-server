@@ -14,7 +14,6 @@ import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 /**
  * Definition and registration of the "Quadratic Unconstrained Binary Optimization" problem.
  */

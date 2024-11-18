@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
@@ -89,13 +90,15 @@ public class Problem<InputT, ResultT> {
       throw new IllegalStateException("Cannot estimate bound without input!");
     }
     
-    if (this.type.getEstimator() == null) {
+    Function<InputT, Bound> estimator;
+    if (this.type.getEstimator().isEmpty()) {
       throw new IllegalStateException("Cannot estimate bound without an estimator!");
     }
+    estimator = this.type.getEstimator().get();
 
     long start = System.currentTimeMillis();
 
-    var bound = this.type.getEstimator().apply(this.input);
+    var bound = estimator.apply(this.input);
     long finish = System.currentTimeMillis();
     var executionTime = finish - start;
     var boundWithExecutionTime = new Bound(bound.bound(), bound.boundType(), executionTime);
