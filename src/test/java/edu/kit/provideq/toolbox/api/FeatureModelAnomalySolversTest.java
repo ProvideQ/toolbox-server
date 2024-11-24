@@ -55,7 +55,9 @@ class FeatureModelAnomalySolversTest {
     var featureModelManager = problemManagerProvider.findProblemManagerForType(problemType).get();
     var satManager = problemManagerProvider.findProblemManagerForType(SAT).get();
 
-    var satSolver = satManager.getSolvers().stream().toList();
+    var satSolver = satManager.getSolvers().stream()
+        .filter(solver -> !(solver instanceof QrispSatSolver || solver instanceof ExactQrispSatSolver))
+        .toList();
 
     return ApiTestHelper.getAllArgumentCombinations(featureModelManager, satSolver)
             .map(list -> Arguments.of(
@@ -72,11 +74,6 @@ class FeatureModelAnomalySolversTest {
         ProblemType<String, String> problemType,
         String input,
         ProblemSolver<String, DimacsCnfSolution> satSolver) {
-
-    if (satSolver instanceof ExactQrispSatSolver || satSolver instanceof QrispSatSolver) {
-      System.out.println("Skipping test for solver: " + satSolver.getClass().getSimpleName());
-      return;
-    }
 
     var problem = ApiTestHelper.createProblem(client, featureModelSolver, input, problemType);
     assertEquals(ProblemState.SOLVING, problem.getState());
