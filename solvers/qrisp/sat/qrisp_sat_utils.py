@@ -1,7 +1,6 @@
-import os
 import numpy as np
 from qrisp import *
-from qrisp.grover import grovers_alg, tag_state
+from qrisp.grover import tag_state
 
 def parse_dimacs(filename):
     clauses = []

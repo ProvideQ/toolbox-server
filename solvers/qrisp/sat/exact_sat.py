@@ -2,7 +2,7 @@ import argparse
 import os
 import platform
 import subprocess
-from qrisp.grover import grovers_alg, tag_state
+from qrisp.grover import grovers_alg
 from qrisp import *
 from qrisp_sat_utils import parse_dimacs, sat_oracle, write_output
 
