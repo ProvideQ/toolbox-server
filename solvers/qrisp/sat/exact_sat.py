@@ -2,6 +2,7 @@ import argparse
 import os
 import platform
 import subprocess
+import tempfile
 from qrisp.grover import grovers_alg
 from qrisp import *
 from qrisp_sat_utils import parse_dimacs, sat_oracle, write_output
@@ -20,41 +21,46 @@ sharp_sat_directory = os.path.abspath(args.sharp_sat_directory)
 if not os.path.isdir(sharp_sat_directory):
     raise FileNotFoundError(f"Sharp-SAT directory not found: {sharp_sat_directory}")
 
-cnf_path = os.path.abspath(args.input_file + ".cnf")
-if not os.path.isfile(cnf_path):
-    raise FileNotFoundError(f"CNF file not found at {cnf_path}")
+# temporary .cnf file for the binary
+input_file_path = os.path.abspath(args.input_file)
+if not os.path.isfile(input_file_path):
+    raise FileNotFoundError(f"Input file not found: {input_file_path}")
 
-system = platform.system().lower()
+with tempfile.TemporaryDirectory() as temp_dir:
+    temp_cnf_path = os.path.join(temp_dir, "problem.cnf")
 
-if system == "windows":
-    binary_name = "sharp-sat-solver-win.exe"
-elif system == "darwin":  # macOS
-    binary_name = "sharp-sat-solver-mac"
-elif system == "linux":
-    binary_name = "sharp-sat-solver-linux"
-else:
-    raise OSError("Unsupported operating system")
+    with open(input_file_path, "r") as src, open(temp_cnf_path, "w") as dest:
+        dest.write(src.read())
 
-binary_path = os.path.join(sharp_sat_directory, binary_name)
+    system = platform.system().lower()
 
-if not os.path.isfile(binary_path):
-    raise FileNotFoundError(f"Solver binary not found at {binary_path}")
+    if system == "windows":
+        binary_name = "sharp-sat-solver-win.exe"
+    elif system == "darwin":  # macOS
+        binary_name = "sharp-sat-solver-mac"
+    elif system == "linux":
+        binary_name = "sharp-sat-solver-linux"
+    else:
+        raise OSError("Unsupported operating system")
 
-if not os.path.isfile(cnf_path):
-    raise FileNotFoundError(f"CNF file not found at {cnf_path}")
-try:
-    result = subprocess.run(
-        [binary_path, cnf_path],
-        cwd=sharp_sat_directory,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        check=True,
-    )
-    sharpSolverResult = result.stdout
+    binary_path = os.path.join(sharp_sat_directory, binary_name)
 
-except subprocess.CalledProcessError as e:
-    raise RuntimeError(f"Solver execution failed: {e.stderr}") from e
+    if not os.path.isfile(binary_path):
+        raise FileNotFoundError(f"Solver binary not found at {binary_path}")
+
+    try:
+        result = subprocess.run(
+            [binary_path, temp_cnf_path],
+            cwd=sharp_sat_directory,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        sharpSolverResult = result.stdout
+
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Solver execution failed: {e.stderr}") from e
 
 try:
     start_tag = "# solutions"
