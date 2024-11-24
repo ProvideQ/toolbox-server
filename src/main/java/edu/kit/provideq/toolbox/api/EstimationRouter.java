@@ -15,7 +15,7 @@ import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import java.util.Objects;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
