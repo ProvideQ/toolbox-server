@@ -18,7 +18,7 @@ public class ProblemDto<InputT, ResultT> {
   private String typeId;
   private InputT input;
   private Solution<ResultT> solution;
-  private Optional<BoundWithInfo> bound;
+  private BoundWithInfo bound;
   private ProblemState state;
   private String solverId;
   private List<SolverSetting> solverSettings;
@@ -41,7 +41,7 @@ public class ProblemDto<InputT, ResultT> {
     dto.typeId = problem.getType().getId();
     dto.input = problem.getInput().orElse(null);
     dto.solution = problem.getSolution();
-    dto.bound = problem.getBound();
+    dto.bound = problem.getBound().orElse(null);
     dto.state = problem.getState();
     dto.solverId = problem.getSolver()
         .map(ProblemSolver::getId)
@@ -71,7 +71,7 @@ public class ProblemDto<InputT, ResultT> {
     return solution;
   }
 
-  public Optional<BoundWithInfo> getBound() {
+  public BoundWithInfo getBound() {
     return bound;
   }
 
