@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.KipuQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QuantagoniaQuboSolver;
@@ -39,11 +40,12 @@ public class QuboConfiguration {
       DwaveQuboSolver dwaveSolver,
       QrispQuboSolver qrispSolver,
       QuantagoniaQuboSolver quantagoniaQuboSolver,
+      KipuQuboSolver kipuQuboSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         QUBO,
-        Set.of(qiskitSolver, dwaveSolver, qrispSolver, quantagoniaQuboSolver),
+        Set.of(qiskitSolver, dwaveSolver, qrispSolver, quantagoniaQuboSolver, kipuQuboSolver),
         loadExampleProblems(resourceProvider)
     );
   }
