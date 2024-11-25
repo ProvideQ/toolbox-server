@@ -125,7 +125,11 @@ public class EstimationRouter {
     }
 
     int comparison = problem.getBound().get().bound().boundType().compare(bound, solutionValue);
-    ComparisonDto comparisonDto = new ComparisonDto(comparison, problem.getBound().get(), problem.getSolution());
+    ComparisonDto comparisonDto = new ComparisonDto(
+        comparison,
+        problem.getBound().get(),
+        problem.getSolution()
+    );
     return ok().body(Mono.just(comparisonDto), new ParameterizedTypeReference<>() {
     });
   }
