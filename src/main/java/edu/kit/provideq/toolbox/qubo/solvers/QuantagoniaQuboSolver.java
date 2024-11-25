@@ -6,6 +6,9 @@ import de.asbestian.jplex.input.Variable;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi;
+import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ProblemProperties;
+import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ResultProperties;
+import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.StatusProperties;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
@@ -16,6 +19,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -80,20 +84,22 @@ public class QuantagoniaQuboSolver extends QuboSolver {
         "/quantagonia/quantagonia-s-free-qubo-solver/1.0.0",
         quantagoniaQubo,
         planQkToken.get(),
-        new PlanQkApi.ProblemProperties("/v1/hqp/job"),
-        new PlanQkApi.StatusProperties<>(
-            QuantagoniaQuboStatus.class,
+        new ProblemProperties<>(
+            "/v1/hqp/job",
+            String.class,
+            Function.identity()),
+        new StatusProperties<>(
             "/v1/hqp/job/%s/status",
+            QuantagoniaQuboStatus.class,
             status -> switch (status) {
               case FINISHED -> PlanQkApi.JobStatus.SUCCEEDED;
               case TERMINATED, ERROR -> PlanQkApi.JobStatus.FAILED;
               case RUNNING, TIMEOUT -> PlanQkApi.JobStatus.RUNNING;
               case CREATED -> PlanQkApi.JobStatus.PENDING;
             }),
-        new PlanQkApi.ResultProperties<>(
-            QuantagoniaQuboSolution.class,
-            "/v1/hqp/job/%s/results"
-        )
+        new ResultProperties<>(
+            "/v1/hqp/job/%s/results",
+            QuantagoniaQuboSolution.class)
     ).flatMap(result -> {
       if (result == null) {
         var solution = new Solution<>(this);
