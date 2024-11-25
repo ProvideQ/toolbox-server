@@ -6,5 +6,5 @@ package edu.kit.provideq.toolbox;
  * @param value the estimated value
  * @param boundType the type of the bound
  */
-public record Bound(String value, BoundType boundType) {
+public record Bound(Float value, BoundType boundType) {
 }
