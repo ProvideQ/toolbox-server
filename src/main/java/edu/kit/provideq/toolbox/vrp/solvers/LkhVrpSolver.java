@@ -51,10 +51,25 @@ public class LkhVrpSolver extends VrpSolver {
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input, "problem.vrp")
+        .writeInputFile(adaptInput(input), "problem.vrp")
         .readOutputFile("problem.sol")
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
+  }
+
+  /**
+   * LKH-3 solver has an issue when the "EOF" tag.
+   * This method removes this substring.
+   *
+   * @param originalInput original input of the TSP problem
+   * @return adapted input with "EOF"
+   */
+  private String adaptInput(String originalInput) {
+    String inputAsVrp = originalInput;
+    if (inputAsVrp.endsWith("EOF")) {
+      inputAsVrp = inputAsVrp.replaceAll("EOF$", "");
+    }
+    return inputAsVrp;
   }
 }
