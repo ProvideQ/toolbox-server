@@ -32,11 +32,11 @@ public class PlanQkApi {
    * @param resultProperties    The properties of the result.
    * @return The result to the problem.
    */
-  public <ProblemT, StatusT, ResultT> Mono<ResultT> call(
+  public <ProblemT, ProblemResponseT, StatusT, ResultT> Mono<ResultT> call(
       String service,
       ProblemT problem,
       String authenticationToken,
-      ProblemProperties problemProperties,
+      ProblemProperties<ProblemResponseT> problemProperties,
       StatusProperties<StatusT> statusProperties,
       ResultProperties<ResultT> resultProperties) {
     var webClientBuilder = WebClient.builder();
@@ -55,47 +55,49 @@ public class PlanQkApi {
         .contentType(MediaType.APPLICATION_JSON)
         .body(BodyInserters.fromValue(problem))
         .retrieve()
-        .bodyToMono(String.class)
-        .flatMap(jobId -> webClient.get()
-            .uri(serviceEndpoint + statusProperties.jobStatusEndpoint().formatted(jobId))
-            .exchangeToMono(response -> {
-              // Handle different kinds of status responses
-              // Usually the JobStatus is returned as json object
-              // but some might use just an enum in plain text
-              MediaType contentType = response.headers().contentType().orElseThrow();
-              if (MediaType.TEXT_PLAIN.equals(contentType)) {
-                return response.bodyToMono(String.class)
-                    .map(status -> parseEnumStatus(statusProperties, status));
-              }
-
-              // Otherwise, assume the content type is application/json
-              return response.bodyToMono(statusProperties.statusClass());
-            })
-            .map(customStatus -> statusProperties.statusMapper().apply(customStatus))
-            .flatMap(status -> {
-              switch (status) {
-                case SUCCEEDED -> {
-                  return Mono.just(status);
+        .bodyToMono(problemProperties.responseClass())
+        .flatMap(problemResponse -> {
+          var jobId = problemProperties.jobIdMapper.apply(problemResponse);
+          return webClient.get()
+              .uri(serviceEndpoint + statusProperties.jobStatusEndpoint()
+                  .formatted(jobId))
+              .exchangeToMono(response -> {
+                // Handle different kinds of status responses
+                // Usually the JobStatus is returned as json object
+                // but some might use just an enum in plain text
+                MediaType contentType = response.headers().contentType().orElseThrow();
+                if (MediaType.TEXT_PLAIN.equals(contentType)) {
+                  return response.bodyToMono(String.class)
+                      .map(status -> parseEnumStatus(statusProperties, status));
                 }
-                case FAILED -> {
-                  return Mono.error(new PlanQkJobFailedException());
+                // Otherwise, assume the content type is application/json
+                return response.bodyToMono(statusProperties.statusClass());
+              })
+              .map(customStatus -> statusProperties.statusMapper().apply(customStatus))
+              .flatMap(status -> {
+                switch (status) {
+                  case SUCCEEDED -> {
+                    return Mono.just(status);
+                  }
+                  case FAILED -> {
+                    return Mono.error(new PlanQkJobFailedException());
+                  }
+                  default -> {
+                    return Mono.error(new PlanQkJobPendingException());
+                  }
                 }
-                default -> {
-                  return Mono.error(new PlanQkJobPendingException());
-                }
-              }
-            })
-            .retryWhen(Retry.backoff(100, Duration.ofSeconds(1))
-                .filter(PlanQkJobPendingException.class::isInstance))
-            .flatMap(succeededJobStatus ->
-                // The job finished successfully, so get the result
-                webClient.get()
-                    .uri(serviceEndpoint
-                        + resultProperties.jobResultsEndpoint().formatted(jobId))
-                    .retrieve()
-                    .bodyToMono(resultProperties.jobResultsClass())
-            )
-        );
+              })
+              .retryWhen(Retry.backoff(100, Duration.ofSeconds(1))
+                  .filter(PlanQkJobPendingException.class::isInstance))
+              .flatMap(succeededJobStatus ->
+                  // The job finished successfully, so get the result
+                  webClient.get()
+                      .uri(serviceEndpoint
+                          + resultProperties.jobResultsEndpoint().formatted(jobId))
+                      .retrieve()
+                      .bodyToMono(resultProperties.jobResultsClass())
+              );
+        });
   }
 
   private static <StatusT> StatusT parseEnumStatus(
@@ -190,11 +192,10 @@ public class PlanQkApi {
    * @param createJobEndpoint The POST endpoint to create a job.
    *                          Must contain %s placeholder for the job ID.
    */
-  public record ProblemProperties(
-      String createJobEndpoint) {
-    public static PlanQkApi.ProblemProperties defaultProblemProperties() {
-      return new PlanQkApi.ProblemProperties("/jobs");
-    }
+  public record ProblemProperties<ResponseT>(
+      String createJobEndpoint,
+      Class<ResponseT> responseClass,
+      Function<ResponseT, String> jobIdMapper) {
   }
 
   /**
@@ -207,13 +208,13 @@ public class PlanQkApi {
    * @param <StatusT>         The type of the custom status.
    */
   public record StatusProperties<StatusT>(
-      Class<StatusT> statusClass,
       String jobStatusEndpoint,
+      Class<StatusT> statusClass,
       Function<StatusT, JobStatus> statusMapper) {
     public static PlanQkApi.StatusProperties<JobInfo> defaultStatusProperties() {
       return new PlanQkApi.StatusProperties<>(
-          PlanQkApi.JobInfo.class,
           "/jobs/%s",
+          PlanQkApi.JobInfo.class,
           PlanQkApi.JobInfo::getStatus);
     }
   }
@@ -225,11 +226,11 @@ public class PlanQkApi {
    * @param jobResultsEndpoint The endpoint to get the result of a job.
    */
   public record ResultProperties<ResultT>(
-      Class<ResultT> jobResultsClass,
-      String jobResultsEndpoint) {
+      String jobResultsEndpoint,
+      Class<ResultT> jobResultsClass) {
     public static <ResultT> PlanQkApi.ResultProperties<ResultT> defaultResultProperties(
         Class<ResultT> resultClass) {
-      return new PlanQkApi.ResultProperties<>(resultClass, "/jobs/%s/results");
+      return new PlanQkApi.ResultProperties<>("/jobs/%s/results", resultClass);
     }
   }
 }
