@@ -97,11 +97,11 @@ public class Problem<InputT, ResultT> {
 
     long start = System.currentTimeMillis();
 
-    var bound = estimator.apply(this.input);
+    var estimatedBound = estimator.apply(this.input);
     long finish = System.currentTimeMillis();
     var executionTime = finish - start;
 
-    this.bound = new BoundWithInfo(bound, executionTime);
+    this.bound = new BoundWithInfo(estimatedBound, executionTime);
   }
 
   public UUID getId() {
