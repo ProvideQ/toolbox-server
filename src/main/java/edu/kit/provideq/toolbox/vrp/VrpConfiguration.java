@@ -27,6 +27,7 @@ public class VrpConfiguration {
       "vrp",
       String.class,
       String.class,
+      null,
       null
   );
 

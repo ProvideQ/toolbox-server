@@ -17,6 +17,7 @@ public class DemonstratorConfiguration {
       "demonstrator",
       String.class,
       String.class,
+      null,
       null
   );
 

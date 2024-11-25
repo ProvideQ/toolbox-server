@@ -12,6 +12,7 @@ public class ProblemType<InputT, ResultT> {
   private final Class<InputT> inputClass;
   private final Class<ResultT> resultClass;
   private final Function<InputT, Bound> estimator;
+  private final String solutionPattern;
 
   /**
    * Defines a new problem type.
@@ -26,12 +27,14 @@ public class ProblemType<InputT, ResultT> {
       String id,
       Class<InputT> inputClass,
       Class<ResultT> resultClass,
-      Function<InputT, Bound> estimator
+      Function<InputT, Bound> estimator,
+      String solutionPattern
   ) {
     this.id = id;
     this.inputClass = inputClass;
     this.resultClass = resultClass;
     this.estimator = estimator;
+    this.solutionPattern = solutionPattern;
   }
 
   /**
@@ -60,6 +63,10 @@ public class ProblemType<InputT, ResultT> {
    */
   public Optional<Function<InputT, Bound>> getEstimator() {
     return Optional.ofNullable(estimator);
+  }
+
+  public String getSolutionPattern() {
+    return solutionPattern;
   }
 
   @Override

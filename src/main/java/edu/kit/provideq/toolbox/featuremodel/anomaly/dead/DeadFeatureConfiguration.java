@@ -27,6 +27,7 @@ public class DeadFeatureConfiguration {
       "feature-model-anomaly-dead",
       String.class,
       String.class,
+      null,
       null
   );
 
