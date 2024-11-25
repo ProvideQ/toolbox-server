@@ -4,7 +4,6 @@ import edu.kit.provideq.toolbox.integration.planqk.exception.PlanQkJobFailedExce
 import edu.kit.provideq.toolbox.integration.planqk.exception.PlanQkJobPendingException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.function.Function;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -126,9 +125,9 @@ public class PlanQkApi {
   public static class JobInfo {
     private String id;
     private JobStatus status;
-    private Date createdAt;
-    private Date startedAt;
-    private Date endedAt;
+    private String createdAt;
+    private String startedAt;
+    private String endedAt;
 
     /**
      * Job ID.
@@ -155,33 +154,33 @@ public class PlanQkApi {
     /**
      * Date of creation.
      */
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
       return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
       this.createdAt = createdAt;
     }
 
     /**
      * Date of starting.
      */
-    public Date getStartedAt() {
+    public String getStartedAt() {
       return startedAt;
     }
 
-    public void setStartedAt(Date startedAt) {
+    public void setStartedAt(String startedAt) {
       this.startedAt = startedAt;
     }
 
     /**
      * Date of ending.
      */
-    public Date getEndedAt() {
+    public String getEndedAt() {
       return endedAt;
     }
 
-    public void setEndedAt(Date endedAt) {
+    public void setEndedAt(String endedAt) {
       this.endedAt = endedAt;
     }
   }
