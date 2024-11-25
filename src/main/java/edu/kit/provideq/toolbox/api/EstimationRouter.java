@@ -124,13 +124,9 @@ public class EstimationRouter {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not parse solution value!");
     }
 
-    int comparison = problem.getBound().get().bound().boundType().compare(bound, solutionValue);
-    ComparisonDto comparisonDto = new ComparisonDto(
-        comparison,
-        problem.getBound().get(),
-        problem.getSolution()
-    );
-    return ok().body(Mono.just(comparisonDto), new ParameterizedTypeReference<>() {
+    Integer comparison = problem.getBound().get().bound().boundType().compare(bound, solutionValue);
+
+    return ok().body(Mono.just(comparison), new ParameterizedTypeReference<>() {
     });
   }
 
@@ -163,7 +159,7 @@ public class EstimationRouter {
         .parameter(parameterBuilder().in(ParameterIn.PATH).name(PROBLEM_ID_PARAM_NAME))
         .response(responseBuilder()
               .responseCode(String.valueOf(HttpStatus.OK.value()))
-              .content(comparisonOkResponseContent())
+              .content(getOkResponseContent())
         );
   }
 
@@ -173,10 +169,10 @@ public class EstimationRouter {
             .schema(schemaBuilder().implementation(BoundDto.class));
   }
 
-  private static org.springdoc.core.fn.builders.content.Builder comparisonOkResponseContent() {
+  private static org.springdoc.core.fn.builders.content.Builder getComparisonResponseContent() {
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)
-            .schema(schemaBuilder().implementation(ComparisonDto.class));
+            .schema(schemaBuilder().implementation(Integer.class));
   }
 
   private <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(

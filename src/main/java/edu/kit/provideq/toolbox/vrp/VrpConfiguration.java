@@ -26,7 +26,9 @@ public class VrpConfiguration {
   public static final ProblemType<String, String> VRP = new ProblemType<>(
       "vrp",
       String.class,
-      String.class
+      String.class,
+      null,
+      null
   );
 
   @Bean

@@ -28,7 +28,9 @@ public class QuboConfiguration {
   public static final ProblemType<String, String> QUBO = new ProblemType<>(
       "qubo",
       String.class,
-      String.class
+      String.class,
+      null,
+      null
   );
 
   @Bean
