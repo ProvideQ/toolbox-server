@@ -14,9 +14,9 @@ import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.ToIntFunction;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -119,76 +119,42 @@ public class QuantagoniaQuboSolver extends QuboSolver {
       throws ConversionException {
     var qubo = new QuantagoniaQuboProblem();
 
-    switch (lpReader.getObjective(0).sense()) {
-      case MAX:
-        qubo.setSense("MAXIMIZE");
-        break;
-      case MIN:
-        qubo.setSense("MINIMIZE");
-        break;
-      case UNDEF:
-        throw new ConversionException("Objective sense is undefined");
-      default:
-        throw new ConversionException("Unknown objective sense");
-    }
+    var objective = lpReader.getObjective(0);
+    var sense = switch (objective.sense()) {
+      case MAX -> "MAXIMIZE";
+      case MIN -> "MINIMIZE";
+      case UNDEF -> throw new ConversionException("Objective sense is undefined");
+    };
+    qubo.setSense(sense);
 
-    var variables = new HashSet<String>();
-    for (Variable variable : lpReader.getContinuousVariables()) {
-      // This name is either
-      // - a single variable (x0)
-      // - a product of variables (x0 * x1)
-      // - an exponent of a variable (x0 ^ 2)
-      String name = variable.name();
+    // Map variable names to digit identifiers which Quantagonia expects
+    var binaryVariables = lpReader.getBinaryVariables();
+    ToIntFunction<Variable> getVariableIndex = binaryVariables::indexOf;
 
-      // Check product
-      String[] factors = name.split("\\*");
-      if (factors.length > 1) {
-        var coefficients = lpReader.getObjective(0).coefficients();
-        var coefficient = coefficients.get(name);
-
-        // Get factors (x0 => 0)
-        double i = getVariableIndex(factors[0]);
-        double j = getVariableIndex(factors[1]);
-
-        variables.add(factors[0].trim());
-        variables.add(factors[1].trim());
-
-        // Add quadratic term at i j with coefficient / -4
-        qubo.getMatrix().getQuadratic().add(List.of(i, j, coefficient / -4));
-      } else {
-        // Check exponent
-        String[] exponent = name.split("\\^");
-        if (exponent.length > 1) {
-          var coefficients = lpReader.getObjective(0).coefficients();
-          var coefficient = coefficients.get(name);
-
-          // Get factor (x0 => 0)
-          double i = Double.parseDouble(exponent[0].trim().replace("x", ""));
-
-          variables.add(exponent[0].trim());
-
-          // Add quadratic term at i i with coefficient / 2
-          qubo.getMatrix().getLinear().add(List.of(i, i, Math.abs(coefficient / 2)));
-        }
-
-        // Ignore single variable
+    // Fill matrix
+    for (var term : objective.terms()) {
+      var coefficient = term.coefficient();
+      var multiplicands = term.multiplicands();
+      if (multiplicands.size() != 2) {
+        throw new ConversionException("Only quadratic terms are supported");
       }
+
+      var var1 = getVariableIndex.applyAsInt(multiplicands.get(0));
+      var var2 = getVariableIndex.applyAsInt(multiplicands.get(1));
+
+      if (var1 == var2) {
+        // Add term in the diagonal with coefficient / 2
+        qubo.getMatrix().getLinear().add(List.of(var1, var2, Math.abs(coefficient / 2)));
+      } else {
+        // Add term at i j with coefficient / -4
+        qubo.getMatrix().getQuadratic().add(List.of(var1, var2, coefficient / -4));
+      }
+
     }
 
-    qubo.getMatrix().setNumberOfVariables(variables.size());
+    qubo.getMatrix().setNumberOfVariables(binaryVariables.size());
 
     return qubo;
-  }
-
-  /**
-   * Get the index of a variable from its name.
-   * Currently only supports variables of the form x0, x1, x2, ...
-   *
-   * @param variableName The name of the variable
-   * @return The index of the variable
-   */
-  static double getVariableIndex(String variableName) {
-    return Double.parseDouble(variableName.trim().replace("x", ""));
   }
 
   static class QuantagoniaQuboProblem {
@@ -215,8 +181,8 @@ public class QuantagoniaQuboSolver extends QuboSolver {
     public static class Matrix {
       @JsonProperty("n")
       private int numberOfVariables;
-      private List<List<Double>> linear = new ArrayList<>();
-      private List<List<Double>> quadratic = new ArrayList<>();
+      private List<List<Number>> linear = new ArrayList<>();
+      private List<List<Number>> quadratic = new ArrayList<>();
 
       public int getNumberOfVariables() {
         return numberOfVariables;
@@ -226,19 +192,19 @@ public class QuantagoniaQuboSolver extends QuboSolver {
         this.numberOfVariables = numberOfVariables;
       }
 
-      public List<List<Double>> getLinear() {
+      public List<List<Number>> getLinear() {
         return linear;
       }
 
-      public void setLinear(List<List<Double>> linear) {
+      public void setLinear(List<List<Number>> linear) {
         this.linear = linear;
       }
 
-      public List<List<Double>> getQuadratic() {
+      public List<List<Number>> getQuadratic() {
         return quadratic;
       }
 
-      public void setQuadratic(List<List<Double>> quadratic) {
+      public void setQuadratic(List<List<Number>> quadratic) {
         this.quadratic = quadratic;
       }
     }
