@@ -25,9 +25,7 @@ public class TspConfiguration {
   public static final ProblemType<String, String> TSP = new ProblemType<>(
       "tsp",
       String.class,
-      String.class,
-      null,
-      null
+      String.class
   );
 
   @Bean
