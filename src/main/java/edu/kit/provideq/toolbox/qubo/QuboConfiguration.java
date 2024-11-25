@@ -50,7 +50,7 @@ public class QuboConfiguration {
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("quadratic-problem.txt"),
+          getClass().getResourceAsStream("qubo.lp"),
           "quadratic-problem example for QUBO is unavailable!"
       );
       var problem = new Problem<>(QUBO);
