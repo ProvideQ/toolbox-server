@@ -9,7 +9,7 @@ public enum BoundType {
    */
   UPPER {
     @Override
-    public int compare(int bound, int actual) {
+    public float compare(float bound, float actual) {
       return 1 - (bound / actual);
     }
   },
@@ -18,10 +18,10 @@ public enum BoundType {
    */
   LOWER {
     @Override
-    public int compare(int bound, int actual) {
+    public float compare(float bound, float actual) {
       return actual / bound - 1;
     }
   };
 
-  public abstract int compare(int bound, int actual);
+  public abstract float compare(float bound, float actual);
 }

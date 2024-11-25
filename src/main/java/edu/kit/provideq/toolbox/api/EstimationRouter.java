@@ -114,17 +114,17 @@ public class EstimationRouter {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bound not estimated yet!");
     }
 
-    int bound = Integer.parseInt(problem.getBound().get().bound().value());
+    float bound = problem.getBound().get().bound().value();
     var pattern = Pattern.compile(manager.getType().getSolutionPattern());
     var solutionMatcher = pattern.matcher(problem.getSolution().getSolutionData().toString());
-    int solutionValue;
+    float solutionValue;
     if (solutionMatcher.find()) {
-      solutionValue = Integer.parseInt(solutionMatcher.group(1));
+      solutionValue = Float.parseFloat(solutionMatcher.group(1));
     } else {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not parse solution value!");
     }
 
-    int comparison = problem.getBound().get().bound().boundType().compare(bound, solutionValue);
+    float comparison = problem.getBound().get().bound().boundType().compare(bound, solutionValue);
     ComparisonDto comparisonDto = new ComparisonDto(
         comparison,
         problem.getBound().get(),

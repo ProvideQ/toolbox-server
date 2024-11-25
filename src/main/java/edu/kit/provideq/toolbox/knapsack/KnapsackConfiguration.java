@@ -43,7 +43,7 @@ public class KnapsackConfiguration {
     }
     items.sort(Comparator.comparingInt(a -> -a.getKey() / a.getValue()));
     // keep adding items until the weight limit is reached, then add a fraction of the next item
-    int bound = 0;
+    float bound = 0;
     int currentWeight = 0;
     while (currentWeight < weightLimit) {
       var item = items.remove(0);
@@ -53,12 +53,12 @@ public class KnapsackConfiguration {
         bound += value;
         currentWeight += weight;
       } else {
-        var fraction = (weightLimit - currentWeight) / (double) weight;
-        bound += (int) (fraction * value);
+        var fraction = (weightLimit - currentWeight) / (float) weight;
+        bound += (fraction * value);
         break;
       }
     }
-    return new Bound(String.valueOf(bound), BoundType.UPPER);
+    return new Bound(bound, BoundType.UPPER);
   };
 
   /**
