@@ -26,9 +26,7 @@ public class DeadFeatureConfiguration {
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_DEAD = new ProblemType<>(
       "feature-model-anomaly-dead",
       String.class,
-      String.class,
-      null,
-      null
+      String.class
   );
 
   @Bean

@@ -38,6 +38,21 @@ public class ProblemType<InputT, ResultT> {
   }
 
   /**
+   * Defines a new problem type without estimation support.
+   *
+   * @param id          a unique string identifier for this type of problem.
+   * @param inputClass  the Java class object corresponding to the {@link InputT} type parameter.
+   * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
+   */
+  public ProblemType(
+      String id,
+      Class<InputT> inputClass,
+      Class<ResultT> resultClass
+  ) {
+    this(id, inputClass, resultClass, null, null);
+  }
+
+  /**
    * Returns the unique identifier for this problem type.
    */
   public String getId() {

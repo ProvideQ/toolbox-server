@@ -26,9 +26,7 @@ public class VoidModelConfiguration {
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_VOID = new ProblemType<>(
       "feature-model-anomaly-void",
       String.class,
-      String.class,
-      null,
-      null
+      String.class
   );
 
   @Bean
