@@ -27,6 +27,7 @@ public class VoidModelConfiguration {
       "feature-model-anomaly-void",
       String.class,
       String.class,
+      null,
       null
   );
 

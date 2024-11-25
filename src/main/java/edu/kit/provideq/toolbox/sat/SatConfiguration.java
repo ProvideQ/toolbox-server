@@ -26,6 +26,7 @@ public class SatConfiguration {
       "sat",
       String.class,
       DimacsCnfSolution.class,
+      null,
       null
   );
 
