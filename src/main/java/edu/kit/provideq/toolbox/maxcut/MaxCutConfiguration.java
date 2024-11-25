@@ -28,6 +28,7 @@ public class MaxCutConfiguration {
       "max-cut",
       String.class,
       String.class,
+      null,
       null
   );
 

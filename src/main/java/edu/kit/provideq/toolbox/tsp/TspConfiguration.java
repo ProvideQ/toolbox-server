@@ -26,6 +26,7 @@ public class TspConfiguration {
       "tsp",
       String.class,
       String.class,
+      null,
       null
   );
 

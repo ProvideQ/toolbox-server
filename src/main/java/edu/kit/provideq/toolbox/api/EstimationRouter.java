@@ -10,6 +10,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+import com.google.common.collect.Streams;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -17,6 +18,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,10 +44,15 @@ public class EstimationRouter {
 
   @Bean
   RouterFunction<ServerResponse> getEstimationRoutes() {
-    return managerProvider.getProblemManagers().stream()
-            .filter(manager -> manager.getType().getEstimator().isPresent())
-            .map(this::defineGetRoute)
-            .reduce(RouterFunction::and)
+    var managers = managerProvider.getProblemManagers();
+    return Streams.concat(
+            managers.stream()
+                    .filter(manager -> manager.getType().getEstimator().isPresent())
+                    .map(this::defineGetRoute),
+            managers.stream()
+                    .filter(manager -> manager.getType().getSolutionPattern() != null)
+                    .map(this::defineCompareRoute)
+    ).reduce(RouterFunction::and)
             .orElse(null);
   }
 
@@ -58,6 +65,18 @@ public class EstimationRouter {
             accept(APPLICATION_JSON),
             req -> handleGet(manager, req),
             ops -> handleGetDocumentation(manager, ops)
+    ).build();
+  }
+
+  /**
+   * Compare Operation: GET /problems/TYPE/{problemId}/bound/compare.
+   */
+  private RouterFunction<ServerResponse> defineCompareRoute(ProblemManager<?, ?> manager) {
+    return route().GET(
+            getCompareRouteForProblemType(manager.getType()),
+            accept(APPLICATION_JSON),
+            req -> handleCompare(manager, req),
+            ops -> handleCompareDocumentation(manager, ops)
     ).build();
   }
 
@@ -80,6 +99,37 @@ public class EstimationRouter {
     });
   }
 
+  private <InputT, ResultT> Mono<ServerResponse> handleCompare(
+          ProblemManager<InputT, ResultT> manager,
+          ServerRequest req
+  ) {
+    var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
+    var problem = findProblemOrThrow(manager, problemId);
+
+    if (problem.getSolution() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Problem not solved yet!");
+    }
+
+    if (problem.getBound().isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bound not estimated yet!");
+    }
+
+    int bound = Integer.parseInt(problem.getBound().get().bound().value());
+    var pattern = Pattern.compile(manager.getType().getSolutionPattern());
+    var solutionMatcher = pattern.matcher(problem.getSolution().getSolutionData().toString());
+    int solutionValue;
+    if (solutionMatcher.find()) {
+      solutionValue = Integer.parseInt(solutionMatcher.group(1));
+    } else {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not parse solution value!");
+    }
+
+    Integer comparison = problem.getBound().get().bound().boundType().compare(bound, solutionValue);
+
+    return ok().body(Mono.just(comparison), new ParameterizedTypeReference<>() {
+    });
+  }
+
   private void handleGetDocumentation(
           ProblemManager<?, ?> manager,
           Builder ops
@@ -96,10 +146,33 @@ public class EstimationRouter {
         );
   }
 
+  private void handleCompareDocumentation(
+          ProblemManager<?, ?> manager,
+          Builder ops
+  ) {
+    ProblemType<?, ?> problemType = manager.getType();
+    ops
+        .operationId(getCompareRouteForProblemType(problemType))
+        .tag(problemType.getId())
+        .description("Compares the solution value with the bound for "
+                + "the problem with the given ID.")
+        .parameter(parameterBuilder().in(ParameterIn.PATH).name(PROBLEM_ID_PARAM_NAME))
+        .response(responseBuilder()
+              .responseCode(String.valueOf(HttpStatus.OK.value()))
+              .content(getOkResponseContent())
+        );
+  }
+
   private static org.springdoc.core.fn.builders.content.Builder getOkResponseContent() {
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)
             .schema(schemaBuilder().implementation(BoundDto.class));
+  }
+
+  private static org.springdoc.core.fn.builders.content.Builder getComparisonResponseContent() {
+    return contentBuilder()
+            .mediaType(APPLICATION_JSON_VALUE)
+            .schema(schemaBuilder().implementation(Integer.class));
   }
 
   private <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(
@@ -120,6 +193,10 @@ public class EstimationRouter {
 
   private String getEstimationRouteForProblemType(ProblemType<?, ?> type) {
     return "/problems/%s/{%s}/bound".formatted(type.getId(), PROBLEM_ID_PARAM_NAME);
+  }
+
+  private String getCompareRouteForProblemType(ProblemType<?, ?> type) {
+    return getEstimationRouteForProblemType(type) + "/compare";
   }
 
   @Autowired

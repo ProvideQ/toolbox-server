@@ -29,6 +29,7 @@ public class QuboConfiguration {
       "qubo",
       String.class,
       String.class,
+      null,
       null
   );
 
