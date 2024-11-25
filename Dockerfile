@@ -32,6 +32,15 @@ RUN jlink \
 FROM debian:bullseye-slim AS runner
 WORKDIR /app
 
+# Copy the pre-built glibc binaries into the container
+COPY lib/glibc-2.39.tar.gz /tmp/
+
+# Extract and install glibc
+RUN tar -xvzf /tmp/glibc-2.39.tar.gz -C /opt && \
+    rm -f /tmp/glibc-2.39.tar.gz
+# Set the dynamic linker path
+ENV LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
+
 COPY scripts scripts
 
 # Install GAMS with conda python environment
