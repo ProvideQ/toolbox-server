@@ -8,7 +8,6 @@ import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Data transfer object for {@link Problem problems}, used in REST API request bodies and responses.
