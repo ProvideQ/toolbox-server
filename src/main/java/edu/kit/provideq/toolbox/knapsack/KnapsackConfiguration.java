@@ -27,7 +27,8 @@ public class KnapsackConfiguration {
   public static final ProblemType<String, String> KNAPSACK = new ProblemType<>(
       "knapsack",
         String.class,
-        String.class
+        String.class,
+        null
     );
 
   @Bean

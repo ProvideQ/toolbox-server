@@ -25,7 +25,8 @@ public class SatConfiguration {
   public static final ProblemType<String, DimacsCnfSolution> SAT = new ProblemType<>(
       "sat",
       String.class,
-      DimacsCnfSolution.class
+      DimacsCnfSolution.class,
+      null
   );
 
   @Bean

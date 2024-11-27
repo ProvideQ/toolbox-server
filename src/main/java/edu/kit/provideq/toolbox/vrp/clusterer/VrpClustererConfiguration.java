@@ -19,7 +19,8 @@ public class VrpClustererConfiguration {
   public static final ProblemType<String, String> CLUSTER_VRP = new ProblemType<>(
       "cluster-vrp",
       String.class,
-      String.class
+      String.class,
+      null
   );
 
   @Bean
