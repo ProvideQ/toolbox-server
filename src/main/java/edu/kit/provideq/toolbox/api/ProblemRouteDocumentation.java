@@ -27,6 +27,10 @@ import org.springframework.http.HttpStatus;
 final class ProblemRouteDocumentation {
   private static final String ENDPOINT_NAME = "problems";
 
+  private ProblemRouteDocumentation() {
+    throw new UnsupportedOperationException("This class should not be instantiated.");
+  }
+
   static void configureCreateDocs(ProblemManager<?, ?> manager, Builder ops) {
     var type = manager.getType();
     ops
