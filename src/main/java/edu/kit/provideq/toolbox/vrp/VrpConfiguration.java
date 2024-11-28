@@ -63,7 +63,7 @@ public class VrpConfiguration {
       }
       return problemSet;
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(VRP, e);
     }
   }
 }

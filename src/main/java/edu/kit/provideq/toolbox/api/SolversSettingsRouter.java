@@ -11,6 +11,8 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
+import edu.kit.provideq.toolbox.exception.MissingSolverException;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -107,7 +109,7 @@ public class SolversSettingsRouter {
                     .getSolvers().stream()
                     .findFirst()
                     .map(ProblemSolver::getId)
-                    .orElseThrow(() -> new RuntimeException("No solver found")));
+                    .orElseThrow(() -> new MissingExampleException(manager.getType())));
   }
 
   private static Builder getOkResponseContent(ProblemManager<?, ?> manager) {
@@ -122,7 +124,7 @@ public class SolversSettingsRouter {
                 throw new JsonParseException(e);
               }
             })
-            .orElseThrow(() -> new RuntimeException("no solver found"));
+            .orElseThrow(() -> new MissingSolverException(manager.getType()));
 
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)

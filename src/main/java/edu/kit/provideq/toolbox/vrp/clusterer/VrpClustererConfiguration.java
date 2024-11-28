@@ -47,7 +47,7 @@ public class VrpClustererConfiguration {
       problem.setInput(resourceProvider.readStream(problemStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(CLUSTER_VRP, e);
     }
   }
 }
