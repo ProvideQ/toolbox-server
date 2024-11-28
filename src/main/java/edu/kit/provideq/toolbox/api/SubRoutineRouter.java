@@ -11,6 +11,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.provideq.toolbox.exception.MissingSolverException;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -18,6 +19,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.content.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
@@ -108,7 +110,7 @@ public class SubRoutineRouter {
                     .getSolvers().stream()
                     .findFirst()
                     .map(ProblemSolver::getId)
-                    .orElseThrow(() -> new RuntimeException("No solver found")));
+                    .orElseThrow(() -> new MissingSolverException(manager.getType())));
   }
 
   private static Builder getOkResponseContent(ProblemManager<?, ?> manager) {
@@ -122,10 +124,10 @@ public class SubRoutineRouter {
               try {
                 return new ObjectMapper().writeValueAsString(subRoutineDtos);
               } catch (JsonProcessingException e) {
-                throw new RuntimeException("example could not be parsed", e);
+                throw new JsonParseException(e);
               }
             })
-            .orElseThrow(() -> new RuntimeException("no solver found"));
+            .orElseThrow(() -> new MissingSolverException(manager.getType()));
 
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)

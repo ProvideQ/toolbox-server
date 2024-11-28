@@ -45,7 +45,7 @@ public class KnapsackConfiguration {
   }
 
   private Set<Problem<String, String>> loadExampleProblems(
-        ResourceProvider resourceProvider
+      ResourceProvider resourceProvider
   ) {
     try {
       var problemInputStream = Objects.requireNonNull(
@@ -56,7 +56,7 @@ public class KnapsackConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(KNAPSACK, e);
     }
   }
 }
