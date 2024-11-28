@@ -66,7 +66,7 @@ public class EstimationRouter {
           ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
-    var problem = findProblemOrThrow(manager, problemId);
+    var problem = RouterUtility.findProblemOrThrow(manager, problemId);
 
     Mono<BoundDto> bound;
     try {
@@ -100,22 +100,6 @@ public class EstimationRouter {
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)
             .schema(schemaBuilder().implementation(BoundDto.class));
-  }
-
-  private <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(
-          ProblemManager<InputT, ResultT> manager,
-          String id
-  ) {
-    UUID uuid;
-    try {
-      uuid = UUID.fromString(id);
-    } catch (IllegalArgumentException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid problem ID");
-    }
-
-    return manager.findInstanceById(uuid)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Could not find a problem for this type with this problem ID!"));
   }
 
   private String getEstimationRouteForProblemType(ProblemType<?, ?> type) {
