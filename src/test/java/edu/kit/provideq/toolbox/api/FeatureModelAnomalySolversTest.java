@@ -56,7 +56,8 @@ class FeatureModelAnomalySolversTest {
     var satManager = problemManagerProvider.findProblemManagerForType(SAT).get();
 
     var satSolver = satManager.getSolvers().stream()
-        .filter(solver -> !(solver instanceof QrispSatSolver || solver instanceof ExactQrispSatSolver))
+        .filter(solver -> !(solver instanceof QrispSatSolver
+            || solver instanceof ExactQrispSatSolver))
         .toList();
 
     return ApiTestHelper.getAllArgumentCombinations(featureModelManager, satSolver)
