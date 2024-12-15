@@ -32,13 +32,13 @@ RUN jlink \
 FROM debian:bullseye-slim AS runner
 WORKDIR /app
 
-# Copy the pre-built glibc binaries into the container
+# Install glibc 2.39
 COPY lib/glibc-2.39.tar.gz /tmp/
-
-# Extract and install glibc
 RUN tar -xvzf /tmp/glibc-2.39.tar.gz -C /opt && \
-    rm -f /tmp/glibc-2.39.tar.gz
-# Set the dynamic linker path
+    rm -f /tmp/glibc-2.39.tar.gz && \
+    ln -sf /opt/glibc-2.39/lib/ld-2.39.so /lib64/ld-linux-x86-64.so.2 && \
+    ln -sf /opt/glibc-2.39/lib/libc.so.6 /lib64/libc.so.6
+
 ENV LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
 
 COPY scripts scripts
