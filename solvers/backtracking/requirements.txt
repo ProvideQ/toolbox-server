@@ -1,0 +1,2 @@
+matplotlib~=3.9.2
+qrisp~=0.4.10
