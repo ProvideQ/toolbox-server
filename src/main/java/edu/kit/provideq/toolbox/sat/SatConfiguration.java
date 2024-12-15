@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sat.solvers.BacktrackingSatSolver;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import java.io.IOException;
 import java.util.Objects;
@@ -32,11 +33,12 @@ public class SatConfiguration {
   @Bean
   ProblemManager<String, DimacsCnfSolution> getSatManager(
       GamsSatSolver gamsSolver,
+      BacktrackingSatSolver backtrackingSatSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         SAT,
-        Set.of(gamsSolver),
+        Set.of(gamsSolver, backtrackingSatSolver),
         loadExampleProblems(resourceProvider)
     );
   }
