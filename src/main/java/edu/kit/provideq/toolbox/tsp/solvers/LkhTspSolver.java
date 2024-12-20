@@ -36,6 +36,11 @@ public class LkhTspSolver extends TspSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solver for the TSP Problem using the LKH-3 heuristics.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,

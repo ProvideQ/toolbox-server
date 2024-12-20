@@ -34,6 +34,12 @@ public class GamsMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves the MaxCut problem using GAMS. This starts from a SDP relaxation then used as a "
+        + " starting point for the QUBO algorithm.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,

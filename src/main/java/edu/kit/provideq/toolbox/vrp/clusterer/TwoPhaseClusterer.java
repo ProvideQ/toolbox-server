@@ -42,6 +42,12 @@ public class TwoPhaseClusterer extends VrpClusterer {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves VRP problems by clustering them into a set of TSP problems "
+        + "using a two-phase clustering approach.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver resolver,

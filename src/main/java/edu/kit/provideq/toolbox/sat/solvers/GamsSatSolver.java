@@ -38,6 +38,11 @@ public class GamsSatSolver extends SatSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves SAT problems using GAMS as a Mixed Integer Programming problem.";
+  }
+
+  @Override
   public Mono<Solution<DimacsCnfSolution>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,

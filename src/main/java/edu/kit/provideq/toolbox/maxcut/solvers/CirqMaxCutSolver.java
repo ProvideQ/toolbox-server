@@ -34,6 +34,11 @@ public class CirqMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves the MaxCut problem using a Cirq QAOA implementation.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,

@@ -40,6 +40,11 @@ public class QrispQuboSolver extends QuboSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "A solver for QUBOs using the Qrisp QAOA implementation.";
+  }
+
+  @Override
   public List<SolverSetting> getSolverSettings() {
     return List.of(
         new IntegerSetting(

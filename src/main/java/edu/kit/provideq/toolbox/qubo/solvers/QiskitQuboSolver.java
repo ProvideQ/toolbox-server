@@ -34,6 +34,11 @@ public class QiskitQuboSolver extends QuboSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves QUBOs using the Qiskit QAOA implementation.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
