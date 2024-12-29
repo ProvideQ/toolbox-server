@@ -125,8 +125,8 @@ public class KipuQuboSolver extends QuboSolver {
         throw new ConversionException("Only quadratic terms are supported");
       }
 
-      var var1 = getVariableIndex.applyAsInt(multiplicands.get(0));
-      var var2 = getVariableIndex.applyAsInt(multiplicands.get(1));
+      int var1 = getVariableIndex.applyAsInt(multiplicands.get(0));
+      int var2 = getVariableIndex.applyAsInt(multiplicands.get(1));
       qubo.getCoefficients().put(
           var1 == var2
               ? String.format("(%d,)", var1)
