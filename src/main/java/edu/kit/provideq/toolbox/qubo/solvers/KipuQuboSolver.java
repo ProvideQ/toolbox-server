@@ -15,8 +15,6 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.TextSetting;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
-import java.io.BufferedReader;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,12 +60,8 @@ public class KipuQuboSolver extends QuboSolver {
       return Mono.just(Solution.failed(this, "No PlanQK token provided."));
     }
 
-    // Convert problem data string to buffered reader
-    var problemDataReader = new BufferedReader(new StringReader(input));
-    // Parse lp data
-    LpFileReader lpReader = new LpFileReader(problemDataReader);
-
     KipuQuboProblem kipuQubo;
+    LpFileReader lpReader = LpFileReader.fromInput(input);
     try {
       kipuQubo = parseKipuQubo(lpReader);
     } catch (ConversionException e) {
