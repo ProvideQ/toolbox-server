@@ -59,10 +59,7 @@ public class KipuQuboSolver extends QuboSolver {
 
     // Return if no token is provided
     if (planQkToken.isEmpty()) {
-      var solution = new Solution<>(this);
-      solution.setDebugData("No PlanQK token provided.");
-      solution.abort();
-      return Mono.just(solution);
+      return Mono.just(Solution.failed(this, "No PlanQK token provided."));
     }
 
     // Convert problem data string to buffered reader
@@ -74,10 +71,7 @@ public class KipuQuboSolver extends QuboSolver {
     try {
       kipuQubo = parseKipuQubo(lpReader);
     } catch (ConversionException e) {
-      var solution = new Solution<>(this);
-      solution.setDebugData(e.getMessage());
-      solution.abort();
-      return Mono.just(solution);
+      return Mono.just(Solution.failed(this, e.getMessage()));
     }
 
     var kipuQuboRequest = new KipuQuboRequest();
