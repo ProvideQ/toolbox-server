@@ -38,8 +38,8 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
 
   @Override
   public String getDescription() {
-    return "This solver builds SAT formulae to determine void features in a feature model."
-        + " It uses a SAT solver to determine if there is any valid configurations of the +"
+    return "This solver builds SAT formulae to determine void features in a feature model. "
+        + "It uses a SAT solver to determine if there is any valid configurations of the "
         + "feature model.";
   }
 
