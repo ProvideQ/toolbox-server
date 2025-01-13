@@ -29,7 +29,7 @@ public class DwaveQuboSolver extends QuboSolver {
   enum AnnealingMethod {
     SIMULATED("sim"),
     HYBRID("hybrid"),
-    ABSOLV("absolv"),
+    QBSOLV("qbsolv"),
     DIRECT("direct");
 
     private final String value;
