@@ -41,6 +41,15 @@ public class DwaveQuboSolver extends QuboSolver {
     public String getValue() {
       return value;
     }
+
+    public static AnnealingMethod fromValue(String value) {
+      for (AnnealingMethod method : values()) {
+        if (method.value.equals(value)) {
+          return method;
+        }
+      }
+      throw new IllegalArgumentException("Unknown value: " + value);
+    }
   }
 
   private final String scriptPath;
@@ -70,7 +79,8 @@ public class DwaveQuboSolver extends QuboSolver {
             SETTING_ANNNEALING_METHOD,
             "The annealing method to use, only relevant when a token is added",
             List.of(AnnealingMethod.values()),
-            AnnealingMethod.SIMULATED
+            AnnealingMethod.SIMULATED,
+            AnnealingMethod::getValue
         )
     );
   }
@@ -90,7 +100,7 @@ public class DwaveQuboSolver extends QuboSolver {
     // (a token is needed to access the d-wave hardware)
     var dwaveAnnealingMethod = properties
         .<SelectSetting<AnnealingMethod>>getSetting(SETTING_ANNNEALING_METHOD)
-        .map(SelectSetting::getSelectedOption)
+        .map(s -> s.getSelectedOptionT(AnnealingMethod::fromValue))
         .orElse(DEFAULT_ANNEALING_METHOD);
 
     var solution = new Solution<>(this);
