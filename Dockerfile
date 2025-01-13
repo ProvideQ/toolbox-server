@@ -29,7 +29,7 @@ RUN jlink \
     --compress=2
 
 # Step 2: Install the toolbox + external dependencies to a runner container
-FROM debian:bookworm-slim AS runner
+FROM debian:bullseye-slim AS runner
 WORKDIR /app
 
 COPY scripts scripts

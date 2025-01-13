@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-// TODO: understand timeout error for qrisp sat solver.
 /**
  * This problem solver solves the {@link DeadFeatureConfiguration#FEATURE_MODEL_ANOMALY_DEAD}
  * problem by building {@link SatConfiguration#SAT} formulae that are solved by a corresponding

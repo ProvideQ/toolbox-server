@@ -6,7 +6,6 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.sat.solvers.ExactQrispSatSolver;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import edu.kit.provideq.toolbox.sat.solvers.QrispSatSolver;
 import java.io.IOException;
@@ -35,12 +34,11 @@ public class SatConfiguration {
   ProblemManager<String, DimacsCnfSolution> getSatManager(
       GamsSatSolver gamsSolver,
       QrispSatSolver qrispSolver,
-      ExactQrispSatSolver exactQrispSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         SAT,
-        Set.of(gamsSolver, qrispSolver, exactQrispSolver),
+        Set.of(gamsSolver, qrispSolver),
         loadExampleProblems(resourceProvider)
     );
   }
