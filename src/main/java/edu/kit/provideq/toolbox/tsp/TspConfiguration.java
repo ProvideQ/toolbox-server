@@ -25,7 +25,8 @@ public class TspConfiguration {
   public static final ProblemType<String, String> TSP = new ProblemType<>(
       "tsp",
       String.class,
-      String.class
+      String.class,
+      null
   );
 
   @Bean
@@ -34,12 +35,14 @@ public class TspConfiguration {
       QuboTspSolver quboTspSolver,
       LkhTspSolver lkhTspSolver
   ) {
-    return new ProblemManager<>(TSP,
+    return new ProblemManager<>(
+        TSP,
         Set.of(quboTspSolver, lkhTspSolver),
         loadExampleProblems(provider));
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
+  private Set<Problem<String, String>> loadExampleProblems(
+      ResourceProvider provider) {
     try {
       String[] problemNames = new String[] {
           "att48.tsp", "SmallSampleTSP.tsp", "VerySmallSampleTSP.tsp"
@@ -55,7 +58,7 @@ public class TspConfiguration {
       }
       return problemSet;
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(TSP, e);
     }
   }
 }

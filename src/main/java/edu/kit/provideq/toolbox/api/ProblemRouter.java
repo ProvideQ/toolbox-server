@@ -11,7 +11,6 @@ import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -119,7 +118,7 @@ public class ProblemRouter {
       ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
-    var problem = findProblemOrThrow(manager, problemId);
+    var problem = RouterUtility.findProblemOrThrow(manager, problemId);
     var problemDto = ProblemDto.fromProblem(problem);
     return ok().body(Mono.just(problemDto), new ParameterizedTypeReference<>() {});
   }
@@ -138,7 +137,7 @@ public class ProblemRouter {
       ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
-    var problem = findProblemOrThrow(manager, problemId);
+    var problem = RouterUtility.findProblemOrThrow(manager, problemId);
     if (problem.getState() == ProblemState.SOLVING || problem.getState() == ProblemState.SOLVED) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
           "Problems that are currently being solved or have been solved cannot be updated!");
@@ -154,22 +153,6 @@ public class ProblemRouter {
         .map(ProblemDto::fromProblem);
 
     return ok().body(updatedProblemDto, new ParameterizedTypeReference<>() {});
-  }
-
-  private <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(
-      ProblemManager<InputT, ResultT> manager,
-      String id
-  ) {
-    UUID uuid;
-    try {
-      uuid = UUID.fromString(id);
-    } catch (IllegalArgumentException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid problem ID");
-    }
-
-    return manager.findInstanceById(uuid)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "Could not find a problem for this type with this problem ID!"));
   }
 
   private <InputT, ResultT> void applySubmittedProblemPatch(

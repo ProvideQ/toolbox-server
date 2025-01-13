@@ -49,6 +49,7 @@ ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
 COPY solvers solvers
+COPY demonstrators demonstrators
 RUN scripts/ci-setup-solvers.sh
 COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
 

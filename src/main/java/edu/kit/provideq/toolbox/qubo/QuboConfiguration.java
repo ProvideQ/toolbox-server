@@ -28,7 +28,8 @@ public class QuboConfiguration {
   public static final ProblemType<String, String> QUBO = new ProblemType<>(
       "qubo",
       String.class,
-      String.class
+      String.class,
+      null
   );
 
   @Bean
@@ -45,7 +46,8 @@ public class QuboConfiguration {
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
+  private Set<Problem<String, String>> loadExampleProblems(
+      ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("quadratic-problem.txt"),
@@ -55,7 +57,7 @@ public class QuboConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(QUBO, e);
     }
   }
 }

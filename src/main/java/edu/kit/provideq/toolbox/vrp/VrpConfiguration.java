@@ -5,7 +5,6 @@ import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.ClusterAndSolveVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.QrispVrpSolver;
@@ -27,7 +26,8 @@ public class VrpConfiguration {
   public static final ProblemType<String, String> VRP = new ProblemType<>(
       "vrp",
       String.class,
-      String.class
+      String.class,
+      null
   );
 
   @Bean
@@ -35,13 +35,11 @@ public class VrpConfiguration {
       ResourceProvider resourceProvider,
       ClusterAndSolveVrpSolver clusterAndSolveVrpSolver,
       LkhVrpSolver lkhVrpSolver,
-      QuboTspSolver quboTspSolver,
       QrispVrpSolver qrispVrpSolver) {
     return new ProblemManager<>(
         VRP,
         Set.of(clusterAndSolveVrpSolver,
             lkhVrpSolver,
-            quboTspSolver,
             qrispVrpSolver),
         loadExampleProblems(resourceProvider)
     );
@@ -65,7 +63,7 @@ public class VrpConfiguration {
       }
       return problemSet;
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(VRP, e);
     }
   }
 }

@@ -27,7 +27,8 @@ public class SatConfiguration {
   public static final ProblemType<String, DimacsCnfSolution> SAT = new ProblemType<>(
       "sat",
       String.class,
-      DimacsCnfSolution.class
+      DimacsCnfSolution.class,
+      null
   );
 
   @Bean
@@ -56,7 +57,7 @@ public class SatConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(SAT, e);
     }
   }
 }

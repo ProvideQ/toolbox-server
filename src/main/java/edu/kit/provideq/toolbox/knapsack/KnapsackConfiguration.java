@@ -27,7 +27,8 @@ public class KnapsackConfiguration {
   public static final ProblemType<String, String> KNAPSACK = new ProblemType<>(
       "knapsack",
         String.class,
-        String.class
+        String.class,
+        null
     );
 
   @Bean
@@ -44,7 +45,7 @@ public class KnapsackConfiguration {
   }
 
   private Set<Problem<String, String>> loadExampleProblems(
-        ResourceProvider resourceProvider
+      ResourceProvider resourceProvider
   ) {
     try {
       var problemInputStream = Objects.requireNonNull(
@@ -55,7 +56,7 @@ public class KnapsackConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(KNAPSACK, e);
     }
   }
 }

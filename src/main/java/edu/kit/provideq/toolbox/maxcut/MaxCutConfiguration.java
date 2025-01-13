@@ -27,7 +27,8 @@ public class MaxCutConfiguration {
   public static final ProblemType<String, String> MAX_CUT = new ProblemType<>(
       "max-cut",
       String.class,
-      String.class
+      String.class,
+      null
   );
 
   @Bean
@@ -44,7 +45,8 @@ public class MaxCutConfiguration {
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
+  private Set<Problem<String, String>> loadExampleProblems(
+      ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("3-nodes-3-edges.txt"),
@@ -54,7 +56,7 @@ public class MaxCutConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(MAX_CUT, e);
     }
   }
 }
