@@ -87,7 +87,8 @@ public class SolverSettingDeserializer extends JsonDeserializer<SolverSetting> {
             name,
             description,
             options,
-            codec.treeToValue(node.get("selectedOption"), Object.class).toString());
+            codec.treeToValue(node.get("selectedOption"), Object.class).toString(),
+            Object::toString);
       }
       case TEXT -> {
         return new TextSetting(
