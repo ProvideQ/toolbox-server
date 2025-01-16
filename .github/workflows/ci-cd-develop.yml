@@ -7,7 +7,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     container:
-      image: debian:bullseye-slim # use the same image as our docker runner
+      image: debian:bookworm-slim # use the same image as our docker runner
     steps:
       - name: Clone repo (shallow)
         uses: actions/checkout@v3

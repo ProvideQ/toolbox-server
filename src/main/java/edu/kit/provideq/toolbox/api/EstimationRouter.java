@@ -85,7 +85,7 @@ public class EstimationRouter {
           ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
-    var problem = findProblemOrThrow(manager, problemId);
+    var problem = RouterUtility.findProblemOrThrow(manager, problemId);
 
     Mono<BoundDto> bound;
     try {
