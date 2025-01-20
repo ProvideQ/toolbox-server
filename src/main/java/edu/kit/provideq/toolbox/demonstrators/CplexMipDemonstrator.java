@@ -39,6 +39,11 @@ public class CplexMipDemonstrator implements Demonstrator {
   }
 
   @Override
+  public String getDescription() {
+    return "Demonstrator for the Cplex MIP solver";
+  }
+
+  @Override
   public List<SolverSetting> getSolverSettings() {
     return List.of(
         new IntegerSetting(

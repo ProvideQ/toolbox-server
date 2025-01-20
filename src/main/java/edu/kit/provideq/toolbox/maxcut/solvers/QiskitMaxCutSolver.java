@@ -39,6 +39,12 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves the MaxCut problem using a Qiskit implementation with a "
+        + "Variational Quantum Eigensolver.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,

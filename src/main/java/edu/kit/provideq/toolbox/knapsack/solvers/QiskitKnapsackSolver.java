@@ -34,6 +34,11 @@ public class QiskitKnapsackSolver extends KnapsackSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves the knapsack problem using Qiskit with QAOA.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,

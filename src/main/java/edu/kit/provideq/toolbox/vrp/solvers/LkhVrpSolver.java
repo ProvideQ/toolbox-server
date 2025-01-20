@@ -37,6 +37,11 @@ public class LkhVrpSolver extends VrpSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves a vehicle routing problem using the LKH-3 heuristic.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver resolver,

@@ -50,6 +50,12 @@ public class QuboTspSolver extends TspSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves TSP Problems by transforming them into QUBOs and solving them "
+        + "with a QUBO solver.";
+  }
+
+  @Override
   public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return List.of(QUBO_SUBROUTINE);
   }
