@@ -16,14 +16,14 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
- * {@link SatConfiguration#SAT} solver using QRISP implementation.
+ * {@link SatConfiguration#SAT} solver using QRISP-Grover implementation.
  */
 @Component
-public class QrispSatSolver extends SatSolver {
+public class QrispGroverSolver extends SatSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
-  public QrispSatSolver(
+  public QrispGroverSolver(
       @Value("${qrisp.script.sat}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
