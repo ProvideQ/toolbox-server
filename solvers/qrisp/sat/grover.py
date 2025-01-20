@@ -5,8 +5,8 @@ from qrisp import *
 from qrisp_sat_utils import parse_dimacs, sat_oracle, write_output
 
 parser = argparse.ArgumentParser(
-    prog="Qrisp Grover SAT Solver",
-    description="A CLI Program to solve SAT problems in DIMACS CNF format with Qrisp"
+    prog="Grover-Search SAT (Qrisp)",
+    description="A CLI Program to solve SAT problems in DIMACS CNF format with Qrisp (Grover)"
 )
 
 parser.add_argument("input_file")
