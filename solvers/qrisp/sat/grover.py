@@ -2,7 +2,7 @@ import argparse
 
 from qrisp.grover import grovers_alg
 from qrisp import *
-from grover_utils.py import parse_dimacs, sat_oracle, write_output
+from grover_utils import parse_dimacs, sat_oracle, write_output
 
 parser = argparse.ArgumentParser(
     prog="Grover-Search SAT (Qrisp)",
