@@ -32,7 +32,7 @@ public class QrispGroverSolver extends SatSolver {
 
   @Override
   public String getName() {
-    return "QRISP SAT";
+    return "Grover-Search (Qrisp)";
   }
 
   @Override
