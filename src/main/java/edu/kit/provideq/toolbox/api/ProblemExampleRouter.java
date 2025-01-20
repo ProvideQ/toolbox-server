@@ -6,8 +6,6 @@ import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -41,7 +39,8 @@ public class ProblemExampleRouter {
   @Bean
   RouterFunction<ServerResponse> getProblemExampleRoutes() {
     var managers = this.managerProvider.getProblemManagers();
-    return managers.stream().map(this::defineReadRoute)
+    return managers.stream()
+        .map(this::defineReadRoute)
         .reduce(RouterFunction::and)
         .orElseThrow();
   }
@@ -52,7 +51,6 @@ public class ProblemExampleRouter {
   private RouterFunction<ServerResponse> defineReadRoute(ProblemManager<?, ?> manager) {
     return route().GET(
         getPath(manager.getType()),
-        accept(APPLICATION_JSON),
         req -> handleRead(manager),
         ops -> configureReadDocs(manager, ops)
     ).build();
