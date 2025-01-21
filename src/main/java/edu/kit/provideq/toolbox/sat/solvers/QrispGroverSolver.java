@@ -36,6 +36,11 @@ public class QrispGroverSolver extends SatSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves SAT problems using QRISP as a quantum Grover-search problem.";
+  }
+
+  @Override
   public Mono<Solution<DimacsCnfSolution>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
