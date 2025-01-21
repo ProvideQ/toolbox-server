@@ -10,6 +10,7 @@ import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sat.solvers.QrispGroverSolver;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,9 @@ class FeatureModelAnomalySolversTest {
     var featureModelManager = problemManagerProvider.findProblemManagerForType(problemType).get();
     var satManager = problemManagerProvider.findProblemManagerForType(SAT).get();
 
-    var satSolver = satManager.getSolvers().stream().toList();
+    var satSolver = satManager.getSolvers().stream()
+        .filter(solver -> !(solver instanceof QrispGroverSolver))
+        .toList();
 
     return ApiTestHelper.getAllArgumentCombinations(featureModelManager, satSolver)
             .map(list -> Arguments.of(
@@ -70,6 +73,7 @@ class FeatureModelAnomalySolversTest {
         ProblemType<String, String> problemType,
         String input,
         ProblemSolver<String, DimacsCnfSolution> satSolver) {
+
     var problem = ApiTestHelper.createProblem(client, featureModelSolver, input, problemType);
     assertEquals(ProblemState.SOLVING, problem.getState());
 

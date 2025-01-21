@@ -7,6 +7,7 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
+import edu.kit.provideq.toolbox.sat.solvers.QrispGroverSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -32,11 +33,12 @@ public class SatConfiguration {
   @Bean
   ProblemManager<String, DimacsCnfSolution> getSatManager(
       GamsSatSolver gamsSolver,
+      QrispGroverSolver qrispSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         SAT,
-        Set.of(gamsSolver),
+        Set.of(gamsSolver, qrispSolver),
         loadExampleProblems(resourceProvider)
     );
   }
