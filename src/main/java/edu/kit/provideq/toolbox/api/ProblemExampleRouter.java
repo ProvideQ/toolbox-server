@@ -17,6 +17,7 @@ import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,7 @@ import reactor.core.publisher.Mono;
 @EnableWebFlux
 public class ProblemExampleRouter {
   private ProblemManagerProvider managerProvider;
+  private static final Logger logger = Logger.getLogger(ProblemExampleRouter.class.getName());
 
   @Bean
   RouterFunction<ServerResponse> getProblemExampleRoutes() {
@@ -60,20 +62,20 @@ public class ProblemExampleRouter {
       ProblemManager<InputT, ResultT> manager
   ) {
     // Add logging to capture request details
-    System.out.println("Handling read for manager: " + manager.getType().getId());
+    logger.warning("Handling read for manager: " + manager.getType().getId());
 
     var exampleProblems = List.of("example1", "example2", "example3");
-    System.out.println("Example problems: " + exampleProblems);
+    logger.warning("Example problems: " + exampleProblems);
 
     if (exampleProblems == null || exampleProblems.isEmpty()) {
-      System.err.println("No example problems found for manager: " + manager.getType().getId());
+      logger.severe("No example problems found for manager: " + manager.getType().getId());
       return ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("No example problems found");
     }
 
     return ok().body(Mono.just(exampleProblems), new ParameterizedTypeReference<>() {
     }).doOnError(error -> {
       // Log the error details
-      System.err.println("Error handling read: " + error.getMessage());
+      logger.severe("Error handling read: " + error.getMessage());
     });
   }
 
