@@ -62,7 +62,7 @@ public class ProblemExampleRouter {
     // Add logging to capture request details
     System.out.println("Handling read for manager: " + manager.getType().getId());
 
-    var exampleProblems = getExampleInput(manager);
+    var exampleProblems = List.of("example1", "example2", "example3");
     System.out.println("Example problems: " + exampleProblems);
 
     if (exampleProblems == null || exampleProblems.isEmpty()) {
