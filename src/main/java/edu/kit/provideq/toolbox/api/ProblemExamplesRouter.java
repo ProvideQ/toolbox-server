@@ -34,9 +34,9 @@ import reactor.core.publisher.Mono;
  */
 @Configuration
 @EnableWebFlux
-public class ExamplesRouter {
+public class ProblemExamplesRouter {
   private ProblemManagerProvider problemManagerProvider;
-  private static final Logger logger = Logger.getLogger(ExamplesRouter.class.getName());
+  private static final Logger logger = Logger.getLogger(ProblemExamplesRouter.class.getName());
 
   @Bean
   RouterFunction<ServerResponse> getExamplesRoutes() {
@@ -46,6 +46,9 @@ public class ExamplesRouter {
         .orElseThrow();
   }
 
+  /**
+   * GET /problems/TYPE/example.
+   */
   private RouterFunction<ServerResponse> defineExamplesRouteForManager(
       ProblemManager<?, ?> manager) {
     var problemType = manager.getType();
@@ -57,9 +60,7 @@ public class ExamplesRouter {
   }
 
   private Mono<ServerResponse> handleExamplesRouteForManager(ProblemManager<?, ?> manager) {
-    logger.warning("Handling read for manager: " + manager.getType().getId());
     var exampleProblems = getExampleInput(manager);
-    logger.warning("Example problems: " + exampleProblems);
 
     return ok().body(Mono.just(exampleProblems), new ParameterizedTypeReference<>() {})
         .doOnError(error -> logger.severe("Error handling read: " + error.getMessage()));
@@ -110,7 +111,7 @@ public class ExamplesRouter {
   }
 
   private String getExamplesRouteForProblemType(ProblemType<?, ?> type) {
-    return "/examples/" + type.getId();
+    return "/problems/%s/examples".formatted(type.getId());
   }
 
   @Autowired

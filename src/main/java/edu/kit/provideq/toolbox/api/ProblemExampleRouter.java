@@ -119,7 +119,7 @@ public class ProblemExampleRouter {
   }
 
   private static String getPath(ProblemType<?, ?> type) {
-    return "/problems/%s/examples".formatted(type.getId());
+    return "/problems/%s/examples2".formatted(type.getId());
   }
 
   @Autowired
