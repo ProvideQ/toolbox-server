@@ -6,6 +6,7 @@ import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -108,6 +109,7 @@ public class ProblemExampleRouter {
         .response(responseBuilder()
             .responseCode(String.valueOf(HttpStatus.OK.value()))
             .content(contentBuilder()
+                .mediaType(APPLICATION_JSON_VALUE)
                 .array(arraySchemaBuilder()
                     .schema(schemaBuilder().implementation(String.class))
                 )
