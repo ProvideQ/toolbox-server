@@ -58,7 +58,7 @@ public class ExamplesRouter {
 
   private Mono<ServerResponse> handleExamplesRouteForManager(ProblemManager<?, ?> manager) {
     logger.warning("Handling read for manager: " + manager.getType().getId());
-    var exampleProblems = List.of("example1", "example2", "example3");
+    var exampleProblems = getExampleInput(manager);
     logger.warning("Example problems: " + exampleProblems);
 
     return ok().body(Mono.just(exampleProblems), new ParameterizedTypeReference<>() {})
@@ -77,14 +77,15 @@ public class ExamplesRouter {
         );
   }
 
-  private static <InputT, ResultT> List<InputT> getExampleInput(
-      ProblemManager<InputT, ResultT> manager
+  private static List<String> getExampleInput(
+      ProblemManager<?, ?> manager
   ) {
     return manager.getExampleInstances()
         .stream()
         .map(Problem::getInput)
         .filter(Optional::isPresent)
         .map(Optional::get)
+        .map(Object::toString)
         .toList();
   }
 
