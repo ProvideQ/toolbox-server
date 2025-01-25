@@ -59,9 +59,21 @@ public class ProblemExampleRouter {
   private <InputT, ResultT> Mono<ServerResponse> handleRead(
       ProblemManager<InputT, ResultT> manager
   ) {
+    // Add logging to capture request details
+    System.out.println("Handling read for manager: " + manager.getType().getId());
+
     var exampleProblems = getExampleInput(manager);
+    System.out.println("Example problems: " + exampleProblems);
+
+    if (exampleProblems == null || exampleProblems.isEmpty()) {
+      System.err.println("No example problems found for manager: " + manager.getType().getId());
+      return ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("No example problems found");
+    }
 
     return ok().body(Mono.just(exampleProblems), new ParameterizedTypeReference<>() {
+    }).doOnError(error -> {
+      // Log the error details
+      System.err.println("Error handling read: " + error.getMessage());
     });
   }
 
