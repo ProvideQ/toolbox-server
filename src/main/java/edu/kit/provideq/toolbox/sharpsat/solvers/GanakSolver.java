@@ -1,24 +1,24 @@
 package edu.kit.provideq.toolbox.sharpsat.solvers;
 
+import static edu.kit.provideq.toolbox.process.ProcessRunner.INPUT_FILE_PATH;
+
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
-import edu.kit.provideq.toolbox.process.ProcessRunner;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
-// TODO: Add test class
+
 public class GanakSolver extends SharpSatSolver {
   private final String binaryPath;
   private final ApplicationContext context;
+  // TODO: Add test class
 
 
   public GanakSolver(
@@ -45,8 +45,8 @@ public class GanakSolver extends SharpSatSolver {
    */
   @Override
   public String getDescription() {
-    return "Exact model counter that uses caching to calculate" +
-        " the number of solutions for SAT problems.";
+    return "Exact model counter that uses caching to calculate"
+        + " the number of solutions for SAT problems.";
   }
 
   /**
@@ -74,23 +74,11 @@ public class GanakSolver extends SharpSatSolver {
       return Mono.just(solution);
     }
 
-    // create a temporary file for the input
-    // TODO: use ProcessRunner .writeInputFile method
-    Path tempFilePath;
-    try {
-      tempFilePath = Files.createTempFile("cnf_input", ".cnf");
-      Files.writeString(tempFilePath, dimacsCnf.toString());
-      solution.setDebugData("Temporary input file created: " + tempFilePath);
-    } catch (IOException e) {
-      solution.setDebugData("Failed to write temporary input file: " + e.getMessage());
-      solution.abort();
-      return Mono.just(solution);
-    }
-
-    // run the Linux binary with the input file path as an argument
+    // run the binary with the input file path as an argument
     ProcessResult<String> processResult = context
-        .getBean(ProcessRunner.class, binaryPath)
-        .withArguments(tempFilePath.toString())
+        .getBean(DefaultProcessRunner.class, binaryPath)
+        .withArguments(INPUT_FILE_PATH)
+        .writeInputFile(dimacsCnf.toString(), "cnf_input.cnf")
         .readOutputString()
         .run(getProblemType(), solution.getId());
 
@@ -107,13 +95,6 @@ public class GanakSolver extends SharpSatSolver {
       solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.fail();
     }
-
-    try {
-      Files.deleteIfExists(tempFilePath);
-    } catch (IOException e) {
-      solution.setDebugData("Failed to delete temporary input file: " + e.getMessage());
-    }
-
     return Mono.just(solution);
   }
 
@@ -133,8 +114,5 @@ public class GanakSolver extends SharpSatSolver {
 
     throw new IllegalArgumentException("Output does not contain a valid 's mc' line.");
   }
-
-
-
 
 }
