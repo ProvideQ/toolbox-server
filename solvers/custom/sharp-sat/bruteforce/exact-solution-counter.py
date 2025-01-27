@@ -79,7 +79,13 @@ def count_solutions(num_vars, clauses):
 
     return count
 
+def write_output(solution_count, output_file=None):
+    if output_file:
+        with open(output_file, 'w') as f:
+            f.write(solution_count)
+    else:
+        print(solution_count)
 
 num_vars, clauses = parse_dimacs(args.input_file)
 solution_count = count_solutions(num_vars, clauses)
-print(f"Number of satisfying assignments: {solution_count}")
+write_output(solution_count, args.output_file)
