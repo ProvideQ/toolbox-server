@@ -1,8 +1,8 @@
 import argparse
 
 parser = argparse.ArgumentParser(
-    prog="",
-    description=""
+    prog="Bruteforce SharpSat solver",
+    description="A CLI Program to count number of solutions given a SAT Formula. It uses naive bruteforce approach"
 )
 
 parser.add_argument("input_file")
