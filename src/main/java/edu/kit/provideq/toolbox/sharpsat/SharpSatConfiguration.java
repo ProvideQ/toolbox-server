@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sharpsat.solvers.GanakSolver;
 import edu.kit.provideq.toolbox.sharpsat.solvers.PythonBruteForceSolver;
 import java.io.IOException;
 import java.util.Objects;
@@ -24,11 +25,12 @@ public class SharpSatConfiguration {
   @Bean
   ProblemManager<String, Integer> getSharpSatManager(
       PythonBruteForceSolver pythonBruteForceSolver,
+      GanakSolver ganakSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         SHARPSAT,
-        Set.of(pythonBruteForceSolver),
+        Set.of(pythonBruteForceSolver, ganakSolver),
         loadExampleProblems(resourceProvider)
     );
   }
