@@ -50,7 +50,7 @@ public class ExactSatSolutionCounter extends SharpSatSolver {
    *
    * @param input              the problem instance to solve.
    * @param subRoutineResolver interface to execute sub-routines with.
-   * @param properties
+   * @param properties         properties
    * @return the {@link Solution} in which all resulting information is stored.
    */
   @Override
