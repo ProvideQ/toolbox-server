@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
 
-public class ExactSatSolutionCounter extends SharpSatSolver {
+public class PythonBruteForceSolver extends SharpSatSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
 
-  public ExactSatSolutionCounter(
+  public PythonBruteForceSolver(
       @Value("${custom.script.exact-sharp-sat}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
