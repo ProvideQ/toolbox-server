@@ -18,7 +18,7 @@ public class PythonBruteForceSolver extends SharpSatSolver {
 
 
   public PythonBruteForceSolver(
-      @Value("${custom.script.exact-sharp-sat}") String scriptPath,
+      @Value("${custom.script.bruteforce-sat}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;
