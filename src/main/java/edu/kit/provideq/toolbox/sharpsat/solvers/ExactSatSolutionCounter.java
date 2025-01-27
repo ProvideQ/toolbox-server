@@ -31,7 +31,17 @@ public class ExactSatSolutionCounter extends SharpSatSolver {
    */
   @Override
   public String getName() {
-    return "Sat solution counter using naive bruteforce approach";
+    return "Bruteforce Exact SharpSAT solver";
+  }
+
+  /**
+   * Returns a description of the solver.
+   *
+   * @return description of the solver
+   */
+  @Override
+  public String getDescription() {
+    return "Sat solution counter in python using naive bruteforce approach";
   }
 
   /**
