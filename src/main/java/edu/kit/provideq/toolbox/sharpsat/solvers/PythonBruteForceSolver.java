@@ -11,9 +11,9 @@ import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
-// TODO: Add test class
 
 public class PythonBruteForceSolver extends SharpSatSolver {
+  // TODO: Add test class
   private final String scriptPath;
   private final ApplicationContext context;
 
