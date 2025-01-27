@@ -37,6 +37,12 @@ public class KipuQuboSolver extends QuboSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "This solver uses Kipu’s Digitized Counterdiabatic Quantum Optimization (DCQO) "
+        + "algorithm to solve optimization problems.";
+  }
+
+  @Override
   public List<SolverSetting> getSolverSettings() {
     return List.of(
         new TextSetting(

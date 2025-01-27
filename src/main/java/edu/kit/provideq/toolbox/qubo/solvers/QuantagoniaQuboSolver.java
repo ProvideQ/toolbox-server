@@ -36,6 +36,11 @@ public class QuantagoniaQuboSolver extends QuboSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "This solver uses Quantagonia’s HybridSolver to solve QUBO problems via PlanQK";
+  }
+
+  @Override
   public List<SolverSetting> getSolverSettings() {
     return List.of(
         new TextSetting(
