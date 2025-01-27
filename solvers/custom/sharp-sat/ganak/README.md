@@ -25,7 +25,7 @@ To count, run:
 
 ```bash
 cd build
-./ganak myfile.cnf
+./ganak-linux myfile.cnf
 ```
 
 ### Projected Model Counting
