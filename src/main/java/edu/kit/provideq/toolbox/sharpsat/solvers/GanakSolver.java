@@ -75,6 +75,7 @@ public class GanakSolver extends SharpSatSolver {
     }
 
     // create a temporary file for the input
+    // TODO: use ProcessRunner .writeInputFile method
     Path tempFilePath;
     try {
       tempFilePath = Files.createTempFile("cnf_input", ".cnf");
