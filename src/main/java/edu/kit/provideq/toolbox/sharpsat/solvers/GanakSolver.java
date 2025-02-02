@@ -22,6 +22,12 @@ public class GanakSolver extends SharpSatSolver {
   public GanakSolver(
       @Value("${custom.binary.ganak-sat}") String binaryPath,
       ApplicationContext context) {
+
+    if (binaryPath == null || binaryPath.isEmpty()) {
+      throw new IllegalArgumentException("Property 'custom.binary.ganak-sat' is not defined."
+          + " This solver isn't available for windows. Use PythonBruteForce instead");
+    }
+
     this.binaryPath = binaryPath;
     this.context = context;
   }
