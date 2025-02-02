@@ -13,7 +13,6 @@ import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
 
 public class PythonBruteForceSolver extends SharpSatSolver {
-  // TODO: Add test class
   private final String scriptPath;
   private final ApplicationContext context;
 

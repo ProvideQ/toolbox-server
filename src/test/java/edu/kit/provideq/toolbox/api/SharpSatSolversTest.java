@@ -37,6 +37,7 @@ class SharpSatSolversTest {
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   Stream<Arguments> provideArguments() {
+    // TODO: Investigate element not found
     var problemManager = problemManagerProvider.findProblemManagerForType(SHARPSAT).get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)

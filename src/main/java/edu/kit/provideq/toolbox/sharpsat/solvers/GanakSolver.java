@@ -18,8 +18,6 @@ import reactor.core.publisher.Mono;
 public class GanakSolver extends SharpSatSolver {
   private final String binaryPath;
   private final ApplicationContext context;
-  // TODO: Add test class
-
 
   public GanakSolver(
       @Value("${custom.binary.ganak-sat}") String binaryPath,
