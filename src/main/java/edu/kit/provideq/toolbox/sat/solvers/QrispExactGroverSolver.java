@@ -60,12 +60,9 @@ public class QrispExactGroverSolver extends SatSolver {
 
   @Override
   public Mono<Solution<DimacsCnfSolution>> solve(
-      String input,
-      SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      String input, SubRoutineResolver subRoutineResolver, SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
-
     DimacsCnf dimacsCnf;
     try {
       dimacsCnf = DimacsCnf.fromString(input);
@@ -75,40 +72,52 @@ public class QrispExactGroverSolver extends SatSolver {
       solution.abort();
       return Mono.just(solution);
     }
-
     return subRoutineResolver.runSubRoutine(SHARPSAT_SUBROUTINE, dimacsCnf.toString())
         .publishOn(Schedulers.boundedElastic())
-        .flatMap(sharpSatSolution -> {
-          if (sharpSatSolution.getSolutionData() == null) {
-            solution.setDebugData("Sharpsat subroutine returned no solution data.");
-            solution.abort();
-            return Mono.just(solution);
-          }
-          int solutionCount = sharpSatSolution.getSolutionData();
-          solution.setDebugData("Sharpsat subroutine found " + solutionCount + " solutions.");
+        .flatMap(sharpSatSolution -> processSharpSatResult(sharpSatSolution, dimacsCnf, solution));
+  }
 
-          ProcessResult<String> processResult = context
-              .getBean(PythonProcessRunner.class, scriptPath)
-              .withArguments(
-                  ProcessRunner.INPUT_FILE_PATH,
-                  "--solution-count", String.valueOf(solutionCount),
-                  "--output-file", ProcessRunner.OUTPUT_FILE_PATH
-              )
-              .writeInputFile(dimacsCnf.toString())
-              .readOutputFile()
-              .run(getProblemType(), solution.getId());
+  private Mono<Solution<DimacsCnfSolution>> processSharpSatResult(
+      Solution<Integer> sharpSatSolution,
+      DimacsCnf dimacsCnf,
+      Solution<DimacsCnfSolution> solution
+  ) {
+    if (sharpSatSolution.getSolutionData() == null) {
+      solution.setDebugData("Sharpsat subroutine returned no solution data.");
+      solution.abort();
+      return Mono.just(solution);
+    }
+    int solutionCount = sharpSatSolution.getSolutionData();
+    solution.setDebugData("Sharpsat subroutine found " + solutionCount + " solutions.");
+    return runPythonSolver(dimacsCnf, solutionCount, solution);
+  }
 
-          if (processResult.success()) {
-            var dimacsCnfSolution =
-                DimacsCnfSolution.fromString(dimacsCnf, processResult.output().orElse(""));
-            solution.setSolutionData(dimacsCnfSolution);
-            solution.complete();
-          } else {
-            solution.setDebugData(
-                processResult.errorOutput().orElse("Unknown error occurred."));
-            solution.fail();
-          }
-          return Mono.just(solution);
-        });
+  private Mono<Solution<DimacsCnfSolution>> runPythonSolver(
+      DimacsCnf dimacsCnf,
+      int solutionCount,
+      Solution<DimacsCnfSolution> solution
+  ) {
+    ProcessResult<String> processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            "--solution-count", String.valueOf(solutionCount),
+            "--output-file", ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(dimacsCnf.toString())
+        .readOutputFile()
+        .run(getProblemType(), solution.getId());
+    if (processResult.success()) {
+      var dimacsCnfSolution = DimacsCnfSolution.fromString(
+          dimacsCnf,
+          processResult.output().orElse("")
+      );
+      solution.setSolutionData(dimacsCnfSolution);
+      solution.complete();
+    } else {
+      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
+      solution.fail();
+    }
+    return Mono.just(solution);
   }
 }
