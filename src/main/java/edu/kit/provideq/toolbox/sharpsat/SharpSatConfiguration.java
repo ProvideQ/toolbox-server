@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 public class SharpSatConfiguration {
 
   public static final ProblemType<String, Integer> SHARPSAT = new ProblemType<>(
-      "sharpSat",
+      "sharpsat",
       String.class,
       Integer.class,
       null
