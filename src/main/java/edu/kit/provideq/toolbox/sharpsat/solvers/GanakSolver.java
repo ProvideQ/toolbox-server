@@ -20,7 +20,7 @@ public class GanakSolver extends SharpSatSolver {
   private final ApplicationContext context;
 
   public GanakSolver(
-      @Value("${custom.binary.ganak-sat}") String binaryPath,
+      @Value("${custom.binary.ganak-sat}") String binaryPath, // TODO: add mac binary
       ApplicationContext context) {
 
     if (binaryPath == null || binaryPath.isEmpty()) {
