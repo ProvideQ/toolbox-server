@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class SharpSatConfiguration {
 
   public static final ProblemType<String, Integer> SHARPSAT = new ProblemType<>(

@@ -8,15 +8,19 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+@Component
 public class PythonBruteForceSolver extends SharpSatSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
 
+  @Autowired
   public PythonBruteForceSolver(
       @Value("${custom.script.bruteforce-sat}") String scriptPath,
       ApplicationContext context) {

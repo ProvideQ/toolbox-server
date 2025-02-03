@@ -11,14 +11,18 @@ import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
+@Configuration
 public class GanakSolver extends SharpSatSolver {
   private final String binaryPath;
   private final ApplicationContext context;
 
+  @Autowired
   public GanakSolver(
       @Value("${custom.binary.ganak-sat}") String binaryPath, // TODO: add mac binary
       ApplicationContext context) {
