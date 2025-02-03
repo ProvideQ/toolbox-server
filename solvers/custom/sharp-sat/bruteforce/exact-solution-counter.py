@@ -6,7 +6,6 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument("input_file")
-parser.add_argument("--sharp-sat-directory", required=True)
 parser.add_argument("--output-file")
 args = parser.parse_args()
 
