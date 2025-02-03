@@ -82,10 +82,9 @@ public class GanakSolver extends SharpSatSolver {
       return Mono.just(solution);
     }
 
-    // run the binary with the input file path as an argument
     ProcessResult<String> processResult = context
-        .getBean(DefaultProcessRunner.class, binaryPath)
-        .withArguments(INPUT_FILE_PATH)
+        .getBean(DefaultProcessRunner.class)
+        .withArguments(binaryPath, INPUT_FILE_PATH)
         .writeInputFile(dimacsCnf.toString(), "cnf_input.cnf")
         .readOutputString()
         .run(getProblemType(), solution.getId());
