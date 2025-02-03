@@ -84,7 +84,7 @@ public class PythonBruteForceSolver extends SharpSatSolver {
         .run(getProblemType(), solution.getId());
 
     if (processResult.success()) {
-      int solutionCount = Integer.getInteger(processResult.output().orElse(""));
+      int solutionCount = Integer.parseInt(processResult.output().orElse(""));
       solution.setSolutionData(solutionCount);
       solution.complete();
     } else {
