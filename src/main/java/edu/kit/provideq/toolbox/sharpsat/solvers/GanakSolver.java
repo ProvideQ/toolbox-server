@@ -24,7 +24,7 @@ public class GanakSolver extends SharpSatSolver {
 
   @Autowired
   public GanakSolver(
-      @Value("${custom.binary.ganak-sat}") String binaryPath, // TODO: add mac binary
+      @Value("${custom.binary.ganak-sat}") String binaryPath,
       ApplicationContext context) {
 
     if (binaryPath == null || binaryPath.isEmpty()) {
