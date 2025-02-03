@@ -81,7 +81,7 @@ def count_solutions(num_vars, clauses):
 def write_output(solution_count, output_file=None):
     if output_file:
         with open(output_file, 'w') as f:
-            f.write(solution_count)
+            f.write(str(solution_count))
     else:
         print(solution_count)
 
