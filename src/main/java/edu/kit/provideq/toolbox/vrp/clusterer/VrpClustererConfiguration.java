@@ -20,6 +20,7 @@ public class VrpClustererConfiguration {
       "cluster-vrp",
       String.class,
       String.class,
+      null,
       null
   );
 

@@ -16,8 +16,7 @@ public class DemonstratorConfiguration {
   public static final ProblemType<String, String> DEMONSTRATOR = new ProblemType<>(
       "demonstrator",
       String.class,
-      String.class,
-      null
+      String.class
   );
 
   @Bean

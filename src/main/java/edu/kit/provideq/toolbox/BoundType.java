@@ -7,9 +7,21 @@ public enum BoundType {
   /**
    * An upper bound.
    */
-  UPPER,
+  UPPER {
+    @Override
+    public float compare(float bound, float actual) {
+      return 1 - (bound / actual);
+    }
+  },
   /**
    * A lower bound.
    */
-  LOWER
+  LOWER {
+    @Override
+    public float compare(float bound, float actual) {
+      return actual / bound - 1;
+    }
+  };
+
+  public abstract float compare(float bound, float actual);
 }
