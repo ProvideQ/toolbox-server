@@ -34,6 +34,12 @@ public class PythonKnapsackSolver extends KnapsackSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "A solver for the Knapsack problem using the Horowitz-Sahni "
+        + "branch and search algorithm.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
           String input,
           SubRoutineResolver subRoutineResolver,

@@ -6,27 +6,25 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
-import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
- * {@link SatConfiguration#SAT} solver using a GAMS implementation.
+ * {@link SatConfiguration#SAT} solver using QRISP-Grover implementation.
  */
 @Component
-public class GamsSatSolver extends SatSolver {
+public class QrispGroverSolver extends SatSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
-  @Autowired
-  public GamsSatSolver(
-      @Value("${gams.script.sat}") String scriptPath,
+  public QrispGroverSolver(
+      @Value("${qrisp.script.sat}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;
@@ -34,12 +32,12 @@ public class GamsSatSolver extends SatSolver {
 
   @Override
   public String getName() {
-    return "GAMS SAT";
+    return "Grover-Search (Qrisp)";
   }
 
   @Override
   public String getDescription() {
-    return "Solves SAT problems using GAMS as a Mixed Integer Programming problem.";
+    return "Solves SAT problems using QRISP as a quantum Grover-search problem.";
   }
 
   @Override
@@ -53,19 +51,18 @@ public class GamsSatSolver extends SatSolver {
     DimacsCnf dimacsCnf;
     try {
       dimacsCnf = DimacsCnf.fromString(input);
-      solution.setDebugData("Using cnf input: " + dimacsCnf);
+      solution.setDebugData("Using CNF input: " + dimacsCnf);
     } catch (ConversionException | RuntimeException e) {
       solution.setDebugData("Parsing error: " + e.getMessage());
       solution.abort();
       return Mono.just(solution);
     }
 
-    // Run SAT with GAMS via console
     ProcessResult<String> processResult = context
-        .getBean(GamsProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath)
         .withArguments(
-            "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
-            "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
+            ProcessRunner.INPUT_FILE_PATH,
+            "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
         .writeInputFile(dimacsCnf.toString())
         .readOutputFile()

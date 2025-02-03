@@ -30,6 +30,13 @@ public interface ProblemSolver<InputT, ResultT> {
   String getName();
 
   /**
+   * Returns a description of the solver.
+   *
+   * @return description of the solver
+   */
+  String getDescription();
+
+  /**
    * Returns the sub problems used to solver this problem.
    *
    * @return list of sub problems

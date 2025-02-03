@@ -10,11 +10,13 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.provideq.toolbox.ProblemSolverInfo;
+import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Logger;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JsonParseException;
@@ -28,81 +30,88 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 /**
- * This router handles solver discovery requests to the GET {@code /solvers/{problemType}}
- * endpoints.
- * Responses are generated from the solvers reported by the meta-solver registered for the given
- * problem type.
+ * This router provides example problems for each problem type.
  */
 @Configuration
 @EnableWebFlux
-public class SolversRouter {
+public class ProblemExamplesRouter {
   private ProblemManagerProvider problemManagerProvider;
+  private static final Logger logger = Logger.getLogger(ProblemExamplesRouter.class.getName());
 
   @Bean
-  RouterFunction<ServerResponse> getSolversRoutes() {
+  RouterFunction<ServerResponse> getExamplesRoutes() {
     return problemManagerProvider.getProblemManagers().stream()
-        .map(this::defineSolversRouteForManager)
+        .map(this::defineExamplesRouteForManager)
         .reduce(RouterFunction::and)
         .orElseThrow();
   }
 
-  private RouterFunction<ServerResponse> defineSolversRouteForManager(
+  /**
+   * GET /problems/TYPE/example.
+   */
+  private RouterFunction<ServerResponse> defineExamplesRouteForManager(
       ProblemManager<?, ?> manager) {
     var problemType = manager.getType();
     return route().GET(
-        getSolversRouteForProblemType(problemType),
-        req -> handleSolversRouteForManager(manager),
-        ops -> handleSolversRouteDocumentation(ops, manager)
+        getExamplesRouteForProblemType(problemType),
+        req -> handleExamplesRouteForManager(manager),
+        ops -> handleExamplesRouteDocumentation(ops, manager)
     ).build();
   }
 
-  private Mono<ServerResponse> handleSolversRouteForManager(ProblemManager<?, ?> manager) {
-    var solvers = getAllSolverInfos(manager);
+  private Mono<ServerResponse> handleExamplesRouteForManager(ProblemManager<?, ?> manager) {
+    var exampleProblems = getExampleInput(manager);
 
-    return ok().body(Mono.just(solvers), new ParameterizedTypeReference<>() {
-    });
+    return ok().body(Mono.just(exampleProblems), new ParameterizedTypeReference<>() {})
+        .doOnError(error -> logger.severe("Error handling read: " + error.getMessage()));
   }
 
-  private static List<ProblemSolverInfo> getAllSolverInfos(ProblemManager<?, ?> manager) {
-    return manager.getSolvers().stream()
-            .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName(),
-                solver.getDescription()))
-            .toList();
-  }
-
-  private void handleSolversRouteDocumentation(Builder ops, ProblemManager<?, ?> manager) {
+  private void handleExamplesRouteDocumentation(Builder ops, ProblemManager<?, ?> manager) {
     ops
-        .operationId(getSolversRouteForProblemType(manager.getType()))
+        .operationId(getExamplesRouteForProblemType(manager.getType()))
         .tag(manager.getType().getId())
-        .description("Returns a list of solvers available to solve the "
-            + manager.getType().getId() + " problem type.")
+        .description("This endpoint can be used to view example problems for '"
+            + manager.getType().getId() + "'.")
         .response(responseBuilder()
             .responseCode(String.valueOf(HttpStatus.OK.value()))
             .content(getOkResponseContent(manager))
         );
   }
 
+  private static List<String> getExampleInput(
+      ProblemManager<?, ?> manager
+  ) {
+    return manager.getExampleInstances()
+        .stream()
+        .map(Problem::getInput)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .map(Object::toString)
+        .toList();
+  }
+
   private static org.springdoc.core.fn.builders.content.Builder getOkResponseContent(
-          ProblemManager<?, ?> manager) {
-    var allSolvers = getAllSolverInfos(manager);
+      ProblemManager<?, ?> manager) {
+    var allExamples = getExampleInput(manager);
     String example;
     try {
-      example = new ObjectMapper().writeValueAsString(allSolvers);
+      example = new ObjectMapper().writeValueAsString(allExamples);
     } catch (JsonProcessingException e) {
       throw new JsonParseException(e);
     }
 
     return contentBuilder()
-            .mediaType(APPLICATION_JSON_VALUE)
-            .example(org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder()
-                    .name(manager.getType().getId())
-                    .value(example))
-            .array(arraySchemaBuilder().schema(
-                    schemaBuilder().implementation(ProblemSolverInfo.class)));
+        .mediaType(APPLICATION_JSON_VALUE)
+        .example(org.springdoc.core.fn.builders.exampleobject.Builder.exampleOjectBuilder()
+            .name(manager.getType().getId())
+            .value(example))
+        .array(arraySchemaBuilder()
+            .schema(schemaBuilder()
+                .implementation(String.class)));
   }
 
-  private String getSolversRouteForProblemType(ProblemType<?, ?> type) {
-    return "/solvers/" + type.getId();
+  private String getExamplesRouteForProblemType(ProblemType<?, ?> type) {
+    return "/problems/%s/examples".formatted(type.getId());
   }
 
   @Autowired

@@ -69,6 +69,11 @@ public class DwaveQuboSolver extends QuboSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves the QUBO problem using a D-Wave Quantum Annealer.";
+  }
+
+  @Override
   public List<SolverSetting> getSolverSettings() {
     return  List.of(
         new TextSetting(

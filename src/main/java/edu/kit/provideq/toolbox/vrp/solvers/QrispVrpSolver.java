@@ -34,6 +34,11 @@ public class QrispVrpSolver extends VrpSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves a vehicle routing problem using a Grover-based Qrisp implementation.";
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver resolver,

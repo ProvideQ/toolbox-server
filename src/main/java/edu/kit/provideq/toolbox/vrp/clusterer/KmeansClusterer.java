@@ -45,6 +45,11 @@ public class KmeansClusterer extends VrpClusterer {
   }
 
   @Override
+  public String getDescription() {
+    return "Clusters a VRP problem into a set of VRP problems using k-means clustering.";
+  }
+
+  @Override
   public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return List.of(VRP_SUBROUTINE);
   }

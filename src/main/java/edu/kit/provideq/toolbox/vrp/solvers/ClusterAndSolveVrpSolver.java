@@ -32,6 +32,12 @@ public class ClusterAndSolveVrpSolver extends VrpSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves a vehicle routing problem by clustering it into multiple smaller problems "
+        + "first.";
+  }
+
+  @Override
   public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return List.of(CLUSTER_SUBROUTINE);
   }
