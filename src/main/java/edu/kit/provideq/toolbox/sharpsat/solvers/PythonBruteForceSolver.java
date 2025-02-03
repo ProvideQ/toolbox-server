@@ -8,12 +8,16 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ * {@link SharpSatConfiguration#SHARPSAT} solver using brute-force approach.
+ */
 @Component
 public class PythonBruteForceSolver extends SharpSatSolver {
   private final String scriptPath;

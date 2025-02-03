@@ -9,6 +9,7 @@ import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
+import edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
+/**
+ * {@link SharpSatConfiguration#SHARPSAT} solver using OpenSource GANAK implementation.
+ */
 @Configuration
 public class GanakSolver extends SharpSatSolver {
   private final String binaryPath;
