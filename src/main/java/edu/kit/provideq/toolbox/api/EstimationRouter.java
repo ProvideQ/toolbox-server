@@ -106,7 +106,7 @@ public class EstimationRouter {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
     var problem = findProblemOrThrow(manager, problemId);
 
-    if (problem.getSolution() == null) {
+    if (problem.getSolution().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Problem not solved yet!");
     }
 
@@ -116,7 +116,7 @@ public class EstimationRouter {
 
     float bound = problem.getBound().get().bound().value();
     var pattern = Pattern.compile(manager.getType().getSolutionPattern());
-    var solutionMatcher = pattern.matcher(problem.getSolution().getSolutionData().toString());
+    var solutionMatcher = pattern.matcher(problem.getSolution().get().getSolutionData().toString());
     float solutionValue;
     if (solutionMatcher.find()) {
       solutionValue = Float.parseFloat(solutionMatcher.group(1));
@@ -128,7 +128,7 @@ public class EstimationRouter {
     ComparisonDto comparisonDto = new ComparisonDto(
         comparison,
         problem.getBound().get(),
-        problem.getSolution()
+        problem.getSolution().get()
     );
     return ok().body(Mono.just(comparisonDto), new ParameterizedTypeReference<>() {
     });
