@@ -75,7 +75,7 @@ public class DwaveQuboSolver extends QuboSolver {
 
   @Override
   public List<SolverSetting> getSolverSettings() {
-    return  List.of(
+    return List.of(
         new TextSetting(
             SETTING_DWAVE_TOKEN,
             "The D-Wave token to use, needed to access the D-Wave hardware"
@@ -103,17 +103,23 @@ public class DwaveQuboSolver extends QuboSolver {
 
     // this field is only relevant when a dwaveToken is added
     // (a token is needed to access the d-wave hardware)
-    var dwaveAnnealingMethod = properties
+    final var dwaveAnnealingMethod = properties
         .<SelectSetting<AnnealingMethod>>getSetting(SETTING_ANNNEALING_METHOD)
         .map(s -> s.getSelectedOptionT(AnnealingMethod::fromValue))
         .orElse(DEFAULT_ANNEALING_METHOD);
 
-    var solution = new Solution<>(this);
+    final var solution = new Solution<>(this);
 
     var processRunner = context.getBean(PythonProcessRunner.class, scriptPath);
 
     if (dwaveToken.isPresent() && !dwaveToken.get().isEmpty()) {
       processRunner.withEnvironmentVariable("DWAVE_API_TOKEN", dwaveToken.get());
+    }
+
+    // Remove "End" at the end of the input as python script can't handle it
+    input = input.trim();
+    if (input.endsWith("End")) {
+      input = input.substring(0, input.length() - 3);
     }
 
     var processResult = processRunner
