@@ -15,13 +15,13 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
  * {@link SharpSatConfiguration#SHARPSAT} solver using OpenSource GANAK implementation.
  */
-@Configuration
+@Component
 public class GanakSolver extends SharpSatSolver {
   private final String binaryPath;
   private final ApplicationContext context;
@@ -30,11 +30,6 @@ public class GanakSolver extends SharpSatSolver {
   public GanakSolver(
       @Value("${custom.binary.ganak-sat}") String binaryPath,
       ApplicationContext context) {
-
-    if (binaryPath == null || binaryPath.isEmpty()) {
-      throw new IllegalArgumentException("Property 'custom.binary.ganak-sat' is not defined."
-          + " This solver isn't available for windows. Use PythonBruteForce instead");
-    }
 
     this.binaryPath = binaryPath;
     this.context = context;
@@ -73,6 +68,11 @@ public class GanakSolver extends SharpSatSolver {
   @Override
   public Mono<Solution<Integer>> solve(String input, SubRoutineResolver subRoutineResolver,
                                        SolvingProperties properties) {
+
+    if (binaryPath == null || binaryPath.isEmpty()) {
+      throw new IllegalArgumentException("Property 'custom.binary.ganak-sat' is not defined."
+          + " This solver isn't available for windows. Use PythonBruteForce instead");
+    }
 
     var solution = new Solution<>(this);
 
