@@ -2,7 +2,6 @@ package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
 import static edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration.SHARPSAT;
-import static edu.kit.provideq.toolbox.vrp.VrpConfiguration.VRP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
