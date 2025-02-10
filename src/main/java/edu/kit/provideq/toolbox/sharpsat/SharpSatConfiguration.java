@@ -13,9 +13,16 @@ import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Definition and registration of the satisfiability solution counting problems.
+ */
 @Configuration
 public class SharpSatConfiguration {
-
+  /**
+   * A satisfiability counting problem:
+   * For a given boolean formula, count number of interpretations that satisfies the formula.
+   * NP-Hard in nature.
+   */
   public static final ProblemType<String, Integer> SHARPSAT = new ProblemType<>(
       "sharpsat",
       String.class,
