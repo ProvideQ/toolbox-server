@@ -21,7 +21,6 @@ import reactor.core.scheduler.Schedulers;
 
 /**
  * {@link SatConfiguration#SAT} solver using QRISP-Grover implementation.
- * TODO: Adapt tests for subroutine
  */
 @Component
 public class QrispExactGroverSolver extends SatSolver {
