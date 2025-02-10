@@ -88,6 +88,7 @@ class SatSolversTest {
     }
     return result.stream();
   }
+
   @ParameterizedTest
   @MethodSource("provideQrispExactGroverArguments")
   void testQrispExactGroverSolver(
