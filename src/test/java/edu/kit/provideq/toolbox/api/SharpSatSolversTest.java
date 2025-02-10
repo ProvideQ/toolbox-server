@@ -27,7 +27,6 @@ class SharpSatSolversTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
-
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -49,16 +48,4 @@ class SharpSatSolversTest {
     var problem = ApiTestHelper.createProblem(client, solver, input, SHARPSAT);
     ApiTestHelper.testSolution(problem);
   }
-
-
-
-
-
-
-
-
-
-
-
-
 }

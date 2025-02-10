@@ -78,12 +78,14 @@ def count_solutions(num_vars, clauses):
 
     return count
 
+
 def write_output(solution_count, output_file=None):
     if output_file:
         with open(output_file, 'w') as f:
             f.write(str(solution_count))
     else:
         print(str(solution_count))
+
 
 num_vars, clauses = parse_dimacs(args.input_file)
 solution_count = count_solutions(num_vars, clauses)

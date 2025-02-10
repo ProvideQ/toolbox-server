@@ -68,15 +68,14 @@ public class GanakSolver extends SharpSatSolver {
   @Override
   public Mono<Solution<Integer>> solve(String input, SubRoutineResolver subRoutineResolver,
                                        SolvingProperties properties) {
-
     if (binaryPath == null || binaryPath.isEmpty()) {
       throw new IllegalArgumentException("Property 'custom.binary.ganak-sat' is not defined."
           + " This solver isn't available for windows. Use PythonBruteForce instead");
     }
 
     var solution = new Solution<>(this);
-
     DimacsCnf dimacsCnf;
+
     try {
       dimacsCnf = DimacsCnf.fromString(input);
       solution.setDebugData("Using CNF input: " + dimacsCnf.toString());
@@ -113,7 +112,6 @@ public class GanakSolver extends SharpSatSolver {
     // match lines like "s mc [number]"
     String regex = "^s mc (\\d+)$";
     Pattern pattern = Pattern.compile(regex);
-
     String[] lines = output.split("\\R"); // matches any line break
     for (String line : lines) {
       Matcher matcher = pattern.matcher(line);
@@ -122,8 +120,6 @@ public class GanakSolver extends SharpSatSolver {
         return Integer.parseInt(matcher.group(1));
       }
     }
-
     throw new IllegalArgumentException("Output does not contain a valid 's mc' line.");
   }
-
 }

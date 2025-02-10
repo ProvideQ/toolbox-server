@@ -23,7 +23,6 @@ public class SharpSatConfiguration {
       null
   );
 
-
   @Bean
   ProblemManager<String, Integer> getSharpSatManager(
       PythonBruteForceSolver pythonBruteForceSolver,
@@ -52,6 +51,4 @@ public class SharpSatConfiguration {
       throw new MissingExampleException(SHARPSAT, e);
     }
   }
-
-
 }

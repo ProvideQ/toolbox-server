@@ -23,7 +23,6 @@ public class PythonBruteForceSolver extends SharpSatSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
-
   @Autowired
   public PythonBruteForceSolver(
       @Value("${custom.script.bruteforce-sat}") String scriptPath,
