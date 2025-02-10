@@ -6,20 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
-import edu.kit.provideq.toolbox.sharpsat.solvers.GanakSolver;
-import edu.kit.provideq.toolbox.sharpsat.solvers.PythonBruteForceSolver;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -33,115 +30,95 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @SpringBootTest
 @AutoConfigureMockMvc
 class SatSolversTest {
+
   @Autowired
   private WebTestClient client;
 
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
-  private ProblemManager<String, DimacsCnfSolution> problemManager;
-  private List<String> problems;
-  private QrispExactGroverSolver qrispExactGroverSolver;
-  private PythonBruteForceSolver pythonBruteForceSolver;
-  private GanakSolver ganakSolver;
 
-  @SuppressWarnings("OptionalGetWithoutIsPresent")
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
-            .responseTimeout(Duration.ofSeconds(20))
-            .build();
-    problemManager = problemManagerProvider.findProblemManagerForType(SAT).get();
-    problems = problemManager.getExampleInstances()
-        .stream()
-        .map(Problem::getInput)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .toList();
+        .responseTimeout(Duration.ofSeconds(20))
+        .build();
   }
-
-
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   Stream<Arguments> provideArguments() {
     var problemManager = problemManagerProvider.findProblemManagerForType(SAT).get();
-    var satSolver = problemManager.getSolvers().stream()
-        .filter(solver -> !(solver instanceof QrispExactGroverSolver))
-        .toList();
-
-    return ApiTestHelper.getAllArgumentCombinations(problemManager, satSolver)
+    return ApiTestHelper.getAllArgumentCombinations(problemManager)
         .map(list -> Arguments.of(list.get(0), list.get(1)));
   }
 
+  /**
+   * Tests standard SAT solvers (excluding Qrisp) on all example inputs.
+   */
   @ParameterizedTest
   @MethodSource("provideArguments")
   void testSatSolver(ProblemSolver<String, DimacsCnfSolution> solver, String input) {
+    Assumptions.assumeFalse(solver instanceof QrispExactGroverSolver,
+        "Skipping QrispExactGroverSolver in testSatSolver.");
     var problem = ApiTestHelper.createProblem(client, solver, input, SAT);
     ApiTestHelper.testSolution(problem);
   }
 
-  @Test
-  void testQrispExactGroverSolverWithGanak() {
-    for (String problem : problems) {
-      var problemDto = ApiTestHelper.createProblem(client, qrispExactGroverSolver, problem, SAT);
-      assertEquals(ProblemState.SOLVING, problemDto.getState(), "Initial state must be SOLVING.");
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
+  Stream<Arguments> provideQrispExactGroverArguments() {
+    var satManager = problemManagerProvider.findProblemManagerForType(SAT).get();
 
-      // QrispExactGroverSolver has only 1 sub-problem - sharpSAT
-      var subProblems = problemDto.getSubProblems();
-      assertFalse(subProblems.isEmpty(), "QrispExactGroverSolver has a sub-problem.");
+    var qrispSolvers = satManager.getSolvers().stream()
+        .filter(s -> s instanceof QrispExactGroverSolver)
+        .toList();
 
-      for (SubProblemReferenceDto subProblemRef : subProblems) {
-        assertEquals(SHARPSAT.getId(),
-            subProblemRef.getSubRoutine().getTypeId(),
-            "Sub-problem should be a SharpSAT routine.");
+    var exampleInputs = satManager.getExampleInstances().stream()
+        .flatMap(e -> e.getInput().stream())
+        .toList();
 
-        // Should be exactly 1 sub-problem ID. Set ganak for it.
-        var subProblemIds = subProblemRef.getSubProblemIds();
-        assertEquals(1, subProblemIds.size(), "Exactly one SharpSAT sub-problem ID expected.");
+    var sharpSatManager = problemManagerProvider.findProblemManagerForType(SHARPSAT).get();
+    var sharpSatSolvers = sharpSatManager.getSolvers();
 
-        // Set Ganak as the sub-solver
+    List<Arguments> result = new ArrayList<>();
+    for (var qrisp : qrispSolvers) {
+      for (String input : exampleInputs) {
+        for (var subSolver : sharpSatSolvers) {
+          result.add(Arguments.of(qrisp, SAT, input, subSolver));
+        }
+      }
+    }
+    return result.stream();
+  }
+  @ParameterizedTest
+  @MethodSource("provideQrispExactGroverArguments")
+  void testQrispExactGroverSolver(
+      ProblemSolver<String, DimacsCnfSolution> qrispSolver,
+      ProblemType<String, DimacsCnfSolution> problemType,
+      String problemInput,
+      ProblemSolver<String, Integer> sharpSatSolver
+  ) {
+    var problemDto = ApiTestHelper.createProblem(client, qrispSolver, problemInput, problemType);
+    assertEquals(ProblemState.SOLVING, problemDto.getState(),
+        "Qrisp problem must be SOLVING.");
+
+    var subProblems = problemDto.getSubProblems();
+    assertFalse(subProblems.isEmpty(),
+        "QrispExactGroverSolver must produce at least one SharpSAT sub-problem.");
+
+    for (SubProblemReferenceDto subRef : subProblems) {
+      assertEquals(SHARPSAT.getId(), subRef.getSubRoutine().getTypeId(),
+          "Sub-problem should be assigned to SharpSAT routine.");
+
+      for (String subProblemId : subRef.getSubProblemIds()) {
         var assignedSubProblem = ApiTestHelper.setProblemSolver(
             client,
-            ganakSolver,
-            subProblemIds.get(0),
+            sharpSatSolver,
+            subProblemId,
             SHARPSAT.getId()
         );
-
         ApiTestHelper.testSolution(assignedSubProblem);
       }
-      var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), SAT);
-      ApiTestHelper.testSolution(solvedProblemDto);
     }
+    var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), problemType);
+    ApiTestHelper.testSolution(solvedProblemDto);
   }
-
-  @Test
-  void testQrispExactGroverSolverWithBruteForce() {
-    for (String problem : problems) {
-      var problemDto = ApiTestHelper.createProblem(client, qrispExactGroverSolver, problem, SAT);
-      assertEquals(ProblemState.SOLVING, problemDto.getState(), "Initial state must be SOLVING.");
-
-      var subProblems = problemDto.getSubProblems();
-      assertFalse(subProblems.isEmpty(), "QrispExactGroverSolver has a sub-problem.");
-
-      for (SubProblemReferenceDto subProblemRef : subProblems) {
-        assertEquals(SHARPSAT.getId(),
-            subProblemRef.getSubRoutine().getTypeId(),
-            "Sub-problem should be a SharpSAT routine.");
-
-        var subProblemIds = subProblemRef.getSubProblemIds();
-        assertEquals(1, subProblemIds.size(), "Exactly one SharpSAT sub-problem ID expected.");
-
-        var assignedSubProblem = ApiTestHelper.setProblemSolver(
-            client,
-            pythonBruteForceSolver,
-            subProblemIds.get(0),
-            SHARPSAT.getId()
-        );
-
-        ApiTestHelper.testSolution(assignedSubProblem);
-      }
-      var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), SAT);
-      ApiTestHelper.testSolution(solvedProblemDto);
-    }
-  }
-
 }
