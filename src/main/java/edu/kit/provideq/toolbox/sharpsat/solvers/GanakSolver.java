@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * {@link SharpSatConfiguration#SHARPSAT} solver using OpenSource GANAK implementation.
+ * {@link <a href="https://github.com/meelgroup/ganak">Ganak</a>} for exact model counting.
  */
 @Component
 public class GanakSolver extends SharpSatSolver {
