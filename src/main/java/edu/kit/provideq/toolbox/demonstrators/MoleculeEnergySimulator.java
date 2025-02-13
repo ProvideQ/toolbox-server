@@ -41,7 +41,7 @@ public class MoleculeEnergySimulator implements Demonstrator {
 
   @Override
   public String getDescription() {
-    return "";
+    return "Computes the ground state energy for a given molecule using VQE algorithm.";
   }
 
   @Override
