@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
- * Demonstrator for the Hydrogen Atom simulation.
+ * Demonstrator for the Molecule Energy simulation.
  * Note that its python dependencies can only be installed on Linux and macOS.
  * Based on this <a href="https://github.com/qiskit-community/qiskit-community-tutorials/blob/master/chemistry/h2_var_forms.ipynb">Jupyter Notebook</a>
  */
@@ -28,7 +28,7 @@ public class MoleculeEnergySimulator implements Demonstrator {
 
   @Autowired
   public MoleculeEnergySimulator(
-      @Value("${demonstrators.qiskit.script.hydrogen}") String scriptPath,
+      @Value("${demonstrators.qiskit.script.molecule-energy}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;
@@ -36,7 +36,7 @@ public class MoleculeEnergySimulator implements Demonstrator {
 
   @Override
   public String getName() {
-    return "Hydrogen Atom Demonstrator";
+    return "Molecule Energy Simulator";
   }
 
   @Override

@@ -1,7 +1,7 @@
 # This file describes the python package requirements for all Qiskit demonstrator scripts
 # supported by ProvideQ
 
-# required for hydrogen solver
+# required for molecule energy solver
 qiskit==1.1.0
 qiskit-aer==0.14.2
 qiskit-algorithms==0.3.0
