@@ -50,7 +50,7 @@ public class MoleculeEnergySimulator implements Demonstrator {
         new TextSetting(
             false,
             SETTING_MOLECULE,
-            "The molecule to be simulated, a di-hydrogen molecule by default",
+            "The molecule to be simulated in XYZ format - a di-hydrogen molecule by default",
             DEFAULT_MOLECULE
         )
     );
