@@ -115,7 +115,8 @@ public class QrispExactGroverSolver extends SatSolver {
       solution.setSolutionData(dimacsCnfSolution);
       solution.complete();
     } else {
-      solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
+      solution.setDebugData(processResult.errorOutput().orElse("Error occurred while running"
+          + " Qrisp implementation of Grover "));
       solution.fail();
     }
     return Mono.just(solution);
