@@ -26,8 +26,7 @@ public class SharpSatConfiguration {
   public static final ProblemType<String, Integer> SHARPSAT = new ProblemType<>(
       "sharpsat",
       String.class,
-      Integer.class,
-      null
+      Integer.class
   );
 
   @Bean
