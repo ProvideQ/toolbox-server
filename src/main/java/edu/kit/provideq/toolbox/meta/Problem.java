@@ -2,6 +2,8 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.api.BoundDto;
+import edu.kit.provideq.toolbox.api.ComparisonDto;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +33,7 @@ public class Problem<InputT, ResultT> {
 
   private InputT input;
   private Solution<ResultT> solution;
-  private BoundWithInfo bound;
+  private final ComparisonDto boundWithComparison = new ComparisonDto();
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
   private List<SolverSetting> solverSettings;
@@ -101,7 +104,32 @@ public class Problem<InputT, ResultT> {
     long finish = System.currentTimeMillis();
     var executionTime = finish - start;
 
-    this.bound = new BoundWithInfo(estimatedBound, executionTime);
+    this.boundWithComparison.setBound(new BoundWithInfo(estimatedBound, executionTime));
+  }
+
+  public void compareBound() {
+    if (this.solution == null) {
+      throw new IllegalStateException("Cannot compare bound without solution!");
+    }
+    if (this.boundWithComparison.getBound() == null) {
+      throw new IllegalStateException("Cannot compare bound without bound!");
+    }
+
+    var bound = this.boundWithComparison.getBound();
+    var solution = this.solution.getSolutionData();
+
+    var pattern = Pattern.compile(this.type.getSolutionPattern());
+    var solutionMatcher = pattern.matcher(solution.toString());
+    float solutionValue;
+    if (solutionMatcher.find()) {
+      solutionValue = Float.parseFloat(solutionMatcher.group(1));
+    } else {
+      throw new IllegalStateException("Solution does not match the expected pattern!");
+    }
+
+    var comparison = bound.boundType().compare(bound.bound(), solutionValue);
+
+    this.boundWithComparison.setComparison(comparison);
   }
 
   public UUID getId() {
@@ -231,7 +259,11 @@ public class Problem<InputT, ResultT> {
             + '}';
   }
 
-  public Optional<BoundWithInfo> getBound() {
-    return Optional.ofNullable(bound);
+  public Optional<BoundDto> getBound() {
+    return Optional.ofNullable(boundWithComparison.getBound());
+  }
+
+  public Optional<ComparisonDto> getBoundWithComparison() {
+    return Optional.of(boundWithComparison);
   }
 }
