@@ -8,8 +8,7 @@ from qiskit_nature.second_q.algorithms import GroundStateEigensolver
 import sys
 
 if len(sys.argv) != 2:
-    raise TypeError('This script expects exactly 1 arguments: the molecule')
-
+    raise TypeError('This script expects exactly 1 argument: the molecule')
 molecule = sys.argv[1]
 
 driver = PySCFDriver(atom=molecule)
