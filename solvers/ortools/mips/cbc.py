@@ -1,7 +1,7 @@
 import argparse
 import os
 from ortools.linear_solver import pywraplp
-from lp_mips_converter import convert_model
+from lp_mps_converter import convert_model
 
 
 parser = argparse.ArgumentParser(

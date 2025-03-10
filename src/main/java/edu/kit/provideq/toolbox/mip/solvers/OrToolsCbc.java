@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.lp.solvers;
+package edu.kit.provideq.toolbox.mip.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class OrToolsMipCbc extends LpSolver {
+public class OrToolsCbc extends MipSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
-  public OrToolsMipCbc(
+  public OrToolsCbc(
       @Value("${ortools.script.ormip}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
@@ -42,6 +42,7 @@ public class OrToolsMipCbc extends LpSolver {
   ) {
     var solution = new Solution<>(this);
 
+    // TODO: enable both .lp and .mps Problems from the start
     var processResult = context
         .getBean(PythonProcessRunner.class, scriptPath)
         .withArguments(

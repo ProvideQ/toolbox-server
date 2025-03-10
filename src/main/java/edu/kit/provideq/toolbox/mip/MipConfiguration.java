@@ -1,8 +1,8 @@
-package edu.kit.provideq.toolbox.lp;
+package edu.kit.provideq.toolbox.mip;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.lp.solvers.OrToolsMipCbc;
+import edu.kit.provideq.toolbox.mip.solvers.OrToolsCbc;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -13,30 +13,30 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Definition and registration of the "Linear and Mixed Integer" problems.
+ * Definition and registration of the "Mixed Integer" problem.
  */
 @Configuration
-public class LpConfiguration {
+public class MipConfiguration {
   /**
-   * LP (Linear Problem)
-   * A linear optimization problem.
-   * For a given linear term,
+   * MIP (Mixed integer Problem)
+   * A mixed integer optimization problem.
+   * For a given integer term,
    * find the minimal variable assignment of the term.
    */
-  public static final ProblemType<String, String> LP = new ProblemType<>(
-      "lp",
+  public static final ProblemType<String, String> MIP = new ProblemType<>(
+      "mip",
       String.class,
       String.class
   );
 
   @Bean
-  ProblemManager<String, String> getLpManager(
-      OrToolsMipCbc orToolsMipCbc,
+  ProblemManager<String, String> getMipManager(
+      OrToolsCbc orToolsCbc,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
-        LP,
-        Set.of(orToolsMipCbc),
+        MIP,
+        Set.of(orToolsCbc),
         loadExampleProblems(resourceProvider)
     );
   }
@@ -46,13 +46,13 @@ public class LpConfiguration {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("simple.mps"),
-          "mixed-integer-problem example for LP is unavailable!"
+          "mixed-integer-problem example is unavailable!"
       );
-      var problem = new Problem<>(LP);
+      var problem = new Problem<>(MIP);
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException(LP, e);
+      throw new MissingExampleException(MIP, e);
     }
   }
 }
