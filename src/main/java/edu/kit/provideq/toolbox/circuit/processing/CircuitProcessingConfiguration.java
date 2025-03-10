@@ -15,8 +15,7 @@ public class CircuitProcessingConfiguration {
   public static final ProblemType<String, String> CIRCUIT_PROCESSING = new ProblemType<>(
       "circuit-processing",
       String.class,
-      String.class,
-      null
+      String.class
   );
 
   @Bean
