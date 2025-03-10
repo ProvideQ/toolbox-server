@@ -7,10 +7,9 @@ import edu.kit.provideq.toolbox.circuit.processing.solver.executor.ExecutorConfi
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Component
 public class MoveToExecutionSolver extends CircuitProcessingSolver {

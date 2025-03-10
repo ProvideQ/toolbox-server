@@ -22,7 +22,11 @@ public class ErrorMitigationSolver implements ProblemSolver<String, String> {
   }
 
   @Override
-  public Mono<Solution<String>> solve(String input, SubRoutineResolver subRoutineResolver, SolvingProperties properties) {
+  public Mono<Solution<String>> solve(
+      String input,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
+  ) {
     var solution = new Solution<>(this);
     solution.setSolutionData(input);
     return Mono.just(solution);
