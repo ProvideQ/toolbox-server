@@ -47,7 +47,7 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
           SolutionStatus status = executionResultSolution.getStatus();
           if (status == SolutionStatus.ERROR) {
             solution.fail();
-            solution.setDebugData("An error occurred while executing the circuit");
+            solution.setDebugData(executionResultSolution.getDebugData());
             return solution;
           }
           solution.complete();
