@@ -45,8 +45,8 @@ public class LpConfiguration {
       ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("qubo.lp"),
-          "quadratic-problem example for QUBO is unavailable!"
+          getClass().getResourceAsStream("simple.mps"),
+          "mixed-integer-problem example for LP is unavailable!"
       );
       var problem = new Problem<>(LP);
       problem.setInput(resourceProvider.readStream(problemInputStream));
