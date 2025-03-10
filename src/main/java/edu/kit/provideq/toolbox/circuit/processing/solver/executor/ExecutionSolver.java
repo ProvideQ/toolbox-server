@@ -9,14 +9,13 @@ import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.Optional;
 
 @Component
 public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
@@ -67,7 +66,11 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   }
 
   @Override
-  public Mono<Solution<ExecutionResult>> solve(String input, SubRoutineResolver subRoutineResolver, SolvingProperties properties) {
+  public Mono<Solution<ExecutionResult>> solve(
+      String input,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
+  ) {
     var solution = new Solution<>(this);
 
     int shotNumber = properties.<IntegerSetting>getSetting(SETTING_NUMBER_OF_SHOTS)

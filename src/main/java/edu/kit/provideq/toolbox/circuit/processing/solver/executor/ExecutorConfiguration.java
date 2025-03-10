@@ -3,18 +3,16 @@ package edu.kit.provideq.toolbox.circuit.processing.solver.executor;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Set;
 
 @Configuration
 public class ExecutorConfiguration {
   public static final ProblemType<String, ExecutionResult> EXECUTOR_CONFIG = new ProblemType<>(
       "circuit-processing-executor",
       String.class,
-      ExecutionResult.class,
-      null
+      ExecutionResult.class
   );
 
   @Bean

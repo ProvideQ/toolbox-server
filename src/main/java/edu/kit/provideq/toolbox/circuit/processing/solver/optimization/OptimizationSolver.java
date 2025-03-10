@@ -2,17 +2,20 @@ package edu.kit.provideq.toolbox.circuit.processing.solver.optimization;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.circuit.processing.solver.CircuitProcessingSolver;
-import edu.kit.provideq.toolbox.meta.*;
+import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Component
 public class OptimizationSolver implements ProblemSolver<String, String> {
