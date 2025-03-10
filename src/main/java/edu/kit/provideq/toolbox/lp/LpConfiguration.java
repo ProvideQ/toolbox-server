@@ -13,14 +13,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Definition and registration of the "Quadratic Unconstrained Binary Optimization" problem.
+ * Definition and registration of the "Linear and Mixed Integer" problems.
  */
 @Configuration
 public class LpConfiguration {
   /**
-   * QUBO (Quadratic Unconstrained Binary Optimization)
-   * A combinatorial optimization problem.
-   * For a given quadratic term with binary decision variables,
+   * LP (Linear Problem)
+   * A linear optimization problem.
+   * For a given linear term,
    * find the minimal variable assignment of the term.
    */
   public static final ProblemType<String, String> LP = new ProblemType<>(
