@@ -1,6 +1,5 @@
 import cplex
 
-
 def convert_model(input_file, output_file):
     """
     Loads a model (LP or MPS) into CPLEX and writes it back out
