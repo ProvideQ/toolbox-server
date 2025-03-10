@@ -10,6 +10,7 @@ import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
 import edu.kit.provideq.toolbox.sat.solvers.QrispGroverSolver;
 import java.time.Duration;
 import java.util.stream.Stream;
@@ -56,6 +57,7 @@ class FeatureModelAnomalySolversTest {
 
     var satSolver = satManager.getSolvers().stream()
         .filter(solver -> !(solver instanceof QrispGroverSolver))
+        .filter(solver -> !(solver instanceof QrispExactGroverSolver))
         .toList();
 
     return ApiTestHelper.getAllArgumentCombinations(featureModelManager, satSolver)

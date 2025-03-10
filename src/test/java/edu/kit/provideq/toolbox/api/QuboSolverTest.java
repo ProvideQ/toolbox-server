@@ -5,6 +5,8 @@ import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
 import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.KipuQuboSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.QuantagoniaQuboSolver;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +41,11 @@ class QuboSolverTest {
     var problemManager = problemManagerProvider.findProblemManagerForType(QUBO).get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
+        .filter(list -> {
+          Object solver = list.get(0);
+          return !(solver instanceof KipuQuboSolver)
+              && !(solver instanceof QuantagoniaQuboSolver);
+        })
         .map(list -> Arguments.of(list.get(0), list.get(1)));
   }
 

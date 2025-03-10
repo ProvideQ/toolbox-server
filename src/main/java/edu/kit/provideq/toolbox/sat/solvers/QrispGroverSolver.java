@@ -10,6 +10,7 @@ import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ public class QrispGroverSolver extends SatSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
+  @Autowired
   public QrispGroverSolver(
       @Value("${qrisp.script.sat}") String scriptPath,
       ApplicationContext context) {

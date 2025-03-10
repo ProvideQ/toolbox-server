@@ -38,6 +38,15 @@ public class Solution<S> {
     this.solverName = problemSolver.getName();
   }
 
+  public static <InputT, S> Solution<S> failed(
+      ProblemSolver<InputT, S> problemSolver,
+      String text) {
+    var solution = new Solution<S>(problemSolver);
+    solution.fail();
+    solution.setDebugData(text);
+    return solution;
+  }
+
   public UUID getId() {
     return this.id;
   }
