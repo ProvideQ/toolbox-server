@@ -19,10 +19,20 @@ public class PythonProcessRunner extends ProcessRunner {
    * Creates a process runner for a Python script.
    *
    * @param scriptPath the filepath of the Python script to run.
+   * @param venvName   the name of the virtual environment to use.
    */
-  public PythonProcessRunner(String scriptPath) {
+  public PythonProcessRunner(String scriptPath, String venvName) {
     super(new ProcessBuilder());
 
+    String osName = System.getProperty("os.name").toLowerCase();
+    String activate;
+    if (osName.contains("win")) {
+      activate = String.format("./venv/%s/Scripts/activate.bat", venvName);
+    } else {
+      activate = String.format("source ./venv/%s/bin/activate", venvName);
+    }
+
+    withArguments(activate, "&&");
     withArguments(PYTHON_EXECUTABLE_NAME, scriptPath);
   }
 }
