@@ -1,0 +1,2 @@
+# This file describes the python package requirements for the Dwave Qubo solver
+dwave-ocean-sdk == 6.4.1

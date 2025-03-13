@@ -1,0 +1,2 @@
+# This file describes the python package requirements for the Qiskit Knapsack solver
+qiskit-optimization == 0.6.1

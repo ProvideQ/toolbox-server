@@ -6,8 +6,10 @@ import numpy as np
 import sys
 from io import StringIO
 
-if len(sys.argv) != 4:
-    raise TypeError('This script expects exactly 3 arguments: max number of variables, step size, and number of repetitons')
+
+arg_count = len(sys.argv) - 1
+if arg_count != 3:
+    raise TypeError(f'This script expects exactly 3 arguments but got {arg_count}: max number of variables, step size, and number of repetitons')
 
 maxNbVars = int(sys.argv[1])
 stepSize = int(sys.argv[2])

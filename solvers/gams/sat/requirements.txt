@@ -1,0 +1,2 @@
+# This file describes the python package requirements for the GAMS SAT solver
+gamsapi[core,connect]

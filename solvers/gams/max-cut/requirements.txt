@@ -1,0 +1,3 @@
+# This file describes the python package requirements for the GAMS Max-Cut solver
+networkx
+gamsapi[core,connect]

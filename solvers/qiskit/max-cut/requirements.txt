@@ -1,0 +1,5 @@
+# This file describes the python package requirements for the Qiskit Max-Cut solver
+pygmlparser == 1.0.1
+qiskit-optimization == 0.6.1
+numpy
+networkx
