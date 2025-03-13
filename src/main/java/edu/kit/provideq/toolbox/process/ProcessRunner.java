@@ -45,9 +45,9 @@ public class ProcessRunner {
   protected final ProcessBuilder processBuilder;
   protected ResourceProvider resourceProvider;
 
-  private final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> preProcessors;
-  private final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> postProcessors;
-  private final List<UnaryOperator<String>> argumentTransformers;
+  protected final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> preProcessors;
+  protected final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> postProcessors;
+  protected final List<UnaryOperator<String>> argumentTransformers;
 
   /**
    * The directory of the problem that is being solved.
@@ -250,7 +250,7 @@ public class ProcessRunner {
     return this;
   }
 
-  private void addCommand(String command) {
+  protected void addCommand(String command) {
     List<String> existingCommands = processBuilder.command();
     existingCommands.add(command);
     processBuilder.command(existingCommands);

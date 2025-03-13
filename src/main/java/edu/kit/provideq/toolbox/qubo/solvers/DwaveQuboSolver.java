@@ -53,13 +53,16 @@ public class DwaveQuboSolver extends QuboSolver {
   }
 
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public DwaveQuboSolver(
-      @Value("${dwave.script.qubo}") String scriptPath,
+      @Value("${path.dwave.qubo}") String scriptPath,
+      @Value("${venv.dwave.qubo}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -110,7 +113,7 @@ public class DwaveQuboSolver extends QuboSolver {
 
     final var solution = new Solution<>(this);
 
-    var processRunner = context.getBean(PythonProcessRunner.class, scriptPath);
+    var processRunner = context.getBean(PythonProcessRunner.class, scriptPath, venv);
 
     if (dwaveToken.isPresent() && !dwaveToken.get().isEmpty()) {
       processRunner.withEnvironmentVariable("DWAVE_API_TOKEN", dwaveToken.get());

@@ -1,5 +1,7 @@
 package edu.kit.provideq.toolbox.process;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,14 +27,51 @@ public class PythonProcessRunner extends ProcessRunner {
     super(new ProcessBuilder());
 
     String osName = System.getProperty("os.name").toLowerCase();
-    String activate;
     if (osName.contains("win")) {
-      activate = String.format("./venv/%s/Scripts/activate.bat", venvName);
+      withArguments(
+          String.format("./venv/%s/Scripts/activate.bat", venvName),
+          "&&",
+          PYTHON_EXECUTABLE_NAME,
+          scriptPath);
     } else {
-      activate = String.format("source ./venv/%s/bin/activate", venvName);
+      processBuilder.command(
+          "sh",
+          "-c",
+          String.format(". ./venv/%s/bin/activate && python %s", venvName, scriptPath));
+    }
+  }
+
+  @Override
+  public ProcessRunner withArguments(String... arguments) {
+    String osName = System.getProperty("os.name").toLowerCase();
+    if (osName.contains("win")) {
+      return super.withArguments(arguments);
     }
 
-    withArguments(activate, "&&");
-    withArguments(PYTHON_EXECUTABLE_NAME, scriptPath);
+    preProcessors.add((problemType, solutionId) -> {
+      for (String argument : arguments) {
+        for (var transformer : argumentTransformers) {
+          argument = transformer.apply(argument);
+        }
+
+        if (processBuilder.command().isEmpty()) {
+          processBuilder.command(argument);
+        } else {
+          List<String> existingCommands = processBuilder.command();
+          System.out.println(String.format("Adding argument %s to existing commands %s", argument, String.join(" ", existingCommands)));
+          int lastIndex = existingCommands.size() - 1;
+          String lastCommand = existingCommands.get(lastIndex);
+          existingCommands.remove(lastIndex);
+
+          var newArgument = lastCommand + " " + argument;
+          existingCommands.add(newArgument);
+          processBuilder.command(existingCommands);
+        }
+      }
+
+      return Optional.empty();
+    });
+
+    return this;
   }
 }
