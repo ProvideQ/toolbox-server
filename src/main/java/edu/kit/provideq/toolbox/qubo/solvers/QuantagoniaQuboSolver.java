@@ -44,6 +44,7 @@ public class QuantagoniaQuboSolver extends QuboSolver {
   public List<SolverSetting> getSolverSettings() {
     return List.of(
         new TextSetting(
+            true,
             SETTING_PLANQK_TOKEN,
             "Create access token as shown in docs: https://docs.planqk.de/services/applications.html"
         )
