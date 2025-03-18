@@ -46,9 +46,9 @@ cd "$GAMS_PATH" &&\
 
 # === Install conda ===
 # download installer, verify it and make it executable
-curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh"
+curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/miniconda/Miniconda3-py310_25.1.1-1-Linux-x86_64.sh"
 cd /opt/conda-installer
-echo "32d73e1bc33fda089d7cd9ef4c1be542616bd8e437d1f77afeeaf7afdb019787 install.sh" | sha256sum --check
+echo "585972959914f1f9be463284d477717eb10f7306bda63f2ec3c4c86047b9dd72 install.sh" | sha256sum --check
 chmod +x ./install.sh
 
 # Install python (with python -> python3 alias) and pip from miniconda
