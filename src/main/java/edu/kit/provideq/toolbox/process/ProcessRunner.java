@@ -294,6 +294,9 @@ public class ProcessRunner {
       String processError;
       int processExitCode;
       try {
+        processBuilder.directory(new File(System.getProperty("user.dir")));
+        String command = processBuilder.command().stream().reduce("", (a, b) -> a + " |break| " + b);
+        System.out.println("ProcessBuilder command: " + command);
         Process process = processBuilder.start();
 
         processOutput = resourceProvider.readStream(process.inputReader());
