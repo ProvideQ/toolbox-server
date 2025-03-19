@@ -53,7 +53,7 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
             SETTING_NUMBER_OF_SHOTS,
             "The number of shots to run",
             1,
-            10000,
+            1000000,
             DEFAULT_NUMBER_OF_SHOTS),
         new SelectSetting<>(
             SETTING_SELECT_SIMULATOR,

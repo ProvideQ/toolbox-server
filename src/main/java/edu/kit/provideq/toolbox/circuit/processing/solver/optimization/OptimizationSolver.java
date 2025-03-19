@@ -37,12 +37,13 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
 
   @Override
   public String getName() {
-    return "Optimize OpenQASM circuit";
+    return "Apply Tket Optimization Pass";
   }
 
   @Override
   public String getDescription() {
-    return "Run optimization algorithms on an OpenQASM circuit";
+    return "Transform the given circuit into an optimized but equivalent circuit using"
+        + "Tket compilation passes (e.g. removing redundancies).";
   }
 
   @Override
