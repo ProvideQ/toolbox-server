@@ -1,5 +1,3 @@
 pytket
 pytket-qiskit
-pytket-pyquil
-pytket-projectq
 pytket-qulacs
