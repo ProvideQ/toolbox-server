@@ -43,12 +43,10 @@ public class ProcessRunner {
   private static final String OUTPUT_FILE_NAME = "output";
 
   protected final ProcessBuilder processBuilder;
-  protected ResourceProvider resourceProvider;
-
   protected final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> preProcessors;
   protected final List<BiFunction<ProblemType<?, ?>, UUID, Optional<Exception>>> postProcessors;
   protected final List<UnaryOperator<String>> argumentTransformers;
-
+  protected ResourceProvider resourceProvider;
   /**
    * The directory of the problem that is being solved.
    * Only set when the run method is called.
@@ -60,7 +58,8 @@ public class ProcessRunner {
     this.preProcessors = new ArrayList<>();
     this.postProcessors = new ArrayList<>();
     this.argumentTransformers = new ArrayList<>();
-    argumentTransformers.add(x -> x.replace(PROBLEM_DIRECTORY_PATH, problemDirectory));
+    argumentTransformers.add(x ->
+        x.replace(PROBLEM_DIRECTORY_PATH, problemDirectory));
   }
 
   protected static ProcessBuilder createGenericProcessBuilder(
@@ -94,7 +93,7 @@ public class ProcessRunner {
   /**
    * Writes the input data to a specific input file.
    *
-   * @param inputData The input data to be written to the input file.
+   * @param inputData     The input data to be written to the input file.
    * @param inputFileName The name of the file to write the input data to.
    * @return ProcessRunner instance for chaining.
    */
@@ -162,7 +161,7 @@ public class ProcessRunner {
    * Reads the output data from a default output file using a custom reader.
    *
    * @param reader The reader to use to read the output data.
-   * @param <T> The type of the output data.
+   * @param <T>    The type of the output data.
    * @return ProcessRunner instance for chaining.
    */
   public <T> ProcessRunnerExecutor<T> readOutputFile(ProcessResultReader<T> reader) {
@@ -173,8 +172,8 @@ public class ProcessRunner {
    * Reads the output data from a specific output file using a custom reader.
    *
    * @param outputFileName The name of the file to read the output data from.
-   * @param reader The reader to use to read the output data.
-   * @param <T> The type of the output data.
+   * @param reader         The reader to use to read the output data.
+   * @param <T>            The type of the output data.
    * @return ProcessRunner instance for chaining.
    */
   public <T> ProcessRunnerExecutor<T> readOutputFile(String outputFileName,
@@ -215,7 +214,7 @@ public class ProcessRunner {
   /**
    * Adds an environment variable to the process.
    *
-   * @param key The key of the environment variable.
+   * @param key   The key of the environment variable.
    * @param value The value of the environment variable.
    * @return ProcessRunner instance for chaining.
    */
@@ -295,7 +294,8 @@ public class ProcessRunner {
       int processExitCode;
       try {
         processBuilder.directory(new File(System.getProperty("user.dir")));
-        String command = processBuilder.command().stream().reduce("", (a, b) -> a + " |break| " + b);
+        String command =
+            processBuilder.command().stream().reduce("", (a, b) -> a + " |break| " + b);
         System.out.println("ProcessBuilder command: " + command);
         Process process = processBuilder.start();
 
