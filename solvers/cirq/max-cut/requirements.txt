@@ -1,7 +1,8 @@
 # This file describes the python package requirements for the Cirq MaxCut solver
 matplotlib
-cirq==1.5.0.dev20241009204224
+cirq
 networkx
 pandas
+
 sympy
 numpy
