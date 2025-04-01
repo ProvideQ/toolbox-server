@@ -51,6 +51,8 @@ ENV PATH="${PATH}:/opt/java/bin"
 COPY solvers solvers
 COPY demonstrators demonstrators
 RUN scripts/ci-setup-solvers.sh
+RUN chmod +x solvers/custom/sharp-sat-ganak/bin/ganak-linux
+RUN chmod +x solvers/custom/sharp-sat-ganak/bin/ganak-mac
 COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port
