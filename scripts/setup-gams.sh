@@ -19,7 +19,7 @@ apt-get install curl --yes
 # iisaa/gams-docker (https://github.com/iiasa/gams-docker/blob/master/Dockerfile, GPL-3.0 licensed)
 
 # Configure the GAMS version here
-GAMS_VERSION_RELEASE_MAJOR=42.1
+GAMS_VERSION_RELEASE_MAJOR=49.3
 GAMS_VERSION_HOTFIX=0
 
 # download the self-extracting archive to /opt/gams/gams.exe and run/extract it
