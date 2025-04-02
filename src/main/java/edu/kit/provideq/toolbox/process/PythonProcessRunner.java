@@ -58,8 +58,6 @@ public class PythonProcessRunner extends ProcessRunner {
           processBuilder.command(argument);
         } else {
           List<String> existingCommands = processBuilder.command();
-          System.out.println(String.format("Adding argument %s to existing commands %s", argument,
-              String.join(" ", existingCommands)));
           int lastIndex = existingCommands.size() - 1;
           String lastCommand = existingCommands.get(lastIndex);
           existingCommands.remove(lastIndex);

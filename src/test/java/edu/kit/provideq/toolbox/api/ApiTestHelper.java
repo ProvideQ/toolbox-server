@@ -141,9 +141,11 @@ public class ApiTestHelper {
     // Wait for problem 10 times
     long waitMilliseconds = seconds * 1000 / 10;
 
+    StringBuilder builder = new StringBuilder();
+
     ProblemDto<InputT, ResultT> problemDto;
     while (true) {
-      System.out.println("Checking if problem is solved...");
+      builder.append("Checking if problem is solved...\n");
       problemDto = client.get()
               .uri("/problems/" + problemType.getId() + "/" + problemId)
               .exchange()
@@ -152,7 +154,7 @@ public class ApiTestHelper {
               })
               .returnResult()
               .getResponseBody();
-      System.out.println("Fetched problem: " + problemDto);
+      builder.append("Fetched problem: " + problemDto + "\n");
 
       assertNotNull(problemDto);
 
@@ -171,13 +173,13 @@ public class ApiTestHelper {
                   })
                   .returnResult()
                   .getResponseBody();
-          System.out.println("Fetched sub problem: " + subProblemDto);
+          builder.append("Fetched sub problem: " + subProblemDto + "\n");
 
           assertNotNull(subProblemDto);
         }
       }
 
-      System.out.println("Problem not solved yet. Waiting 5 seconds...");
+      builder.append("Problem not solved yet. Waiting 5 seconds...\n");
 
       try {
         Thread.sleep(waitMilliseconds);
@@ -190,8 +192,14 @@ public class ApiTestHelper {
       }
     }
 
+    // print error output if something went wrong
+    if (problemDto.getState() != ProblemState.SOLVED
+      || problemDto.getSolution().getStatus() != SolutionStatus.SOLVED) {
+      System.out.println(builder);
+    }
+
     assertEquals(ProblemState.SOLVED, problemDto.getState());
-    Assertions.assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
+    assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
 
     return problemDto;
   }
