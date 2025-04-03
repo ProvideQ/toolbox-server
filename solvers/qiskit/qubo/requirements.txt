@@ -1,2 +1,3 @@
 # This file describes the python package requirements for the Qiskit QUBO solver
+qiskit == 1.4.2
 qiskit-optimization == 0.6.1
