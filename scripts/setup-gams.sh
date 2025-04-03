@@ -73,6 +73,7 @@ source /opt/conda/bin/activate gams
 
 # install GAMS links for python
 pip install gamsapi[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+pip install networkx
 
 # make GAMS use our python version
 echo "export GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> ~/.bashrc
