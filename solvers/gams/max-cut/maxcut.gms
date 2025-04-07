@@ -133,7 +133,7 @@ $set LSYM L
 execute_unload 'csdpin.gdx' n = m, n, c, F, F0;
 execute.checkErrorLevel 'gams runcsdp.inc lo=%gams.lo% --strict=1'
 execute_load 'csdpout.gdx'  Y;
-$libInclude linalg cholesky n Y L
+$callTool linalg.cholesky n Y L
 
 SDPRelaxation = 0.5*sum(e, w(e)*(1 - Y(e)));
 
@@ -155,7 +155,7 @@ Solve sdp min sdpobj using lp;
 
 Parameter Yl(i,j)   'level values of Y as parameter';
 Yl(i,j) = Y.l(i,j);
-$libInclude linalg cholesky n Yl L
+$callTool linalg.cholesky n Yl L
 
 SDPRelaxation = 0.5*sum(e, w(e)*(1 - Y.l(e)));
 
