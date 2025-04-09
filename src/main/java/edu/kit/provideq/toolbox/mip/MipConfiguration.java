@@ -2,10 +2,10 @@ package edu.kit.provideq.toolbox.mip;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.mip.solvers.CplexMip;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.mip.solvers.CplexMip;
 import edu.kit.provideq.toolbox.mip.solvers.QuboMipSolver;
 import java.io.IOException;
 import java.util.Objects;
