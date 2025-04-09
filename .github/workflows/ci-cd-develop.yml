@@ -33,7 +33,7 @@ jobs:
       - name: Cache Venv Dependencies
         uses: actions/cache@v4
         with:
-          path: ~/venv
+          path: ${{ github.workspace }}/venv
           # update venv when setup script or any solver has changed:
           key: venv-${{ runner.os }}-${{ hashFiles('scripts/ci-setup-solvers.sh', 'solvers/**') }}
           restore-keys: |
@@ -43,8 +43,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
+            ${{ github.workspace }}/.gradle/caches
+            ${{ github.workspace }}/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-${{ runner.os }}-
@@ -53,9 +53,9 @@ jobs:
         run: ./scripts/ci-setup-solvers.sh
       - name: Run checks
         shell: bash # required for the source command
-        run: |
+        run: | # change to "./gradlew check --info" for more debugging output.
           source /opt/conda/bin/activate gams
-          ./gradlew check --info
+          ./gradlew check
 
       - name: Archive test reports
         if: always()
