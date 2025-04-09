@@ -15,6 +15,7 @@ except cplex.exceptions.CplexError as exc:
     print("Error reading the MPS file:", exc)
     exit()
 
+
 try:
     cpx.solve()
 except cplex.exceptions.CplexError as exc:
@@ -23,14 +24,10 @@ except cplex.exceptions.CplexError as exc:
 
 status = cpx.solution.get_status()
 with open(args.output_file, 'w') as out_file:
-    if status == cpx.solution.status.optimal:
-        out_file.write("Solution is optimal.\n")
-        out_file.write("Objective value = {}\n".format(cpx.solution.get_objective_value()))
-        var_names = cpx.variables.get_names()
-        var_values = cpx.solution.get_values()
-        for name, val in zip(var_names, var_values):
-            out_file.write("{:<15} = {}\n".format(name, val))
-    else:
-        out_file.write("No optimal solution found. Status: {}\n".format(status))
-        out_file.write("Solution status string: {}\n".format(cpx.solution.get_status_string()))
+    out_file.write("Solution status: {}\n".format(cpx.solution.get_status_string()))
+    out_file.write("Objective value = {}\n".format(cpx.solution.get_objective_value()))
+    var_names = cpx.variables.get_names()
+    var_values = cpx.solution.get_values()
+    for name, val in zip(var_names, var_values):
+        out_file.write("{:<15} = {}\n".format(name, val))
 print("Solution written to", args.output_file)
