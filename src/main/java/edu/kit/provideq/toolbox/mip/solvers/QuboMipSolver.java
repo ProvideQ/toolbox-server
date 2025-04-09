@@ -17,7 +17,7 @@ public class QuboMipSolver extends MipSolver {
   private final String scriptPath;
   private final String dependencyScriptPath;
   private final ApplicationContext context;
-  public static final int PENALTY = 2;
+  public static final int PENALTY = 100;
 
   @Autowired
   public QuboMipSolver(
@@ -48,14 +48,25 @@ public class QuboMipSolver extends MipSolver {
     var solution = new Solution<>(this);
 
     // Run GAMS via console
-    ProcessResult<String> processResult = context
+    ProcessResult<String> fileGeneratorResult = context
         .getBean(GamsProcessRunner.class, scriptPath)
         .withArguments(
             "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
+            "--PENALTY=" + String.valueOf(PENALTY)
+        )
+        .writeInputFile(input)
+        .readOutputFile()
+        .run(getProblemType(), solution.getId());
+
+    String modifiedInputFilePath = ProcessRunner.INPUT_FILE_PATH.replaceFirst("\\.[^.]*$", ".gms");
+
+    ProcessResult<String> processResult = context
+        .getBean(GamsProcessRunner.class, modifiedInputFilePath)
+        .withArguments(
             "--IDIR=" + dependencyScriptPath,
             "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input, "problem.lp")
+        .writeInputFile(input)
         .readOutputFile()
         .run(getProblemType(), solution.getId());
     return Mono.just(processResult.applyTo(solution));
