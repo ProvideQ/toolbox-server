@@ -3,14 +3,19 @@ package edu.kit.provideq.toolbox.mip.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.mip.MipConfiguration;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ * {@link MipConfiguration#MIP} solver using IBM cplex.
+ */
 @Component
 public class CplexMip extends MipSolver {
   private final String scriptPath;
@@ -26,12 +31,12 @@ public class CplexMip extends MipSolver {
 
   @Override
   public String getName() {
-    return "(OR-Tools) Cbc Solver for MIP";
+    return "IBM Cplex Solver for MIP";
   }
 
   @Override
   public String getDescription() {
-    return "This solver uses OR-Tools CBC Solver to solve MIP problems";
+    return "This solver uses IBM Cplex Solver to solve MIP problems";
   }
 
   @Override

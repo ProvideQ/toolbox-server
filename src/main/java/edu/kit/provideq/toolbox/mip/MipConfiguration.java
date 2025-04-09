@@ -22,7 +22,7 @@ public class MipConfiguration {
    * MIP (Mixed integer Problem)
    * A mixed integer optimization problem.
    * For a given integer term,
-   * find the minimal variable assignment of the term.
+   * find the minimal / maximal variable assignment of the term.
    */
   public static final ProblemType<String, String> MIP = new ProblemType<>(
       "mip",

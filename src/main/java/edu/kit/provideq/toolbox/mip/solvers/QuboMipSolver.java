@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.mip.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.mip.MipConfiguration;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
@@ -13,12 +14,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ * {@link MipConfiguration#MIP} solver using QUBO Reformulation implementing gams.
+ */
 @Component
 public class QuboMipSolver extends MipSolver {
   private final String scriptPath;
   private final String dependencyScriptPath;
   private final ApplicationContext context;
-  public static final int PENALTY = 100;
+  private static final int PENALTY = 100;
 
   @Autowired
   public QuboMipSolver(
@@ -32,12 +36,13 @@ public class QuboMipSolver extends MipSolver {
 
   @Override
   public String getName() {
-    return "TODO";
+    return "Gams Solver for MIP";
   }
 
   @Override
   public String getDescription() {
-    return "TODO";
+    return "This solver uses LP / MIP reformulation to QUBO which "
+        + "is then subsequently solved by gams";
   }
 
   @Override
@@ -49,11 +54,11 @@ public class QuboMipSolver extends MipSolver {
     var solution = new Solution<>(this);
 
     // Run GAMS via console
-    ProcessResult<String> fileGeneratorResult = context
+    context
         .getBean(GamsProcessRunner.class, scriptPath)
         .withArguments(
             "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
-            "--PENALTY=" + String.valueOf(PENALTY)
+            "--PENALTY=" + PENALTY
         )
         .writeInputFile(input, "problem.lp")
         .readOutputFile("problem.lp")
