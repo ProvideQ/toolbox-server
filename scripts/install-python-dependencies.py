@@ -9,6 +9,7 @@ base_dirs = [
     os.path.join(root_dir, 'solvers'),
 ]
 
+exitCode = 0
 for base_dir in base_dirs:
     for root, dirs, files in os.walk(base_dir):
         # Iterate over framework directory (cirq, gams, qiskit, etc.)
@@ -32,3 +33,7 @@ for base_dir in base_dirs:
                         subprocess.run([pip_executable, 'install', '-r', req_file], check=True)
                     except subprocess.CalledProcessError as e:
                         print(f"Error setting up virtual environment for {solver_dir}: {e}")
+                        exitCode = 1
+                        
+# let pipeline fail if there was an error in the venv setup.
+exit(exitCode)
