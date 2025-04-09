@@ -39,16 +39,6 @@ jobs:
           restore-keys: |
             venv-${{ runner.os }}-
 
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            root/.gradle/caches
-            root/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
       - name: Install solver dependencies
         run: ./scripts/ci-setup-solvers.sh
       - name: Run checks
