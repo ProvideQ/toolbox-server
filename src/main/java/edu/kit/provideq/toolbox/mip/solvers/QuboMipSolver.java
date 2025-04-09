@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
+import java.io.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -54,20 +55,19 @@ public class QuboMipSolver extends MipSolver {
             "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
             "--PENALTY=" + String.valueOf(PENALTY)
         )
-        .writeInputFile(input)
-        .readOutputFile()
+        .writeInputFile(input, "problem.lp")
+        .readOutputFile("problem.lp")
         .run(getProblemType(), solution.getId());
 
-    String modifiedInputFilePath = ProcessRunner.INPUT_FILE_PATH.replaceFirst("\\.[^.]*$", ".gms");
+    String relativePath = "jobs/mip/" + solution.getId() + "/problem.gms";
 
     ProcessResult<String> processResult = context
-        .getBean(GamsProcessRunner.class, modifiedInputFilePath)
+        .getBean(GamsProcessRunner.class, relativePath)
         .withArguments(
-            "--IDIR=" + dependencyScriptPath,
+            "--IDIR=" + new File(dependencyScriptPath).getAbsolutePath(),
             "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input)
-        .readOutputFile()
+        .readOutputFile("output.txt")
         .run(getProblemType(), solution.getId());
     return Mono.just(processResult.applyTo(solution));
   }
