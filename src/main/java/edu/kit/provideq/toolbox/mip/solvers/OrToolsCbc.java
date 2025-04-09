@@ -42,14 +42,13 @@ public class OrToolsCbc extends MipSolver {
   ) {
     var solution = new Solution<>(this);
 
-    // TODO: enable both .lp and .mps Problems from the start
     var processResult = context
         .getBean(PythonProcessRunner.class, scriptPath)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input, "problem.lp")
+        .writeInputFile(input)
         .readOutputFile()
         .run(getProblemType(), solution.getId());
 

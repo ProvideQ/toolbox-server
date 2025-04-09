@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.mip.solvers.OrToolsCbc;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.mip.solvers.QuboMipSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -32,11 +33,12 @@ public class MipConfiguration {
   @Bean
   ProblemManager<String, String> getMipManager(
       OrToolsCbc orToolsCbc,
+      QuboMipSolver quboMipSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         MIP,
-        Set.of(orToolsCbc),
+        Set.of(orToolsCbc, quboMipSolver),
         loadExampleProblems(resourceProvider)
     );
   }
@@ -45,7 +47,7 @@ public class MipConfiguration {
       ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("simple.mps"),
+          getClass().getResourceAsStream("simple.lp"),
           "mixed-integer-problem example is unavailable!"
       );
       var problem = new Problem<>(MIP);
