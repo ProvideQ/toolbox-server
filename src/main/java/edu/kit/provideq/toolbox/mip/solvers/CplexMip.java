@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class OrToolsCbc extends MipSolver {
+public class CplexMip extends MipSolver {
   private final String scriptPath;
   private final ApplicationContext context;
 
   @Autowired
-  public OrToolsCbc(
-      @Value("${ortools.script.ormip}") String scriptPath,
+  public CplexMip(
+      @Value("${cplex.script.mip}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;
@@ -49,7 +49,7 @@ public class OrToolsCbc extends MipSolver {
             ProcessRunner.OUTPUT_FILE_PATH
         )
         .writeInputFile(input)
-        .readOutputFile()
+        .readOutputFile("output.txt")
         .run(getProblemType(), solution.getId());
 
     // Return if process failed

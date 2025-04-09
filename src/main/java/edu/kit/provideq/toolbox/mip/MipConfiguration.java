@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.mip;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.mip.solvers.OrToolsCbc;
+import edu.kit.provideq.toolbox.mip.solvers.CplexMip;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -32,13 +32,13 @@ public class MipConfiguration {
 
   @Bean
   ProblemManager<String, String> getMipManager(
-      OrToolsCbc orToolsCbc,
+      CplexMip cplexMip,
       QuboMipSolver quboMipSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         MIP,
-        Set.of(orToolsCbc, quboMipSolver),
+        Set.of(cplexMip, quboMipSolver),
         loadExampleProblems(resourceProvider)
     );
   }
