@@ -14,14 +14,18 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class QuboMipSolver extends MipSolver {
-  private final String translationScriptPath;
+  private final String scriptPath;
+  private final String dependencyScriptPath;
   private final ApplicationContext context;
+  public static final int PENALTY = 2;
 
   @Autowired
   public QuboMipSolver(
-      @Value("${ortools.script.ormip}") String translationScriptPath,
+      @Value("${gams.script.mip}") String scriptPath,
+      @Value("${gams.script.qubo_solve}") String dependencyScriptPath,
       ApplicationContext context) {
-    this.translationScriptPath = translationScriptPath;
+    this.scriptPath = scriptPath;
+    this.dependencyScriptPath = dependencyScriptPath;
     this.context = context;
   }
 
@@ -45,9 +49,10 @@ public class QuboMipSolver extends MipSolver {
 
     // Run GAMS via console
     ProcessResult<String> processResult = context
-        .getBean(GamsProcessRunner.class, translationScriptPath)
+        .getBean(GamsProcessRunner.class, scriptPath)
         .withArguments(
             "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
+            "--IDIR=" + dependencyScriptPath,
             "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
         )
         .writeInputFile(input, "problem.lp")

@@ -1,5 +1,4 @@
 $setEnv GAMSINP "%INPUT%"
-$setEnv GAMSPEN "%PENALTY%"
 
 $onEmbeddedCode Python:
 import os
@@ -24,6 +23,8 @@ res = subprocess.run(
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE
 )
+#out = res.stdout.decode('utf-8', errors='ignore')
+#err = res.stderr.decode('utf-8', errors='ignore')
 
 with open(new_name, 'r', encoding='utf-8', errors='ignore') as f:
     content = f.read()
@@ -46,15 +47,18 @@ if sense_text.lower().startswith('max'):
 else:
     gams_sense = 'min'
 
-# Create the replacement line using the matched groups
-penalty = os.environ.get("GAMSPEN", "100")  # Default to 100 if not set
-new_line = f'$batinclude %IDIR% {model_name} {model_type} {gams_sense} {obj_var} {penalty} -logOn=2;'
+# 6) Show info to GAMS listing:
+print(f'--- Detected from "{new_name}":')
+print(f'    Model name    = {model_name}')
+print(f'    Model type    = {model_type}')
+print(f'    Sense         = {gams_sense}')
+print(f'    Objective var = {obj_var}')
 
-# Replace the matching "Solve ..." line with the new line (only the first occurrence)
-new_content = pattern.sub(new_line, content, count=1)
-
-# Write the modified content back to the .gms file
-with open(new_name, 'w', encoding='utf-8', errors='ignore') as f:
-    f.write(new_content)
+with open("parsed_macros.gms", "w") as macrofile:
+    macrofile.write(f"$set PARSED_MODELNAME {model_name}\n")
+    macrofile.write(f"$set PARSED_MODELTYPE {model_type}\n")
+    macrofile.write(f"$set PARSED_SENSE {gams_sense}\n")
+    macrofile.write(f"$set PARSED_OBJVAR {obj_var}\n")
+    macrofile.write(f"$set HARDCODED_PENALTY 10\n")
 
 $offEmbeddedCode
