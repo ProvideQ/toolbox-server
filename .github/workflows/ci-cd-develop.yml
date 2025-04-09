@@ -30,7 +30,7 @@ jobs:
           echo "$GAMS_PATH" >> "$GITHUB_PATH"
           echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
 
-      - name: Cache Venv Dependencies
+      - name: Cache Venv dependencies
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/venv
@@ -39,12 +39,12 @@ jobs:
           restore-keys: |
             venv-${{ runner.os }}-
 
-      - name: Cache Gradle Dependencies
+      - name: Cache Gradle dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/.gradle/caches
-            ${{ github.workspace }}/.gradle/wrapper
+            root/.gradle/caches
+            root/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-${{ runner.os }}-
