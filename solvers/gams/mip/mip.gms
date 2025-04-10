@@ -13,7 +13,7 @@ print(f"{inp_file}")
 if not os.path.exists(inp_file):
     sys.exit(f"*** ERROR: input file not found: {inp_file}")
 
-# Replace .lp with .gms
+# Replace .lp or .mps with .gms
 base, ext = os.path.splitext(inp_file)
 new_name = base + '.gms'
 
