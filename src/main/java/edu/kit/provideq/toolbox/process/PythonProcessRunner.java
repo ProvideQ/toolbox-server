@@ -13,8 +13,7 @@ public class PythonProcessRunner extends ProcessRunner {
   /**
    * The name of the file to call for running a GAMS script.
    */
-  private static final String PYTHON_EXECUTABLE_NAME
-      = "python";
+  private static final String PYTHON_EXECUTABLE_NAME = "python";
 
   /**
    * Creates a process runner for a Python script.
