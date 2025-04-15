@@ -20,10 +20,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.10.17
+      - name: Set up GAMS
+        shell: bash # required for the source command
+        env:
+          GAMS_LICENSE: ${{ secrets.GAMS_LICENSE }}
+        run: |
+          source ./scripts/setup-gams.sh
+          echo "/opt/conda/bin" >> "$GITHUB_PATH"
+          echo "$GAMS_PATH" >> "$GITHUB_PATH"
+          echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
 
       - name: Cache Venv dependencies
         uses: actions/cache@v4
@@ -36,16 +41,6 @@ jobs:
 
       - name: Install solver dependencies
         run: ./scripts/ci-setup-solvers.sh
-
-      - name: Set up GAMS
-        shell: bash # required for the source command
-        env:
-          GAMS_LICENSE: ${{ secrets.GAMS_LICENSE }}
-        run: |
-          source ./scripts/setup-gams.sh
-          echo "/opt/conda/bin" >> "$GITHUB_PATH"
-          echo "$GAMS_PATH" >> "$GITHUB_PATH"
-          echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
 
       - name: Run checks
         shell: bash # required for the source command
