@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.quantum.material.simulation;
+package edu.kit.provideq.toolbox.materialsimulation;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
@@ -15,22 +15,22 @@ import org.springframework.context.annotation.Configuration;
  * Definition and registration of the Quantum Material Simulation problem.
  */
 @Configuration
-public class QuantumMaterialSimulationConfiguration {
+public class MaterialSimulationConfiguration {
 
   /**
    * A simulation problem, computing electronic properties of a molecular system.
    */
-  public static final ProblemType<String, String> QUANTUM_MATERIAL_SIMULATION = new ProblemType<>(
-      "quantum-material-simulation",
+  public static final ProblemType<String, String> MATERIAL_SIMULATION = new ProblemType<>(
+      "material-simulation",
       String.class,
       String.class
   );
 
-  ProblemManager<String, String> getQuantumMaterialSimulationManager(
+  ProblemManager<String, String> getMaterialSimulationManager(
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
-        QUANTUM_MATERIAL_SIMULATION,
+        MATERIAL_SIMULATION,
         Set.of(),
         loadExampleProblems(resourceProvider)
     );
@@ -41,13 +41,13 @@ public class QuantumMaterialSimulationConfiguration {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("empty.txt"),
-          "example for Quantum Material Simulation is unavailable!"
+          "example for Material Simulation is unavailable!"
       );
-      var problem = new Problem<>(QUANTUM_MATERIAL_SIMULATION);
+      var problem = new Problem<>(MATERIAL_SIMULATION);
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException(QUANTUM_MATERIAL_SIMULATION, e);
+      throw new MissingExampleException(MATERIAL_SIMULATION, e);
     }
   }
 
