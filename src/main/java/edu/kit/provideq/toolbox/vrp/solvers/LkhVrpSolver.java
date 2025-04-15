@@ -18,16 +18,19 @@ import reactor.core.publisher.Mono;
 @Component
 public class LkhVrpSolver extends VrpSolver {
   private final String scriptPath;
+  private final String binaryPath;
+  private final String venv;
   private final ApplicationContext context;
-  private final String solverBinary;
 
   @Autowired
   public LkhVrpSolver(
-      @Value("${custom.script.lkh}") String scriptPath,
-      @Value("${custom.binary.lkh}") String solverBinary,
+      @Value("${path.custom.lkh}") String scriptPath,
+      @Value("${path.custom.lkh.binary}") String binaryPath,
+      @Value("${venv.custom.lkh}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
-    this.solverBinary = solverBinary;
+    this.binaryPath = binaryPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -50,9 +53,9 @@ public class LkhVrpSolver extends VrpSolver {
     var solution = new Solution<>(this);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
-            "--lkh-instance", solverBinary,
+            "--lkh-instance", binaryPath,
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )

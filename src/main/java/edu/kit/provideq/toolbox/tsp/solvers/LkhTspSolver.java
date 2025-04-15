@@ -16,17 +16,20 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class LkhTspSolver extends TspSolver {
-  private final String pythonWrapperScriptPath;
-  private final ApplicationContext context;
+  private final String scriptPath;
   private final String binaryPath;
+  private final String venv;
+  private final ApplicationContext context;
 
   @Autowired
   public LkhTspSolver(
-      @Value("${custom.script.lkh}") String pythonWrapperScriptPath,
-      @Value("${custom.binary.lkh}") String lkhBinaryPath,
+      @Value("${path.custom.lkh}") String scriptPath,
+      @Value("${path.custom.lkh.binary}") String binaryPath,
+      @Value("${venv.custom.lkh}") String venv,
       ApplicationContext context) {
-    this.pythonWrapperScriptPath = pythonWrapperScriptPath;
-    this.binaryPath = lkhBinaryPath;
+    this.scriptPath = scriptPath;
+    this.binaryPath = binaryPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -48,7 +51,7 @@ public class LkhTspSolver extends TspSolver {
   ) {
     var solution = new Solution<>(this);
     var processResult = context
-        .getBean(PythonProcessRunner.class, pythonWrapperScriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             "--lkh-instance", binaryPath,
             ProcessRunner.INPUT_FILE_PATH,

@@ -32,12 +32,15 @@ public class QrispExactGroverSolver extends SatSolver {
       );
 
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   public QrispExactGroverSolver(
-      @Value("${qrisp.script.exact-sat}") String scriptPath,
+      @Value("${path.qrisp.sat.exact}") String scriptPath,
+      @Value("${venv.qrisp.sat}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -98,7 +101,7 @@ public class QrispExactGroverSolver extends SatSolver {
       Solution<DimacsCnfSolution> solution
   ) {
     ProcessResult<String> processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             "--solution-count", String.valueOf(solutionCount),

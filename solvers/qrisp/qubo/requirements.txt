@@ -1,0 +1,4 @@
+# This file describes the python package requirements for the Qrisp QUBO solver
+qrisp == 0.4.4
+numpy == 1.26.4
+gurobipy == 11.0.1 # for lp file reading

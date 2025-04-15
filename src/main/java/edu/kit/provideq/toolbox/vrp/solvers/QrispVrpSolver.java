@@ -18,13 +18,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class QrispVrpSolver extends VrpSolver {
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public QrispVrpSolver(
-      @Value("${qrisp.script.vrp}") String scriptPath,
+      @Value("${path.qrisp.vrp}") String scriptPath,
+      @Value("${venv.qrisp.vrp}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -47,7 +50,7 @@ public class QrispVrpSolver extends VrpSolver {
     var solution = new Solution<>(this);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH,

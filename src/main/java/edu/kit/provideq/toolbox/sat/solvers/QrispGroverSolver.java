@@ -22,13 +22,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class QrispGroverSolver extends SatSolver {
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public QrispGroverSolver(
-      @Value("${qrisp.script.sat}") String scriptPath,
+      @Value("${path.qrisp.sat.grover}") String scriptPath,
+      @Value("${venv.qrisp.sat}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -61,7 +64,7 @@ public class QrispGroverSolver extends SatSolver {
     }
 
     ProcessResult<String> processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH

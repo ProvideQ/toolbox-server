@@ -9,8 +9,9 @@ from qiskit_optimization.applications import Knapsack
 from qiskit_optimization.converters import QuadraticProgramToQubo
 from qiskit_algorithms import QAOA
 
-if len(sys.argv) != 3:
-    raise TypeError('This script expects exactly 2 arguments. Input file (argument 1) and output file (argument 2).')
+arg_count = len(sys.argv) - 1
+if arg_count != 2:
+    raise TypeError(f'This script expects exactly 2 arguments but got {arg_count}. Input file (argument 1) and output file (argument 2).')
 
 input_path = sys.argv[1]
 output_path = sys.argv[2]

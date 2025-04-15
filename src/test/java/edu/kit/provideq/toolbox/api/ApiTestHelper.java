@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -26,23 +25,23 @@ import reactor.core.publisher.Mono;
 
 public class ApiTestHelper {
   public static Stream<List<Object>> getAllArgumentCombinations(
-          ProblemManager<?, ?> problemManager) {
+      ProblemManager<?, ?> problemManager) {
     return getAllArgumentCombinations(problemManager, List.of());
   }
 
   public static Stream<List<Object>> getAllArgumentCombinations(
-          ProblemManager<?, ?> problemManager,
-          List<?>... lists) {
+      ProblemManager<?, ?> problemManager,
+      List<?>... lists) {
     // Get all solvers
     var solvers = problemManager.getSolvers().stream().toList();
 
     // Get all example inputs
     var problems = problemManager.getExampleInstances()
-            .stream()
-            .map(Problem::getInput)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .toList();
+        .stream()
+        .map(Problem::getInput)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
 
     List<List<?>> arguments = new ArrayList<>(List.of(solvers, problems));
     for (List<?> list : lists) {
@@ -70,10 +69,10 @@ public class ApiTestHelper {
   }
 
   public static <InputT, ResultT> ProblemDto<InputT, ResultT> createProblem(
-          WebTestClient client,
-          ProblemSolver<InputT, ResultT> solver,
-          InputT input,
-          ProblemType<InputT, ResultT> problemType) {
+      WebTestClient client,
+      ProblemSolver<InputT, ResultT> solver,
+      InputT input,
+      ProblemType<InputT, ResultT> problemType) {
     // Initialize mock solver
     var problemDtoMock = Mockito.mock(ProblemDto.class);
     Mockito.when(problemDtoMock.getSolverId()).thenReturn(solver.getId());
@@ -81,15 +80,15 @@ public class ApiTestHelper {
     Mockito.when(problemDtoMock.getState()).thenReturn(ProblemState.SOLVING);
 
     var problem = client.post()
-            .uri("/problems/" + problemType.getId())
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(problemDtoMock)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
-            })
-            .returnResult()
-            .getResponseBody();
+        .uri("/problems/" + problemType.getId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(problemDtoMock)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
+        })
+        .returnResult()
+        .getResponseBody();
 
     assertNotNull(problem);
     assertEquals(input, problem.getInput());
@@ -98,25 +97,25 @@ public class ApiTestHelper {
   }
 
   public static <InputT, ResultT> ProblemDto<InputT, ResultT> setProblemSolver(
-          WebTestClient client,
-          ProblemSolver<InputT, ResultT> solver,
-          String problemId,
-          String problemTypeId) {
+      WebTestClient client,
+      ProblemSolver<InputT, ResultT> solver,
+      String problemId,
+      String problemTypeId) {
     // Set subroutine solver and state
     var problemDtoMock = Mockito.mock(ProblemDto.class);
     Mockito.when(problemDtoMock.getSolverId()).thenReturn(solver.getId());
     Mockito.when(problemDtoMock.getState()).thenReturn(ProblemState.SOLVING);
 
     var problem = client.patch()
-            .uri("/problems/" + problemTypeId + "/" + problemId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(problemDtoMock)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
-            })
-            .returnResult()
-            .getResponseBody();
+        .uri("/problems/" + problemTypeId + "/" + problemId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(problemDtoMock)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
+        })
+        .returnResult()
+        .getResponseBody();
 
     assertNotNull(problem);
 
@@ -125,34 +124,36 @@ public class ApiTestHelper {
 
   @SuppressWarnings("BusyWait")
   public static <InputT, ResultT> ProblemDto<InputT, ResultT> trySolveFor(
-          long seconds,
-          WebTestClient client,
-          String problemId,
-          ProblemType<InputT, ResultT> problemType) {
+      long seconds,
+      WebTestClient client,
+      String problemId,
+      ProblemType<InputT, ResultT> problemType) {
     AtomicBoolean hasTimeout = new AtomicBoolean(false);
     // Timeout throwing exception in x seconds
     Mono.delay(Duration.ofSeconds(seconds))
-            .flux()
-            .doOnNext(x -> {
-              hasTimeout.set(true);
-            })
-            .subscribe();
+        .flux()
+        .doOnNext(x -> {
+          hasTimeout.set(true);
+        })
+        .subscribe();
 
     // Wait for problem 10 times
     long waitMilliseconds = seconds * 1000 / 10;
 
+    StringBuilder builder = new StringBuilder();
+
     ProblemDto<InputT, ResultT> problemDto;
     while (true) {
-      System.out.println("Checking if problem is solved...");
+      builder.append("Checking if problem is solved...\n");
       problemDto = client.get()
-              .uri("/problems/" + problemType.getId() + "/" + problemId)
-              .exchange()
-              .expectStatus().isOk()
-              .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
-              })
-              .returnResult()
-              .getResponseBody();
-      System.out.println("Fetched problem: " + problemDto);
+          .uri("/problems/" + problemType.getId() + "/" + problemId)
+          .exchange()
+          .expectStatus().isOk()
+          .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
+          })
+          .returnResult()
+          .getResponseBody();
+      builder.append("Fetched problem: " + problemDto + "\n");
 
       assertNotNull(problemDto);
 
@@ -164,20 +165,20 @@ public class ApiTestHelper {
         String subProblemTypeId = subProblem.getSubRoutine().getTypeId();
         for (String subProblemId : subProblem.getSubProblemIds()) {
           var subProblemDto = client.get()
-                  .uri("/problems/" + subProblemTypeId + "/" + subProblemId)
-                  .exchange()
-                  .expectStatus().isOk()
-                  .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
-                  })
-                  .returnResult()
-                  .getResponseBody();
-          System.out.println("Fetched sub problem: " + subProblemDto);
+              .uri("/problems/" + subProblemTypeId + "/" + subProblemId)
+              .exchange()
+              .expectStatus().isOk()
+              .expectBody(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {
+              })
+              .returnResult()
+              .getResponseBody();
+          builder.append("Fetched sub problem: " + subProblemDto + "\n");
 
           assertNotNull(subProblemDto);
         }
       }
 
-      System.out.println("Problem not solved yet. Waiting 5 seconds...");
+      builder.append("Problem not solved yet. Waiting 5 seconds...\n");
 
       try {
         Thread.sleep(waitMilliseconds);
@@ -190,8 +191,14 @@ public class ApiTestHelper {
       }
     }
 
+    // print error output if something went wrong
+    if (problemDto.getState() != ProblemState.SOLVED
+        || problemDto.getSolution().getStatus() != SolutionStatus.SOLVED) {
+      System.out.println(builder);
+    }
+
     assertEquals(ProblemState.SOLVED, problemDto.getState());
-    Assertions.assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
+    assertEquals(SolutionStatus.SOLVED, problemDto.getSolution().getStatus());
 
     return problemDto;
   }

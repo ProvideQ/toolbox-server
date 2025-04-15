@@ -9,27 +9,10 @@ defined to be sum of weights of the edges crossing the cut.
 This model presents a simple MIP formulation of the problem that is
 seeded with a solution from the Goemans/Williamson randomized
 approximation algorithm based on a semidefinite programming
-relaxation. By default CSDP is used to solve the SDP.
-Use --SDPSOLVER=MOSEK to switch to Mosek.
-
-The MaxCut instance tg20_7777 is available from the Biq Mac Library
-and comes from applications in statistical physics.
-
-
-Wiegele A., Biq Mac Library - Binary Quadratic and Max Cut Library.
-http://biqmac.uni-klu.ac.at/biqmaclib.html
-
-Goemans M.X., and Williamson, D.P., Improved Approximation Algorithms
-for Maximum Cut and Satisfiability Problems Using Semidefinite
-Programming. Journal of the ACM 42 (1995), 1115-1145.
-http://www-math.mit.edu/~goemans/PAPERS/maxcut-jacm.pdf
-
-Keywords: mixed integer linear programming, approximation algorithms,
-          convex optimization, randomized algorithms, maximum cut problem,
-          mathematics
+relaxation. The model uses MOSEK to solve the SDP.
 $offText
 
-$if not set INPUT $abort Please provide an input file via --INPUT=<myFile>
+$if not set INPUT           $abort Please provide an input file via --INPUT=<myFile>
 $if not set TARGETATTRIBUTE $set TARGETATTRIBUTE weight
 $if not set SOLVESDP        $set SOLVESDP  1
 $if not set SOLVEMIP        $set SOLVEMIP  0
@@ -58,7 +41,6 @@ parameter rep(*) / 'value of cut'              -inf
                    'value of best known bound' +inf
                    'relative gap'              NA   /;
 
-
 $ onembeddedCode Python:
 import networkx as nx
 graph = nx.read_gml("%INPUT%", label=None)
@@ -72,7 +54,6 @@ w(e(i,j)) = w(i,j) + w(j,i);
 w(i,j)$(not e(i,j)) = 0;
 
 option e < w;
-*option e:0:0:1, w:8:0:1; display n,e,w;
 
 * Simple MIP model
 Variable
@@ -133,7 +114,7 @@ $set LSYM L
 execute_unload 'csdpin.gdx' n = m, n, c, F, F0;
 execute.checkErrorLevel 'gams runcsdp.inc lo=%gams.lo% --strict=1'
 execute_load 'csdpout.gdx'  Y;
-$libInclude linalg cholesky n Y L
+$callTool linalg.cholesky n Y L
 
 SDPRelaxation = 0.5*sum(e, w(e)*(1 - Y(e)));
 
@@ -155,11 +136,19 @@ Solve sdp min sdpobj using lp;
 
 Parameter Yl(i,j)   'level values of Y as parameter';
 Yl(i,j) = Y.l(i,j);
-$libInclude linalg cholesky n Yl L
+executeTool.checkErrorLevel 'linalg.cholesky n Yl L';
+* Symbol L has been loaded implicitly by executeTool.checkErrorLevel. The compiler instruction
+* in the next line supresses errors about presumably unassigned symbols
+$onImplicitAssign
+
+* Check if Cholesky factorization is correct
+Parameter Y_, Ydiff;
+Y_(i,j)    = sum(n, L(i,n)*L(j,n));
+Ydiff(i,j) = round(Y.l(i,j) - Y_(i,j),1e-6);
+option Ydiff:8:0:1;
+abort$card(Ydiff) Ydiff;
 
 SDPRelaxation = 0.5*sum(e, w(e)*(1 - Y.l(e)));
-
-$endif.sdpsolver
 
 display SDPRelaxation;
 
@@ -195,10 +184,10 @@ put_utility 'log' / '### Value of cut:              ' rep('value of cut'):0:4;
 put_utility 'log' / '### Value of best known bound: ' rep('value of best known bound'):0:4;
 put_utility 'log' / '### Relative gap:              ' rep('relative gap'):0:16;
 
-
 * use computed feasible solution as starting point for MIP solve
 x.l(bestS)    = 1;
 cut.l(e(i,j)) = x.l(i) xor x.l(j);
+$endif.sdpsolver
 $endif.solvesdp
 
 $ifthene.solvemip %SOLVEMIP%==1
@@ -344,4 +333,3 @@ with open("%OUTPUT%", 'w') as fout:
         fout.write(strEdge + '\n')
     fout.write("]")
 endembeddedCode
- 

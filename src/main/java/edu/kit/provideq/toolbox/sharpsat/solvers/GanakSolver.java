@@ -31,9 +31,8 @@ public class GanakSolver extends SharpSatSolver {
 
   @Autowired
   public GanakSolver(
-      @Value("${custom.binary.ganak-sat}") String binaryPath,
+      @Value("${path.custom.sharp-sat-ganak}") String binaryPath,
       ApplicationContext context) {
-
     this.binaryPath = binaryPath;
     this.context = context;
   }
