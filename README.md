@@ -32,7 +32,7 @@ A web-based user interface can be found in our
             `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
             * If you get an error building `psycopg2`, try to install these postgres packages:
               `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
-      8. Install the python dependencies we use in our python packages: `pip install -r gams/python/requirements.txt`
+      8. Install the python dependencies we use in our python packages: `pip install -r ./solvers/gams/python/requirements.txt`
 4. Run the server using `./gradlew bootRun`
 
 ## Deployment
