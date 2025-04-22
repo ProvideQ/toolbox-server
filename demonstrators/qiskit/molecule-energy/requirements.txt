@@ -1,0 +1,12 @@
+# This file describes the python package requirements for all Qiskit demonstrator scripts
+# supported by ProvideQ
+
+# required for molecule energy solver
+qiskit
+qiskit_aer
+qiskit_ibm_runtime
+matplotlib
+pylatexenc
+qiskit-transpiler-service
+qiskit-nature
+qiskit-nature-pyscf
