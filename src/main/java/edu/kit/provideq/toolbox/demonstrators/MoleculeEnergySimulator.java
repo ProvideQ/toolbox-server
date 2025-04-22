@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class MoleculeEnergySimulator implements Demonstrator {
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   private static final String SETTING_MOLECULE = "Molecule";
@@ -28,9 +29,11 @@ public class MoleculeEnergySimulator implements Demonstrator {
 
   @Autowired
   public MoleculeEnergySimulator(
-      @Value("${demonstrators.qiskit.script.molecule-energy}") String scriptPath,
+      @Value("${path.demonstrators.qiskit.molecule-energy}") String scriptPath,
+      @Value("${venv.demonstrators.qiskit.molecule-energy}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -66,7 +69,7 @@ public class MoleculeEnergySimulator implements Demonstrator {
         .orElse(DEFAULT_MOLECULE);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(molecule)
         .readOutputString()
         .run(getProblemType(), solution.getId());
