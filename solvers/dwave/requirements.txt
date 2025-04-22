@@ -1,5 +1,0 @@
-# This file describes the python package requirements for all Dwave scripts
-# supported by ProvideQ
-
-# required for Dwave Qubo solver
-dwave-ocean-sdk == 6.4.1

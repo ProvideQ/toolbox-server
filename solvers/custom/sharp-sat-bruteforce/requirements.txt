@@ -1,0 +1,1 @@
+# This file describes the python package requirements for the Sharp SAT solver

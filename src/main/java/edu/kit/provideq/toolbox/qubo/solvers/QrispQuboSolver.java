@@ -23,14 +23,17 @@ public class QrispQuboSolver extends QuboSolver {
   private static final String SETTING_MAX_NUMBER_OF_VARS = "Max Number of Variables";
   private static final int DEFAULT_MAX_NUMBER_OF_VARS = 4;
 
-  private final ApplicationContext context;
   private final String scriptPath;
+  private final String venv;
+  private final ApplicationContext context;
 
   @Autowired
   public QrispQuboSolver(
-      @Value("${qrisp.script.qubo}") String scriptPath,
+      @Value("${path.qrisp.qubo}") String scriptPath,
+      @Value("${venv.qrisp.qubo}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -78,7 +81,7 @@ public class QrispQuboSolver extends QuboSolver {
     }
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH,

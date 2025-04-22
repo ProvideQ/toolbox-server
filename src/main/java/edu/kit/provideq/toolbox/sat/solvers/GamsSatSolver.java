@@ -26,7 +26,7 @@ public class GamsSatSolver extends SatSolver {
 
   @Autowired
   public GamsSatSolver(
-      @Value("${gams.script.sat}") String scriptPath,
+      @Value("${path.gams.sat}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;

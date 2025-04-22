@@ -52,13 +52,7 @@ class QuboSolverTest {
   @ParameterizedTest
   @MethodSource("provideArguments")
   void testQuboSolvers(ProblemSolver<String, String> solver, String input) {
-    System.out.println("Testing Solver: " + solver.getName());
     var problemDto = ApiTestHelper.createProblem(client, solver, input, QUBO);
     ApiTestHelper.testSolution(problemDto);
-
-    if (problemDto.getSolution().getStatus() != SolutionStatus.SOLVED) {
-      System.out.println("Test Failed, Input was: " + problemDto.getInput());
-      System.out.println("Error Message: " + problemDto.getSolution().getDebugData());
-    }
   }
 }

@@ -17,14 +17,17 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class QiskitKnapsackSolver extends KnapsackSolver {
-  private final String knapsackPath;
+  private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public QiskitKnapsackSolver(
-      @Value("${qiskit.script.knapsack}") String knapsackPath,
+      @Value("${path.qiskit.knapsack}") String scriptPath,
+      @Value("${venv.qiskit.knapsack}") String venv,
       ApplicationContext context) {
-    this.knapsackPath = knapsackPath;
+    this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -47,7 +50,7 @@ public class QiskitKnapsackSolver extends KnapsackSolver {
     var solution = new Solution<>(this);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, knapsackPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH

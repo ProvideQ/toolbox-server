@@ -19,13 +19,17 @@ import reactor.core.publisher.Mono;
 @Component
 public class CplexMip extends MipSolver {
   private final String scriptPath;
+  private final String venv;
+
   private final ApplicationContext context;
 
   @Autowired
   public CplexMip(
-      @Value("${cplex.script.mip}") String scriptPath,
+      @Value("${path.cplex.mip}") String scriptPath,
+      @Value("${venv.cplex.mip}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -48,7 +52,7 @@ public class CplexMip extends MipSolver {
     var solution = new Solution<>(this);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH

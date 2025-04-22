@@ -1,0 +1,8 @@
+# This file describes the python package requirements for the Cirq MaxCut solver
+matplotlib
+cirq
+networkx
+pandas
+
+sympy
+numpy

@@ -21,13 +21,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class PythonBruteForceSolver extends SharpSatSolver {
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public PythonBruteForceSolver(
-      @Value("${custom.script.bruteforce-sat}") String scriptPath,
+      @Value("${path.custom.sharp-sat-bruteforce}") String scriptPath,
+      @Value("${venv.custom.sharp-sat-bruteforce}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -77,7 +80,7 @@ public class PythonBruteForceSolver extends SharpSatSolver {
     }
 
     ProcessResult<String> processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
