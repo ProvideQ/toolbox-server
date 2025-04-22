@@ -28,8 +28,8 @@ public class CplexMipDemonstrator implements Demonstrator {
 
   @Autowired
   public CplexMipDemonstrator(
-      @Value("${path.cplex.mip}") String scriptPath,
-      @Value("${venv.cplex.mip}") String venv,
+      @Value("${path.demonstrators.cplex.mip}") String scriptPath,
+      @Value("${venv.demonstrators.cplex.mip}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.venv = venv;
