@@ -40,8 +40,8 @@ public class MaterialSimulationConfiguration {
       ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("empty.txt"),
-          "example for Material Simulation is unavailable!"
+          getClass().getResourceAsStream("h2.txt"),
+          "H2 example for Material Simulation is unavailable!"
       );
       var problem = new Problem<>(MATERIAL_SIMULATION);
       problem.setInput(resourceProvider.readStream(problemInputStream));
