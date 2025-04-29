@@ -23,7 +23,7 @@ from qiskit_algorithms.optimizers import SPSA
 
 
 #if len(sys.argv) != 3:
-#    raise TypeError('This script expects exactly 2 arguments. Input file (argument 1) and output file (argument 2).')
+#    raise ValueError('This script expects exactly 2 arguments. Input file (argument 1) and output file (argument 2).')
 
 input_path = sys.argv[1]
 output_path = sys.argv[2]
