@@ -40,10 +40,9 @@ electronic_structure_result = algorithm.solve(problem)
 electronic_structure_result.formatting_precision = 6
 print(electronic_structure_result) # we're going to calculate the total ground state energy
 
-from qiskit_nature.second_q.drivers import PySCFDriver
+
 from qiskit_nature.second_q.mappers import JordanWignerMapper
 from qiskit_algorithms.optimizers import SLSQP
-from qiskit.primitives import Estimator
 
 driver = PySCFDriver(atom='H .0 .0 .0; H .0 .0 0.74279')
 problem = driver.run()
@@ -56,8 +55,6 @@ estimator = Estimator()
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import TwoLocal
-from qiskit_algorithms import VQE
-from qiskit_nature.second_q.algorithms import GroundStateEigensolver
 import numpy as np
 
 var_forms = [['ry', 'rz'], 'ry']
