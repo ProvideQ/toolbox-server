@@ -44,7 +44,7 @@ class MipSolversTest {
 
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testSatSolver(ProblemSolver<String, String> solver, String input) {
+  void testMipSolver(ProblemSolver<String, String> solver, String input) {
     var problem = ApiTestHelper.createProblem(client, solver, input, MIP);
     ApiTestHelper.testSolution(problem);
   }

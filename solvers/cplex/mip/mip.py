@@ -1,5 +1,6 @@
 import argparse
 import cplex
+import sys
 
 parser = argparse.ArgumentParser(
     description="Solve a MIP problem from an MPS file using IBM CPLEX."
@@ -13,14 +14,14 @@ try:
     cpx.read(args.input_file)
 except cplex.exceptions.CplexError as exc:
     print("Error reading the MPS file:", exc)
-    exit()
+    sys.exit(1)
 
 
 try:
     cpx.solve()
 except cplex.exceptions.CplexError as exc:
     print("Error during solve:", exc)
-    exit()
+    sys.exit(1)
 
 status = cpx.solution.get_status()
 with open(args.output_file, 'w') as out_file:

@@ -26,11 +26,11 @@ public class QuboMipSolver extends MipSolver {
 
   @Autowired
   public QuboMipSolver(
-      @Value("${path.gams.mip}") String scriptPath,
-      @Value("${path.gams.qubo-solve}") String dependencyScriptPath,
+      @Value("${path.gams.mip-to-qubo-reformulation}") String mipToQuboReformulatorPath,
+      @Value("${path.gams.qubo-solve}") String solverScriptPath,
       ApplicationContext context) {
-    this.scriptPath = scriptPath;
-    this.dependencyScriptPath = dependencyScriptPath;
+    this.scriptPath = mipToQuboReformulatorPath;
+    this.dependencyScriptPath = solverScriptPath;
     this.context = context;
   }
 

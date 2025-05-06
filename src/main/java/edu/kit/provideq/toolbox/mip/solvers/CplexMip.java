@@ -6,7 +6,6 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.mip.MipConfiguration;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
-import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
