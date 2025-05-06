@@ -1,10 +1,15 @@
-from qiskit_nature.second_q.drivers import PySCFDriver
-from qiskit_nature.second_q.mappers import ParityMapper
-from qiskit_algorithms.optimizers import L_BFGS_B
-from qiskit.primitives import Estimator
-from qiskit_nature.second_q.circuit.library import HartreeFock, UCCSD
+from qiskit import QuantumCircuit
 from qiskit_algorithms import VQE
+from qiskit_algorithms.optimizers import L_BFGS_B, SLSQP
+from qiskit.circuit.library import TwoLocal
 from qiskit_nature.second_q.algorithms import GroundStateEigensolver
+from qiskit_nature.second_q.circuit.library import HartreeFock, UCCSD
+from qiskit_nature.second_q.drivers import PySCFDriver
+from qiskit_nature.second_q.mappers import JordanWignerMapper, ParityMapper
+from qiskit.primitives import Estimator
+import matplotlib.pyplot as plt
+from io import StringIO
+import numpy as np
 import sys
 
 if len(sys.argv) != 2:
@@ -38,11 +43,7 @@ algorithm = GroundStateEigensolver(mapper, vqe)
 
 electronic_structure_result = algorithm.solve(problem)
 electronic_structure_result.formatting_precision = 6
-print(electronic_structure_result) # we're going to calculate the total ground state energy
-
-
-from qiskit_nature.second_q.mappers import JordanWignerMapper
-from qiskit_algorithms.optimizers import SLSQP
+print(electronic_structure_result)  # we're going to calculate the total ground state energy
 
 driver = PySCFDriver(atom='H .0 .0 .0; H .0 .0 0.74279')
 problem = driver.run()
@@ -52,10 +53,6 @@ mapper = JordanWignerMapper()
 optimizer = SLSQP(maxiter=10000, ftol=1e-9)
 
 estimator = Estimator()
-
-from qiskit import QuantumCircuit
-from qiskit.circuit.library import TwoLocal
-import numpy as np
 
 var_forms = [['ry', 'rz'], 'ry']
 entanglements = ['full', 'linear']
@@ -74,7 +71,7 @@ for i, d in enumerate(depths):
         for k, vf in enumerate(var_forms):
             for l, eb in enumerate(entanglement_blocks):
                 optimizer = SLSQP(maxiter=10000, ftol=1e-9)
-                variational_form = TwoLocal(4, rotation_blocks=vf, entanglement_blocks=eb,entanglement=e, reps=d)
+                variational_form = TwoLocal(4, rotation_blocks=vf, entanglement_blocks=eb, entanglement=e, reps=d)
 
                 ansatz = reference_circuit.compose(variational_form)
 
@@ -86,9 +83,6 @@ for i, d in enumerate(depths):
                 electronic_structure_result = algorithm.solve(problem)
 
                 results[i, j, k, l] = electronic_structure_result.total_energies[0]
-
-import matplotlib.pyplot as plt
-from io import StringIO
 
 fig1, axs1 = plt.subplots(2, 3, sharey=True, sharex=True)
 fig2, axs2 = plt.subplots(2, 3, sharey=True, sharex=True)
@@ -110,10 +104,12 @@ for j, e in enumerate(entanglements):
         axs2[j, l].set_title(f'{e}, ry, {eb}')
         axs2[j, l].text(0.90, 0.75, f'Min: {np.min(results[:, j, 1, l]):.3f}')
 
+
 def print_fig(fig):
     string_io = StringIO()
     fig.savefig(string_io, format='svg')
     print(string_io.getvalue())
+
 
 print_fig(fig1)
 print_fig(fig2)
