@@ -26,7 +26,7 @@ public class TwoPhaseClusterer extends VrpClusterer {
 
   @Autowired
   public TwoPhaseClusterer(
-      @Value("${custom.binary.berger-vrp}") String binaryPath,
+      @Value("${path.custom.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     super(binaryPath, context);
   }
@@ -39,6 +39,12 @@ public class TwoPhaseClusterer extends VrpClusterer {
   @Override
   public String getName() {
     return "Two Phase Clustering (VRP -> Set of TSP)";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves VRP problems by clustering them into a set of TSP problems "
+        + "using a two-phase clustering approach.";
   }
 
   @Override

@@ -18,19 +18,27 @@ import reactor.core.publisher.Mono;
 @Component
 public class QiskitQuboSolver extends QuboSolver {
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public QiskitQuboSolver(
-      @Value("${qiskit.script.qubo}") String scriptPath,
+      @Value("${path.qiskit.qubo}") String scriptPath,
+      @Value("${venv.qiskit.qubo}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
   @Override
   public String getName() {
     return "(Qiskit) QAOA Solver for QUBOs";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves QUBOs using the Qiskit QAOA implementation.";
   }
 
   @Override
@@ -43,7 +51,7 @@ public class QiskitQuboSolver extends QuboSolver {
 
     // Run Qiskit solver via console
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH

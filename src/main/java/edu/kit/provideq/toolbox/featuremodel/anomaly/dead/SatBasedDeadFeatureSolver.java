@@ -39,6 +39,12 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   }
 
   @Override
+  public String getDescription() {
+    return "This solver builds SAT formulae to determine dead features in a feature model."
+        + " It uses a SAT solver to solve each formula per feature.";
+  }
+
+  @Override
   public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return List.of(SAT_SUBROUTINE);
   }

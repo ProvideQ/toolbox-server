@@ -12,11 +12,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.operation.Builder;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -24,6 +26,10 @@ import org.springframework.http.HttpStatus;
  */
 final class ProblemRouteDocumentation {
   private static final String ENDPOINT_NAME = "problems";
+
+  private ProblemRouteDocumentation() {
+    throw new UnsupportedOperationException("This class should not be instantiated.");
+  }
 
   static void configureCreateDocs(ProblemManager<?, ?> manager, Builder ops) {
     var type = manager.getType();
@@ -88,8 +94,7 @@ final class ProblemRouteDocumentation {
       ProblemManager<InputT, ResultT> manager) {
     var exampleProblem = manager.getExampleInstances().stream()
         .findFirst()
-        .orElseThrow(() -> new RuntimeException(
-            "No example available for problem " + manager.getType() + "!"));
+        .orElseThrow(() -> new MissingExampleException(manager.getType()));
 
 
     var request = ProblemDto.fromProblem(exampleProblem);
@@ -98,7 +103,7 @@ final class ProblemRouteDocumentation {
     try {
       requestString = new ObjectMapper().writeValueAsString(request);
     } catch (JsonProcessingException exception) {
-      throw new RuntimeException("no example available", exception);
+      throw new MissingExampleException(manager.getType(), exception);
     }
 
     var problemType = manager.getType();
@@ -121,7 +126,7 @@ final class ProblemRouteDocumentation {
     try {
       problemDtosJson = new ObjectMapper().writeValueAsString(problemDtos);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Could not serialize example problems!", e);
+      throw new JsonParseException(e);
     }
 
     return responseBuilder()
@@ -147,7 +152,7 @@ final class ProblemRouteDocumentation {
     int exampleProblemIndex = 1;
     for (var exampleProblem : problemManager.getExampleInstances()) {
       contentBuilder = contentBuilder.example(
-          buildExample(exampleProblem, "Example " + exampleProblemIndex)
+          buildExample(problemManager, exampleProblem, "Example " + exampleProblemIndex)
       );
     }
 
@@ -157,13 +162,15 @@ final class ProblemRouteDocumentation {
   }
 
   private static org.springdoc.core.fn.builders.exampleobject.Builder buildExample(
-      Problem<?, ?> exampleProblem, String name) {
+      ProblemManager<?, ?> manager,
+      Problem<?, ?> exampleProblem,
+      String name) {
     String problemDtoJson;
     try {
       var problemDto = ProblemDto.fromProblem(exampleProblem);
       problemDtoJson = new ObjectMapper().writeValueAsString(problemDto);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Example problem could not be parsed!", e);
+      throw new MissingExampleException(manager.getType(), e);
     }
 
     return exampleOjectBuilder()

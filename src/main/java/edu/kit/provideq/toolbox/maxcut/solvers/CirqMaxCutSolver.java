@@ -19,18 +19,26 @@ import reactor.core.publisher.Mono;
 public class CirqMaxCutSolver extends MaxCutSolver {
   private final ApplicationContext context;
   private final String scriptPath;
+  private final String venv;
 
   @Autowired
   public CirqMaxCutSolver(
-      @Value("${cirq.script.max-cut}") String scriptPath,
+      @Value("${path.cirq.max-cut}") String scriptPath,
+      @Value("${venv.cirq.max-cut}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
   @Override
   public String getName() {
     return "Cirq MaxCut";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves the MaxCut problem using a Cirq QAOA implementation.";
   }
 
   @Override
@@ -42,7 +50,7 @@ public class CirqMaxCutSolver extends MaxCutSolver {
     var solution = new Solution<>(this);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH

@@ -1,8 +1,0 @@
-# This file describes the python package requirements for all Qiskit scripts
-# supported by ProvideQ
-
-# required for Qiskit MaxCut solver
-pygmlparser == 1.0.1
-
-#required for MaxCut and QUBO Solver, will automatically download a matching Qiskit, NumPy, and Qiskit-Algorithms version.
-qiskit-optimization == 0.6.1

@@ -22,7 +22,7 @@ public class GamsMaxCutSolver extends MaxCutSolver {
 
   @Autowired
   public GamsMaxCutSolver(
-      @Value("${gams.script.max-cut}") String scriptPath,
+      @Value("${path.gams.max-cut}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;
@@ -31,6 +31,12 @@ public class GamsMaxCutSolver extends MaxCutSolver {
   @Override
   public String getName() {
     return "GAMS MaxCut";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves the MaxCut problem using GAMS. This starts from a SDP relaxation then used as a "
+        + " starting point for the QUBO algorithm.";
   }
 
   @Override

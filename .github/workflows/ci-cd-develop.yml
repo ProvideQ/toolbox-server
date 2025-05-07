@@ -7,17 +7,19 @@ jobs:
   check:
     runs-on: ubuntu-latest
     container:
-      image: debian:bullseye-slim # use the same image as our docker runner
+      image: debian:bookworm-slim # use the same image as our docker runner
     steps:
       - name: Clone repo (shallow)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - name: Set up GAMS
         shell: bash # required for the source command
         env:
@@ -27,22 +29,35 @@ jobs:
           echo "/opt/conda/bin" >> "$GITHUB_PATH"
           echo "$GAMS_PATH" >> "$GITHUB_PATH"
           echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
+
+      - name: Cache Venv dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/venv
+          # update venv when setup script or any solver has changed:
+          key: venv-${{ runner.os }}-${{ hashFiles('scripts/ci-setup-solvers.sh', 'solvers/**') }}
+          restore-keys: |
+            venv-${{ runner.os }}-
+
       - name: Install solver dependencies
         run: ./scripts/ci-setup-solvers.sh
+
       - name: Run checks
         shell: bash # required for the source command
-        run: |
+        run: | # change to "./gradlew check --info" for more debugging output.
           source /opt/conda/bin/activate gams
-          ./gradlew check --info
+          ./gradlew check
+
       - name: Archive test reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
           path: build/reports/tests/test/
+
       - name: Archive style reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: style-report
           path: build/reports/checkstyle/
@@ -53,7 +68,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/develop' }}
     steps:
       - name: Clone repo (shallow)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Push to dokku

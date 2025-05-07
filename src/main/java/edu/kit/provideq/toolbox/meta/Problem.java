@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
@@ -29,6 +30,7 @@ public class Problem<InputT, ResultT> {
 
   private InputT input;
   private Solution<ResultT> solution;
+  private BoundWithInfo bound;
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
   private List<SolverSetting> solverSettings;
@@ -82,6 +84,26 @@ public class Problem<InputT, ResultT> {
         });
   }
 
+  public void estimateBound() {
+    if (this.input == null) {
+      throw new IllegalStateException("Cannot estimate value without input!");
+    }
+
+    var optionalEstimator = this.type.getEstimator();
+    if (optionalEstimator.isEmpty()) {
+      throw new IllegalStateException("Cannot estimate value without an estimator!");
+    }
+    var estimator = optionalEstimator.get();
+
+    long start = System.currentTimeMillis();
+
+    var estimatedBound = estimator.apply(this.input);
+    long finish = System.currentTimeMillis();
+    var executionTime = finish - start;
+
+    this.bound = new BoundWithInfo(estimatedBound, executionTime);
+  }
+
   public UUID getId() {
     return id;
   }
@@ -103,8 +125,8 @@ public class Problem<InputT, ResultT> {
     this.observers.forEach(observer -> observer.onInputChanged(this, newInput));
   }
 
-  public Solution<ResultT> getSolution() {
-    return this.solution;
+  public Optional<Solution<ResultT>> getSolution() {
+    return Optional.ofNullable(this.solution);
   }
 
   public Optional<ProblemSolver<InputT, ResultT>> getSolver() {
@@ -207,5 +229,9 @@ public class Problem<InputT, ResultT> {
             + ", state=" + state
             + ", solver=" + solver
             + '}';
+  }
+
+  public Optional<BoundWithInfo> getBound() {
+    return Optional.ofNullable(bound);
   }
 }

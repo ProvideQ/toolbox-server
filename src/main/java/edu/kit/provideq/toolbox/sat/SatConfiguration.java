@@ -7,6 +7,8 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
+import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
+import edu.kit.provideq.toolbox.sat.solvers.QrispGroverSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -31,11 +33,13 @@ public class SatConfiguration {
   @Bean
   ProblemManager<String, DimacsCnfSolution> getSatManager(
       GamsSatSolver gamsSolver,
+      QrispGroverSolver qrispSolver,
+      QrispExactGroverSolver exactSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         SAT,
-        Set.of(gamsSolver),
+        Set.of(gamsSolver, qrispSolver, exactSolver),
         loadExampleProblems(resourceProvider)
     );
   }
@@ -52,7 +56,7 @@ public class SatConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(SAT, e);
     }
   }
 }

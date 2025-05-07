@@ -17,6 +17,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.List;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
@@ -64,7 +65,8 @@ public class SolversRouter {
 
   private static List<ProblemSolverInfo> getAllSolverInfos(ProblemManager<?, ?> manager) {
     return manager.getSolvers().stream()
-            .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName()))
+            .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName(),
+                solver.getDescription()))
             .toList();
   }
 
@@ -87,7 +89,7 @@ public class SolversRouter {
     try {
       example = new ObjectMapper().writeValueAsString(allSolvers);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("solvers could not be parsed", e);
+      throw new JsonParseException(e);
     }
 
     return contentBuilder()

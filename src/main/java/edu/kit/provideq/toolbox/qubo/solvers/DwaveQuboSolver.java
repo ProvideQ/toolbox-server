@@ -29,7 +29,7 @@ public class DwaveQuboSolver extends QuboSolver {
   enum AnnealingMethod {
     SIMULATED("sim"),
     HYBRID("hybrid"),
-    ABSOLV("absolv"),
+    QBSOLV("qbsolv"),
     DIRECT("direct");
 
     private final String value;
@@ -41,16 +41,28 @@ public class DwaveQuboSolver extends QuboSolver {
     public String getValue() {
       return value;
     }
+
+    public static AnnealingMethod fromValue(String value) {
+      for (AnnealingMethod method : values()) {
+        if (method.value.equals(value)) {
+          return method;
+        }
+      }
+      throw new IllegalArgumentException("Unknown value: " + value);
+    }
   }
 
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public DwaveQuboSolver(
-      @Value("${dwave.script.qubo}") String scriptPath,
+      @Value("${path.dwave.qubo}") String scriptPath,
+      @Value("${venv.dwave.qubo}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -60,8 +72,13 @@ public class DwaveQuboSolver extends QuboSolver {
   }
 
   @Override
+  public String getDescription() {
+    return "Solves the QUBO problem using a D-Wave Quantum Annealer.";
+  }
+
+  @Override
   public List<SolverSetting> getSolverSettings() {
-    return  List.of(
+    return List.of(
         new TextSetting(
             SETTING_DWAVE_TOKEN,
             "The D-Wave token to use, needed to access the D-Wave hardware"
@@ -70,7 +87,8 @@ public class DwaveQuboSolver extends QuboSolver {
             SETTING_ANNNEALING_METHOD,
             "The annealing method to use, only relevant when a token is added",
             List.of(AnnealingMethod.values()),
-            AnnealingMethod.SIMULATED
+            AnnealingMethod.SIMULATED,
+            AnnealingMethod::getValue
         )
     );
   }
@@ -88,17 +106,23 @@ public class DwaveQuboSolver extends QuboSolver {
 
     // this field is only relevant when a dwaveToken is added
     // (a token is needed to access the d-wave hardware)
-    var dwaveAnnealingMethod = properties
+    final var dwaveAnnealingMethod = properties
         .<SelectSetting<AnnealingMethod>>getSetting(SETTING_ANNNEALING_METHOD)
-        .map(SelectSetting::getSelectedOption)
+        .map(s -> s.getSelectedOptionT(AnnealingMethod::fromValue))
         .orElse(DEFAULT_ANNEALING_METHOD);
 
-    var solution = new Solution<>(this);
+    final var solution = new Solution<>(this);
 
-    var processRunner = context.getBean(PythonProcessRunner.class, scriptPath);
+    var processRunner = context.getBean(PythonProcessRunner.class, scriptPath, venv);
 
     if (dwaveToken.isPresent() && !dwaveToken.get().isEmpty()) {
       processRunner.withEnvironmentVariable("DWAVE_API_TOKEN", dwaveToken.get());
+    }
+
+    // Remove "End" at the end of the input as python script can't handle it
+    input = input.trim();
+    if (input.endsWith("End")) {
+      input = input.substring(0, input.length() - 3);
     }
 
     var processResult = processRunner

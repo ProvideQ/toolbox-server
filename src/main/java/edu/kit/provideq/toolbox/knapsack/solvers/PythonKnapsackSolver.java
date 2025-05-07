@@ -18,19 +18,28 @@ import reactor.core.publisher.Mono;
 @Component
 public class PythonKnapsackSolver extends KnapsackSolver {
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public PythonKnapsackSolver(
-          @Value("${custom.script.hs_knapsack}") String scriptPath,
+          @Value("${path.custom.hs-knapsack}") String scriptPath,
+          @Value("${venv.custom.hs-knapsack}") String venv,
           ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
   @Override
   public String getName() {
     return "Horowitz-Sahni Knapsack";
+  }
+
+  @Override
+  public String getDescription() {
+    return "A solver for the Knapsack problem using the Horowitz-Sahni "
+        + "branch and search algorithm.";
   }
 
   @Override
@@ -42,7 +51,7 @@ public class PythonKnapsackSolver extends KnapsackSolver {
     var solution = new Solution<>(this);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH)

@@ -18,22 +18,30 @@ import reactor.core.publisher.Mono;
 @Component
 public class LkhVrpSolver extends VrpSolver {
   private final String scriptPath;
+  private final String binaryPath;
+  private final String venv;
   private final ApplicationContext context;
-  private final String solverBinary;
 
   @Autowired
   public LkhVrpSolver(
-      @Value("${custom.script.lkh}") String scriptPath,
-      @Value("${custom.binary.lkh}") String solverBinary,
+      @Value("${path.custom.lkh}") String scriptPath,
+      @Value("${path.custom.lkh.binary}") String binaryPath,
+      @Value("${venv.custom.lkh}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
-    this.solverBinary = solverBinary;
+    this.binaryPath = binaryPath;
+    this.venv = venv;
     this.context = context;
   }
 
   @Override
   public String getName() {
     return "LKH-3 VRP Solver";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves a vehicle routing problem using the LKH-3 heuristic.";
   }
 
   @Override
@@ -45,16 +53,31 @@ public class LkhVrpSolver extends VrpSolver {
     var solution = new Solution<>(this);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
-            "--lkh-instance", solverBinary,
+            "--lkh-instance", binaryPath,
             ProcessRunner.INPUT_FILE_PATH,
             "--output-file", ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input, "problem.vrp")
+        .writeInputFile(adaptInput(input), "problem.vrp")
         .readOutputFile("problem.sol")
         .run(getProblemType(), solution.getId());
 
     return Mono.just(processResult.applyTo(solution));
+  }
+
+  /**
+   * LKH-3 solver has an issue when the "EOF" tag.
+   * This method removes this substring.
+   *
+   * @param originalInput original input of the TSP problem
+   * @return adapted input with "EOF"
+   */
+  private String adaptInput(String originalInput) {
+    String inputAsVrp = originalInput;
+    if (inputAsVrp.endsWith("EOF")) {
+      inputAsVrp = inputAsVrp.replaceAll("EOF$", "");
+    }
+    return inputAsVrp;
   }
 }

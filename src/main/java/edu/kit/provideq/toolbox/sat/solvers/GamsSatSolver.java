@@ -26,7 +26,7 @@ public class GamsSatSolver extends SatSolver {
 
   @Autowired
   public GamsSatSolver(
-      @Value("${gams.script.sat}") String scriptPath,
+      @Value("${path.gams.sat}") String scriptPath,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.context = context;
@@ -35,6 +35,11 @@ public class GamsSatSolver extends SatSolver {
   @Override
   public String getName() {
     return "GAMS SAT";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves SAT problems using GAMS as a Mixed Integer Programming problem.";
   }
 
   @Override

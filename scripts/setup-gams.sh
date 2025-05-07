@@ -19,7 +19,7 @@ apt-get install curl --yes
 # iisaa/gams-docker (https://github.com/iiasa/gams-docker/blob/master/Dockerfile, GPL-3.0 licensed)
 
 # Configure the GAMS version here
-GAMS_VERSION_RELEASE_MAJOR=42.1
+GAMS_VERSION_RELEASE_MAJOR=49.3
 GAMS_VERSION_HOTFIX=0
 
 # download the self-extracting archive to /opt/gams/gams.exe and run/extract it
@@ -46,9 +46,9 @@ cd "$GAMS_PATH" &&\
 
 # === Install conda ===
 # download installer, verify it and make it executable
-curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh"
+curl --show-error --output /opt/conda-installer/install.sh --create-dirs "https://repo.anaconda.com/miniconda/Miniconda3-py310_25.1.1-1-Linux-x86_64.sh"
 cd /opt/conda-installer
-echo "32d73e1bc33fda089d7cd9ef4c1be542616bd8e437d1f77afeeaf7afdb019787 install.sh" | sha256sum --check
+echo "585972959914f1f9be463284d477717eb10f7306bda63f2ec3c4c86047b9dd72 install.sh" | sha256sum --check
 chmod +x ./install.sh
 
 # Install python (with python -> python3 alias) and pip from miniconda
@@ -72,7 +72,8 @@ conda create --name gams python=3.10 --yes
 source /opt/conda/bin/activate gams
 
 # install GAMS links for python
-pip install gams[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+pip install gamsapi[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+pip install networkx
 
 # make GAMS use our python version
 echo "export GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> ~/.bashrc

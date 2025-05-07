@@ -28,7 +28,7 @@ public class KmeansClusterer extends VrpClusterer {
 
   @Autowired
   public KmeansClusterer(
-      @Value("${custom.binary.berger-vrp}") String binaryPath,
+      @Value("${path.custom.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     super(binaryPath, context);
   }
@@ -42,6 +42,11 @@ public class KmeansClusterer extends VrpClusterer {
   @Override
   public String getName() {
     return "K-means Clustering (VRP -> Set of VRP)";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Clusters a VRP problem into a set of VRP problems using k-means clustering.";
   }
 
   @Override

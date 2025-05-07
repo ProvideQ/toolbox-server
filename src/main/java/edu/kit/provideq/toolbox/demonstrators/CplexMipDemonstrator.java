@@ -23,19 +23,27 @@ public class CplexMipDemonstrator implements Demonstrator {
   private static final int DEFAULT_REPETITIONS = 3;
 
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public CplexMipDemonstrator(
-      @Value("${cplex.directory.mip}") String scriptPath,
+      @Value("${path.demonstrators.cplex.mip}") String scriptPath,
+      @Value("${venv.demonstrators.cplex.mip}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
   @Override
   public String getName() {
     return "Cplex MIP Demonstrator";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Demonstrator for the Cplex MIP solver";
   }
 
   @Override
@@ -89,7 +97,7 @@ public class CplexMipDemonstrator implements Demonstrator {
         .orElse(DEFAULT_REPETITIONS);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(maxNumberVariables.toString(), stepSize.toString(), repetitions.toString())
         .readOutputString()
         .run(getProblemType(), solution.getId());

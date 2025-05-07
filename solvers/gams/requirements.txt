@@ -1,5 +1,0 @@
-# This file describes the python package requirements for all GAMS scripts
-# supported by ProvideQ
-
-# required for GAMS MaxCut solver
-networkx

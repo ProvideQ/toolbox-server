@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
+import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -16,6 +17,7 @@ public class ProblemDto<InputT, ResultT> {
   private String typeId;
   private InputT input;
   private Solution<ResultT> solution;
+  private BoundWithInfo bound;
   private ProblemState state;
   private String solverId;
   private List<SolverSetting> solverSettings;
@@ -37,7 +39,8 @@ public class ProblemDto<InputT, ResultT> {
     dto.id = problem.getId().toString();
     dto.typeId = problem.getType().getId();
     dto.input = problem.getInput().orElse(null);
-    dto.solution = problem.getSolution();
+    dto.solution = problem.getSolution().orElse(null);
+    dto.bound = problem.getBound().orElse(null);
     dto.state = problem.getState();
     dto.solverId = problem.getSolver()
         .map(ProblemSolver::getId)
@@ -65,6 +68,10 @@ public class ProblemDto<InputT, ResultT> {
 
   public Solution<ResultT> getSolution() {
     return solution;
+  }
+
+  public BoundWithInfo getBound() {
+    return bound;
   }
 
   public ProblemState getState() {
@@ -100,6 +107,7 @@ public class ProblemDto<InputT, ResultT> {
         + ", solverId=" + solverId
         + ", input=" + input
         + ", solution=" + solution
+        + ", value=" + bound
         + ", solverSettings=" + solverSettings
         + ", subProblems=" + subProblems
         + '}';

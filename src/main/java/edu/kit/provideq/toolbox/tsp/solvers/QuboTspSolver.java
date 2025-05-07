@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -32,7 +33,7 @@ public class QuboTspSolver extends TspSolver {
 
   @Autowired
   public QuboTspSolver(
-      @Value("${custom.binary.berger-vrp}") String binaryPath,
+      @Value("${path.custom.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     this.binaryPath = binaryPath;
     this.context = context;
@@ -46,6 +47,12 @@ public class QuboTspSolver extends TspSolver {
   @Override
   public String getName() {
     return "TSP to QUBO Transformation";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves TSP Problems by transforming them into QUBOs and solving them "
+        + "with a QUBO solver.";
   }
 
   @Override
@@ -95,7 +102,8 @@ public class QuboTspSolver extends TspSolver {
         .readOutputFile("problem.lp")
         .run(getProblemType(), solution.getId());
 
-    if (!processResult.success() || processResult.output().isEmpty()) {
+    Optional<String> output = processResult.output();
+    if (!processResult.success() || output.isEmpty()) {
       solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.abort();
       return Mono.just(solution);
@@ -110,7 +118,7 @@ public class QuboTspSolver extends TspSolver {
     Path quboSolutionFilePath = Path.of(problemDirectoryPath, "problem.bin");
 
     String finalInput = input;
-    return resolver.runSubRoutine(QUBO_SUBROUTINE, processResult.output().get())
+    return resolver.runSubRoutine(QUBO_SUBROUTINE, output.get())
         .publishOn(Schedulers.boundedElastic()) //avoids block from Files.writeString() in try/catch
         .map(subRoutineSolution -> {
           if (subRoutineSolution.getSolutionData() == null

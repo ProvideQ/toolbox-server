@@ -13,22 +13,12 @@ A web-based user interface can be found in our
    1. Python-based Solvers (Qiskit, Cirq, Dwave, Qrisp)
       1. Install Python
       2. Install Python dependencies by running `python scripts/install-python-dependencies.py` <br>
-         Alternatively, run `pip install -r requirements.txt` on all requirement.txt files in the /solvers directory.
+         **Note:** Ensure that you execute the script from the root directory! Otherwise the created venv/ directory might be created at the wrong path.
    2. Compiled Solvers (e.g. used for VRP and TSP)
-      1. Solvers implemented in compiled languages must be executed via binaries that are compiled for your operating system. For those types of solvers we usually include pre-compiled binaries for windows, mac (only arm), and unix.
-      * General Note: Solvers might be programmed in different languages. E.g., LKH-3 is implemented in C. Make sure that the solver-specific language is installed on your system.
-      2. In case the pre-compiled versions do not work on your machine: re-compile them:
-      * LKH-3:
-        1. Build LKH-3 using the offical guide: http://webhotel4.ruc.dk/~keld/research/LKH-3/
-        2. Put the build binary in `solvers/lkh/bin`, replace the binary that matches your OS.
-      * VRP-Pipeline (used for K-means, Two Phase Clustering, VRP to QUBO convertion):
-        1. Install Rust: https://www.rust-lang.org/tools/install
-        2. Install a specific Rust nightly build (needed cause the solver uses experimental features): `rustup install nightly-2023-07-01`
-        3. Check how the nightly build is called on your machine (this is shown when running the install command, on Mac it is called *nightly-2023-07-01-aarch64-apple-darwin*)
-        4. Set the nightly build as default: `rustup default nightly-2023-07-01(... specific version name on machine)`
-        5. Download source code of the VRP-Pipeline: https://github.com/ProvideQ/hybrid-vrp-solver
-        6. build the source code using `cargo build`
-        7. Put the build binary in `solvers/berger-vrp/bin`, replace the binary that matches your OS.
+      1. Solvers implemented in compiled languages must be executed via binaries that are compiled for your operating system.
+         For those types of solvers we usually include pre-compiled binaries for windows, mac (only arm), and unix.
+      2. In case the pre-compiled versions do not work on your machine: re-compile them.
+         Detailed compliation guides can be found in the *solvers/custom/[solver-name]* directory.
    3. GAMS (multiple solvers are build on this):
       1. Install a python env that works with GAMS (skip this step if you don't need GAMS)
       2. Install GAMS. (https://www.gams.com/download/)
@@ -42,7 +32,7 @@ A web-based user interface can be found in our
             `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
             * If you get an error building `psycopg2`, try to install these postgres packages:
               `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
-      8. Install the python dependencies we use in our python packages: `pip install -r gams/requirements.txt`
+      8. Install the python dependencies we use in our python packages: `pip install -r ./solvers/gams/python/requirements.txt`
 4. Run the server using `./gradlew bootRun`
 
 ## Deployment

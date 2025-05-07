@@ -23,19 +23,28 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   private static final String SOLUTION_LINE_PREFIX = "solution:";
 
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public QiskitMaxCutSolver(
-      @Value("${qiskit.script.max-cut}") String scriptPath,
+      @Value("${path.qiskit.max-cut}") String scriptPath,
+      @Value("${venv.qiskit.max-cut}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
   @Override
   public String getName() {
     return "Qiskit MaxCut";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves the MaxCut problem using a Qiskit implementation with a "
+        + "Variational Quantum Eigensolver.";
   }
 
   @Override
@@ -58,7 +67,7 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
 
     // Run Qiskit solver via console
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH

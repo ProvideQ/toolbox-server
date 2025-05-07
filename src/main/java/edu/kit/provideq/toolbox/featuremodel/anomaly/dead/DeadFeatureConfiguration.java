@@ -41,7 +41,8 @@ public class DeadFeatureConfiguration {
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider resourceProvider) {
+  private Set<Problem<String, String>> loadExampleProblems(
+      ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
           getClass().getResourceAsStream("sandwich.txt"),
@@ -51,7 +52,7 @@ public class DeadFeatureConfiguration {
       problem.setInput(resourceProvider.readStream(problemInputStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException("Could not load example problems", e);
+      throw new MissingExampleException(FEATURE_MODEL_ANOMALY_DEAD, e);
     }
   }
 }
