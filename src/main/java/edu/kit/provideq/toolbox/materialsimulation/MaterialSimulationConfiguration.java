@@ -8,6 +8,7 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
@@ -21,11 +22,12 @@ public class MaterialSimulationConfiguration {
    * A simulation problem, computing electronic properties of a molecular system.
    */
   public static final ProblemType<String, String> MATERIAL_SIMULATION = new ProblemType<>(
-      "material-simulation",
+      "materialsimulation",
       String.class,
       String.class
   );
 
+  @Bean
   ProblemManager<String, String> getMaterialSimulationManager(
       ResourceProvider resourceProvider
   ) {
