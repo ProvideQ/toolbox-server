@@ -24,8 +24,8 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
 
   @Autowired
   public QiskitMaterialSimulationSolver(
-      @Value("$path.qiskit.materialsimulation") String scriptPath,
-      @Value("$venv.qiskit.materialsimulation") String venv,
+      @Value("${path.qiskit.materialsimulation}") String scriptPath,
+      @Value("${venv.qiskit.materialsimulation}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.venv = venv;
