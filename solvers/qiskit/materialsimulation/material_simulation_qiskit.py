@@ -38,8 +38,9 @@ def get_ansatz(problem, mapper):
     )
     return ansatz
 
+
 parser.add_argument("input_file")
-parser.add_argument("--output-file")
+parser.add_argument("output-file")
 args = parser.parse_args()
 
 es_problem = get_problem(args.input_file)
