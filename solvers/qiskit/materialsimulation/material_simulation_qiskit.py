@@ -31,7 +31,7 @@ def get_ansatz(problem, mapper):
         problem.num_particles,
         mapper,
         initial_state=HartreeFock(
-            problem.num_orbitals,
+            problem.num_spatial_orbitals,
             problem.num_particles,
             mapper
         )
@@ -43,13 +43,15 @@ parser.add_argument("input_file")
 parser.add_argument("output-file")
 args = parser.parse_args()
 
-es_problem = get_problem(args.input_file)
+with open(args.input_file, 'r') as input_file:
+    input_molecule = input_file.read().strip()
+
+es_problem = get_problem(input_molecule)
 mapper = JordanWignerMapper()
 ansatz = get_ansatz(es_problem, mapper)
 
 estimator = Estimator()
 # This first part sets the ground state solver
-# see more about this part in the ground state calculation tutorial
 solver = VQE(estimator, ansatz, SLSQP())
 solver.initial_point = [0.0] * ansatz.num_parameters
 gse = GroundStateEigensolver(mapper, solver)
