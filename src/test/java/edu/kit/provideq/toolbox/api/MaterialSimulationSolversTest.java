@@ -5,8 +5,10 @@ import static edu.kit.provideq.toolbox.materialsimulation.MaterialSimulationConf
 import edu.kit.provideq.toolbox.materialsimulation.solvers.QiskitMaterialSimulationSolver;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
+
 import java.time.Duration;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,9 +29,6 @@ class MaterialSimulationSolversTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
-  @Autowired
-  private QiskitMaterialSimulationSolver qiskitMaterialSimulationSolver;
-
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -39,7 +38,9 @@ class MaterialSimulationSolversTest {
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   Stream<Arguments> provideArguments() {
-    var problemManager = problemManagerProvider.findProblemManagerForType(MATERIAL_SIMULATION).get();
+    var problemManager = problemManagerProvider
+        .findProblemManagerForType(MATERIAL_SIMULATION)
+        .get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
         .map(list -> Arguments.of(list.get(0), list.get(1)));
