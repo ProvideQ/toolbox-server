@@ -2,13 +2,10 @@ package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.materialsimulation.MaterialSimulationConfiguration.MATERIAL_SIMULATION;
 
-import edu.kit.provideq.toolbox.materialsimulation.solvers.QiskitMaterialSimulationSolver;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
-
 import java.time.Duration;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
