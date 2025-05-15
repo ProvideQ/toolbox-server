@@ -40,7 +40,7 @@ def get_ansatz(problem, mapper):
 
 
 parser.add_argument("input_file")
-parser.add_argument("output-file")
+parser.add_argument("output_file")
 args = parser.parse_args()
 
 with open(args.input_file, 'r') as input_file:
