@@ -2,8 +2,15 @@ import sys
 from pytket.qasm import circuit_from_qasm_str
 from pytket.extensions.qulacs import QulacsBackend
 
-input_circuit = sys.argv[1]
-shots = int(sys.argv[2])
+input_path = sys.argv[1]
+num_runs = sys.argv[2]
+
+# read input from file
+with open(input_path, 'r') as input_file:
+    text = input_file.read()
+
+input_circuit = text
+shots = num_runs
 
 try:
     circuit = circuit_from_qasm_str(input_circuit)

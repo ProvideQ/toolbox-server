@@ -5,8 +5,15 @@ from pytket.extensions.qiskit import AerBackend
 from qiskit_aer.noise import NoiseModel
 from qiskit_aer.noise.errors import depolarizing_error
 
-input_circuit = sys.argv[1]
-shots = sys.argv[2]
+input_path = sys.argv[1]
+num_runs = sys.argv[2]
+
+# read input from file
+with open(input_path, 'r') as input_file:
+    text = input_file.read()
+
+input_circuit = text
+shots = num_runs
 
 try:
     circuit = circuit_from_qasm_str(input_circuit)
