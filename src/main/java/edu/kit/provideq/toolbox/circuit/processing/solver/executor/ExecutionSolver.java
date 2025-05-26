@@ -8,6 +8,7 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import java.util.List;
 import java.util.Optional;
@@ -25,14 +26,17 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   private static final QuantumSimulator DEFAULT_SIMULATOR = QuantumSimulator.AER;
 
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public ExecutionSolver(
-      @Value("${circuitprocessing.base.directory}") String scriptPath,
+      @Value("${path.circuitprocessing.circuitexecution}") String scriptPath,
+      @Value("${venv.circuitprocessing.circuitexecution}") String venv,
       ApplicationContext context
   ) {
     this.context = context;
+    this.venv = venv;
     this.scriptPath = scriptPath;
   }
 
@@ -83,8 +87,12 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
         .orElse(DEFAULT_SIMULATOR);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath + selectedSimulator.getScriptPath())
-        .withArguments(input, String.valueOf(shotNumber))
+        .getBean(PythonProcessRunner.class, scriptPath + selectedSimulator.getScriptPath(), venv)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            String.valueOf(shotNumber)
+        )
+        .writeInputFile(input)
         .readOutputString()
         .run(getProblemType(), solution.getId());
 

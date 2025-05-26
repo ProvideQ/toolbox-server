@@ -9,6 +9,7 @@ import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +25,17 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
       QuantumOptimizer.DECOMPOSE_MULTI_CX;
 
   private final String scriptPath;
+  private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public OptimizationSolver(
-      @Value("${circuitoptimizing.base.directory}") String scriptPath,
+      @Value("${path.circuitprocessing.circuitoptimization}") String scriptPath,
+      @Value("${venv.circuitprocessing.circuitoptimization}") String venv,
       ApplicationContext context
   ) {
     this.scriptPath = scriptPath;
+    this.venv = venv;
     this.context = context;
   }
 
@@ -77,9 +81,13 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
         .map(s -> s.getSelectedOptionT(OptimizationSolver.QuantumOptimizer::fromValue))
         .orElse(DEFAULT_OPTIMIZER);
 
+    //String[] inputArray = new String[]{input};
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath + selectedOptimizer.getScriptPath())
-        .withArguments(input)
+        .getBean(PythonProcessRunner.class, scriptPath + selectedOptimizer.getScriptPath(), venv)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH
+        )
+        .writeInputFile(input)
         .readOutputString()
         .run(getProblemType(), solution.getId());
 
