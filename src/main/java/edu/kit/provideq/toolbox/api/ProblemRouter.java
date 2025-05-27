@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
+import static edu.kit.provideq.toolbox.demonstrators.DemonstratorConfiguration.DEMONSTRATOR;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
@@ -113,6 +114,7 @@ public class ProblemRouter {
 
   private Mono<ServerResponse> handleListTypes() {
     var problemTypes = managerProvider.getProblemManagers().stream()
+        .filter(p -> !p.getType().equals(DEMONSTRATOR))
         .map(ProblemManager::getType)
         .map(ProblemTypeDto::fromProblemType)
         .toList();
