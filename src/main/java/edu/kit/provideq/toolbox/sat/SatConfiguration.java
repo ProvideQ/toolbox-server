@@ -25,7 +25,7 @@ public class SatConfiguration {
    * For a given boolean formula, check if there is an interpretation that satisfies the formula.
    */
   public static final ProblemType<String, DimacsCnfSolution> SAT = new ProblemType<>(
-      "sat",
+      "SAT",
       "A satisfiability problem: For a given boolean formula, check "
           + "if there is an interpretation that satisfies the formula.",
       String.class,

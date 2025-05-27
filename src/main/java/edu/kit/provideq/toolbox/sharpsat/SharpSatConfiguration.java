@@ -24,7 +24,7 @@ public class SharpSatConfiguration {
    * NP-Hard in nature.
    */
   public static final ProblemType<String, Integer> SHARPSAT = new ProblemType<>(
-      "sharpsat",
+      "SharpSAT",
       "A satisfiability counting problem: For a given boolean formula, count number of "
           + "interpretations that satisfies the formula. NP-Hard in nature.",
       String.class,
