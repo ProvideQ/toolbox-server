@@ -9,6 +9,7 @@ import java.util.function.Function;
  */
 public class ProblemType<InputT, ResultT> {
   private final String id;
+  private final String description;
   private final Class<InputT> inputClass;
   private final Class<ResultT> resultClass;
   private final Function<InputT, Bound> estimator;
@@ -18,6 +19,7 @@ public class ProblemType<InputT, ResultT> {
    * Defines a new problem type.
    *
    * @param id          a unique string identifier for this type of problem.
+   * @param description a description of the problem type.
    * @param inputClass  the Java class object corresponding to the {@link InputT} type parameter.
    * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
    * @param estimator   the bound estimator for this problem type.
@@ -25,12 +27,14 @@ public class ProblemType<InputT, ResultT> {
    */
   public ProblemType(
       String id,
+      String description,
       Class<InputT> inputClass,
       Class<ResultT> resultClass,
       Function<InputT, Bound> estimator,
       String solutionPattern
   ) {
     this.id = id;
+    this.description = description;
     this.inputClass = inputClass;
     this.resultClass = resultClass;
     this.estimator = estimator;
@@ -41,15 +45,17 @@ public class ProblemType<InputT, ResultT> {
    * Defines a new problem type without estimation support.
    *
    * @param id          a unique string identifier for this type of problem.
+   * @param description a description of the problem type.
    * @param inputClass  the Java class object corresponding to the {@link InputT} type parameter.
    * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
    */
   public ProblemType(
       String id,
+      String description,
       Class<InputT> inputClass,
       Class<ResultT> resultClass
   ) {
-    this(id, inputClass, resultClass, null, null);
+    this(id, description, inputClass, resultClass, null, null);
   }
 
   /**
@@ -57,6 +63,13 @@ public class ProblemType<InputT, ResultT> {
    */
   public String getId() {
     return id;
+  }
+
+  /**
+   * Returns a description of this problem type.
+   */
+  public String getDescription() {
+    return description;
   }
 
   /**
@@ -91,6 +104,7 @@ public class ProblemType<InputT, ResultT> {
         + ", inputClass=%s".formatted(inputClass)
         + ", resultClass=%s".formatted(resultClass)
         + ", estimator?=%s".formatted(estimator != null)
+        + ", description='%s'".formatted(description)
         + '}';
   }
 }

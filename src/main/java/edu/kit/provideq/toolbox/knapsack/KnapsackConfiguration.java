@@ -69,11 +69,14 @@ public class KnapsackConfiguration {
    */
   public static final ProblemType<String, String> KNAPSACK = new ProblemType<>(
       "knapsack",
-        String.class,
-        String.class,
-        estimator,
-        "^(\\d+)"
-    );
+      "An optimization problem: For given items each with a weight and value, "
+          + "determine which items are part of a collection where the total weight is "
+          + "less than or equal to a given limit and the sum of values is as large as possible.",
+      String.class,
+      String.class,
+      estimator,
+      "^(\\d+)"
+  );
 
   @Bean
   ProblemManager<String, String> getKnapsackManager(

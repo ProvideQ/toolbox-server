@@ -21,10 +21,12 @@ public class VrpConfiguration {
   /**
    * A Capacitated Vehicle Routing Problem
    * Optimization Problem with the goal to find a minimal route
-   *     for a given set of trucks and cities with demand.
+   * for a given set of trucks and cities with demand.
    */
   public static final ProblemType<String, String> VRP = new ProblemType<>(
       "vrp",
+      "A Capacitated Vehicle Routing Problem Optimization Problem with the goal "
+          + "to find a minimal route for a given set of trucks and cities with demand.",
       String.class,
       String.class
   );
