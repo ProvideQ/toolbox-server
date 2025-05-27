@@ -18,6 +18,7 @@ public class VrpClustererConfiguration {
    */
   public static final ProblemType<String, String> CLUSTER_VRP = new ProblemType<>(
       "cluster-vrp",
+      "A Configuration for Vehicle Routing Problem Clusterer.",
       String.class,
       String.class
   );
