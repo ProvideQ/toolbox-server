@@ -14,12 +14,12 @@ parser = argparse.ArgumentParser(
 )
 
 
-def get_problem(molecule):
+def get_problem(molecule, charge, spin):
     driver = PySCFDriver(
         atom=molecule,
         basis="sto3g",
-        charge=0,
-        spin=0,
+        charge=charge,
+        spin=spin,
         unit=DistanceUnit.ANGSTROM,
     )
     return driver.run()
@@ -41,12 +41,14 @@ def get_ansatz(problem, mapper):
 
 parser.add_argument("input_file")
 parser.add_argument("output_file")
+parser.add_argument("--charge", type=int, default=0, help="Charge of the molecule")
+parser.add_argument("--spin", type=int, default=0, help="Spin of the molecule")
 args = parser.parse_args()
 
 with open(args.input_file, 'r') as input_file:
     input_molecule = input_file.read().strip()
 
-es_problem = get_problem(input_molecule)
+es_problem = get_problem(input_molecule, args.charge, args.spin)
 mapper = JordanWignerMapper()
 ansatz = get_ansatz(es_problem, mapper)
 
