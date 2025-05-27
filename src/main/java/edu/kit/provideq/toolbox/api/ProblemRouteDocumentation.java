@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.api.ProblemRouter.PROBLEM_ID_PARAM_NAME;
+import static edu.kit.provideq.toolbox.demonstrators.DemonstratorConfiguration.DEMONSTRATOR;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -129,6 +130,7 @@ final class ProblemRouteDocumentation {
   private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemTypeListResponse(
       ProblemManagerProvider problemManagerProvider) {
     var problemTypes = problemManagerProvider.getProblemManagers().stream()
+        .filter(p -> !p.getType().equals(DEMONSTRATOR))
         .map(ProblemManager::getType)
         .map(ProblemTypeDto::fromProblemType)
         .toList();
