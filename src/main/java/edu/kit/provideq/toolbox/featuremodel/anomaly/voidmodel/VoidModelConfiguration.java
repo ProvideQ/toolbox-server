@@ -24,7 +24,7 @@ public class VoidModelConfiguration {
    *      "Explaining Anomalies in Feature Models", Kowal et al., 2016</a>
    */
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_VOID = new ProblemType<>(
-      "feature-model-anomaly-void",
+      "FeatureModelAnomalyVoid",
       "A searching problem: For a given feature model, check if the model is void.",
       String.class,
       String.class
