@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
+import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -29,6 +30,15 @@ final class ProblemRouteDocumentation {
 
   private ProblemRouteDocumentation() {
     throw new UnsupportedOperationException("This class should not be instantiated.");
+  }
+
+  public static void configureListTypesDocs(ProblemManagerProvider problemManagerProvider,
+                                            Builder ops) {
+    ops
+        .operationId(getOperationId("listType"))
+        .description("Responds with a list of all problem types that are supported by the server.")
+        .tag("_")
+        .response(buildProblemTypeListResponse(problemManagerProvider));
   }
 
   static void configureCreateDocs(ProblemManager<?, ?> manager, Builder ops) {
@@ -116,6 +126,32 @@ final class ProblemRouteDocumentation {
         .mediaType(APPLICATION_JSON_VALUE);
   }
 
+  private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemTypeListResponse(
+      ProblemManagerProvider problemManagerProvider) {
+    var problemTypes = problemManagerProvider.getProblemManagers().stream()
+        .map(ProblemManager::getType)
+        .map(ProblemTypeDto::fromProblemType)
+        .toList();
+
+    String problemTypeDtosJson;
+    try {
+      problemTypeDtosJson = new ObjectMapper().writeValueAsString(problemTypes);
+    } catch (JsonProcessingException e) {
+      throw new JsonParseException(e);
+    }
+
+    return responseBuilder()
+        .responseCode(String.valueOf(HttpStatus.OK.value()))
+        .content(contentBuilder()
+            .array(arraySchemaBuilder()
+                .schema(schemaBuilder().implementation(ProblemTypeDto.class))
+            )
+            .example(exampleOjectBuilder()
+                .value(problemTypeDtosJson)
+            )
+        );
+  }
+
   private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemListResponse(
       ProblemManager<?, ?> manager) {
     var problemDtos = manager.getExampleInstances().stream()
@@ -140,7 +176,6 @@ final class ProblemRouteDocumentation {
             )
         );
   }
-
 
   private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemResponse(
       ProblemManager<?, ?> problemManager) {
@@ -176,6 +211,10 @@ final class ProblemRouteDocumentation {
     return exampleOjectBuilder()
         .name(name)
         .value(problemDtoJson);
+  }
+
+  private static String getOperationId(String operationName) {
+    return "/%s/%s".formatted(ENDPOINT_NAME, operationName);
   }
 
   private static String getOperationId(ProblemType<?, ?> type, String operationName) {
