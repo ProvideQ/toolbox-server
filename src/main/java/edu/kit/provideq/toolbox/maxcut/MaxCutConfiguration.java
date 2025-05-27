@@ -26,6 +26,8 @@ public class MaxCutConfiguration {
    */
   public static final ProblemType<String, String> MAX_CUT = new ProblemType<>(
       "max-cut",
+      "An optimization problem: For a given graph, find the optimal separation of vertices "
+          + "that maximises the cut crossing edge weight sum.",
       String.class,
       String.class
   );

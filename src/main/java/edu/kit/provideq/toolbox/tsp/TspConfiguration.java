@@ -24,6 +24,8 @@ public class TspConfiguration {
    */
   public static final ProblemType<String, String> TSP = new ProblemType<>(
       "tsp",
+      "A Traveling Sales Person Problem. Optimization Problem with the goal of find "
+          + "an optimal route between a given set of connected cities.",
       String.class,
       String.class
   );

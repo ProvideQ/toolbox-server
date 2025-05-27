@@ -29,6 +29,9 @@ public class QuboConfiguration {
    */
   public static final ProblemType<String, String> QUBO = new ProblemType<>(
       "qubo",
+      "QUBO (Quadratic Unconstrained Binary Optimization) A combinatorial optimization problem. "
+          + "For a given quadratic term with binary decision variables, find the "
+          + "minimal variable assignment of the term.",
       String.class,
       String.class
   );

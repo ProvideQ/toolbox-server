@@ -15,6 +15,8 @@ public class DemonstratorConfiguration {
    */
   public static final ProblemType<String, String> DEMONSTRATOR = new ProblemType<>(
       "demonstrator",
+      "A demonstrator is a broad group of processes that demonstrate "
+          + "certain aspects of quantum computing.",
       String.class,
       String.class
   );

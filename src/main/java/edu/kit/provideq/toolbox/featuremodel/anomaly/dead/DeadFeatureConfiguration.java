@@ -25,6 +25,7 @@ public class DeadFeatureConfiguration {
    */
   public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_DEAD = new ProblemType<>(
       "feature-model-anomaly-dead",
+      "A searching problem: For a given feature model, check if the model contains dead features.",
       String.class,
       String.class
   );
