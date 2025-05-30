@@ -70,7 +70,6 @@ for i, d in enumerate(depths):
     for j, e in enumerate(entanglements):
         for k, vf in enumerate(var_forms):
             for l, eb in enumerate(entanglement_blocks):
-                optimizer = SLSQP(maxiter=10000, ftol=1e-9)
                 variational_form = TwoLocal(4, rotation_blocks=vf, entanglement_blocks=eb, entanglement=e, reps=d)
 
                 ansatz = reference_circuit.compose(variational_form)
