@@ -12,8 +12,9 @@ from io import StringIO
 import numpy as np
 import sys
 
-if len(sys.argv) != 2:
-    raise ValueError('This script expects exactly 1 argument: the molecule')
+arg_count =  len(sys.argv) - 1
+if arg_count != 1:
+    raise ValueError(f'This script expects exactly 1 argument: the molecule, but got {arg_count}: {sys.argv[1:]}')
 molecule = sys.argv[1]
 
 driver = PySCFDriver(atom=molecule)
