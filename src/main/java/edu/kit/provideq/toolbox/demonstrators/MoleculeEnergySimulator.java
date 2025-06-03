@@ -70,7 +70,7 @@ public class MoleculeEnergySimulator implements Demonstrator {
 
     var processResult = context
         .getBean(PythonProcessRunner.class, scriptPath, venv)
-        .withArguments(molecule)
+        .withArguments('"' + molecule + '"')
         .readOutputString()
         .run(getProblemType(), solution.getId());
 
