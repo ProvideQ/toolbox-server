@@ -44,7 +44,6 @@ algorithm = GroundStateEigensolver(mapper, vqe)
 
 electronic_structure_result = algorithm.solve(problem)
 electronic_structure_result.formatting_precision = 6
-print(electronic_structure_result)  # we're going to calculate the total ground state energy
 
 driver = PySCFDriver(atom='H .0 .0 .0; H .0 .0 0.74279')
 problem = driver.run()
@@ -67,7 +66,6 @@ reference_circuit.x(2)
 results = np.zeros((len(depths), len(entanglements), len(var_forms), len(entanglement_blocks)))
 
 for i, d in enumerate(depths):
-    print(f'Depth: {d} done.')
     for j, e in enumerate(entanglements):
         for k, vf in enumerate(var_forms):
             for l, eb in enumerate(entanglement_blocks):
