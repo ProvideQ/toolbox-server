@@ -56,7 +56,7 @@ public class ProblemRouter {
    * Create operation: GET /problems.
    */
   private RouterFunction<ServerResponse> defineListTypesRoute() {
-    return route().POST(
+    return route().GET(
         PROBLEMS_BASE_PATH,
         accept(APPLICATION_JSON),
         req -> handleListTypes(),
