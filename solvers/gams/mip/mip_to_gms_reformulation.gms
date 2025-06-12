@@ -48,7 +48,7 @@ else:
 
 # Create the replacement line using the matched groups
 penalty = os.environ.get("GAMSPEN", "100")  # Default to 100 if not set
-new_line = f'$batinclude %IDIR% {model_name} {model_type} {gams_sense} {obj_var} {penalty} -logOn=2'
+new_line = f'$batinclude %IDIR% {model_name} {model_type} {gams_sense} {obj_var} {penalty}'
 
 # Replace the matching "Solve ..." line with the new line (only the first occurrence)
 new_content = pattern.sub(new_line, content, count=1)

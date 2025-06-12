@@ -16,14 +16,14 @@ import reactor.core.publisher.Mono;
  * {@link MipConfiguration#MIP} solver using IBM cplex.
  */
 @Component
-public class CplexMip extends MipSolver {
+public class CplexMipSolver extends MipSolver {
   private final String scriptPath;
   private final String venv;
 
   private final ApplicationContext context;
 
   @Autowired
-  public CplexMip(
+  public CplexMipSolver(
       @Value("${path.cplex.mip}") String scriptPath,
       @Value("${venv.cplex.mip}") String venv,
       ApplicationContext context) {
@@ -34,12 +34,13 @@ public class CplexMip extends MipSolver {
 
   @Override
   public String getName() {
-    return "IBM Cplex Solver for MIP";
+    return "Cplex";
   }
 
   @Override
   public String getDescription() {
-    return "This solver uses IBM Cplex Solver to solve MIP problems";
+    return "This solver uses IBM Cplex Solver to solve MIP problems. "
+            + "It is called via Python wrapper without any additional parameters";
   }
 
   @Override

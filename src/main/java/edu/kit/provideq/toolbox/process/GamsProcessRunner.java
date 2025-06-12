@@ -26,7 +26,7 @@ public class GamsProcessRunner extends ProcessRunner {
   /**
    * The name of the file to call for running a GAMS script.
    */
-  private static final String GAMS_EXECUTABLE_NAME = "gams";
+  private static final String GAMS_EXECUTABLE_NAME = "/home/piotr/gams49.4_linux_x64_64_sfx/gams";
 
   /**
    * Creates a process runner for a GAMS task.

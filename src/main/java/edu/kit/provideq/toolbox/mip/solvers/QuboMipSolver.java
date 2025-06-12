@@ -19,18 +19,18 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class QuboMipSolver extends MipSolver {
-  private final String scriptPath;
-  private final String dependencyScriptPath;
+  private final String mipToGamsReformulatorPath;
+  private final String solverScriptPath;
   private final ApplicationContext context;
   private static final int PENALTY = 100;
 
   @Autowired
   public QuboMipSolver(
-      @Value("${path.gams.mip-to-qubo-reformulation}") String mipToQuboReformulatorPath,
-      @Value("${path.gams.qubo-solve}") String solverScriptPath,
+      @Value("${path.gams.mip-to-gams-reformulation}") String mipToGamsReformulatorPath,
+      @Value("${path.gams.gams-to-qubo-reformulation}") String solverScriptPath,
       ApplicationContext context) {
-    this.scriptPath = mipToQuboReformulatorPath;
-    this.dependencyScriptPath = solverScriptPath;
+    this.mipToGamsReformulatorPath = mipToGamsReformulatorPath;
+    this.solverScriptPath = solverScriptPath;
     this.context = context;
   }
 
@@ -55,7 +55,7 @@ public class QuboMipSolver extends MipSolver {
 
     // Run GAMS via console
     context
-        .getBean(GamsProcessRunner.class, scriptPath)
+        .getBean(GamsProcessRunner.class, mipToGamsReformulatorPath)
         .withArguments(
             "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
             "--PENALTY=" + PENALTY
@@ -69,7 +69,7 @@ public class QuboMipSolver extends MipSolver {
     ProcessResult<String> processResult = context
         .getBean(GamsProcessRunner.class, relativePath)
         .withArguments(
-            "--IDIR=" + new File(dependencyScriptPath).getAbsolutePath(),
+            "--IDIR=" + new File(solverScriptPath).getAbsolutePath(),
             "--SOLOUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
         )
         .readOutputFile("output.txt")
