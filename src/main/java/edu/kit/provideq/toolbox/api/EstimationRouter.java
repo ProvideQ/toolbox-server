@@ -90,7 +90,7 @@ public class EstimationRouter {
     Mono<BoundDto> bound;
     try {
       problem.estimateBound();
-      bound = Mono.just(new BoundDto(problem.getBound().orElseThrow()));
+      bound = Mono.just(problem.getBound().orElseThrow());
     } catch (IllegalStateException | NoSuchElementException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
@@ -114,22 +114,14 @@ public class EstimationRouter {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bound not estimated yet!");
     }
 
-    float bound = problem.getBound().get().bound().value();
-    var pattern = Pattern.compile(manager.getType().getSolutionPattern());
-    var solutionMatcher = pattern.matcher(problem.getSolution().get().getSolutionData().toString());
-    float solutionValue;
-    if (solutionMatcher.find()) {
-      solutionValue = Float.parseFloat(solutionMatcher.group(1));
-    } else {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not parse solution value!");
+    try {
+      problem.compareBound();
+    } catch (IllegalStateException | NoSuchElementException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
-    float comparison = problem.getBound().get().bound().boundType().compare(bound, solutionValue);
-    ComparisonDto comparisonDto = new ComparisonDto(
-        comparison,
-        problem.getBound().get(),
-        problem.getSolution().get()
-    );
+    var comparisonDto = problem.getBoundWithComparison();
+
     return ok().body(Mono.just(comparisonDto), new ParameterizedTypeReference<>() {
     });
   }

@@ -2,6 +2,8 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.api.BoundDto;
+import edu.kit.provideq.toolbox.api.ComparisonDto;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +33,7 @@ public class Problem<InputT, ResultT> {
 
   private InputT input;
   private Solution<ResultT> solution;
-  private BoundWithInfo bound;
+  private final ComparisonDto boundWithComparison = new ComparisonDto();
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
   private List<SolverSetting> solverSettings;
@@ -84,6 +87,10 @@ public class Problem<InputT, ResultT> {
         });
   }
 
+  /**
+   * Estimates a bound for the problem's solution. Uses the estimator provided by the problem type.
+   * Also sets the execution time of the estimation in the boundWithComparison object.
+   */
   public void estimateBound() {
     if (this.input == null) {
       throw new IllegalStateException("Cannot estimate value without input!");
@@ -93,6 +100,7 @@ public class Problem<InputT, ResultT> {
     if (optionalEstimator.isEmpty()) {
       throw new IllegalStateException("Cannot estimate value without an estimator!");
     }
+
     var estimator = optionalEstimator.get();
 
     long start = System.currentTimeMillis();
@@ -101,7 +109,28 @@ public class Problem<InputT, ResultT> {
     long finish = System.currentTimeMillis();
     var executionTime = finish - start;
 
-    this.bound = new BoundWithInfo(estimatedBound, executionTime);
+    this.boundWithComparison.setBound(new BoundWithInfo(estimatedBound, executionTime));
+  }
+
+  /**
+   * Compares the current solution with the bound according to the bound type.
+   */
+  public void compareBound() {
+    if (this.solution == null) {
+      throw new IllegalStateException("Cannot compare bound without solution!");
+    }
+    if (!this.boundWithComparison.hasBound()) {
+      throw new IllegalStateException("Cannot compare bound without bound!");
+    }
+
+    var bound = this.boundWithComparison.getBound();
+    var solutionData = this.solution.getSolutionData();
+
+    float solutionValue = getSolutionValue(solutionData);
+
+    var comparison = bound.boundType().compare(bound.bound(), solutionValue);
+
+    this.boundWithComparison.setComparison(comparison);
   }
 
   public UUID getId() {
@@ -231,7 +260,23 @@ public class Problem<InputT, ResultT> {
             + '}';
   }
 
-  public Optional<BoundWithInfo> getBound() {
-    return Optional.ofNullable(bound);
+  public Optional<BoundDto> getBound() {
+    return Optional.ofNullable(boundWithComparison.getBound());
+  }
+
+  public Optional<ComparisonDto> getBoundWithComparison() {
+    return Optional.of(boundWithComparison);
+  }
+
+  private float getSolutionValue(ResultT solutionData) {
+    var pattern = Pattern.compile(this.type.getSolutionPattern());
+    var solutionMatcher = pattern.matcher(solutionData.toString());
+    float solutionValue;
+    if (solutionMatcher.find()) {
+      solutionValue = Float.parseFloat(solutionMatcher.group(1));
+    } else {
+      throw new IllegalStateException("Solution does not match the expected pattern!");
+    }
+    return solutionValue;
   }
 }
