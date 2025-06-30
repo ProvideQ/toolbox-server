@@ -35,6 +35,10 @@ public class ComparisonDto {
     this.bound = new BoundDto(bound);
   }
 
+  public boolean hasBound() {
+    return bound != null;
+  }
+
   public void setComparison(float comparison) {
     this.comparison = comparison;
   }

@@ -111,7 +111,7 @@ public class Problem<InputT, ResultT> {
     if (this.solution == null) {
       throw new IllegalStateException("Cannot compare bound without solution!");
     }
-    if (this.boundWithComparison.getBound() == null) {
+    if (!this.boundWithComparison.hasBound()) {
       throw new IllegalStateException("Cannot compare bound without bound!");
     }
 
