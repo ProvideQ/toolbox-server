@@ -87,6 +87,10 @@ public class Problem<InputT, ResultT> {
         });
   }
 
+  /**
+   * Estimates a bound for the problem's solution. Uses the estimator provided by the problem type.
+   * Also sets the execution time of the estimation in the boundWithComparison object.
+   */
   public void estimateBound() {
     if (this.input == null) {
       throw new IllegalStateException("Cannot estimate value without input!");
@@ -96,6 +100,7 @@ public class Problem<InputT, ResultT> {
     if (optionalEstimator.isEmpty()) {
       throw new IllegalStateException("Cannot estimate value without an estimator!");
     }
+
     var estimator = optionalEstimator.get();
 
     long start = System.currentTimeMillis();
@@ -107,6 +112,9 @@ public class Problem<InputT, ResultT> {
     this.boundWithComparison.setBound(new BoundWithInfo(estimatedBound, executionTime));
   }
 
+  /**
+   * Compares the current solution with the bound according to the bound type.
+   */
   public void compareBound() {
     if (this.solution == null) {
       throw new IllegalStateException("Cannot compare bound without solution!");
@@ -116,16 +124,9 @@ public class Problem<InputT, ResultT> {
     }
 
     var bound = this.boundWithComparison.getBound();
-    var solution = this.solution.getSolutionData();
+    var solutionData = this.solution.getSolutionData();
 
-    var pattern = Pattern.compile(this.type.getSolutionPattern());
-    var solutionMatcher = pattern.matcher(solution.toString());
-    float solutionValue;
-    if (solutionMatcher.find()) {
-      solutionValue = Float.parseFloat(solutionMatcher.group(1));
-    } else {
-      throw new IllegalStateException("Solution does not match the expected pattern!");
-    }
+    float solutionValue = getSolutionValue(solutionData);
 
     var comparison = bound.boundType().compare(bound.bound(), solutionValue);
 
@@ -265,5 +266,17 @@ public class Problem<InputT, ResultT> {
 
   public Optional<ComparisonDto> getBoundWithComparison() {
     return Optional.of(boundWithComparison);
+  }
+
+  private float getSolutionValue(ResultT solutionData) {
+    var pattern = Pattern.compile(this.type.getSolutionPattern());
+    var solutionMatcher = pattern.matcher(solutionData.toString());
+    float solutionValue;
+    if (solutionMatcher.find()) {
+      solutionValue = Float.parseFloat(solutionMatcher.group(1));
+    } else {
+      throw new IllegalStateException("Solution does not match the expected pattern!");
+    }
+    return solutionValue;
   }
 }
