@@ -1,7 +1,9 @@
 package edu.kit.provideq.toolbox.sat;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
+import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
@@ -10,8 +12,10 @@ import edu.kit.provideq.toolbox.sat.solvers.GamsSatSolver;
 import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
 import edu.kit.provideq.toolbox.sat.solvers.QrispGroverSolver;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,8 +33,28 @@ public class SatConfiguration {
       "A satisfiability problem: For a given boolean formula, check "
           + "if there is an interpretation that satisfies the formula.",
       String.class,
-      DimacsCnfSolution.class
+      DimacsCnfSolution.class,
+      getAttributes()
   );
+
+  public static Map<String, Function<String, String>> getAttributes() {
+    return Map.ofEntries(
+        Map.entry("variable_count", problem -> {
+          try {
+            return String.valueOf(DimacsCnf.fromString(problem).getVariables().size());
+          } catch (ConversionException e) {
+            return "";
+          }
+        }),
+        Map.entry("or_clause_count", problem -> {
+          try {
+            return String.valueOf(DimacsCnf.fromString(problem).getOrClauses().size());
+          } catch (ConversionException e) {
+            return "";
+          }
+        })
+    );
+  }
 
   @Bean
   ProblemManager<String, DimacsCnfSolution> getSatManager(

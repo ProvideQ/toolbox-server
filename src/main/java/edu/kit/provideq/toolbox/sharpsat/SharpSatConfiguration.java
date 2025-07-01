@@ -5,6 +5,7 @@ import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sat.SatConfiguration;
 import edu.kit.provideq.toolbox.sharpsat.solvers.GanakSolver;
 import edu.kit.provideq.toolbox.sharpsat.solvers.PythonBruteForceSolver;
 import java.io.IOException;
@@ -28,7 +29,8 @@ public class SharpSatConfiguration {
       "A satisfiability counting problem: For a given boolean formula, count number of "
           + "interpretations that satisfies the formula. NP-Hard in nature.",
       String.class,
-      Integer.class
+      Integer.class,
+      SatConfiguration.getAttributes()
   );
 
   @Bean
