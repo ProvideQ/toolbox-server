@@ -8,6 +8,7 @@ import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 public final class SubRoutineDefinitionDto {
   private final String typeId;
   private final String description;
+  private final boolean isCalledOnlyOnce;
 
   /**
    * Internal constructor, used for de-serialization.
@@ -16,6 +17,7 @@ public final class SubRoutineDefinitionDto {
   private SubRoutineDefinitionDto() {
     this.typeId = null;
     this.description = null;
+    this.isCalledOnlyOnce = true;
   }
 
   /**
@@ -23,10 +25,12 @@ public final class SubRoutineDefinitionDto {
    */
   private SubRoutineDefinitionDto(
       String typeId,
-      String description
+      String description,
+      boolean isCalledOnlyOnce
   ) {
     this.typeId = typeId;
     this.description = description;
+    this.isCalledOnlyOnce = isCalledOnlyOnce;
   }
 
   /**
@@ -37,8 +41,9 @@ public final class SubRoutineDefinitionDto {
   ) {
     var typeId = definition.type().getId();
     var description = definition.description();
+    var isCalledOnlyOnce = definition.isCalledOnlyOnce();
 
-    return new SubRoutineDefinitionDto(typeId, description);
+    return new SubRoutineDefinitionDto(typeId, description, isCalledOnlyOnce);
   }
 
   public String getTypeId() {
@@ -49,10 +54,15 @@ public final class SubRoutineDefinitionDto {
     return description;
   }
 
+  public boolean getIsCalledOnlyOnce() {
+    return isCalledOnlyOnce;
+  }
+
   @Override
   public String toString() {
     return "SubRoutineDefinitionDto["
         + "typeId=" + typeId + ", "
-        + "description=" + description + ']';
+        + "description=" + description + ", "
+        + "isCalledOnlyOnce=" + isCalledOnlyOnce + ']';
   }
 }

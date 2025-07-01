@@ -6,8 +6,6 @@ import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.vrp.clusterer.VrpClustererConfiguration;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -16,15 +14,9 @@ public class ClusterAndSolveVrpSolver extends VrpSolver {
   private static final SubRoutineDefinition<String, String> CLUSTER_SUBROUTINE =
       new SubRoutineDefinition<>(
           VrpClustererConfiguration.CLUSTER_VRP,
-          "Creates a cluster of multiple vehicle routing problems"
+          "Creates a cluster of multiple vehicle routing problems",
+          true
       );
-  private final ApplicationContext context;
-
-  @Autowired
-  public ClusterAndSolveVrpSolver(
-      ApplicationContext context) {
-    this.context = context;
-  }
 
   @Override
   public String getName() {

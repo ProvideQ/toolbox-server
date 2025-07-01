@@ -30,7 +30,8 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   private static final SubRoutineDefinition<String, DimacsCnfSolution> SAT_SUBROUTINE =
       new SubRoutineDefinition<>(
           SatConfiguration.SAT,
-          "Called per feature to determine if it is dead"
+          "Called per feature to determine if it is dead",
+          false
       );
 
   @Override

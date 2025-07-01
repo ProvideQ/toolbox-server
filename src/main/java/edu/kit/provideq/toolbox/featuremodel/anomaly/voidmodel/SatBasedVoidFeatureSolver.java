@@ -23,7 +23,8 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
   private static final SubRoutineDefinition<String, DimacsCnfSolution> SAT_SUBROUTINE =
       new SubRoutineDefinition<>(
           SatConfiguration.SAT,
-          "Used to determine if there is any valid configurations of the Feature Model"
+          "Used to determine if there is any valid configurations of the Feature Model",
+          true
       );
 
   @Override
