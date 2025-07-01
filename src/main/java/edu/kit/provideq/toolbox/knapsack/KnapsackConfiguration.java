@@ -75,7 +75,15 @@ public class KnapsackConfiguration {
       String.class,
       String.class,
       estimator,
-      "^(\\d+)"
+      "^(\\d+)",
+      Map.ofEntries(
+          Map.entry("item_count", problem -> problem.lines()
+              .findFirst()
+              .orElse("")),
+          Map.entry("capacity", p2 -> p2.lines()
+              .reduce((a, b) -> b)
+              .orElse(""))
+      )
   );
 
   @Bean
