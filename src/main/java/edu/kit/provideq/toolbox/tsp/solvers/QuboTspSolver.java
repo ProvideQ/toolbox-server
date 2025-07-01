@@ -26,7 +26,12 @@ import reactor.core.scheduler.Schedulers;
 @Component
 public class QuboTspSolver extends TspSolver {
   private static final SubRoutineDefinition<String, String> QUBO_SUBROUTINE =
-      new SubRoutineDefinition<>(QuboConfiguration.QUBO, "How should the QUBO be solved?");
+      new SubRoutineDefinition<>(
+          QuboConfiguration.QUBO,
+          "How should the QUBO be solved?",
+          true
+      );
+
   private final ApplicationContext context;
   private final String binaryPath;
   private ResourceProvider resourceProvider;

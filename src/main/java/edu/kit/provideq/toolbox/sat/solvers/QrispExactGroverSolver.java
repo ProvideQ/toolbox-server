@@ -28,7 +28,8 @@ public class QrispExactGroverSolver extends SatSolver {
   private static final SubRoutineDefinition<String, Integer> SHARPSAT_SUBROUTINE =
       new SubRoutineDefinition<>(
           SharpSatConfiguration.SHARPSAT,
-          "Count the number of solutions using a SharpSAT solver"
+          "Count the number of solutions using a SharpSAT solver",
+          true
       );
 
   private final String scriptPath;

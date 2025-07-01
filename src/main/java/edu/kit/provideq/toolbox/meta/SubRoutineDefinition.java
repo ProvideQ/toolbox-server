@@ -11,6 +11,7 @@ package edu.kit.provideq.toolbox.meta;
  */
 public record SubRoutineDefinition<InputT, ResultT>(
     ProblemType<InputT, ResultT> type,
-    String description
+    String description,
+    boolean isCalledOnlyOnce
 ) {
 }
