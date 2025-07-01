@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.demonstrators.DemonstratorConfiguration.DEMONSTRATOR;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
@@ -48,20 +47,7 @@ public class ProblemRouter {
             managers.stream().map(this::defineUpdateRoute)
         )
         .reduce(RouterFunction::and)
-        .orElseThrow()
-        .and(defineListTypesRoute());
-  }
-
-  /**
-   * Create operation: GET /problems.
-   */
-  private RouterFunction<ServerResponse> defineListTypesRoute() {
-    return route().GET(
-        PROBLEMS_BASE_PATH,
-        accept(APPLICATION_JSON),
-        req -> handleListTypes(),
-        ops -> ProblemRouteDocumentation.configureListTypesDocs(managerProvider, ops)
-    ).build();
+        .orElseThrow();
   }
 
   /**
@@ -110,17 +96,6 @@ public class ProblemRouter {
         req -> handleUpdate(manager, req),
         ops -> ProblemRouteDocumentation.configureUpdateDocs(manager, ops)
     ).build();
-  }
-
-  private Mono<ServerResponse> handleListTypes() {
-    var problemTypes = managerProvider.getProblemManagers().stream()
-        .filter(p -> !p.getType().equals(DEMONSTRATOR))
-        .map(ProblemManager::getType)
-        .map(ProblemTypeDto::fromProblemType)
-        .toList();
-
-    return ok().body(Mono.just(problemTypes), new ParameterizedTypeReference<>() {
-    });
   }
 
   private <InputT, ResultT> Mono<ServerResponse> handleCreate(
