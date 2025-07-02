@@ -20,7 +20,8 @@ for base_dir in base_dirs:
             for solver_name in os.listdir(framework_dir):
                 solver_dir = os.path.join(framework_dir, solver_name)
                 req_file = os.path.join(solver_dir, 'requirements.txt')
-                if os.path.exists(req_file):
+                submodules_file = os.path.join(solver_dir, 'submodules.txt')
+                if os.path.exists(req_file) or os.path.exists(submodules_file):
                     venv_name = f"{os.path.basename(root)}_{framework_name}_{solver_name}"
                     print(f"Setting up virtual environment '{venv_name}' for {solver_dir}...")
                     try:
@@ -30,7 +31,15 @@ for base_dir in base_dirs:
                             pip_executable = os.path.join(venv_path, 'Scripts', 'pip.exe')
                         else:
                             pip_executable = os.path.join(venv_path, 'bin', 'pip')
-                        subprocess.run([pip_executable, 'install', '-r', req_file], check=True)
+                        if os.path.exists(req_file):
+                          subprocess.run([pip_executable, 'install', '-r', req_file], check=True)
+                        if os.path.exists(submodules_file):
+                            with open(submodules_file, 'r') as f:
+                                submodules = f.read().strip().splitlines()
+                            for submodule in submodules:
+                                submodule_path = os.path.join(solver_dir, submodule)
+                                if os.path.exists(submodule_path):
+                                    subprocess.run([pip_executable, 'install', submodule_path], check=True)
                     except subprocess.CalledProcessError as e:
                         print(f"Error setting up virtual environment for {solver_dir}: {e}")
                         exitCode = 1

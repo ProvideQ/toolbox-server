@@ -1,0 +1,4 @@
+[submodule "solvers/custom/materialsimulation-ansatz-tvha/tvha"]
+	path = solvers/custom/materialsimulation-ansatz-tvha/tvha
+	url = https://github.com/ProvideQ/tvha.git
+	branch = main

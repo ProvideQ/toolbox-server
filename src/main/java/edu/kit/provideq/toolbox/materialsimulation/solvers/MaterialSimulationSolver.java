@@ -4,6 +4,9 @@ import edu.kit.provideq.toolbox.materialsimulation.MaterialSimulationConfigurati
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 
+/**
+ * Abstract base class for solvers that handle material simulation problems.
+*/
 public abstract class MaterialSimulationSolver implements ProblemSolver<String, String> {
   @Override
   public ProblemType<String, String> getProblemType() {

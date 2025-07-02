@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
+import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import java.util.List;
@@ -21,7 +22,7 @@ import reactor.core.publisher.Mono;
  * implementation.
  */
 @Component
-public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
+public class CustomMaterialSimulationSolver extends MaterialSimulationSolver {
   private final String scriptPath;
   private final String venv;
   private final ApplicationContext context;
@@ -32,15 +33,44 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
   private static final String SETTING_SPIN = "Spin";
   private static final int DEFAULT_SPIN = 0;
 
+  private static final String SETTING_ANSATZ = "Ansatz";
+  private static final Ansatz DEFAULT_ANSATZ = Ansatz.VHA;
+
+  enum Ansatz {
+    UCCSD("uccsd"),
+    VHA("vha");
+
+    private final String value;
+
+    Ansatz(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public static Ansatz fromValue(String value) {
+      for (Ansatz ansatz : values()) {
+        if (ansatz.value.equals(value)) {
+          return ansatz;
+        }
+      }
+      throw new IllegalArgumentException("Unknown value: " + value);
+    }
+  }
+
   @Autowired
-  public QiskitMaterialSimulationSolver(
-      @Value("${path.qiskit.materialsimulation}") String scriptPath,
-      @Value("${venv.qiskit.materialsimulation}") String venv,
+  public CustomMaterialSimulationSolver(
+      @Value("${path.custom.materialsimulation}") String scriptPath,
+      @Value("${venv.custom.materialsimulation}") String venv,
       ApplicationContext context) {
     this.scriptPath = scriptPath;
     this.venv = venv;
     this.context = context;
   }
+
+  
 
   @Override
   public String getName() {
@@ -68,6 +98,13 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
                 + " i.e. the difference between the number of alpha and beta electrons.",
             DEFAULT_SPIN,
             0, Integer.MAX_VALUE
+        ),
+        new SelectSetting<>(
+          SETTING_ANSATZ,
+          "The Ansatz to use in the quantum material simulation.",
+          List.of(Ansatz.values()),
+          DEFAULT_ANSATZ,
+          Ansatz::getValue
         )
     );
   }
@@ -88,6 +125,11 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
         .map(IntegerSetting::getValue)
         .orElse(DEFAULT_SPIN);
 
+    final Ansatz ansatz = properties
+        .<SelectSetting<Ansatz>>getSetting(SETTING_ANSATZ)
+        .map(s -> s.getSelectedOptionT(Ansatz::fromValue))
+        .orElse(DEFAULT_ANSATZ);
+
     if (charge < 0) {
       throw new IllegalArgumentException("Charge must be non-negative");
     }
@@ -100,6 +142,7 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH,
+            ansatz.value,
             "--charge", String.valueOf(charge),
             "--spin", String.valueOf(spin)
         )

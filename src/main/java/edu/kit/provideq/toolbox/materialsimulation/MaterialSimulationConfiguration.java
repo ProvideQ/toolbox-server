@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.materialsimulation;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.materialsimulation.solvers.QiskitMaterialSimulationSolver;
+import edu.kit.provideq.toolbox.materialsimulation.solvers.CustomMaterialSimulationSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -30,12 +30,12 @@ public class MaterialSimulationConfiguration {
 
   @Bean
   ProblemManager<String, String> getMaterialSimulationManager(
-      QiskitMaterialSimulationSolver qiskitSolver,
+      CustomMaterialSimulationSolver customMaterialSimulationSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         MATERIAL_SIMULATION,
-        Set.of(qiskitSolver),
+        Set.of(customMaterialSimulationSolver),
         loadExampleProblems(resourceProvider)
     );
   }
