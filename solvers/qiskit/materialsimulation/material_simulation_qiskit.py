@@ -6,6 +6,7 @@ from qiskit_algorithms import VQE
 from qiskit_algorithms.optimizers import SLSQP
 from qiskit.primitives import Estimator
 from qiskit_nature.second_q.algorithms import GroundStateEigensolver, QEOM, EvaluationRule
+from qiskit_nature.second_q.algorithms.initial_points import HFInitialPoint
 from qiskit_nature.second_q.circuit.library import HartreeFock, UCCSD
 
 parser = argparse.ArgumentParser(
@@ -55,7 +56,13 @@ ansatz = get_ansatz(es_problem, mapper)
 estimator = Estimator()
 # This first part sets the ground state solver
 solver = VQE(estimator, ansatz, SLSQP())
-solver.initial_point = [0.0] * ansatz.num_parameters
+
+hf_initial_point = HFInitialPoint()
+hf_initial_point.ansatz = ansatz
+initial_point = hf_initial_point.to_numpy_array()
+
+solver.initial_point = initial_point
+
 gse = GroundStateEigensolver(mapper, solver)
 
 # The qEOM algorithm is simply instantiated with the chosen ground state solver and Estimator primitive
