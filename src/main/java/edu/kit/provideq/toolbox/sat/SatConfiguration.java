@@ -46,7 +46,7 @@ public class SatConfiguration {
             return "";
           }
         }),
-        Map.entry("or_clause_count", problem -> {
+        Map.entry("clause_count", problem -> {
           try {
             return String.valueOf(DimacsCnf.fromString(problem).getOrClauses().size());
           } catch (ConversionException e) {
