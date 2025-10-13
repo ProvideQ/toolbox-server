@@ -86,6 +86,6 @@ To use this, enable GitHub Actions and configure the following secrets in the Gi
   3. Set `DOKKU_DEPLOYMENT_KEY` to the private key generated in step i.
 
 ## License
-Copyright (c) 2022 - 2023 ProvideQ
+Copyright (c) 2022 - 2025 ProvideQ
 
 This project is available under the [MIT License](./LICENSE).
