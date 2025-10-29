@@ -25,7 +25,9 @@ jobs:
         env:
           GAMS_LICENSE: ${{ secrets.GAMS_LICENSE }}
         run: |
+          echo "DEBUG: before source"
           source ./scripts/setup-gams.sh
+          echo "DEBUG: after source
           echo "/opt/conda/bin" >> "$GITHUB_PATH"
           echo "$GAMS_PATH" >> "$GITHUB_PATH"
           echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
