@@ -23,7 +23,7 @@ public class MaterialSimulationConfiguration {
    * A simulation problem, computing electronic properties of a molecular system.
    */
   public static final ProblemType<String, String> MATERIAL_SIMULATION = new ProblemType<>(
-      "materialsimulation",
+      "MaterialSimulation",
       "A simulation problem, computing electronic properties of a molecular system.",
       String.class,
       String.class
