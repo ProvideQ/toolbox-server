@@ -10,6 +10,7 @@ import edu.kit.provideq.toolbox.vrp.solvers.LkhVrpSolver;
 import edu.kit.provideq.toolbox.vrp.solvers.QrispVrpSolver;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +29,19 @@ public class VrpConfiguration {
       "A Capacitated Vehicle Routing Problem Optimization Problem with the goal "
           + "to find a minimal route for a given set of trucks and cities with demand.",
       String.class,
-      String.class
+      String.class,
+      Map.ofEntries(
+          Map.entry("dimension", problem -> problem.lines()
+              .filter(line -> line.startsWith("DIMENSION"))
+              .findFirst()
+              .map(line -> line.split(":")[1].trim())
+              .orElse("")),
+          Map.entry("capacity", problem -> problem.lines()
+              .filter(line -> line.startsWith("CAPACITY"))
+              .findFirst()
+              .map(line -> line.split(":")[1].trim())
+              .orElse(""))
+      )
   );
 
   @Bean
