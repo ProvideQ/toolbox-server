@@ -13,7 +13,7 @@ set -e
 apt-get update
 apt-get install curl --yes
 
-echo "updated and installed curl"
+echo "--- DEBUG: updated and installed curl---"
 
 # === Install GAMS ===
 # GAMS Installation script is based on the official installation guide
@@ -26,19 +26,19 @@ GAMS_VERSION_HOTFIX=0
 
 # download the self-extracting archive to /opt/gams/gams.exe and run/extract it
 curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}/linux/linux_x64_64_sfx.exe"
-echo "downloaded gams"
+echo "--- DEBUG: downloaded gams---"
 cd /opt/gams
 chmod +x gams.exe
 sync
-./gams.exe -q # -q = quietly, see https://linux.die.net/man/1/unzipsfx
-echo "installed gams"
+./gams.exe # -q # -q = quietly, see https://linux.die.net/man/1/unzipsfx
+echo "--- DEBUG: installed gams---"
 rm -rf gams.exe
-echo "removed gams installer"
+echo "--- DEBUG: removed gams installer---"
 
 # Install GAMS license
 GAMS_PATH=/opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx
 echo "${GAMS_LICENSE}" | base64 --decode > "$GAMS_PATH/gamslice.txt"
-echo "installed gams license"\
+echo "--- DEBUG: installed gams license---"
 
 # Add GAMS to PATH
 ln -s "$GAMS_PATH/gams" /usr/local/bin/gams
