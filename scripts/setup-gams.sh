@@ -13,8 +13,6 @@ set -e
 apt-get update
 apt-get install curl --yes
 
-echo "--- DEBUG: updated and installed curl---"
-
 # === Install GAMS ===
 # GAMS Installation script is based on the official installation guide
 # (https://www.gams.com/latest/docs/UG_UNIX_INSTALL.html) and adapts some lines from
@@ -26,29 +24,24 @@ GAMS_VERSION_HOTFIX=0
 
 # download the self-extracting archive to /opt/gams/gams.exe and run/extract it
 curl --show-error --output /opt/gams/gams.exe --create-dirs "https://d37drm4t2jghv5.cloudfront.net/distributions/${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}/linux/linux_x64_64_sfx.exe"
-echo "--- DEBUG: downloaded gams---"
 cd /opt/gams
 chmod +x gams.exe
 sync
 ./gams.exe -q # -q = quietly, see https://linux.die.net/man/1/unzipsfx
-echo "--- DEBUG: installed gams---"
 rm -rf gams.exe
-echo "--- DEBUG: removed gams installer---"
 
 # Install GAMS license
 GAMS_PATH=/opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx
 echo "${GAMS_LICENSE}" | base64 --decode > "$GAMS_PATH/gamslice.txt"
-echo "--- DEBUG: installed gams license---"
 
 # Add GAMS to PATH
 ln -s "$GAMS_PATH/gams" /usr/local/bin/gams
 echo "export PATH=\$PATH:$GAMS_PATH" >> ~/.bashrc
-echo "--- DEBUG: added gams to path---"
 
 # Run GAMS installer
 cd "$GAMS_PATH" &&\
 ./gamsinst -a
-echo "--- DEBUG: ran gams installer---"
+
 
 
 # === Install conda ===
@@ -78,15 +71,9 @@ conda create --name gams python=3.10 --yes
 # (https://askubuntu.com/a/1464306)
 source /opt/conda/bin/activate gams
 
-echo "---DEBUG: activated conda env---"
-
 # install GAMS links for python
 pip install gamsapi[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
 pip install networkx
 
-echo "---DEBUG: installed python libs---"
-
 # make GAMS use our python version
 echo "export GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> ~/.bashrc
-
-echo "---DEBUG: successfully set GAMS python version---"
