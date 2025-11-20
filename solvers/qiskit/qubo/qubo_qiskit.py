@@ -1,8 +1,8 @@
 import sys
 from qp_converter import QpConverter
 
-from qiskit.primitives import Sampler
-from qiskit_algorithms import QAOA
+from qiskit.primitives import StatevectorSampler
+from qiskit_optimization.minimum_eigensolvers import QAOA
 from qiskit_algorithms.optimizers import COBYLA
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
 
@@ -19,7 +19,7 @@ print(qubo.prettyprint())
 # TODO: Sampler() has to be replaces with StatevectorSampler() in newer versions.
 # (currently not yet supported by qiskit-optimization)
 # TODO: add a dedicated mixer
-qaoa_mes = QAOA(sampler=Sampler(), optimizer=COBYLA())
+qaoa_mes = QAOA(sampler=StatevectorSampler(), optimizer=COBYLA())
 qaoa = MinimumEigenOptimizer(qaoa_mes)
 
 qaoa_result = qaoa.solve(qubo)

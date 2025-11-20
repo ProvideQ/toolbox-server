@@ -16,10 +16,10 @@ from pygmlparser.Graph import Graph
 
 # Qiskit
 from qiskit.circuit.library import TwoLocal
-from qiskit.primitives import Sampler
+from qiskit.primitives import StatevectorSampler
 from qiskit_optimization.applications import Maxcut
-from qiskit_algorithms import SamplingVQE
-from qiskit_algorithms.optimizers import SPSA
+from qiskit_optimization.minimum_eigensolvers import SamplingVQE
+from qiskit_optimization.optimizers import SPSA
 
 
 #if len(sys.argv) != 3:
@@ -86,7 +86,7 @@ qubitOp, offset = qp.to_ising()
 # construct VQE
 optimizer=SPSA(maxiter=300)
 ry = TwoLocal(qubitOp.num_qubits, "ry", "cz", reps=5, entanglement="linear")
-vqe = SamplingVQE(sampler=Sampler(), ansatz=ry, optimizer=optimizer)
+vqe = SamplingVQE(sampler=StatevectorSampler(), ansatz=ry, optimizer=optimizer)
 
 # run VQE
 result = vqe.compute_minimum_eigenvalue(qubitOp)
