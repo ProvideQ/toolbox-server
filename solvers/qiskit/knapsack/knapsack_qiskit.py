@@ -4,7 +4,7 @@ import sys
 # Qiskit
 from qiskit.primitives import StatevectorSampler
 from qiskit_optimization.minimum_eigensolvers import QAOA
-from qiskit_algorithms.optimizers import COBYLA
+from qiskit_optimization.optimizers import COBYLA
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
 from qiskit_optimization.applications import Knapsack
 from qiskit_optimization.converters import QuadraticProgramToQubo

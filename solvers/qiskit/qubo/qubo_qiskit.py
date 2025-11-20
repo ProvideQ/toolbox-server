@@ -3,7 +3,7 @@ from qp_converter import QpConverter
 
 from qiskit.primitives import StatevectorSampler
 from qiskit_optimization.minimum_eigensolvers import QAOA
-from qiskit_algorithms.optimizers import COBYLA
+from qiskit_optimization.optimizers import COBYLA
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
 
 if len(sys.argv) != 3:
