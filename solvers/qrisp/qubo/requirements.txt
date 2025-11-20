@@ -2,3 +2,4 @@
 qrisp == 0.4.4
 numpy == 1.26.4
 gurobipy == 11.0.1 # for lp file reading
+sympy == 1.12.1 # needed but not specified in qrisp requirements
