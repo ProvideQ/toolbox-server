@@ -2,3 +2,4 @@
 qrisp == 0.4.4
 numpy == 1.26.4
 tsplib95 == 0.7.1 # for tsplib file parsing
+sympy == 1.12.1 # needed but not specified in qrisp requirements
