@@ -20,6 +20,16 @@ public class BoundComparisonDto {
     this.bound = new BoundDto(bound);
   }
 
+  /**
+   * Creates a new comparison DTO out of a bound and with an uninitialized comparison value.
+   *
+   * @param bound a bound
+   */
+  public BoundComparisonDto(BoundWithInfo bound) {
+    this.comparison = -1;
+    this.bound = new BoundDto(bound);
+  }
+
   public BoundComparisonDto() {
     this.comparison = -1;
     this.bound = null;
@@ -52,10 +62,6 @@ public class BoundComparisonDto {
     return bound != null;
   }
 
-  public void setComparison(float comparison) {
-    this.comparison = comparison;
-  }
-
   /**
    * Gets the comparison value of the comparison.
    *
@@ -63,6 +69,10 @@ public class BoundComparisonDto {
    */
   public float getComparison() {
     return comparison;
+  }
+
+  public void setComparison(float comparison) {
+    this.comparison = comparison;
   }
 
 }

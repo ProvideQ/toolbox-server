@@ -33,7 +33,7 @@ public class Problem<InputT, ResultT> {
 
   private InputT input;
   private Solution<ResultT> solution;
-  private final BoundComparisonDto boundWithComparison = new BoundComparisonDto();
+  private BoundComparisonDto boundWithComparison;
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
   private List<SolverSetting> solverSettings;
@@ -109,7 +109,8 @@ public class Problem<InputT, ResultT> {
     long finish = System.currentTimeMillis();
     var executionTime = finish - start;
 
-    this.boundWithComparison.setBound(new BoundWithInfo(estimatedBound, executionTime));
+    this.boundWithComparison =
+        new BoundComparisonDto(new BoundWithInfo(estimatedBound, executionTime));
   }
 
   /**
@@ -119,7 +120,7 @@ public class Problem<InputT, ResultT> {
     if (this.solution == null) {
       throw new IllegalStateException("Cannot compare bound without solution!");
     }
-    if (!this.boundWithComparison.hasBound()) {
+    if (this.boundWithComparison == null || !this.boundWithComparison.hasBound()) {
       throw new IllegalStateException("Cannot compare bound without bound!");
     }
 
@@ -261,11 +262,15 @@ public class Problem<InputT, ResultT> {
   }
 
   public Optional<BoundDto> getBound() {
+    if (boundWithComparison == null) {
+      return Optional.empty();
+    }
+
     return Optional.ofNullable(boundWithComparison.getBound());
   }
 
   public Optional<BoundComparisonDto> getBoundWithComparison() {
-    return Optional.of(boundWithComparison);
+    return Optional.ofNullable(boundWithComparison);
   }
 
   private float getSolutionValue(ResultT solutionData) {
