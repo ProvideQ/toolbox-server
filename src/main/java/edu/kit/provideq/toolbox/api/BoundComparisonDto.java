@@ -35,7 +35,6 @@ public class BoundComparisonDto {
     this.bound = null;
   }
 
-
   @Override public String toString() {
     return "Comparison{bound=%s, comparison=%f}"
         .formatted(bound, comparison);
@@ -48,10 +47,6 @@ public class BoundComparisonDto {
    */
   public BoundDto getBound() {
     return bound;
-  }
-
-  public void setBound(BoundDto bound) {
-    this.bound = bound;
   }
 
   public void setBound(BoundWithInfo bound) {

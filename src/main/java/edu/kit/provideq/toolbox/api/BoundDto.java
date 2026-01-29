@@ -10,4 +10,8 @@ public record BoundDto(float bound, BoundType boundType, long executionTime) {
         boundWithInfo.bound().boundType(),
         boundWithInfo.executionTime());
   }
+
+  public BoundDto() {
+    this(-1, BoundType.LOWER, -1);
+  }
 }
