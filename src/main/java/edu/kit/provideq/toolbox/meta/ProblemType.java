@@ -17,11 +17,14 @@ public class ProblemType<InputT, ResultT> {
   /**
    * Defines a new problem type.
    *
-   * @param id          a unique string identifier for this type of problem.
-   * @param inputClass  the Java class object corresponding to the {@link InputT} type parameter.
-   * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
-   * @param estimator   the bound estimator for this problem type.
-   *                    null if estimation is not supported.
+   * @param id              a unique string identifier for this type of problem.
+   * @param inputClass      the Java class object matching the {@link InputT} type parameter.
+   * @param resultClass     the Java class object matching the {@link ResultT} type parameter.
+   * @param estimator       the bound estimator for this problem type,
+   *                        null if estimation is not supported.
+   * @param solutionPattern a regex pattern describing the format of valid solutions
+   *                        needs to contain one group to match a float number describing
+   *                        the problem quality if estimation is supported, null otherwise.
    */
   public ProblemType(
       String id,
