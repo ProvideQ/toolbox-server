@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -18,7 +17,7 @@ public class ProblemDto<InputT, ResultT> {
   private InputT input;
   private Solution<ResultT> solution;
   private ProblemState state;
-  private ComparisonDto boundWithComparison;
+  private BoundComparisonDto boundWithComparison;
   private String solverId;
   private List<SolverSetting> solverSettings;
   private List<SubProblemReferenceDto> subProblems;
@@ -70,7 +69,7 @@ public class ProblemDto<InputT, ResultT> {
     return solution;
   }
 
-  public ComparisonDto getBoundWithComparison() {
+  public BoundComparisonDto getBoundWithComparison() {
     return boundWithComparison;
   }
 

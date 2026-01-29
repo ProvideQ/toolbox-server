@@ -2,8 +2,8 @@ package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.api.BoundComparisonDto;
 import edu.kit.provideq.toolbox.api.BoundDto;
-import edu.kit.provideq.toolbox.api.ComparisonDto;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public class Problem<InputT, ResultT> {
 
   private InputT input;
   private Solution<ResultT> solution;
-  private final ComparisonDto boundWithComparison = new ComparisonDto();
+  private final BoundComparisonDto boundWithComparison = new BoundComparisonDto();
   private ProblemState state;
   private ProblemSolver<InputT, ResultT> solver;
   private List<SolverSetting> solverSettings;
@@ -264,7 +264,7 @@ public class Problem<InputT, ResultT> {
     return Optional.ofNullable(boundWithComparison.getBound());
   }
 
-  public Optional<ComparisonDto> getBoundWithComparison() {
+  public Optional<BoundComparisonDto> getBoundWithComparison() {
     return Optional.of(boundWithComparison);
   }
 

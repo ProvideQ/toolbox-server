@@ -18,7 +18,6 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -168,7 +167,7 @@ public class EstimationRouter {
   private static org.springdoc.core.fn.builders.content.Builder comparisonOkResponseContent() {
     return contentBuilder()
             .mediaType(APPLICATION_JSON_VALUE)
-            .schema(schemaBuilder().implementation(ComparisonDto.class));
+            .schema(schemaBuilder().implementation(BoundComparisonDto.class));
   }
 
   private <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(

@@ -5,7 +5,7 @@ import edu.kit.provideq.toolbox.BoundWithInfo;
 /**
  * A DTO for a comparison between a bound and a solution.
  */
-public class ComparisonDto {
+public class BoundComparisonDto {
   private BoundDto bound;
   private float comparison;
 
@@ -15,12 +15,12 @@ public class ComparisonDto {
    * @param comparison the comparison value, e.g., the ratio of the solution to the bound
    * @param bound a bound
    */
-  public ComparisonDto(float comparison, BoundWithInfo bound) {
+  public BoundComparisonDto(float comparison, BoundWithInfo bound) {
     this.comparison = comparison;
     this.bound = new BoundDto(bound);
   }
 
-  public ComparisonDto() {
+  public BoundComparisonDto() {
     this.comparison = -1;
     this.bound = null;
   }
