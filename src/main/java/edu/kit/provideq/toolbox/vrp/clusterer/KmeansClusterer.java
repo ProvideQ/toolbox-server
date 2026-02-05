@@ -36,7 +36,8 @@ public class KmeansClusterer extends VrpClusterer {
   protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
       new SubRoutineDefinition<>(
           VrpConfiguration.VRP,
-          "Solve a VRP problem"
+          "Solve a VRP problem",
+          false
       );
 
   @Override

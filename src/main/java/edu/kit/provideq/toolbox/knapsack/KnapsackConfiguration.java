@@ -68,12 +68,23 @@ public class KnapsackConfiguration {
    * and the sum of values is as large as possible.
    */
   public static final ProblemType<String, String> KNAPSACK = new ProblemType<>(
-      "knapsack",
-        String.class,
-        String.class,
-        estimator,
-        "^(\\d+)"
-    );
+      "Knapsack",
+      "An optimization problem: For given items each with a weight and value, "
+          + "determine which items are part of a collection where the total weight is "
+          + "less than or equal to a given limit and the sum of values is as large as possible.",
+      String.class,
+      String.class,
+      estimator,
+      "^(\\d+)",
+      Map.ofEntries(
+          Map.entry("item_count", problem -> problem.lines()
+              .findFirst()
+              .orElse("")),
+          Map.entry("capacity", p2 -> p2.lines()
+              .reduce((a, b) -> b)
+              .orElse(""))
+      )
+  );
 
   @Bean
   ProblemManager<String, String> getKnapsackManager(

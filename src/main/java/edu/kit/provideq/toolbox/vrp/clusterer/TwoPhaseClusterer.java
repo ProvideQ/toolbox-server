@@ -21,7 +21,8 @@ public class TwoPhaseClusterer extends VrpClusterer {
   protected static final SubRoutineDefinition<String, String> TSP_SUBROUTINE =
       new SubRoutineDefinition<>(
           TspConfiguration.TSP,
-          "Solve a TSP problem"
+          "Solve a TSP problem",
+          false
       );
 
   @Autowired
