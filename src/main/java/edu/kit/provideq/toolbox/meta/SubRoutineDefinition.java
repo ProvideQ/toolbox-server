@@ -6,8 +6,8 @@ package edu.kit.provideq.toolbox.meta;
  *
  * @param type             {@link ProblemType} that needs to be solved
  *                         by this sub-routine.
- * @param description      description of the sub-routine call to provide information where and why it is
- *                         needed.
+ * @param description      description of the sub-routine call to provide information where and
+ *                         why it is needed.
  * @param isCalledOnlyOnce whether this sub-routine is called only once during the solution
  *                         or if it may be called multiple times.a
  */
