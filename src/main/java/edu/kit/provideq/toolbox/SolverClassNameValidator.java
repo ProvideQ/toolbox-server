@@ -8,6 +8,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+/**
+ * Validates that all solver class names are unique upon application startup.
+ */
 @Component
 public class SolverClassNameValidator implements ApplicationListener<ContextRefreshedEvent> {
   @Override
