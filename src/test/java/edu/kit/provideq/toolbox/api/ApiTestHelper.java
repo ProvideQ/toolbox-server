@@ -200,7 +200,7 @@ public class ApiTestHelper {
       }
 
       if (hasTimeout.get()) {
-        System.out.print("Stopping testcase due to timeout.");
+        System.out.println("Stopping testcase due to timeout.");
         System.out.println("log: " + builder);
         throw new IllegalStateException("Problem did not solve in time: " + problemDto);
       }
