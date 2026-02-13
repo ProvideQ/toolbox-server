@@ -155,7 +155,8 @@ public class ApiTestHelper {
           .getResponseBody();
 
       if (problemDto == null) {
-        System.out.println("Testcase with id " + problemId + " will terminate because problemDto is null");
+        System.out.println("Testcase with id " + problemId
+            + " will terminate because problemDto is null");
         System.out.println("problemType: " + problemType);
       }
       assertNotNull(problemDto);
@@ -181,7 +182,8 @@ public class ApiTestHelper {
           builder.append("Fetched sub problem: " + subProblemDto + "\n");
 
           if (subProblemDto == null) {
-            System.out.println("Subproblem with id " + subProblemId + " will terminate because subProblemDto is null");
+            System.out.println("Subproblem with id " + subProblemId
+                + " will terminate because subProblemDto is null");
             System.out.println("subProblem: " + subProblem);
             System.out.println("Log: " + builder);
           }
