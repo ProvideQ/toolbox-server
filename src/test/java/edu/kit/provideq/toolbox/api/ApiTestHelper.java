@@ -153,11 +153,17 @@ public class ApiTestHelper {
           })
           .returnResult()
           .getResponseBody();
-      builder.append("Fetched problem: " + problemDto + "\n");
 
+      if (problemDto == null) {
+        System.out.println("Testcase with id " + problemId + " will terminate because problemDto is null");
+        System.out.println("problemType: " + problemType);
+      }
       assertNotNull(problemDto);
 
+      builder.append("Fetched problem: " + problemDto + "\n");
+
       if (problemDto.getState() == ProblemState.SOLVED) {
+        System.out.println(problemId + " solved successful.");
         break;
       }
 
@@ -174,6 +180,11 @@ public class ApiTestHelper {
               .getResponseBody();
           builder.append("Fetched sub problem: " + subProblemDto + "\n");
 
+          if (subProblemDto == null) {
+            System.out.println("Subproblem with id " + subProblemId + " will terminate because subProblemDto is null");
+            System.out.println("subProblem: " + subProblem);
+            System.out.println("Log: " + builder);
+          }
           assertNotNull(subProblemDto);
         }
       }
@@ -187,6 +198,8 @@ public class ApiTestHelper {
       }
 
       if (hasTimeout.get()) {
+        System.out.print("Stopping testcase due to timeout.");
+        System.out.println("log: " + builder);
         throw new IllegalStateException("Problem did not solve in time: " + problemDto);
       }
     }
