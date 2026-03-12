@@ -40,6 +40,8 @@ out/
 ### VS Code ###
 .vscode/
 
+### Environment variables ###
+.env
 
 ### virtual envs and python ###
 venv/
