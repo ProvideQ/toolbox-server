@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class CircuitProcessingConfiguration {
   public static final ProblemType<String, String> CIRCUIT_PROCESSING = new ProblemType<>(
       "circuit-processing",
+      "A quantum circuit processing problem that routes a QASM circuit through optimization, "
+          + "error mitigation, or execution.",
       String.class,
       String.class
   );

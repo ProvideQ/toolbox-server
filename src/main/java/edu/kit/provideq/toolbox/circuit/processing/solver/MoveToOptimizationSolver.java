@@ -14,7 +14,8 @@ public class MoveToOptimizationSolver extends CircuitProcessingSolver {
   private static final SubRoutineDefinition<String, String> OPTIMIZER_SUBROUTINE =
       new SubRoutineDefinition<>(
           OptimizationConfiguration.OPTIMIZATION_CONFIG,
-          "Creates a optimization solver"
+          "Creates a optimization solver",
+          true
       );
 
   @Override

@@ -14,7 +14,8 @@ public class MoveToMitigationSolver extends CircuitProcessingSolver {
   private static final SubRoutineDefinition<String, String> MITIGATOR_SUBROUTINE =
       new SubRoutineDefinition<>(
           ErrorMitigationConfiguration.MITIGATION_CONFIG,
-          "Creates a mitigation solver"
+          "Creates a mitigation solver",
+          true
       );
 
   @Override
