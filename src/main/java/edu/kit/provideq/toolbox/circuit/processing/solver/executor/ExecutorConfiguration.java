@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class ExecutorConfiguration {
   public static final ProblemType<String, ExecutionResult> EXECUTOR_CONFIG = new ProblemType<>(
       "circuit-processing-executor",
+      "A quantum circuit execution problem that runs a given QASM circuit on a quantum backend "
+          + "and returns the measurement results.",
       String.class,
       ExecutionResult.class
   );

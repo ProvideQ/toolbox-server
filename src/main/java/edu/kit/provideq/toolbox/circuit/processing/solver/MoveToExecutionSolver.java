@@ -16,7 +16,8 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
   private static final SubRoutineDefinition<String, ExecutionResult> EXECUTOR_SUBROUTINE =
       new SubRoutineDefinition<>(
           ExecutorConfiguration.EXECUTOR_CONFIG,
-          "Creates a execution solver"
+          "Creates a execution solver",
+          true
       );
 
   @Override

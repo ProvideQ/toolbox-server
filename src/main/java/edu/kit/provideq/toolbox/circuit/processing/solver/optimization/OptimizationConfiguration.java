@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class OptimizationConfiguration {
   public static final ProblemType<String, String> OPTIMIZATION_CONFIG = new ProblemType<>(
       "circuit-processing-optimization",
+      "A quantum circuit optimization problem that reduces gate count or circuit depth of a "
+          + "given QASM circuit.",
       String.class,
       String.class
   );
