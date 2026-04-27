@@ -9,6 +9,7 @@ import edu.kit.provideq.toolbox.tsp.solvers.LkhTspSolver;
 import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,14 @@ public class TspConfiguration {
       "A Traveling Sales Person Problem. Optimization Problem with the goal of find "
           + "an optimal route between a given set of connected cities.",
       String.class,
-      String.class
+      String.class,
+      Map.ofEntries(
+          Map.entry("dimension", problem -> problem.lines()
+              .filter(line -> line.startsWith("DIMENSION"))
+              .findFirst()
+              .map(line -> line.split(":")[1].trim())
+              .orElse(""))
+      )
   );
 
   @Bean
