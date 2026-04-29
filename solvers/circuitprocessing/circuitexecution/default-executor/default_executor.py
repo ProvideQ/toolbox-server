@@ -10,7 +10,7 @@ with open(input_path, 'r') as input_file:
     text = input_file.read()
 
 input_circuit = text
-shots = num_runs
+shots = int(num_runs)
 
 try:
     circuit = circuit_from_qasm_str(input_circuit)
