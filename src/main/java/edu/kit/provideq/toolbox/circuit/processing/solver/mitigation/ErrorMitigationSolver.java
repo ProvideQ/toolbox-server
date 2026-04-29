@@ -29,6 +29,7 @@ public class ErrorMitigationSolver implements ProblemSolver<String, String> {
   ) {
     var solution = new Solution<>(this);
     solution.setSolutionData(input);
+    solution.complete();
     return Mono.just(solution);
   }
 
