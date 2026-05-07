@@ -1,11 +1,16 @@
 package edu.kit.provideq.toolbox.circuit.processing;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToExecutionSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToMitigationSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToOptimizationSolver;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,28 +27,11 @@ public class CircuitProcessingConfiguration {
 
   @Bean
   ProblemManager<String, String> getCircuitProcessingManager(
+      ResourceProvider provider,
       MoveToExecutionSolver moveToExecutionSolver,
       MoveToOptimizationSolver moveToOptimizationSolver,
       MoveToMitigationSolver moveToMitigationSolver
   ) {
-    Problem<String, String> demo = new Problem<>(CIRCUIT_PROCESSING);
-    demo.setInput("""
-        OPENQASM 2.0;
-        include "qelib1.inc";
-        qreg q[2];
-        creg c[2];
-        h q[0];
-        cx q[0],q[1];
-        measure q[0] -> c[0];
-        measure q[1] -> c[1];""");
-    Problem<String, String> secondDemo = new Problem<>(CIRCUIT_PROCESSING);
-    secondDemo.setInput("""
-        OPENQASM 2.0;
-        include "qelib1.inc";
-        qreg q[3];
-        crz(0.5) q[0], q[1];
-        t q[2];
-        cswap q[2], q[0], q[1];""");
     return new ProblemManager<>(
         CIRCUIT_PROCESSING,
         Set.of(
@@ -51,7 +39,24 @@ public class CircuitProcessingConfiguration {
             moveToOptimizationSolver,
             moveToMitigationSolver
         ),
-        Set.of(demo, secondDemo)
+        loadExampleProblems(provider)
     );
+  }
+
+  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
+    try {
+      String[] problemNames = new String[] {"bell-state.qasm", "cswap.qasm"};
+      var problemSet = new HashSet<Problem<String, String>>();
+      for (var problemName : problemNames) {
+        var problemStream = Objects.requireNonNull(
+            getClass().getResourceAsStream(problemName), "Problem " + problemName + " not found");
+        var problem = new Problem<>(CIRCUIT_PROCESSING);
+        problem.setInput(provider.readStream(problemStream));
+        problemSet.add(problem);
+      }
+      return problemSet;
+    } catch (IOException e) {
+      throw new MissingExampleException(CIRCUIT_PROCESSING, e);
+    }
   }
 }

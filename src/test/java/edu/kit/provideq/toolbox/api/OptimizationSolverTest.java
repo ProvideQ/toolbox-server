@@ -8,7 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToMitigationSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.mitigation.ErrorMitigationSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.optimization.OptimizationSolver;
+import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemManager;
+import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +24,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @SpringBootTest
 @AutoConfigureMockMvc
 class OptimizationSolverTest {
-  private static final String CIRCUIT = """
-      OPENQASM 2.0;
-      include "qelib1.inc";
-      qreg q[2];
-      creg c[2];
-      h q[0];
-      cx q[0],q[1];
-      measure q[0] -> c[0];
-      measure q[1] -> c[1];""";
-
   @Autowired
   private WebTestClient client;
+
+  @Autowired
+  private ProblemManagerProvider problemManagerProvider;
 
   @Autowired
   private OptimizationSolver optimizationSolver;
@@ -41,16 +39,27 @@ class OptimizationSolverTest {
   @Autowired
   private ErrorMitigationSolver errorMitigationSolver;
 
+  private ProblemManager<String, String> problemManager;
+  private List<String> problems;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
         .responseTimeout(Duration.ofSeconds(60))
         .build();
+    problemManager = problemManagerProvider.findProblemManagerForType(OPTIMIZATION_CONFIG).get();
+    problems = problemManager.getExampleInstances()
+        .stream()
+        .map(Problem::getInput)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
   }
 
   @Test
   void testOptimizationSolver() {
-    var problemDto = ApiTestHelper.createProblem(client, optimizationSolver, CIRCUIT, OPTIMIZATION_CONFIG);
+    var circuit = problems.get(0);
+    var problemDto = ApiTestHelper.createProblem(client, optimizationSolver, circuit, OPTIMIZATION_CONFIG);
     var circuitSubProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     var mitigationEntryDto = ApiTestHelper.setProblemSolver(
         client, moveToMitigationSolver, circuitSubProblemId, CIRCUIT_PROCESSING.getId());

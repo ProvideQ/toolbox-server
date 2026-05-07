@@ -1,8 +1,12 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver.mitigation;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,14 +23,25 @@ public class ErrorMitigationConfiguration {
 
   @Bean
   ProblemManager<String, String> getMitigationProblemManager(
+      ResourceProvider provider,
       ErrorMitigationSolver errorMitigationSolver
   ) {
     return new ProblemManager<>(
         MITIGATION_CONFIG,
-        Set.of(
-            errorMitigationSolver
-        ),
-        Set.of(new Problem<>(MITIGATION_CONFIG))
+        Set.of(errorMitigationSolver),
+        loadExampleProblems(provider)
     );
+  }
+
+  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
+    try {
+      var problemStream = Objects.requireNonNull(
+          getClass().getResourceAsStream("../../bell-state.qasm"), "Problem bell-state.qasm not found");
+      var problem = new Problem<>(MITIGATION_CONFIG);
+      problem.setInput(provider.readStream(problemStream));
+      return Set.of(problem);
+    } catch (IOException e) {
+      throw new MissingExampleException(MITIGATION_CONFIG, e);
+    }
   }
 }
