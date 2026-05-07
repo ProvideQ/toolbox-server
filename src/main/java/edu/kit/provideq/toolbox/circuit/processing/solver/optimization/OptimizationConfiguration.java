@@ -1,8 +1,12 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver.optimization;
 
+import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,14 +23,25 @@ public class OptimizationConfiguration {
 
   @Bean
   ProblemManager<String, String> getOptimizationProblemManager(
+      ResourceProvider provider,
       OptimizationSolver optimizationSolver
   ) {
     return new ProblemManager<>(
         OPTIMIZATION_CONFIG,
-        Set.of(
-            optimizationSolver
-        ),
-        Set.of(new Problem<>(OPTIMIZATION_CONFIG))
+        Set.of(optimizationSolver),
+        loadExampleProblems(provider)
     );
+  }
+
+  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
+    try {
+      var problemStream = Objects.requireNonNull(
+          getClass().getResourceAsStream("../../bell-state.qasm"), "Problem bell-state.qasm not found");
+      var problem = new Problem<>(OPTIMIZATION_CONFIG);
+      problem.setInput(provider.readStream(problemStream));
+      return Set.of(problem);
+    } catch (IOException e) {
+      throw new MissingExampleException(OPTIMIZATION_CONFIG, e);
+    }
   }
 }

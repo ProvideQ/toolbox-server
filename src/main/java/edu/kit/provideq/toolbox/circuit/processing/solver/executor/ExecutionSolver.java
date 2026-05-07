@@ -87,10 +87,11 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
         .orElse(DEFAULT_SIMULATOR);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath + selectedSimulator.getScriptPath(), venv)
+        .getBean(PythonProcessRunner.class, scriptPath + "executor.py", venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
-            String.valueOf(shotNumber)
+            String.valueOf(shotNumber),
+            selectedSimulator.getBackendKey()
         )
         .writeInputFile(input)
         .readOutputString()
@@ -112,25 +113,25 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   }
 
   enum QuantumSimulator {
-    AER("AerBackend", "default-executor/default_executor.py"),
-    // PROJECTQ("ProjectQBackend", "projectq-executor/projectq_executor.py"),
-    QULACS("QulacsBackend", "qulacs-executor/qulacs_executor.py"),
-    AER_NOISY("Aer Noisy Backend (max. 2 qubits)", "aer-noisy/aer_noisy_executor.py");
+    AER("AerBackend", "aer"),
+    // PROJECTQ("ProjectQBackend", "projectq"),
+    QULACS("QulacsBackend", "qulacs"),
+    AER_NOISY("Aer Noisy Backend (max. 2 qubits)", "aer_noisy");
 
     private final String value;
-    private final String scriptPath;
+    private final String backendKey;
 
-    QuantumSimulator(String value, String scriptPath) {
+    QuantumSimulator(String value, String backendKey) {
       this.value = value;
-      this.scriptPath = scriptPath;
+      this.backendKey = backendKey;
     }
 
     public String getValue() {
       return value;
     }
 
-    public String getScriptPath() {
-      return scriptPath;
+    public String getBackendKey() {
+      return backendKey;
     }
 
     public static QuantumSimulator fromValue(String value) {

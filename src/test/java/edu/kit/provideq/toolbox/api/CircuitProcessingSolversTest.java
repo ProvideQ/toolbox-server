@@ -14,7 +14,12 @@ import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToOptimizationSolv
 import edu.kit.provideq.toolbox.circuit.processing.solver.executor.ExecutionSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.mitigation.ErrorMitigationSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.optimization.OptimizationSolver;
+import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemManager;
+import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,18 +30,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @SpringBootTest
 @AutoConfigureMockMvc
 class CircuitProcessingSolversTest {
-  private static final String CIRCUIT = """
-      OPENQASM 2.0;
-      include "qelib1.inc";
-      qreg q[2];
-      creg c[2];
-      h q[0];
-      cx q[0],q[1];
-      measure q[0] -> c[0];
-      measure q[1] -> c[1];""";
-
   @Autowired
   private WebTestClient client;
+
+  @Autowired
+  private ProblemManagerProvider problemManagerProvider;
 
   @Autowired
   private MoveToMitigationSolver moveToMitigationSolver;
@@ -56,26 +54,38 @@ class CircuitProcessingSolversTest {
   @Autowired
   private OptimizationSolver optimizationSolver;
 
+  private ProblemManager<String, String> problemManager;
+  private List<String> problems;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
         .responseTimeout(Duration.ofSeconds(60))
         .build();
+    problemManager = problemManagerProvider.findProblemManagerForType(CIRCUIT_PROCESSING).get();
+    problems = problemManager.getExampleInstances()
+        .stream()
+        .map(Problem::getInput)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
   }
 
   @Test
   void testMoveToMitigationSolver() {
-    var problemDto = ApiTestHelper.createProblem(client, moveToMitigationSolver, CIRCUIT, CIRCUIT_PROCESSING);
+    var circuit = problems.get(0);
+    var problemDto = ApiTestHelper.createProblem(client, moveToMitigationSolver, circuit, CIRCUIT_PROCESSING);
     var subProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     ApiTestHelper.setProblemSolver(client, errorMitigationSolver, subProblemId, MITIGATION_CONFIG.getId());
     var solvedDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), CIRCUIT_PROCESSING);
     ApiTestHelper.testSolution(solvedDto);
-    assertEquals(CIRCUIT, solvedDto.getSolution().getSolutionData());
+    assertEquals(circuit, solvedDto.getSolution().getSolutionData());
   }
 
   @Test
   void testMoveToExecutionSolver() {
-    var problemDto = ApiTestHelper.createProblem(client, moveToExecutionSolver, CIRCUIT, CIRCUIT_PROCESSING);
+    var circuit = problems.get(0);
+    var problemDto = ApiTestHelper.createProblem(client, moveToExecutionSolver, circuit, CIRCUIT_PROCESSING);
     var subProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     ApiTestHelper.setProblemSolver(client, executionSolver, subProblemId, EXECUTOR_CONFIG.getId());
     var solvedDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), CIRCUIT_PROCESSING);
@@ -85,7 +95,8 @@ class CircuitProcessingSolversTest {
 
   @Test
   void testMoveToOptimizationSolver() {
-    var problemDto = ApiTestHelper.createProblem(client, moveToOptimizationSolver, CIRCUIT, CIRCUIT_PROCESSING);
+    var circuit = problems.get(0);
+    var problemDto = ApiTestHelper.createProblem(client, moveToOptimizationSolver, circuit, CIRCUIT_PROCESSING);
     var optSubProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     var optDto = ApiTestHelper.setProblemSolver(
         client, optimizationSolver, optSubProblemId, OPTIMIZATION_CONFIG.getId());
