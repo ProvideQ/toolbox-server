@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.knapsack.solvers.PythonKnapsackSolver;
 import edu.kit.provideq.toolbox.knapsack.solvers.QiskitKnapsackSolver;
+import edu.kit.provideq.toolbox.knapsack.solvers.QuantumTreeGeneratorSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -90,11 +91,12 @@ public class KnapsackConfiguration {
   ProblemManager<String, String> getKnapsackManager(
           PythonKnapsackSolver pythonKnapsackSolver,
           QiskitKnapsackSolver qiskitKnapsackSolver,
+          QuantumTreeGeneratorSolver quantumTreeGeneratorSolver,
           ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
             KNAPSACK,
-            Set.of(pythonKnapsackSolver, qiskitKnapsackSolver),
+            Set.of(pythonKnapsackSolver, qiskitKnapsackSolver, quantumTreeGeneratorSolver),
             loadExampleProblems(resourceProvider)
     );
   }
