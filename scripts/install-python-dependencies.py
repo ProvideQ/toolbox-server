@@ -25,7 +25,7 @@ for base_dir in base_dirs:
                     print(f"Setting up virtual environment '{venv_name}' for {solver_dir}...")
                     try:
                         venv_path = os.path.join('venv', venv_name)
-                        subprocess.run(['python3', '-m', 'venv', venv_path], check=True)
+                        subprocess.run(['python', '-m', 'venv', venv_path], check=True)
                         if platform.system() == 'Windows':
                             pip_executable = os.path.join(venv_path, 'Scripts', 'pip.exe')
                         else:
