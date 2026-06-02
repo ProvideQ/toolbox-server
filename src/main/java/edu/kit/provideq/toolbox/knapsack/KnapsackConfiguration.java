@@ -38,8 +38,8 @@ public class KnapsackConfiguration {
     for (int i = 1; i < parts.length - 1; i++) {
       var item = parts[i].split(" ");
       items.add(new AbstractMap.SimpleEntry<>(
-              Integer.parseInt(item[1]),
-              Integer.parseInt(item[2]))
+          Integer.parseInt(item[1]),
+          Integer.parseInt(item[2]))
       );
     }
     items.sort(Comparator.comparingInt(a -> -a.getKey() / a.getValue()));
@@ -89,15 +89,15 @@ public class KnapsackConfiguration {
 
   @Bean
   ProblemManager<String, String> getKnapsackManager(
-          PythonKnapsackSolver pythonKnapsackSolver,
-          QiskitKnapsackSolver qiskitKnapsackSolver,
-          QuantumTreeGeneratorSolver quantumTreeGeneratorSolver,
-          ResourceProvider resourceProvider
+      PythonKnapsackSolver pythonKnapsackSolver,
+      QiskitKnapsackSolver qiskitKnapsackSolver,
+      QuantumTreeGeneratorSolver quantumTreeGeneratorSolver,
+      ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
-            KNAPSACK,
-            Set.of(pythonKnapsackSolver, qiskitKnapsackSolver, quantumTreeGeneratorSolver),
-            loadExampleProblems(resourceProvider)
+        KNAPSACK,
+        Set.of(pythonKnapsackSolver, qiskitKnapsackSolver, quantumTreeGeneratorSolver),
+        loadExampleProblems(resourceProvider)
     );
   }
 
