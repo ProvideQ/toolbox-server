@@ -1,0 +1,2 @@
+# This file describes the python package requirements for the GAMS Qubo solver
+gamspy == 1.23.1
