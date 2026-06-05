@@ -1,9 +1,9 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.circuit.processing.solver.mitigation.ErrorMitigationConfiguration.MITIGATION_CONFIG;
+import static edu.kit.provideq.toolbox.circuit.processing.solvers.mitigation.ErrorMitigationConfiguration.MITIGATION_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.kit.provideq.toolbox.circuit.processing.solver.mitigation.ErrorMitigationSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.mitigation.ErrorMitigationSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;

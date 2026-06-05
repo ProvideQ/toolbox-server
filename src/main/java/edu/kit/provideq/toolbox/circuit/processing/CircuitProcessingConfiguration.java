@@ -1,9 +1,9 @@
 package edu.kit.provideq.toolbox.circuit.processing;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToExecutionSolver;
-import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToMitigationSolver;
-import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToOptimizationSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToExecutionSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToMitigationSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToOptimizationSolver;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;

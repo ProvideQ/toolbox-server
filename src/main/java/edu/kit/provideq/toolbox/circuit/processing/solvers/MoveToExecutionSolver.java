@@ -1,9 +1,9 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver;
+package edu.kit.provideq.toolbox.circuit.processing.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.circuit.processing.solver.executor.ExecutionResult;
-import edu.kit.provideq.toolbox.circuit.processing.solver.executor.ExecutorConfiguration;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResult;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -16,7 +16,7 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
   private static final SubRoutineDefinition<String, ExecutionResult> EXECUTOR_SUBROUTINE =
       new SubRoutineDefinition<>(
           ExecutorConfiguration.EXECUTOR_CONFIG,
-          "Creates a execution solver",
+          "Creates an execution solver",
           true
       );
 

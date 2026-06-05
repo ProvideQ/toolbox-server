@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver;
+package edu.kit.provideq.toolbox.circuit.processing.solvers;
 
 import edu.kit.provideq.toolbox.circuit.processing.CircuitProcessingConfiguration;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;

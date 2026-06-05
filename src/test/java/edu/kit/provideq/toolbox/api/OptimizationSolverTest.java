@@ -1,13 +1,13 @@
 package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.circuit.processing.CircuitProcessingConfiguration.CIRCUIT_PROCESSING;
-import static edu.kit.provideq.toolbox.circuit.processing.solver.mitigation.ErrorMitigationConfiguration.MITIGATION_CONFIG;
-import static edu.kit.provideq.toolbox.circuit.processing.solver.optimization.OptimizationConfiguration.OPTIMIZATION_CONFIG;
+import static edu.kit.provideq.toolbox.circuit.processing.solvers.mitigation.ErrorMitigationConfiguration.MITIGATION_CONFIG;
+import static edu.kit.provideq.toolbox.circuit.processing.solvers.optimization.OptimizationConfiguration.OPTIMIZATION_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToMitigationSolver;
-import edu.kit.provideq.toolbox.circuit.processing.solver.mitigation.ErrorMitigationSolver;
-import edu.kit.provideq.toolbox.circuit.processing.solver.optimization.OptimizationSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToMitigationSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.mitigation.ErrorMitigationSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.optimization.OptimizationSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;

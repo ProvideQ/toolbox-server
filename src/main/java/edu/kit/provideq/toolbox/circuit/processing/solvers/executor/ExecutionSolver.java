@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver.executor;
+package edu.kit.provideq.toolbox.circuit.processing.solvers.executor;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -87,7 +87,7 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
         .orElse(DEFAULT_SIMULATOR);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath + "executor.py", venv)
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             String.valueOf(shotNumber),

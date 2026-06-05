@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver.optimization;
+package edu.kit.provideq.toolbox.circuit.processing.solvers.optimization;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;

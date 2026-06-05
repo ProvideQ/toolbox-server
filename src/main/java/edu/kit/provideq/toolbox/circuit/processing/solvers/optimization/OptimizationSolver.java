@@ -1,7 +1,7 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver.optimization;
+package edu.kit.provideq.toolbox.circuit.processing.solvers.optimization;
 
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.circuit.processing.solver.CircuitProcessingSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.CircuitProcessingSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -81,7 +81,6 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
         .map(s -> s.getSelectedOptionT(OptimizationSolver.QuantumOptimizer::fromValue))
         .orElse(DEFAULT_OPTIMIZER);
 
-    //String[] inputArray = new String[]{input};
     var processResult = context
         .getBean(PythonProcessRunner.class, scriptPath + selectedOptimizer.getScriptPath(), venv)
         .withArguments(

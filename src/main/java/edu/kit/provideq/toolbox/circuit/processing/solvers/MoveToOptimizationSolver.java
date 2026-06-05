@@ -1,7 +1,7 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver;
+package edu.kit.provideq.toolbox.circuit.processing.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.circuit.processing.solver.optimization.OptimizationConfiguration;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.optimization.OptimizationConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -14,7 +14,7 @@ public class MoveToOptimizationSolver extends CircuitProcessingSolver {
   private static final SubRoutineDefinition<String, String> OPTIMIZER_SUBROUTINE =
       new SubRoutineDefinition<>(
           OptimizationConfiguration.OPTIMIZATION_CONFIG,
-          "Creates a optimization solver",
+          "Creates an optimization solver",
           true
       );
 

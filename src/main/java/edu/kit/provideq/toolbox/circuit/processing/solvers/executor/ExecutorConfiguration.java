@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver.mitigation;
+package edu.kit.provideq.toolbox.circuit.processing.solvers.executor;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
@@ -12,36 +12,36 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ErrorMitigationConfiguration {
-  public static final ProblemType<String, String> MITIGATION_CONFIG = new ProblemType<>(
-      "circuit-processing-mitigation",
-      "A quantum circuit error mitigation problem that applies error mitigation techniques to "
-          + "a given QASM circuit.",
+public class ExecutorConfiguration {
+  public static final ProblemType<String, ExecutionResult> EXECUTOR_CONFIG = new ProblemType<>(
+      "circuit-processing-executor",
+      "A quantum circuit execution problem that runs a given QASM circuit on a quantum backend "
+          + "and returns the measurement results.",
       String.class,
-      String.class
+      ExecutionResult.class
   );
 
   @Bean
-  ProblemManager<String, String> getMitigationProblemManager(
+  ProblemManager<String, ExecutionResult> getExecutorProblemManager(
       ResourceProvider provider,
-      ErrorMitigationSolver errorMitigationSolver
+      ExecutionSolver executionSolver
   ) {
     return new ProblemManager<>(
-        MITIGATION_CONFIG,
-        Set.of(errorMitigationSolver),
+        EXECUTOR_CONFIG,
+        Set.of(executionSolver),
         loadExampleProblems(provider)
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
+  private Set<Problem<String, ExecutionResult>> loadExampleProblems(ResourceProvider provider) {
     try {
       var problemStream = Objects.requireNonNull(
           getClass().getResourceAsStream("../../bell-state.qasm"), "Problem bell-state.qasm not found");
-      var problem = new Problem<>(MITIGATION_CONFIG);
+      var problem = new Problem<>(EXECUTOR_CONFIG);
       problem.setInput(provider.readStream(problemStream));
       return Set.of(problem);
     } catch (IOException e) {
-      throw new MissingExampleException(MITIGATION_CONFIG, e);
+      throw new MissingExampleException(EXECUTOR_CONFIG, e);
     }
   }
 }

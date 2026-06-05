@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.circuit.processing.solver.mitigation;
+package edu.kit.provideq.toolbox.circuit.processing.solvers.mitigation;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
