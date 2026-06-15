@@ -1,13 +1,21 @@
 import argparse
 import os
+import sys
 from datetime import datetime
 from typing import Literal
+import gurobipy as gp
 
-from dimod import BINARY, BinaryQuadraticModel, binary, constrained, lp
+# Import parse_qubo_from_lp from sibling _utility directory
+# Add the parent (solvers) directory to enable the import
+script_dir = os.path.dirname(os.path.abspath(__file__))
+solvers_dir = os.path.join(script_dir, '..', '..')
+sys.path.insert(0, solvers_dir)
+
+from _utility.parse_qubo_from_lp import parse_qubo_from_lp
+
+from dimod import BINARY, BinaryQuadraticModel
 from dimod.serialization import coo
-from dwave.cloud import Client
 from solver import solve_with
-
 
 def main():
     parser = argparse.ArgumentParser(
@@ -32,21 +40,12 @@ def main():
             bqm = None
 
     if bqm is None:
-        with open(args.file) as problem:
-            cqm = lp.load(problem)
-            converted, _ = constrained.cqm_to_bqm(cqm)
+        model = gp.read(args.file)
+        (vars, quadratic_terms, linear_terms, constant_offset) = parse_qubo_from_lp(model)
 
-            linear_conv = {
-                (int(str(x)[1:])): converted.linear[x] for x in converted.linear
-            }
-            quad_conv = {
-                (int(str(x)[1:]), int(str(y)[1:])): converted.quadratic[(x, y)]
-                for x, y in converted.quadratic
-            }
-
-            bqm = BinaryQuadraticModel(linear_conv, quad_conv, converted.offset, BINARY)
-            if len(bqm.quadratic) == 0:
-                bqm = None
+        bqm = BinaryQuadraticModel(linear_terms, quadratic_terms, constant_offset, BINARY)
+        if len(bqm.quadratic) == 0:
+            bqm = None
 
     filename = os.path.basename(args.file)
 
