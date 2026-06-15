@@ -1,8 +1,18 @@
 import gamspy as gp
+import gurobipy
 import pandas as pd
 import json
+import os
 import re
 import sys
+
+# Import parse_qubo_from_lp from sibling _utility directory
+# Add the parent (solvers) directory to enable the import
+script_dir = os.path.dirname(os.path.abspath(__file__))
+solvers_dir = os.path.join(script_dir, '..', '..')
+sys.path.insert(0, solvers_dir)
+
+from _utility.parse_qubo_from_lp import parse_qubo_from_lp
 
 arg_count = len(sys.argv) - 1
 if arg_count != 2:
@@ -13,73 +23,22 @@ output_path = sys.argv[2]
 
 def parse_lp_to_df(filepath="unsplittable_model.lp"):
     """Parses the LP file to extract the Q matrix coefficients and constant."""
-    with open(filepath, "r") as f:
-        content = f.read()
-
-    # 1. Extract the quadratic block inside [...]
-    q_block_match = re.search(r"\[(.*?)\]", content, re.DOTALL)
-    if not q_block_match:
-        raise ValueError("Could not find the [...] block in the LP file.")
-
-    # Clean up line breaks and excess spaces
-    q_text = q_block_match.group(1).replace("\n", " ").replace("\r", "")
-    q_text = re.sub(r"\s+", " ", q_text)
-
-    # 2. Extract coefficients using prefix-agnostic Regex
-    # Matches squares (e.g., "- 9600 x1 ^2") allowing spaces around the caret
-    squares = re.findall(r"([+-]?\s*\d+(?:\.\d+)?)\s*([a-zA-Z]\d+)\s*\^\s*2", q_text)
-    # Matches products (e.g., "+ 9600 x1 * x2")
-    products = re.findall(
-        r"([+-]?\s*\d+(?:\.\d+)?)\s*([a-zA-Z]\d+)\s*\*\s*([a-zA-Z]\d+)", q_text
-    )
 
     q_records = []
 
-    # Format diagonal terms (x_i * x_i)
-    for coef_str, var_name in squares:
-        coef = float(coef_str.replace(" ", ""))
-        q_records.append({"i": var_name, "j": var_name, "value": coef})
+    model = gurobipy.read(filepath)
+    (vars, quadratic_terms, linear_terms, constant_offset) = parse_qubo_from_lp(model)
 
-    # Format off-diagonal terms (x_i * x_j)
-    for coef_str, var1, var2 in products:
-        coef = float(coef_str.replace(" ", ""))
-        q_records.append({"i": var1, "j": var2, "value": coef})
-
-    if not q_records:
-        raise ValueError(
-            "No quadratic terms matched. Please verify the LP file structure."
-        )
+    print(quadratic_terms)
+    for ((var1, var2), coeff) in quadratic_terms.items():
+        # restore the original name of the variables
+        q_records.append({"i": vars[var1], "j": vars[var2], "value": coeff})
 
     q_df = pd.DataFrame(q_records)
+    print("q_records", q_records)
+    print("q_df", q_df)
 
-    # 3. Handle the constant from fixed boundary variables in the objective function
-    constant = 0.0
-    bounds_match = re.search(r"Bounds(.*?)(?:Binaries|End)", content, re.DOTALL)
-    if bounds_match:
-        bounds_text = bounds_match.group(1)
-        # Parse fixed boundaries like: x47 = 42150
-        fixed_vars = re.findall(
-            r"([a-zA-Z]\d+)\s*=\s*([+-]?\d+(?:\.\d+)?)", bounds_text
-        )
-        fixed_map = {var: float(val) for var, val in fixed_vars}
-
-        # Locate the linear parts of the objective function before the quadratic bracket block
-        obj_match = re.search(r"Minimize\s+\w+:(.*?)\[", content, re.DOTALL)
-        if obj_match:
-            obj_text = obj_match.group(1).replace("\n", " ").replace("\r", "")
-            obj_text = re.sub(r"\s+", " ", obj_text)
-            linear_terms = re.findall(
-                r"([+-]?)\s*(\d+(?:\.\d+)?)?\s*([a-zA-Z]\d+)", obj_text
-            )
-
-            for sign, coef_str, var in linear_terms:
-                if var in fixed_map:
-                    coef = float(coef_str) if coef_str else 1.0
-                    if sign == "-":
-                        coef = -coef
-                    constant += coef * fixed_map[var]
-
-    return q_df, constant
+    return q_df, constant_offset
 
 
 q_df, constant = parse_lp_to_df(input_path)
@@ -88,6 +47,7 @@ m = gp.Container()
 
 # Dynamically find all unique variables present in the parsed LP matrix
 unique_vars = set(q_df["i"].unique()).union(set(q_df["j"].unique()))
+print("uniqvar", unique_vars)
 
 # Sort variables numerically regardless of character prefix (e.g., x1, x2, ... x46)
 b_idx = sorted(list(unique_vars), key=lambda x: int("".join(filter(str.isdigit, x))))
