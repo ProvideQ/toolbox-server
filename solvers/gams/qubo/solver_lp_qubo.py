@@ -25,34 +25,59 @@ def parse_lp_to_df(filepath="unsplittable_model.lp"):
     q_text = q_block_match.group(1).replace("\n", " ").replace("\r", "")
     q_text = re.sub(r"\s+", " ", q_text)
 
-    # 2. Extract coefficients using Regex
-    # Match squares (e.g., "- 18270 b1^2")
-    squares = re.findall(r"([+-]?\s*\d+(?:\.\d+)?)\s*b(\d+)\^2", q_text)
-    # Match products (e.g., "+ 6480 b1 * b2")
-    products = re.findall(r"([+-]?\s*\d+(?:\.\d+)?)\s*b(\d+)\s*\*\s*b(\d+)", q_text)
+    # 2. Extract coefficients using prefix-agnostic Regex
+    # Matches squares (e.g., "- 9600 x1 ^2") allowing spaces around the caret
+    squares = re.findall(r"([+-]?\s*\d+(?:\.\d+)?)\s*([a-zA-Z]\d+)\s*\^\s*2", q_text)
+    # Matches products (e.g., "+ 9600 x1 * x2")
+    products = re.findall(
+        r"([+-]?\s*\d+(?:\.\d+)?)\s*([a-zA-Z]\d+)\s*\*\s*([a-zA-Z]\d+)", q_text
+    )
 
     q_records = []
 
-    # Format diagonal terms (b_i * b_i)
-    for coef_str, idx in squares:
+    # Format diagonal terms (x_i * x_i)
+    for coef_str, var_name in squares:
         coef = float(coef_str.replace(" ", ""))
-        q_records.append({"i": f"b{idx}", "j": f"b{idx}", "value": coef})
+        q_records.append({"i": var_name, "j": var_name, "value": coef})
 
-    # Format off-diagonal terms (b_i * b_j)
-    for coef_str, idx1, idx2 in products:
+    # Format off-diagonal terms (x_i * x_j)
+    for coef_str, var1, var2 in products:
         coef = float(coef_str.replace(" ", ""))
-        q_records.append({"i": f"b{idx1}", "j": f"b{idx2}", "value": coef})
+        q_records.append({"i": var1, "j": var2, "value": coef})
+
+    if not q_records:
+        raise ValueError(
+            "No quadratic terms matched. Please verify the LP file structure."
+        )
 
     q_df = pd.DataFrame(q_records)
 
-    # 3. Find the constant on the right-hand side
-    # e1: -x143 + [...] = -590660
-    const_match = re.search(r"=\s*([+-]?\d+(?:\.\d+)?)", content)
-    if const_match:
-        # Move RHS constant to the objective side
-        constant = -(float(const_match.group(1).replace(" ", "")))
-    else:
-        constant = 0
+    # 3. Handle the constant from fixed boundary variables in the objective function
+    constant = 0.0
+    bounds_match = re.search(r"Bounds(.*?)(?:Binaries|End)", content, re.DOTALL)
+    if bounds_match:
+        bounds_text = bounds_match.group(1)
+        # Parse fixed boundaries like: x47 = 42150
+        fixed_vars = re.findall(
+            r"([a-zA-Z]\d+)\s*=\s*([+-]?\d+(?:\.\d+)?)", bounds_text
+        )
+        fixed_map = {var: float(val) for var, val in fixed_vars}
+
+        # Locate the linear parts of the objective function before the quadratic bracket block
+        obj_match = re.search(r"Minimize\s+\w+:(.*?)\[", content, re.DOTALL)
+        if obj_match:
+            obj_text = obj_match.group(1).replace("\n", " ").replace("\r", "")
+            obj_text = re.sub(r"\s+", " ", obj_text)
+            linear_terms = re.findall(
+                r"([+-]?)\s*(\d+(?:\.\d+)?)?\s*([a-zA-Z]\d+)", obj_text
+            )
+
+            for sign, coef_str, var in linear_terms:
+                if var in fixed_map:
+                    coef = float(coef_str) if coef_str else 1.0
+                    if sign == "-":
+                        coef = -coef
+                    constant += coef * fixed_map[var]
 
     return q_df, constant
 
@@ -64,8 +89,8 @@ m = gp.Container()
 # Dynamically find all unique variables present in the parsed LP matrix
 unique_vars = set(q_df["i"].unique()).union(set(q_df["j"].unique()))
 
-# Sort them properly (b1, b2, ... b150)
-b_idx = sorted(list(unique_vars), key=lambda x: int(x[1:]))
+# Sort variables numerically regardless of character prefix (e.g., x1, x2, ... x46)
+b_idx = sorted(list(unique_vars), key=lambda x: int("".join(filter(str.isdigit, x))))
 
 i = gp.Set(m, name="i", records=b_idx)
 alias_j = gp.Alias(m, name="j", alias_with=i)
@@ -74,8 +99,7 @@ Q = gp.Parameter(m, name="Q", domain=[i, alias_j], records=q_df)
 
 x = gp.Variable(m, name="x", domain=[i], type="binary")
 
-# Note: CPLEX LP format implies the [...] block is implicitly multiplied by 0.5.
-# We add `0.5 *` here to mirror exactly how the solver reads standard LP files.
+# Standard CPLEX LP format implicitly scales the quadratic block inside [...] by 0.5.
 obj_expr = 0.5 * gp.Sum((i, alias_j), Q[i, alias_j] * x[i] * x[alias_j]) + constant
 
 z = gp.Variable(m, name="z", type="free")
