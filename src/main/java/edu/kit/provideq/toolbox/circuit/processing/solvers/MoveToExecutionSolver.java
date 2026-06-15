@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.circuit.processing.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResult;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -42,17 +41,6 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
       SolvingProperties properties
   ) {
     return subRoutineResolver.runSubRoutine(EXECUTOR_SUBROUTINE, input)
-        .map(executionResultSolution -> {
-          Solution<String> solution = new Solution<>(this);
-          SolutionStatus status = executionResultSolution.getStatus();
-          if (status == SolutionStatus.ERROR) {
-            solution.fail();
-            solution.setDebugData(executionResultSolution.getDebugData());
-            return solution;
-          }
-          solution.complete();
-          solution.setSolutionData(executionResultSolution.getSolutionData().toString());
-          return solution;
-        });
+        .map(s -> Solution.from(this, s, ExecutionResult::toString));
   }
 }

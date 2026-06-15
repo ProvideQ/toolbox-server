@@ -12,6 +12,7 @@ import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -24,17 +25,21 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
   private static final OptimizationSolver.QuantumOptimizer DEFAULT_OPTIMIZER =
       QuantumOptimizer.DECOMPOSE_MULTI_CX;
 
-  private final String scriptPath;
+  private final Map<QuantumOptimizer, String> optimizerScriptPaths;
   private final String venv;
   private final ApplicationContext context;
 
   @Autowired
   public OptimizationSolver(
-      @Value("${path.circuitprocessing.circuitoptimization}") String scriptPath,
+      @Value("${path.circuitprocessing.circuitoptimization.decomposemulticx}") String decomposeMultiCxPath,
+      @Value("${path.circuitprocessing.circuitoptimization.removeredundancies}") String removeRedundanciesPath,
       @Value("${venv.circuitprocessing.circuitoptimization}") String venv,
       ApplicationContext context
   ) {
-    this.scriptPath = scriptPath;
+    this.optimizerScriptPaths = Map.of(
+        QuantumOptimizer.DECOMPOSE_MULTI_CX, decomposeMultiCxPath,
+        QuantumOptimizer.REMOVE_REDUNDANCIES, removeRedundanciesPath
+    );
     this.venv = venv;
     this.context = context;
   }
@@ -82,7 +87,7 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
         .orElse(DEFAULT_OPTIMIZER);
 
     var processResult = context
-        .getBean(PythonProcessRunner.class, scriptPath + selectedOptimizer.getScriptPath(), venv)
+        .getBean(PythonProcessRunner.class, optimizerScriptPaths.get(selectedOptimizer), venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH
         )
@@ -91,11 +96,10 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
         .run(getProblemType(), solution.getId());
 
     if (processResult.success() && processResult.output().isPresent()) {
-      solution.complete();
-      solution.setSolutionData(processResult.output().get());
       return subRoutineResolver
           .runSubRoutine(CircuitProcessingSolver.CIRCUIT_PROCESSING_SUBROUTINE,
-              processResult.output().get());
+              processResult.output().get())
+          .map(subRoutineSolution -> Solution.from(this, subRoutineSolution, s -> s));
     }
     solution.fail();
     processResult.errorOutput().ifPresent(solution::setDebugData);
@@ -108,25 +112,17 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
   }
 
   enum QuantumOptimizer {
-    DECOMPOSE_MULTI_CX("DecomposeMultiQubitsCX",
-        "decompose-multi-cx/decompose_multi_cx_optimizer.py"),
-    REMOVE_REDUNDANCIES("RemoveRedundancies",
-        "remove-redundancies/remove_redundancies_optimizer.py");
+    DECOMPOSE_MULTI_CX("DecomposeMultiQubitsCX"),
+    REMOVE_REDUNDANCIES("RemoveRedundancies");
 
     private final String value;
-    private final String scriptPath;
 
-    QuantumOptimizer(String value, String scriptPath) {
+    QuantumOptimizer(String value) {
       this.value = value;
-      this.scriptPath = scriptPath;
     }
 
     public String getValue() {
       return value;
-    }
-
-    public String getScriptPath() {
-      return scriptPath;
     }
 
     public static OptimizationSolver.QuantumOptimizer fromValue(String value) {

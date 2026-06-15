@@ -33,18 +33,32 @@ public class Solution<S> {
     this.id = id;
   }
 
-  public <InputT> Solution(ProblemSolver<InputT, S> problemSolver) {
+  public <I> Solution(ProblemSolver<I, S> problemSolver) {
     this.id = UUID.randomUUID();
     this.solverName = problemSolver.getName();
   }
 
-  public static <InputT, S> Solution<S> failed(
-      ProblemSolver<InputT, S> problemSolver,
+  public static <I, S> Solution<S> failed(
+      ProblemSolver<I, S> problemSolver,
       String text) {
     var solution = new Solution<S>(problemSolver);
     solution.fail();
     solution.setDebugData(text);
     return solution;
+  }
+
+  public static <I, S, T> Solution<T> from(
+      ProblemSolver<I, T> solver,
+      Solution<S> source,
+      Function<S, T> mapper) {
+    var result = new Solution<T>();
+    result.solverName = source.solverName;
+    result.status = source.status;
+    result.metaData = source.metaData;
+    result.debugData = source.debugData;
+    result.executionMilliseconds = source.executionMilliseconds;
+    result.solutionData = source.solutionData == null ? null : mapper.apply(source.solutionData);
+    return result;
   }
 
   public UUID getId() {
