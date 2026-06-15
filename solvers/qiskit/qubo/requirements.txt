@@ -1,3 +1,4 @@
 # This file describes the python package requirements for the Qiskit QUBO solver
+gurobipy == 13.0.2
 qiskit == 2.2.3
 qiskit-optimization == 0.7.0
