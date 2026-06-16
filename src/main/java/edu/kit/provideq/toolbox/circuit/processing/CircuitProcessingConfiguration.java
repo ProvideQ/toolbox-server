@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.circuit.processing;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
 import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToExecutionSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToMitigationSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solver.MoveToOptimizationSolver;
@@ -17,16 +18,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CircuitProcessingConfiguration {
-  public static final ProblemType<String, String> CIRCUIT_PROCESSING = new ProblemType<>(
+  public static final ProblemType<String, Result> CIRCUIT_PROCESSING = new ProblemType<>(
       "circuit-processing",
       "A quantum circuit processing problem that routes a QASM circuit through optimization, "
           + "error mitigation, or execution.",
       String.class,
-      String.class
+      Result.class
   );
 
   @Bean
-  ProblemManager<String, String> getCircuitProcessingManager(
+  ProblemManager<String, Result> getCircuitProcessingManager(
       ResourceProvider provider,
       MoveToExecutionSolver moveToExecutionSolver,
       MoveToOptimizationSolver moveToOptimizationSolver,
@@ -43,10 +44,10 @@ public class CircuitProcessingConfiguration {
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
+  private Set<Problem<String, Result>> loadExampleProblems(ResourceProvider provider) {
     try {
       String[] problemNames = new String[] {"bell-state.qasm", "cswap.qasm"};
-      var problemSet = new HashSet<Problem<String, String>>();
+      var problemSet = new HashSet<Problem<String, Result>>();
       for (var problemName : problemNames) {
         var problemStream = Objects.requireNonNull(
             getClass().getResourceAsStream(problemName), "Problem " + problemName + " not found");

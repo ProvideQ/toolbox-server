@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
 import edu.kit.provideq.toolbox.circuit.processing.solver.mitigation.ErrorMitigationConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class MoveToMitigationSolver extends CircuitProcessingSolver {
-  private static final SubRoutineDefinition<String, String> MITIGATOR_SUBROUTINE =
+  private static final SubRoutineDefinition<String, Result> MITIGATOR_SUBROUTINE =
       new SubRoutineDefinition<>(
           ErrorMitigationConfiguration.MITIGATION_CONFIG,
           "Creates a mitigation solver",
@@ -34,7 +35,7 @@ public class MoveToMitigationSolver extends CircuitProcessingSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
+  public Mono<Solution<Result>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
       SolvingProperties properties

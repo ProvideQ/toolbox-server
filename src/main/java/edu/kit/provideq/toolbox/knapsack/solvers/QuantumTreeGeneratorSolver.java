@@ -1,7 +1,10 @@
 package edu.kit.provideq.toolbox.knapsack.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.circuit.processing.CircuitProcessingConfiguration;
+import edu.kit.provideq.toolbox.circuit.processing.results.ExecutionResultVisitor;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -16,7 +19,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class QuantumTreeGeneratorSolver extends KnapsackSolver {
-  private static final SubRoutineDefinition<String, String> CIRCUIT_PROCESSING_SUBROUTINE =
+  private static final SubRoutineDefinition<String, Result> CIRCUIT_PROCESSING_SUBROUTINE =
       new SubRoutineDefinition<>(
           CircuitProcessingConfiguration.CIRCUIT_PROCESSING,
           "Use circuit processing",
@@ -67,7 +70,20 @@ public class QuantumTreeGeneratorSolver extends KnapsackSolver {
         .run(getProblemType(), solution.getId());
 
     String openQasm = processResult.output().orElseThrow();
-    return subRoutineResolver.runSubRoutine(CIRCUIT_PROCESSING_SUBROUTINE, openQasm);
+    return subRoutineResolver.runSubRoutine(CIRCUIT_PROCESSING_SUBROUTINE, openQasm)
+        .map(resultSolution -> {
+          Solution<String> s = new Solution<>(this);
+          SolutionStatus status = resultSolution.getStatus();
+          if (status == SolutionStatus.ERROR) {
+            s.fail();
+            s.setDebugData(resultSolution.getDebugData());
+            return s;
+          }
+
+          s.complete();
+          s.setSolutionData(resultSolution.getSolutionData().accept(new ExecutionResultVisitor()));
+          return s;
+        });
   }
 
   @Override

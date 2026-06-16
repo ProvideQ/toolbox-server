@@ -1,6 +1,8 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver.executor;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.results.ExecutionResultHelper;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
+public class ExecutionSolver implements ProblemSolver<String, Result> {
   private static final String SETTING_NUMBER_OF_SHOTS = "Number of shots";
   private static final String SETTING_SELECT_SIMULATOR = "Selected Simulator";
   private static final int DEFAULT_NUMBER_OF_SHOTS = 1024;
@@ -70,7 +72,7 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   }
 
   @Override
-  public Mono<Solution<ExecutionResult>> solve(
+  public Mono<Solution<Result>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
       SolvingProperties properties
@@ -99,7 +101,9 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
 
     if (processResult.success()) {
       solution.complete();
-      solution.setSolutionData(new ExecutionResult(processResult.output(), Optional.of(input)));
+      solution.setSolutionData(
+          ExecutionResultHelper.createExecutionResult(processResult.output(), Optional.of(input))
+      );
       return Mono.just(solution);
     }
     solution.fail();
@@ -108,7 +112,7 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   }
 
   @Override
-  public ProblemType<String, ExecutionResult> getProblemType() {
+  public ProblemType<String, Result> getProblemType() {
     return ExecutorConfiguration.EXECUTOR_CONFIG;
   }
 

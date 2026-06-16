@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
 import edu.kit.provideq.toolbox.circuit.processing.solver.optimization.OptimizationConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class MoveToOptimizationSolver extends CircuitProcessingSolver {
-  private static final SubRoutineDefinition<String, String> OPTIMIZER_SUBROUTINE =
+  private static final SubRoutineDefinition<String, Result> OPTIMIZER_SUBROUTINE =
       new SubRoutineDefinition<>(
           OptimizationConfiguration.OPTIMIZATION_CONFIG,
           "Creates a optimization solver",
@@ -34,7 +35,7 @@ public class MoveToOptimizationSolver extends CircuitProcessingSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
+  public Mono<Solution<Result>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
       SolvingProperties properties

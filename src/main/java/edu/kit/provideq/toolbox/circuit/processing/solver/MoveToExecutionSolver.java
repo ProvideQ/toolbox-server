@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.circuit.processing.solver;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.SolutionStatus;
-import edu.kit.provideq.toolbox.circuit.processing.solver.executor.ExecutionResult;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
 import edu.kit.provideq.toolbox.circuit.processing.solver.executor.ExecutorConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class MoveToExecutionSolver extends CircuitProcessingSolver {
-  private static final SubRoutineDefinition<String, ExecutionResult> EXECUTOR_SUBROUTINE =
+  private static final SubRoutineDefinition<String, Result> EXECUTOR_SUBROUTINE =
       new SubRoutineDefinition<>(
           ExecutorConfiguration.EXECUTOR_CONFIG,
           "Creates a execution solver",
@@ -36,14 +36,14 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
+  public Mono<Solution<Result>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
       SolvingProperties properties
   ) {
     return subRoutineResolver.runSubRoutine(EXECUTOR_SUBROUTINE, input)
         .map(executionResultSolution -> {
-          Solution<String> solution = new Solution<>(this);
+          Solution<Result> solution = new Solution<>(this);
           SolutionStatus status = executionResultSolution.getStatus();
           if (status == SolutionStatus.ERROR) {
             solution.fail();
@@ -51,7 +51,7 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
             return solution;
           }
           solution.complete();
-          solution.setSolutionData(executionResultSolution.getSolutionData().toString());
+          solution.setSolutionData(executionResultSolution.getSolutionData());
           return solution;
         });
   }

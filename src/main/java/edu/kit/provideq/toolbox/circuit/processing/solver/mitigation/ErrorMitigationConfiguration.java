@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver.mitigation;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
@@ -13,16 +14,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ErrorMitigationConfiguration {
-  public static final ProblemType<String, String> MITIGATION_CONFIG = new ProblemType<>(
+  public static final ProblemType<String, Result> MITIGATION_CONFIG = new ProblemType<>(
       "circuit-processing-mitigation",
       "A quantum circuit error mitigation problem that applies error mitigation techniques to "
           + "a given QASM circuit.",
       String.class,
-      String.class
+      Result.class
   );
 
   @Bean
-  ProblemManager<String, String> getMitigationProblemManager(
+  ProblemManager<String, Result> getMitigationProblemManager(
       ResourceProvider provider,
       ErrorMitigationSolver errorMitigationSolver
   ) {
@@ -33,7 +34,7 @@ public class ErrorMitigationConfiguration {
     );
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
+  private Set<Problem<String, Result>> loadExampleProblems(ResourceProvider provider) {
     try {
       var problemStream = Objects.requireNonNull(
           getClass().getResourceAsStream("../../bell-state.qasm"), "Problem bell-state.qasm not found");

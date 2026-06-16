@@ -1,6 +1,8 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver.optimization;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
+import edu.kit.provideq.toolbox.circuit.processing.results.StringResult;
 import edu.kit.provideq.toolbox.circuit.processing.solver.CircuitProcessingSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class OptimizationSolver implements ProblemSolver<String, String> {
+public class OptimizationSolver implements ProblemSolver<String, Result> {
   private static final String SETTING_SELECT_OPTIMIZER = "Selected Optimization Pass";
   private static final OptimizationSolver.QuantumOptimizer DEFAULT_OPTIMIZER =
       QuantumOptimizer.DECOMPOSE_MULTI_CX;
@@ -69,7 +71,7 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
+  public Mono<Solution<Result>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
       SolvingProperties properties
@@ -93,7 +95,7 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
 
     if (processResult.success() && processResult.output().isPresent()) {
       solution.complete();
-      solution.setSolutionData(processResult.output().get());
+      solution.setSolutionData(new StringResult(processResult.output().get()));
       return subRoutineResolver
           .runSubRoutine(CircuitProcessingSolver.CIRCUIT_PROCESSING_SUBROUTINE,
               processResult.output().get());
@@ -104,7 +106,7 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
   }
 
   @Override
-  public ProblemType<String, String> getProblemType() {
+  public ProblemType<String, Result> getProblemType() {
     return OptimizationConfiguration.OPTIMIZATION_CONFIG;
   }
 

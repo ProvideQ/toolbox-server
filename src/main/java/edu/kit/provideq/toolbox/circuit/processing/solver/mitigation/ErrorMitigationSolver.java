@@ -1,6 +1,8 @@
 package edu.kit.provideq.toolbox.circuit.processing.solver.mitigation;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.results.Result;
+import edu.kit.provideq.toolbox.circuit.processing.results.StringResult;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class ErrorMitigationSolver implements ProblemSolver<String, String> {
+public class ErrorMitigationSolver implements ProblemSolver<String, Result> {
 
   @Override
   public String getName() {
@@ -22,19 +24,19 @@ public class ErrorMitigationSolver implements ProblemSolver<String, String> {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
+  public Mono<Solution<Result>> solve(
       String input,
       SubRoutineResolver subRoutineResolver,
       SolvingProperties properties
   ) {
     var solution = new Solution<>(this);
-    solution.setSolutionData(input);
+    solution.setSolutionData(new StringResult(input));
     solution.complete();
     return Mono.just(solution);
   }
 
   @Override
-  public ProblemType<String, String> getProblemType() {
+  public ProblemType<String, Result> getProblemType() {
     return ErrorMitigationConfiguration.MITIGATION_CONFIG;
   }
 }
