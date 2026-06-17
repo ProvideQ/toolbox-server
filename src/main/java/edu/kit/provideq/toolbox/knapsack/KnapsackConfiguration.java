@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.knapsack.solvers.PythonKnapsackSolver;
 import edu.kit.provideq.toolbox.knapsack.solvers.QiskitKnapsackSolver;
+import edu.kit.provideq.toolbox.knapsack.solvers.QuantumTreeGeneratorSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -37,8 +38,8 @@ public class KnapsackConfiguration {
     for (int i = 1; i < parts.length - 1; i++) {
       var item = parts[i].split(" ");
       items.add(new AbstractMap.SimpleEntry<>(
-              Integer.parseInt(item[1]),
-              Integer.parseInt(item[2]))
+          Integer.parseInt(item[1]),
+          Integer.parseInt(item[2]))
       );
     }
     items.sort(Comparator.comparingInt(a -> -a.getKey() / a.getValue()));
@@ -88,14 +89,15 @@ public class KnapsackConfiguration {
 
   @Bean
   ProblemManager<String, String> getKnapsackManager(
-          PythonKnapsackSolver pythonKnapsackSolver,
-          QiskitKnapsackSolver qiskitKnapsackSolver,
-          ResourceProvider resourceProvider
+      PythonKnapsackSolver pythonKnapsackSolver,
+      QiskitKnapsackSolver qiskitKnapsackSolver,
+      QuantumTreeGeneratorSolver quantumTreeGeneratorSolver,
+      ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
-            KNAPSACK,
-            Set.of(pythonKnapsackSolver, qiskitKnapsackSolver),
-            loadExampleProblems(resourceProvider)
+        KNAPSACK,
+        Set.of(pythonKnapsackSolver, qiskitKnapsackSolver, quantumTreeGeneratorSolver),
+        loadExampleProblems(resourceProvider)
     );
   }
 

@@ -23,6 +23,7 @@ bin/test
 
 ### IntelliJ IDEA ###
 .idea
+.junie
 *.iws
 *.iml
 *.ipr
