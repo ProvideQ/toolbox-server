@@ -1,0 +1,221 @@
+{
+    "config": {
+        "N_PRODUCTS": 1,
+        "N_TIME_STEPS": 2,
+        "N_ORDERS": 2,
+        "N_FACTORIES": 1,
+        "N_SORT": 1,
+        "N_DIEBANK": 1,
+        "N_ASSEMBLY": 1,
+        "N_TEST": 1,
+        "N_DISTRIBUTION": 1,
+        "N_DEMAND": 1,
+        "MIN_CYCLE_TIME": 0,
+        "MAX_CYCLE_TIME": 1,
+        "MIN_CAPACITY": 10,
+        "MAX_CAPACITY": 15,
+        "MIN_LOAD_FACTOR": 1,
+        "MAX_LOAD_FACTOR": 2,
+        "PENALTY_DELAY": 5,
+        "PENALTY_SLACK": 40,
+        "PENALTY_CONSTANT": 50
+    },
+    "cycle_time": [
+        [
+            "v_sort0",
+            1.0
+        ]
+    ],
+    "capacity": [
+        [
+            "v_fac0",
+            11.0
+        ],
+        [
+            "v_sort0",
+            12.0
+        ],
+        [
+            "v_db0",
+            1e+100
+        ],
+        [
+            "v_asm0",
+            12.0
+        ],
+        [
+            "v_test0",
+            12.0
+        ],
+        [
+            "v_dc0",
+            1e+100
+        ]
+    ],
+    "load_factor": [
+        [
+            "v_fac0",
+            "p0",
+            2.0
+        ],
+        [
+            "v_sort0",
+            "p0",
+            1.0
+        ],
+        [
+            "v_asm0",
+            "p0",
+            2.0
+        ],
+        [
+            "v_test0",
+            "p0",
+            2.0
+        ]
+    ],
+    "demand": [
+        [
+            "o0",
+            "p0",
+            "t0",
+            "v_dc0",
+            4.0
+        ],
+        [
+            "o1",
+            "p0",
+            "t0",
+            "v_dc0",
+            3.0
+        ]
+    ],
+    "eo": [
+        [
+            "v_source",
+            "t0",
+            "v_fac0",
+            "t0",
+            "o0"
+        ],
+        [
+            "v_source",
+            "t0",
+            "v_fac0",
+            "t0",
+            "o1"
+        ],
+        [
+            "v_source",
+            "t0",
+            "v_fac0",
+            "t1",
+            "o0"
+        ],
+        [
+            "v_source",
+            "t0",
+            "v_fac0",
+            "t1",
+            "o1"
+        ],
+        [
+            "v_fac0",
+            "t0",
+            "v_sort0",
+            "t0",
+            "o0"
+        ],
+        [
+            "v_fac0",
+            "t0",
+            "v_sort0",
+            "t0",
+            "o1"
+        ],
+        [
+            "v_fac0",
+            "t1",
+            "v_sort0",
+            "t1",
+            "o0"
+        ],
+        [
+            "v_fac0",
+            "t1",
+            "v_sort0",
+            "t1",
+            "o1"
+        ],
+        [
+            "v_sort0",
+            "t0",
+            "v_db0",
+            "t1",
+            "o0"
+        ],
+        [
+            "v_sort0",
+            "t0",
+            "v_db0",
+            "t1",
+            "o1"
+        ],
+        [
+            "v_db0",
+            "t1",
+            "v_asm0",
+            "t1",
+            "o0"
+        ],
+        [
+            "v_db0",
+            "t1",
+            "v_asm0",
+            "t1",
+            "o1"
+        ],
+        [
+            "v_asm0",
+            "t1",
+            "v_test0",
+            "t1",
+            "o0"
+        ],
+        [
+            "v_asm0",
+            "t1",
+            "v_test0",
+            "t1",
+            "o1"
+        ],
+        [
+            "v_test0",
+            "t1",
+            "v_dc0",
+            "t1",
+            "o0"
+        ],
+        [
+            "v_test0",
+            "t1",
+            "v_dc0",
+            "t1",
+            "o1"
+        ],
+        [
+            "v_dc0",
+            "t0",
+            "v_dc0",
+            "t1",
+            "o0"
+        ],
+        [
+            "v_dc0",
+            "t0",
+            "v_dc0",
+            "t1",
+            "o1"
+        ]
+    ]
+}
