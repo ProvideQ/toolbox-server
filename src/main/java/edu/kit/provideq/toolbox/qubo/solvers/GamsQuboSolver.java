@@ -38,7 +38,8 @@ public class GamsQuboSolver extends QuboSolver {
 
   @Override
   public String getDescription() {
-    return "A solver for QUBOs using a GAMS CPLEX solver.";
+    return "Solves QUBO problems by transforming it into a MIP,"
+        + "which is then solved with CPLEX. Implementation is done in GAMS";
   }
 
   @Override
