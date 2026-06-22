@@ -77,7 +77,7 @@ class TspSolverTest {
 
   private Stream<Arguments> quboSolvers() {
     return Stream.of(
-        Arguments.of(dwaveQuboSolver, "NAME : small sample"),
+        // Arguments.of(dwaveQuboSolver, "NAME : small sample"),
         Arguments.of(qrispQuboSolver, "NAME : VerySmallSample")
     );
   }

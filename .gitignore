@@ -52,7 +52,10 @@ __pycache__/
 # Software license key for GAMS, used for a docker container with GAMS included
 gamslice.txt
 
-# Listing files compiled from our GAMS scripts
+# Don't include GAMS Data eXchange (GDX)
+*.gdx
+
+# Listing files compiled from our GAMS scripts files, which are generated when running GAMS solvers
 *.lst
 *.op2
 solvers/gams/**/225a

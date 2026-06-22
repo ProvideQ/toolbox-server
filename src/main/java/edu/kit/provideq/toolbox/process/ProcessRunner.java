@@ -26,8 +26,21 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProcessRunner {
+  /**
+   * Placeholder for the problem directory path in the process arguments.
+   */
   public static final String PROBLEM_DIRECTORY_PATH = "PROBLEM_DIRECTORY_PATH";
+  /**
+   * Placeholder for the input file path in the process arguments.
+   */
   public static final String INPUT_FILE_PATH = "INPUT_FILE_PATH";
+  /**
+   * Placeholder for another input file path in the process arguments.
+   */
+  public static final String INPUT_FILE_PATH2 = "INPUT_FILE_PATH2";
+  /**
+   * Placeholder for the output file path in the process arguments.
+   */
   public static final String OUTPUT_FILE_PATH = "OUTPUT_FILE_PATH";
 
   /**
@@ -98,6 +111,21 @@ public class ProcessRunner {
    * @return ProcessRunner instance for chaining.
    */
   public ProcessRunner writeInputFile(String inputData, String inputFileName) {
+    return writeInputFile(inputData, inputFileName, INPUT_FILE_PATH);
+  }
+
+  /**
+   * Writes the input data to a specific input file.
+   *
+   * @param inputData     The input data to be written to the input file.
+   * @param inputFileName The name of the file to write the input data to.
+   * @param inputFilePathPlaceholder The placeholder to be replaced with the input
+   *                                 file path in the arguments.
+   * @return ProcessRunner instance for chaining.
+   */
+  public ProcessRunner writeInputFile(String inputData,
+                                      String inputFileName,
+                                      String inputFilePathPlaceholder) {
     // Add at the beginning of the pre-processors list
     // This ensures that the argument transformers are applied for every argument
     preProcessors.add(0, (problemType, solutionId) -> {
@@ -116,7 +144,7 @@ public class ProcessRunner {
 
       // Add support for replacing the input file path in the arguments
       argumentTransformers.add(
-          argument -> argument.replace(INPUT_FILE_PATH, normalizedInputFilePath));
+          argument -> argument.replace(inputFilePathPlaceholder, normalizedInputFilePath));
 
       return Optional.empty();
     });
