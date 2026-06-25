@@ -59,12 +59,14 @@ class OptimizationSolverTest {
   @Test
   void testOptimizationSolver() {
     var circuit = problems.get(0);
-    var problemDto = ApiTestHelper.createProblem(client, optimizationSolver, circuit, OPTIMIZATION_CONFIG);
+    var problemDto = ApiTestHelper.createProblem(client, optimizationSolver,
+        circuit, OPTIMIZATION_CONFIG);
     var circuitSubProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     var mitigationEntryDto = ApiTestHelper.setProblemSolver(
         client, moveToMitigationSolver, circuitSubProblemId, CIRCUIT_PROCESSING.getId());
     var mitigationId = mitigationEntryDto.getSubProblems().get(0).getSubProblemIds().get(0);
-    ApiTestHelper.setProblemSolver(client, errorMitigationSolver, mitigationId, MITIGATION_CONFIG.getId());
+    ApiTestHelper.setProblemSolver(client, errorMitigationSolver, mitigationId,
+        MITIGATION_CONFIG.getId());
     var solvedDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), OPTIMIZATION_CONFIG);
     ApiTestHelper.testSolution(solvedDto);
     assertTrue(solvedDto.getSolution().getSolutionData().contains("OPENQASM"));

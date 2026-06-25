@@ -36,7 +36,8 @@ public class ErrorMitigationConfiguration {
   private Set<Problem<String, String>> loadExampleProblems(ResourceProvider provider) {
     try {
       var problemStream = Objects.requireNonNull(
-          getClass().getResourceAsStream("../../bell-state.qasm"), "Problem bell-state.qasm not found");
+          getClass().getResourceAsStream("../../bell-state.qasm"),
+          "Problem bell-state.qasm not found");
       var problem = new Problem<>(MITIGATION_CONFIG);
       problem.setInput(provider.readStream(problemStream));
       return Set.of(problem);

@@ -45,7 +45,8 @@ class ErrorMitigationSolverTest {
   @Test
   void testErrorMitigationSolver() {
     var circuit = problems.get(0);
-    var problem = ApiTestHelper.createProblem(client, errorMitigationSolver, circuit, MITIGATION_CONFIG);
+    var problem = ApiTestHelper.createProblem(client, errorMitigationSolver,
+        circuit, MITIGATION_CONFIG);
     ApiTestHelper.testSolution(problem);
     assertEquals(circuit, problem.getSolution().getSolutionData());
   }

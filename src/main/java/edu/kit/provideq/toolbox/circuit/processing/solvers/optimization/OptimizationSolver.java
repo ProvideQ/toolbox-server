@@ -31,8 +31,10 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
 
   @Autowired
   public OptimizationSolver(
-      @Value("${path.circuitprocessing.circuitoptimization.decomposemulticx}") String decomposeMultiCxPath,
-      @Value("${path.circuitprocessing.circuitoptimization.removeredundancies}") String removeRedundanciesPath,
+      @Value("${path.circuitprocessing.circuitoptimization.decomposemulticx}")
+      String decomposeMultiCxPath,
+      @Value("${path.circuitprocessing.circuitoptimization.removeredundancies}")
+      String removeRedundanciesPath,
       @Value("${venv.circuitprocessing.circuitoptimization}") String venv,
       ApplicationContext context
   ) {

@@ -74,9 +74,12 @@ class CircuitProcessingSolversTest {
   @Test
   void testMoveToMitigationSolver() {
     var circuit = problems.get(0);
-    var problemDto = ApiTestHelper.createProblem(client, moveToMitigationSolver, circuit, CIRCUIT_PROCESSING);
-    var subProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
-    ApiTestHelper.setProblemSolver(client, errorMitigationSolver, subProblemId, MITIGATION_CONFIG.getId());
+    var problemDto = ApiTestHelper.createProblem(client, moveToMitigationSolver,
+        circuit, CIRCUIT_PROCESSING);
+    var subProblemId = problemDto.getSubProblems().get(0)
+        .getSubProblemIds().get(0);
+    ApiTestHelper.setProblemSolver(client, errorMitigationSolver, subProblemId,
+        MITIGATION_CONFIG.getId());
     var solvedDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), CIRCUIT_PROCESSING);
     ApiTestHelper.testSolution(solvedDto);
     assertEquals(circuit, solvedDto.getSolution().getSolutionData());
@@ -85,10 +88,12 @@ class CircuitProcessingSolversTest {
   @Test
   void testMoveToExecutionSolver() {
     var circuit = problems.get(0);
-    var problemDto = ApiTestHelper.createProblem(client, moveToExecutionSolver, circuit, CIRCUIT_PROCESSING);
+    var problemDto = ApiTestHelper.createProblem(client, moveToExecutionSolver,
+        circuit, CIRCUIT_PROCESSING);
     var subProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     ApiTestHelper.setProblemSolver(client, executionSolver, subProblemId, EXECUTOR_CONFIG.getId());
-    var solvedDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), CIRCUIT_PROCESSING);
+    var solvedDto = ApiTestHelper.trySolveFor(60, client,
+        problemDto.getId(), CIRCUIT_PROCESSING);
     ApiTestHelper.testSolution(solvedDto);
     assertFalse(solvedDto.getSolution().getSolutionData().isBlank());
   }
@@ -96,7 +101,8 @@ class CircuitProcessingSolversTest {
   @Test
   void testMoveToOptimizationSolver() {
     var circuit = problems.get(0);
-    var problemDto = ApiTestHelper.createProblem(client, moveToOptimizationSolver, circuit, CIRCUIT_PROCESSING);
+    var problemDto = ApiTestHelper.createProblem(client, moveToOptimizationSolver,
+        circuit, CIRCUIT_PROCESSING);
     var optSubProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     var optDto = ApiTestHelper.setProblemSolver(
         client, optimizationSolver, optSubProblemId, OPTIMIZATION_CONFIG.getId());
@@ -104,7 +110,8 @@ class CircuitProcessingSolversTest {
     var mitigationEntryDto = ApiTestHelper.setProblemSolver(
         client, moveToMitigationSolver, circuitSubProblemId, CIRCUIT_PROCESSING.getId());
     var mitigationId = mitigationEntryDto.getSubProblems().get(0).getSubProblemIds().get(0);
-    ApiTestHelper.setProblemSolver(client, errorMitigationSolver, mitigationId, MITIGATION_CONFIG.getId());
+    ApiTestHelper.setProblemSolver(client, errorMitigationSolver, mitigationId,
+        MITIGATION_CONFIG.getId());
     var solvedDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), CIRCUIT_PROCESSING);
     ApiTestHelper.testSolution(solvedDto);
     assertTrue(solvedDto.getSolution().getSolutionData().contains("OPENQASM"));
