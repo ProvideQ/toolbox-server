@@ -67,19 +67,13 @@ jobs:
     needs: check
     if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' }}
     steps:
-      - name: Cloning repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Deploy via SSH and Docker Compose
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          debug: true
+          command_timeout: 60m
           script: |
-            whoami
-            echo "Deploying ${{ github.event.repository.name }} to ${{ github.ref_name }} environment"
+            echo "Deploying ${{ github.event.repository.name }} to '${{ github.ref_name }}' environment"
             sh /root/ProvideQ/${{ github.event.repository.name }}/deploy.sh ${{ github.ref_name }}
