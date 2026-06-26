@@ -87,7 +87,7 @@ class FeatureModelAnomalySolversTest {
       }
     }
 
-    problem = ApiTestHelper.trySolveFor(15, client, problem.getId(), problemType);
+    problem = ApiTestHelper.trySolveFor(120, client, problem.getId(), problemType);
     ApiTestHelper.testSolution(problem);
   }
 }

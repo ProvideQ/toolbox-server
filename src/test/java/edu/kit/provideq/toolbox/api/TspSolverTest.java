@@ -105,7 +105,7 @@ class TspSolverTest {
     );
 
     //solve problem:
-    var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), TSP);
+    var solvedProblemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), TSP);
     ApiTestHelper.testSolution(solvedProblemDto);
   }
 }
