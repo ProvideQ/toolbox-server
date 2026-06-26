@@ -7,10 +7,8 @@ import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.GamsQuboSolver;
-import edu.kit.provideq.toolbox.qubo.solvers.KipuQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
-import edu.kit.provideq.toolbox.qubo.solvers.QuantagoniaQuboSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -42,15 +40,12 @@ public class QuboConfiguration {
       QiskitQuboSolver qiskitSolver,
       DwaveQuboSolver dwaveSolver,
       QrispQuboSolver qrispSolver,
-      QuantagoniaQuboSolver quantagoniaQuboSolver,
-      KipuQuboSolver kipuQuboSolver,
       GamsQuboSolver gamsQuboSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         QUBO,
-        Set.of(qiskitSolver, dwaveSolver, qrispSolver, quantagoniaQuboSolver, kipuQuboSolver,
-            gamsQuboSolver),
+        Set.of(qiskitSolver, dwaveSolver, qrispSolver, gamsQuboSolver),
         loadExampleProblems(resourceProvider)
     );
   }

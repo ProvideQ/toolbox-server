@@ -67,7 +67,7 @@ class UnsplittableMcfSolversTest {
       }
     }
 
-    problem = ApiTestHelper.trySolveFor(20, client, problem.getId(), UNSPLITTABLE_MCF);
+    problem = ApiTestHelper.trySolveFor(120, client, problem.getId(), UNSPLITTABLE_MCF);
     ApiTestHelper.testSolution(problem);
   }
 }

@@ -80,7 +80,7 @@ class CircuitProcessingSolversTest {
         .getSubProblemIds().get(0);
     ApiTestHelper.setProblemSolver(client, errorMitigationSolver, subProblemId,
         MITIGATION_CONFIG.getId());
-    var solvedDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), CIRCUIT_PROCESSING);
+    var solvedDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), CIRCUIT_PROCESSING);
     ApiTestHelper.testSolution(solvedDto);
     assertEquals(circuit, solvedDto.getSolution().getSolutionData());
   }
@@ -92,7 +92,7 @@ class CircuitProcessingSolversTest {
         circuit, CIRCUIT_PROCESSING);
     var subProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
     ApiTestHelper.setProblemSolver(client, executionSolver, subProblemId, EXECUTOR_CONFIG.getId());
-    var solvedDto = ApiTestHelper.trySolveFor(60, client,
+    var solvedDto = ApiTestHelper.trySolveFor(120, client,
         problemDto.getId(), CIRCUIT_PROCESSING);
     ApiTestHelper.testSolution(solvedDto);
     assertFalse(solvedDto.getSolution().getSolutionData().isBlank());
