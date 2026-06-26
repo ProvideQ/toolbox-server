@@ -41,11 +41,6 @@ class QuboSolverTest {
     var problemManager = problemManagerProvider.findProblemManagerForType(QUBO).get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
-        .filter(list -> {
-          Object solver = list.get(0);
-          return !(solver instanceof KipuQuboSolver)
-              && !(solver instanceof QuantagoniaQuboSolver);
-        })
         .map(list -> Arguments.of(list.get(0), list.get(1)));
   }
 
