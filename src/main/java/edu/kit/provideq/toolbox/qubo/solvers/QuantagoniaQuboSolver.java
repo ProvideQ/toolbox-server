@@ -25,9 +25,11 @@ import reactor.core.publisher.Mono;
 /**
  * {@link QuboConfiguration#QUBO} solver using the
  * Quantagonia QUBO solver hosted on the PlanQK platform.
+ *
+ * @deprecated This solver is not provided on the Kipu platform anymore, use different Qubo solvers.
  */
 @Component
-@Deprecated
+@Deprecated(forRemoval = true)
 public class QuantagoniaQuboSolver extends QuboSolver {
   private static final String SETTING_PLANQK_TOKEN = "PlanQK Access Token";
 
