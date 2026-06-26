@@ -78,6 +78,8 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          debug: true
           script: |
+            whoami
             echo "Deploying ${{ github.event.repository.name }} to ${{ github.ref_name }} environment"
             sh /root/ProvideQ/${{ github.event.repository.name }}/deploy.sh ${{ github.ref_name }}
