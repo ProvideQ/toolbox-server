@@ -28,6 +28,7 @@ import reactor.core.publisher.Mono;
  * Kipu Digitized Counterdiabatic Quantum Optimization (DCQO) solver hosted on the PlanQK platform.
  */
 @Component
+@Deprecated
 public class KipuQuboSolver extends QuboSolver {
   private static final String SETTING_PLANQK_TOKEN = "PlanQK Access Token";
 

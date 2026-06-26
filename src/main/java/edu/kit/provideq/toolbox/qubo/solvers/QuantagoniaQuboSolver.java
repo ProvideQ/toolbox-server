@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
  * Quantagonia QUBO solver hosted on the PlanQK platform.
  */
 @Component
+@Deprecated
 public class QuantagoniaQuboSolver extends QuboSolver {
   private static final String SETTING_PLANQK_TOKEN = "PlanQK Access Token";
 
