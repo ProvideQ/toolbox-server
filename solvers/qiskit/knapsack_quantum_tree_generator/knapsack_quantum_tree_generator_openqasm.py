@@ -1,44 +1,45 @@
-from input import parse_input
-from run import run
-from run_retrieve_openqasm import run_retrieve_openqasm
+from qiskit import qasm2
+
+from BaseCircuit.circuit_core import Circuit
+from QTG.QTG import QTG
+from helper import parse_input
+from knapsack.knapsack import KnapsackInstance
+from helper import run
 
 
-def _create_standard_output(solve_results):
-    probabilities = solve_results["probabilities"]
-    knapsack = solve_results["knapsack"]
+def _retrieve_openqasm(knapsack: KnapsackInstance):
+    # Prepare the quantum circuit
+    circuit = Circuit("Knapsack_Demo")
+    has_ancillas = False
+    circuit.prepare_knapsack_circuit(knapsack, has_ancillas=has_ancillas)
 
-    # Best feasible
-    best_feasible_bitstring = None
-    best_value = -1
+    # Build the QTG
+    bias = 0.5
+    current_best_solution = "0" * len(knapsack.items)
 
-    for bitstring, _ in probabilities.items():
-        weight = sum(
-            knapsack.items[i].weight for i, b in enumerate(bitstring) if
-            b == '1')
-        if weight <= knapsack.capacity:
-            value = sum(
-                knapsack.items[i].value for i, b in enumerate(bitstring) if
-                b == '1')
-            if best_value == -1 or value > best_value:
-                best_value = value
-                best_feasible_bitstring = bitstring
+    qtg = QTG(
+        input_circuit=circuit,
+        knapsack=knapsack,
+        depth_interval=(0, -1),
+        bias=bias,
+        current_best_solution=current_best_solution,
+        has_ancillas=has_ancillas
+    )
+    qtg.build_circuit()
 
-    if best_feasible_bitstring:
-        included_indexes = []
-        for i, bit in enumerate(best_feasible_bitstring):
-            if bit == '1':
-                included_indexes.append(knapsack.items[i].id)
+    # Append QTG
+    qreg = circuit.get_qubits_in_registers(all=True)
+    circuit.append_subcircuit_as_instruction(qtg.current_circuit, qubits=qreg,
+                                             name='qtg_circuit')
 
-        # Sort indexes to match expected output if necessary,
-        # but the original code just appended them.
-        return f"{best_value}\n{included_indexes}"
-    else:
-        return "0\n[]"
+    circuit.measure_items("items_c")
+
+    return qasm2.dumps(circuit.qc)
 
 
-def _retrieve_openqasm(input_data):
-    return run_retrieve_openqasm(parse_input(input_data))
+# def _retrieve_openqasm(input_data):
+#     return _run_retrieve_openqasm(parse_input(input_data))
 
 
 if __name__ == "__main__":
-    run(_retrieve_openqasm)
+    run(lambda input_data: _retrieve_openqasm(parse_input(input_data)))
