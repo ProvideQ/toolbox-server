@@ -8,7 +8,7 @@ A web-based user interface can be found in our
 [ProvideQ/ProvideQ repository](https://github.com/ProvideQ/ProvideQ).
 
 ## Development setup
-1. Install Java 17 or newer (check with `java -version`)
+1. Install Java 25 or newer (check with `java -version`)
 2. Clone this repository
 3. [Optional, Solver Installation - install the Solvers that you want/need]
    1. Python-based Solvers (Qiskit, Cirq, Dwave, Qrisp)
