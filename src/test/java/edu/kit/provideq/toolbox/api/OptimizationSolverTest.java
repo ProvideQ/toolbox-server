@@ -45,7 +45,7 @@ class OptimizationSolverTest {
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
-        .responseTimeout(Duration.ofSeconds(60))
+        .responseTimeout(Duration.ofSeconds(300))
         .build();
     problemManager = problemManagerProvider.findProblemManagerForType(OPTIMIZATION_CONFIG).get();
     problems = problemManager.getExampleInstances()

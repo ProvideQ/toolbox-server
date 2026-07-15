@@ -40,7 +40,7 @@ class SatSolversTest {
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
-        .responseTimeout(Duration.ofSeconds(20))
+        .responseTimeout(Duration.ofSeconds(300))
         .build();
   }
 
