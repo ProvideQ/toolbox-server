@@ -15,16 +15,19 @@ public class DemonstratorConfiguration {
    */
   public static final ProblemType<String, String> DEMONSTRATOR = new ProblemType<>(
       "demonstrator",
+      "A demonstrator is a broad group of processes that demonstrate "
+          + "certain aspects of quantum computing.",
       String.class,
       String.class
   );
 
   @Bean
   ProblemManager<String, String> getDemonstratorManager(
-      CplexMipDemonstrator cplexMipDemonstrator
+      CplexMipDemonstrator cplexMipDemonstrator,
+      MoleculeEnergySimulator moleculeEnergySimulator
   ) {
     return new ProblemManager<>(DEMONSTRATOR,
-        Set.of(cplexMipDemonstrator),
+        Set.of(cplexMipDemonstrator, moleculeEnergySimulator),
         Set.of(new Problem<>(DEMONSTRATOR)));
   }
 }

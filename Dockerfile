@@ -32,6 +32,14 @@ RUN jlink \
 FROM debian:bookworm-slim AS runner
 WORKDIR /app
 
+# Install system build tools, needed to build solver dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY scripts scripts
 
 # Install GAMS with conda python environment

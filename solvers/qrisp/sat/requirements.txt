@@ -1,3 +1,4 @@
 # This file describes the python package requirements for the Qrisp SAT solver
 qrisp == 0.4.4
 numpy == 1.26.4
+sympy == 1.12.1 # needed but not specified in qrisp requirements

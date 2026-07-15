@@ -141,7 +141,6 @@ final class ProblemRouteDocumentation {
         );
   }
 
-
   private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemResponse(
       ProblemManager<?, ?> problemManager) {
     var contentBuilder = contentBuilder()

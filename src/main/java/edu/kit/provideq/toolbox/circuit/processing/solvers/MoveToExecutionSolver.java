@@ -1,0 +1,46 @@
+package edu.kit.provideq.toolbox.circuit.processing.solvers;
+
+import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResult;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
+import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import java.util.List;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+@Component
+public class MoveToExecutionSolver extends CircuitProcessingSolver {
+  private static final SubRoutineDefinition<String, ExecutionResult> EXECUTOR_SUBROUTINE =
+      new SubRoutineDefinition<>(
+          ExecutorConfiguration.EXECUTOR_CONFIG,
+          "Creates an execution solver",
+          true
+      );
+
+  @Override
+  public String getName() {
+    return "Execute QASM Code";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Move QASM input to the executors";
+  }
+
+  @Override
+  public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
+    return List.of(EXECUTOR_SUBROUTINE);
+  }
+
+  @Override
+  public Mono<Solution<String>> solve(
+      String input,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties
+  ) {
+    return subRoutineResolver.runSubRoutine(EXECUTOR_SUBROUTINE, input)
+        .map(s -> Solution.from(this, s, ExecutionResult::toString));
+  }
+}

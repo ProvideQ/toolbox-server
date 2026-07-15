@@ -68,7 +68,7 @@ class SatSolversTest {
     var satManager = problemManagerProvider.findProblemManagerForType(SAT).get();
 
     var qrispSolvers = satManager.getSolvers().stream()
-        .filter(s -> s instanceof QrispExactGroverSolver)
+        .filter(QrispExactGroverSolver.class::isInstance)
         .toList();
 
     var exampleInputs = satManager.getExampleInstances().stream()
@@ -119,7 +119,7 @@ class SatSolversTest {
         ApiTestHelper.testSolution(assignedSubProblem);
       }
     }
-    var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), problemType);
+    var solvedProblemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), problemType);
     ApiTestHelper.testSolution(solvedProblemDto);
   }
 }

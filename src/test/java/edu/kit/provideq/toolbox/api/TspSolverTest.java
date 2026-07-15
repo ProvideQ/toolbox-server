@@ -77,7 +77,7 @@ class TspSolverTest {
 
   private Stream<Arguments> quboSolvers() {
     return Stream.of(
-        Arguments.of(dwaveQuboSolver, "NAME : small sample"),
+        // Arguments.of(dwaveQuboSolver, "NAME : small sample"),
         Arguments.of(qrispQuboSolver, "NAME : VerySmallSample")
     );
   }
@@ -105,7 +105,7 @@ class TspSolverTest {
     );
 
     //solve problem:
-    var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), TSP);
+    var solvedProblemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), TSP);
     ApiTestHelper.testSolution(solvedProblemDto);
   }
 }

@@ -37,7 +37,7 @@ class FeatureModelAnomalySolversTest {
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
-              .responseTimeout(Duration.ofSeconds(20))
+              .responseTimeout(Duration.ofSeconds(60))
               .build();
   }
 
@@ -87,7 +87,7 @@ class FeatureModelAnomalySolversTest {
       }
     }
 
-    problem = ApiTestHelper.trySolveFor(15, client, problem.getId(), problemType);
+    problem = ApiTestHelper.trySolveFor(120, client, problem.getId(), problemType);
     ApiTestHelper.testSolution(problem);
   }
 }

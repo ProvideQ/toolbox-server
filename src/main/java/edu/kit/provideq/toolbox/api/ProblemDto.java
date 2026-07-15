@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
@@ -17,8 +16,8 @@ public class ProblemDto<InputT, ResultT> {
   private String typeId;
   private InputT input;
   private Solution<ResultT> solution;
-  private BoundWithInfo bound;
   private ProblemState state;
+  private BoundComparisonDto boundWithComparison;
   private String solverId;
   private List<SolverSetting> solverSettings;
   private List<SubProblemReferenceDto> subProblems;
@@ -40,7 +39,7 @@ public class ProblemDto<InputT, ResultT> {
     dto.typeId = problem.getType().getId();
     dto.input = problem.getInput().orElse(null);
     dto.solution = problem.getSolution().orElse(null);
-    dto.bound = problem.getBound().orElse(null);
+    dto.boundWithComparison = problem.getBoundWithComparison().orElse(null);
     dto.state = problem.getState();
     dto.solverId = problem.getSolver()
         .map(ProblemSolver::getId)
@@ -70,8 +69,8 @@ public class ProblemDto<InputT, ResultT> {
     return solution;
   }
 
-  public BoundWithInfo getBound() {
-    return bound;
+  public BoundComparisonDto getBoundWithComparison() {
+    return boundWithComparison;
   }
 
   public ProblemState getState() {
@@ -107,7 +106,7 @@ public class ProblemDto<InputT, ResultT> {
         + ", solverId=" + solverId
         + ", input=" + input
         + ", solution=" + solution
-        + ", value=" + bound
+        + ", boundWithComparison=" + boundWithComparison
         + ", solverSettings=" + solverSettings
         + ", subProblems=" + subProblems
         + '}';

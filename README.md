@@ -1,4 +1,5 @@
-[![Build](https://img.shields.io/github/actions/workflow/status/ProvideQ/toolbox-server/deploy-main.yml?style=for-the-badge)](https://github.com/ProvideQ/toolbox-server/actions/workflows/deploy-main.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/ProvideQ/toolbox-server/ci-cd.yml?branch=main&style=for-the-badge
+)](https://github.com/ProvideQ/toolbox-server/actions/workflows/ci-cd.yml)
 [![Release](https://img.shields.io/github/v/release/ProvideQ/toolbox-server?style=for-the-badge)](https://github.com/ProvideQ/toolbox-server/releases/)
 
 # ProvideQ Toolbox Server
@@ -86,6 +87,6 @@ To use this, enable GitHub Actions and configure the following secrets in the Gi
   3. Set `DOKKU_DEPLOYMENT_KEY` to the private key generated in step i.
 
 ## License
-Copyright (c) 2022 - 2023 ProvideQ
+Copyright (c) 2022 - 2026 ProvideQ
 
 This project is available under the [MIT License](./LICENSE).

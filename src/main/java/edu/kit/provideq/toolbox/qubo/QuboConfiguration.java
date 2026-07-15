@@ -6,10 +6,9 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
-import edu.kit.provideq.toolbox.qubo.solvers.KipuQuboSolver;
+import edu.kit.provideq.toolbox.qubo.solvers.GamsQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
-import edu.kit.provideq.toolbox.qubo.solvers.QuantagoniaQuboSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -28,7 +27,10 @@ public class QuboConfiguration {
    * find the minimal variable assignment of the term.
    */
   public static final ProblemType<String, String> QUBO = new ProblemType<>(
-      "qubo",
+      "QUBO",
+      "QUBO (Quadratic Unconstrained Binary Optimization) A combinatorial optimization problem. "
+          + "For a given quadratic term with binary decision variables, find the "
+          + "minimal variable assignment of the term.",
       String.class,
       String.class
   );
@@ -38,13 +40,12 @@ public class QuboConfiguration {
       QiskitQuboSolver qiskitSolver,
       DwaveQuboSolver dwaveSolver,
       QrispQuboSolver qrispSolver,
-      QuantagoniaQuboSolver quantagoniaQuboSolver,
-      KipuQuboSolver kipuQuboSolver,
+      GamsQuboSolver gamsQuboSolver,
       ResourceProvider resourceProvider
   ) {
     return new ProblemManager<>(
         QUBO,
-        Set.of(qiskitSolver, dwaveSolver, qrispSolver, quantagoniaQuboSolver, kipuQuboSolver),
+        Set.of(qiskitSolver, dwaveSolver, qrispSolver, gamsQuboSolver),
         loadExampleProblems(resourceProvider)
     );
   }

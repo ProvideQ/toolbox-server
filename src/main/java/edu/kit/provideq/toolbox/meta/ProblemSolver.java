@@ -19,7 +19,7 @@ public interface ProblemSolver<InputT, ResultT> {
    * @return id of the solver
    */
   default String getId() {
-    return getClass().getName();
+    return getClass().getSimpleName();
   }
 
   /**

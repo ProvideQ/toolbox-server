@@ -32,6 +32,7 @@ import reactor.core.publisher.Mono;
 @Configuration
 @EnableWebFlux
 public class ProblemRouter {
+  private static final String PROBLEMS_BASE_PATH = "/problems";
   public static final String PROBLEM_ID_PARAM_NAME = "problemId";
   private ProblemManagerProvider managerProvider;
   private Validator validator;
@@ -40,11 +41,13 @@ public class ProblemRouter {
   RouterFunction<ServerResponse> getProblemRoutes() {
     var managers = this.managerProvider.getProblemManagers();
     return Streams.concat(
-        managers.stream().map(this::defineCreateRoute),
-        managers.stream().map(this::defineReadRoute),
-        managers.stream().map(this::defineListRoute),
-        managers.stream().map(this::defineUpdateRoute)
-    ).reduce(RouterFunction::and).orElseThrow();
+            managers.stream().map(this::defineCreateRoute),
+            managers.stream().map(this::defineReadRoute),
+            managers.stream().map(this::defineListRoute),
+            managers.stream().map(this::defineUpdateRoute)
+        )
+        .reduce(RouterFunction::and)
+        .orElseThrow();
   }
 
   /**
@@ -197,7 +200,7 @@ public class ProblemRouter {
   }
 
   private String getPathWithoutId(ProblemType<?, ?> type) {
-    return "/problems/%s".formatted(type.getId());
+    return "%s/%s".formatted(PROBLEMS_BASE_PATH, type.getId());
   }
 
   private String getPathWithId(ProblemType<?, ?> type) {

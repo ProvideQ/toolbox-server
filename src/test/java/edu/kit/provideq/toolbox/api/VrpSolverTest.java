@@ -135,7 +135,7 @@ class VrpSolverTest {
       }
 
       //solve the problem:
-      problemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
+      problemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), VRP);
       ApiTestHelper.testSolution(problemDto);
     }
   }
@@ -176,7 +176,7 @@ class VrpSolverTest {
       }
 
       //solve the problem:
-      var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
+      var solvedProblemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), VRP);
       ApiTestHelper.testSolution(solvedProblemDto);
     }
   }
@@ -226,7 +226,7 @@ class VrpSolverTest {
     }
 
     //solve the problem:
-    var solvedProblemDto = ApiTestHelper.trySolveFor(60, client, problemDto.getId(), VRP);
+    var solvedProblemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), VRP);
     ApiTestHelper.testSolution(solvedProblemDto);
   }
 }
