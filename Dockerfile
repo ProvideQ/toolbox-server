@@ -1,5 +1,5 @@
 # Step 1: Build the toolbox-server Java application
-FROM eclipse-temurin:17-jdk-jammy AS builder
+FROM eclipse-temurin:25-jdk-jammy AS builder
 WORKDIR /app
 
 # Install dependencies first
