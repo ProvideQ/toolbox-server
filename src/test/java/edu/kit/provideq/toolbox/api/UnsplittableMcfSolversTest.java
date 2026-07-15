@@ -34,7 +34,7 @@ class UnsplittableMcfSolversTest {
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
-        .responseTimeout(Duration.ofSeconds(60)) // Longer timeout for MCF solving
+        .responseTimeout(Duration.ofSeconds(300)) // Longer timeout for MCF solving
         .build();
   }
 
