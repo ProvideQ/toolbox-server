@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ErrorMitigationConfiguration {
   public static final ProblemType<String, String> MITIGATION_CONFIG = new ProblemType<>(
-      "circuit-processing-mitigation",
+      "CircuitProcessingMitigation",
       "A quantum circuit error mitigation problem that applies error mitigation techniques to "
           + "a given QASM circuit.",
       String.class,
