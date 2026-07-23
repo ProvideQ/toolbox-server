@@ -37,6 +37,15 @@ public interface ProblemSolver<InputT, ResultT> {
   String getDescription();
 
   /**
+   * Return the list of characteristics for the solver.
+   *
+   * @return list of characteristics
+   */
+  default List<SolverCharacteristic> getCharacteristics() {
+    return List.of(SolverCharacteristic.SOLVE);
+  }
+
+  /**
    * Returns the sub problems used to solver this problem.
    *
    * @return list of sub problems
