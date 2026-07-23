@@ -8,6 +8,7 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -43,6 +44,11 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   public String getDescription() {
     return "This solver builds SAT formulae to determine dead features in a feature model."
         + " It uses a SAT solver to solve each formula per feature.";
+  }
+
+  @Override
+  public List<SolverCharacteristic> getCharacteristics() {
+    return List.of(SolverCharacteristic.DECOMPOSITION);
   }
 
   @Override

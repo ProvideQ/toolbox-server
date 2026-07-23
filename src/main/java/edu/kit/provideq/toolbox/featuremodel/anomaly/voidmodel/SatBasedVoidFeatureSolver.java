@@ -6,6 +6,7 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -35,6 +36,11 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
   @Override
   public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return List.of(SAT_SUBROUTINE);
+  }
+
+  @Override
+  public List<SolverCharacteristic> getCharacteristics() {
+    return List.of(SolverCharacteristic.REFORMULATION);
   }
 
   @Override

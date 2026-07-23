@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -27,6 +28,11 @@ public class ClusterAndSolveVrpSolver extends VrpSolver {
   public String getDescription() {
     return "Solves a vehicle routing problem by clustering it into multiple smaller problems "
         + "first.";
+  }
+
+  @Override
+  public List<SolverCharacteristic> getCharacteristics() {
+    return List.of(SolverCharacteristic.REFORMULATION);
   }
 
   @Override

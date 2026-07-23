@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.circuit.processing.solvers;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResult;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -27,6 +28,11 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
   @Override
   public String getDescription() {
     return "Move QASM input to the executors";
+  }
+
+  @Override
+  public List<SolverCharacteristic> getCharacteristics() {
+    return List.of(SolverCharacteristic.REFORMULATION);
   }
 
   @Override
