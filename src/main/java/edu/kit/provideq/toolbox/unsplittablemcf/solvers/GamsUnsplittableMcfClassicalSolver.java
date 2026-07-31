@@ -34,12 +34,12 @@ public class GamsUnsplittableMcfClassicalSolver extends GamsUnsplittableMcfSolve
 
   @Override
   public String getName() {
-    return "(GAMS) CPLEX Classical MCF Solver";
+    return "(GAMS) SCIP Classical MCF Solver";
   }
 
   @Override
   public String getDescription() {
-    return "Solves the Unsplittable Multi Commodity Flow problem using GAMSPy with CPLEX. "
+    return "Solves the Unsplittable Multi Commodity Flow problem using GAMSPy and SCIP. "
         + "Builds a time-expanded network model and finds optimal flow routes minimizing "
         + "delay and slack penalties.";
   }
