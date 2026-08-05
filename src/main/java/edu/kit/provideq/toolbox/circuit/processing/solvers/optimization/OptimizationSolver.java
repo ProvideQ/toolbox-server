@@ -4,7 +4,9 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.CircuitProcessingSolver;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -54,13 +56,14 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
 
   @Override
   public String getDescription() {
-    return "Transform the given circuit into an optimized but equivalent circuit using"
+    return "Transform the given circuit into an optimized but equivalent circuit using "
         + "Tket compilation passes (e.g. removing redundancies).";
   }
 
   @Override
-  public List<SolverCharacteristic> getCharacteristics() {
-    return List.of(SolverCharacteristic.REFORMULATION);
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.REFORMULATION, RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override

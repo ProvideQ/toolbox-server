@@ -2,7 +2,9 @@ package edu.kit.provideq.toolbox.tsp.solvers;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -62,8 +64,11 @@ public class QuboTspSolver extends TspSolver {
   }
 
   @Override
-  public List<SolverCharacteristic> getCharacteristics() {
-    return List.of(SolverCharacteristic.REFORMULATION);
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.WEAKLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override

@@ -8,18 +8,21 @@ import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This problem solver solves the {@link DeadFeatureConfiguration#FEATURE_MODEL_ANOMALY_DEAD}
@@ -47,8 +50,10 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   }
 
   @Override
-  public List<SolverCharacteristic> getCharacteristics() {
-    return List.of(SolverCharacteristic.DECOMPOSITION);
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.DECOMPOSITION, RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override
@@ -98,7 +103,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
 
     return Flux.fromIterable(dimacsCnf.getVariables())
         .flatMap(feature -> checkFeatureDead(dimacsCnf, feature, subRoutineResolver)
-          .map(isVoid -> Tuples.of(feature, isVoid)))
+            .map(isVoid -> Tuples.of(feature, isVoid)))
         .collectMap(Tuple2::getT1, Tuple2::getT2)
         .map(featureIsVoidMap -> {
           var stringBuilder = new StringBuilder();
@@ -129,7 +134,7 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
    *
    * @param subRoutineResolver used to evaluate a SAT formula for the check.
    * @return the solution of the given {@code feature}.
-   *         Use {@link DimacsCnfSolution#isVoid()} to check the feature.
+   * Use {@link DimacsCnfSolution#isVoid()} to check the feature.
    */
   private static Mono<Boolean> checkFeatureDead(
       DimacsCnf cnf,

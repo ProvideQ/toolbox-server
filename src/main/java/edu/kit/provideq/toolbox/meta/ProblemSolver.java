@@ -41,8 +41,8 @@ public interface ProblemSolver<InputT, ResultT> {
    *
    * @return list of characteristics
    */
-  default List<SolverCharacteristic> getCharacteristics() {
-    return List.of(SolverCharacteristic.SOLVE);
+  default SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE);
   }
 
   /**

@@ -6,14 +6,17 @@ import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.meta.SolverCharacteristic;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
-import java.util.List;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * This problem solver solves the {@link VoidModelConfiguration#FEATURE_MODEL_ANOMALY_VOID} problem
@@ -39,8 +42,9 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
   }
 
   @Override
-  public List<SolverCharacteristic> getCharacteristics() {
-    return List.of(SolverCharacteristic.REFORMULATION);
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.REFORMULATION, RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override
@@ -90,7 +94,7 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
           solution.setSolutionData(dimacsCnfSolution.isVoid()
               ? "The feature model is a void feature model. The configuration is never valid."
               : "The feature model has valid configurations, for example: \n"
-                + dimacsCnfSolution.toHumanReadableString());
+              + dimacsCnfSolution.toHumanReadableString());
           solution.complete();
 
           return solution;
