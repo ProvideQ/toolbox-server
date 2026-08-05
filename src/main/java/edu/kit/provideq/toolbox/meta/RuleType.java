@@ -1,7 +1,8 @@
 package edu.kit.provideq.toolbox.meta;
 
-public enum SolverCharacteristic {
+public enum RuleType {
   SOLVE,
   REFORMULATION,
-  DECOMPOSITION
+  DECOMPOSITION,
+  DELEGATION
 }
