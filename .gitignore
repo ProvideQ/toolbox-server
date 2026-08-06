@@ -1,6 +1,7 @@
 HELP.md
 *.DS_Store
 .gradle
+.gamspy_license
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
