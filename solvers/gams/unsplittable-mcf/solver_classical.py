@@ -26,4 +26,4 @@ print("Building equations and model...")
 model.build_equations_and_model()
 
 print("\n--- Solving Classical MIP with CPLEX ---")
-model.solve_classical(solver="CPLEX", output_html=output_path)
+model.solve_classical(solver="SCIP", output_html=output_path)

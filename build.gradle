@@ -37,6 +37,12 @@ jar {
 // inject JUnit into test task
 tasks.named('test') {
     useJUnitPlatform()
+
+    // Show test output (System.out.println, etc)
+    testLogging {
+        showStandardStreams = true
+        events "passed", "skipped", "failed"
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

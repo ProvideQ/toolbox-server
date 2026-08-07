@@ -71,7 +71,8 @@ qubo_model = gp.Model(
 )
 
 print("Solving model natively...")
-qubo_model.solve(solver="CPLEX", output=sys.stdout, options=gp.Options(time_limit=60))
+qubo_model.solve(solver="SCIP", solver_options={"lp/solver": '"highs"'},
+                 output=sys.stdout, options=gp.Options(time_limit=60))
 
 print(f"\n--- Solver Status: {qubo_model.status} ---")
 print(f"--- Objective Value: {qubo_model.objective_value} ---")
