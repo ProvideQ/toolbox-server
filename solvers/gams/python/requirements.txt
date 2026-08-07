@@ -1,3 +1,4 @@
-# This file describes the python package requirements for all GAMS solvers.
-# We only build one venv for all of GAMS, not for every GAMS solver.
+# This file contains of the python dependencies required in the .gms files
+# GamsPy solvers are handles extra.
 networkx
+gamspy == 1.23.1

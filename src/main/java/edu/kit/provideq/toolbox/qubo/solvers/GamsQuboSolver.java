@@ -33,13 +33,13 @@ public class GamsQuboSolver extends QuboSolver {
 
   @Override
   public String getName() {
-    return "(GAMS) CPLEX Solver for QUBOs";
+    return "(GAMS) SCIP Solver for QUBOs";
   }
 
   @Override
   public String getDescription() {
     return "Solves QUBO problems by transforming it into a MIP,"
-        + "which is then solved with CPLEX. Implementation is done in GAMS";
+        + "which is then solved with SCIP. Implementation is done in GAMS";
   }
 
   @Override
