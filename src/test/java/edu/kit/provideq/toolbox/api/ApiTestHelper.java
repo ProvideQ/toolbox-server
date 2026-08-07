@@ -209,6 +209,7 @@ public class ApiTestHelper {
     // print error output if something went wrong
     if (problemDto.getState() != ProblemState.SOLVED
         || problemDto.getSolution().getStatus() != SolutionStatus.SOLVED) {
+      System.out.println("Testcase failed. Printing debugging info:");
       System.out.println(builder);
     }
 
