@@ -40,6 +40,8 @@ jobs:
             venv-${{ runner.os }}-
 
       - name: Install solver dependencies
+        env:
+          GAMSPY_LICENSE: ${{ secrets.GAMSPY_LICENSE }}
         run: ./scripts/ci-setup-solvers.sh
 
       - name: Run checks
