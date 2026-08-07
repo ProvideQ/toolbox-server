@@ -49,11 +49,11 @@ for base_dir in base_dirs:
                 req_file = os.path.join(solver_dir, 'requirements.txt')
                 if os.path.exists(req_file):
                     venv_name = f"{os.path.basename(root)}_{framework_name}_{solver_name}"
-                    print(f"Setting up virtual environment '{venv_name}' for {solver_dir}...")
 
+                    print(f"Setting up virtual environment '{venv_name}'")
                     try:
                         venv_path = os.path.join('venv', venv_name)
-                        subprocess.run(['python', '-m', 'venv', venv_path], check=True)
+                        subprocess.run(['python', '-m', 'venv', venv_path], check=True, capture_output=True)
                         if platform.system() == 'Windows':
                             pip_executable = os.path.join(venv_path, 'Scripts', 'pip.exe')
                             python_executable = os.path.join(venv_path, 'Scripts', 'python.exe')
@@ -62,13 +62,13 @@ for base_dir in base_dirs:
                             python_executable = os.path.join(venv_path, 'bin', 'python')
 
                         # install dependencies from requirements.txt
-                        subprocess.run([pip_executable, 'install', '-r', req_file], check=True)
+                        subprocess.run([pip_executable, 'install', '-r', req_file], check=True, capture_output=True)
 
                         # install GAMSPy license if this is a GAMS environment
                         if "gams" in venv_name.lower():
                             license_key = get_gamspy_license()
 
-                            print("Installing GAMSPy license...")
+                            print("Installing GAMSPy license and scip solver ...")
                             subprocess.run(
                                 [
                                     python_executable,
@@ -79,11 +79,30 @@ for base_dir in base_dirs:
                                     license_key,
                                 ],
                                 check=True,
+                                capture_output=True,
                             )
-                            print("GAMSPy license activated in '%s'" % venv_name)
+
+                            subprocess.run(
+                                [
+                                    python_executable,
+                                    "-m",
+                                    "gamspy",
+                                    "install",
+                                    "solver",
+                                    "scip"
+                                ],
+                                check=True,
+                                capture_output=True,
+                            )
 
                     except subprocess.CalledProcessError as e:
-                        print(f"Error setting up virtual environment for {solver_dir}: {e}")
+                        print(f"Error setting up virtual environment '{venv_name}' for {solver_dir}:")
+                        if e.stdout:
+                            print("STDOUT:")
+                            print(e.stdout.decode() if isinstance(e.stdout, bytes) else e.stdout)
+                        if e.stderr:
+                            print("STDERR:")
+                            print(e.stderr.decode() if isinstance(e.stderr, bytes) else e.stderr)
                         exitCode = 1
                         
 # let pipeline fail if there was an error in the venv setup.
