@@ -2,6 +2,9 @@ package edu.kit.provideq.toolbox.knapsack.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.knapsack.KnapsackConfiguration;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
@@ -40,6 +43,11 @@ public class PythonKnapsackSolver extends KnapsackSolver {
   public String getDescription() {
     return "A solver for the Knapsack problem using the Horowitz-Sahni "
         + "branch and search algorithm.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.EXACT, RuleProperty.VALID);
   }
 
   @Override
