@@ -62,7 +62,9 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
 
   @Override
   public SolverCharacteristics getCharacteristics() {
-    return SolverCharacteristics.of(RuleType.REFORMULATION, RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
         RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 

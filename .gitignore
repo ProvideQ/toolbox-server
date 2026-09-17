@@ -43,6 +43,7 @@ out/
 
 ### virtual envs and python ###
 venv/
+.venv/
 __pycache__/
 
 ### ProvideQ toolbox-server ###

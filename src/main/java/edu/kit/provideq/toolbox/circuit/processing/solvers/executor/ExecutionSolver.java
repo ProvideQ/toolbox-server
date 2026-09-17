@@ -55,7 +55,8 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
 
   @Override
   public SolverCharacteristics getCharacteristics() {
-    // TODO: valid only holds true for noise free simulation, add additional executor, splitting noisy and noise free
+    // TODO: valid only holds true for noise free simulation, add additional executor,
+    //  splitting noisy and noise free
     return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 

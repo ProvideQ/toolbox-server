@@ -13,10 +13,9 @@ import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 /**
  * This problem solver solves the {@link VoidModelConfiguration#FEATURE_MODEL_ANOMALY_VOID} problem
@@ -43,7 +42,9 @@ public class SatBasedVoidFeatureSolver implements ProblemSolver<String, String> 
 
   @Override
   public SolverCharacteristics getCharacteristics() {
-    return SolverCharacteristics.of(RuleType.REFORMULATION, RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
         RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
