@@ -1,6 +1,9 @@
 package edu.kit.provideq.toolbox.unsplittablemcf.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
@@ -42,6 +45,11 @@ public class GamsUnsplittableMcfClassicalSolver extends GamsUnsplittableMcfSolve
     return "Solves the Unsplittable Multi Commodity Flow problem using GAMSPy and SCIP. "
         + "Builds a time-expanded network model and finds optimal flow routes minimizing "
         + "delay and slack penalties.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override

@@ -2,17 +2,24 @@ package edu.kit.provideq.toolbox.tsp.solvers;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.meta.guard.Guard;
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
+import edu.kit.provideq.toolbox.tsp.TspSolutionGuard;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -31,6 +38,9 @@ public class QuboTspSolver extends TspSolver {
           "How should the QUBO be solved?",
           true
       );
+
+  private static final boolean DEFAULT_GUARDED = false;
+  private static final int DEFAULT_GUARD_RETRIES = 3;
 
   private final ApplicationContext context;
   private final String binaryPath;
@@ -61,6 +71,14 @@ public class QuboTspSolver extends TspSolver {
   }
 
   @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.WEAKLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
+  }
+
+  @Override
   public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return List.of(QUBO_SUBROUTINE);
   }
@@ -80,18 +98,30 @@ public class QuboTspSolver extends TspSolver {
   }
 
   @Override
+  public List<SolverSetting> getSolverSettings() {
+    return Guard.createSettings(
+        "Check that the reconstructed tour visits every node exactly once. "
+            + "Invalid or missing tours are rejected instead of being returned.",
+        DEFAULT_GUARDED,
+        DEFAULT_GUARD_RETRIES);
+  }
+
+  @Override
   public Mono<Solution<String>> solve(
       String input,
       SubRoutineResolver resolver,
       SolvingProperties properties
   ) {
+    var guardConfiguration =
+        Guard.readConfiguration(properties, DEFAULT_GUARDED, DEFAULT_GUARD_RETRIES);
+
     var solution = new Solution<>(this);
 
     // change "TYPE" keyword from "TSP" to "CVRP"
     // add capacity declaration of "0" (is ignored later)
     // this is theoretically wrong, but needed for Lucas' QUBO converter to work
     String typeRegex = "(?i)\\btype\\s*:\\s*tsp\\b";
-    input = input.replaceAll(typeRegex, "TYPE : CVRP\nCAPACITY : 0");
+    String vrpInput = input.replaceAll(typeRegex, "TYPE : CVRP\nCAPACITY : 0");
 
     // translate into qubo in lp-file format with rust vrp meta solver
     var processResult = context
@@ -103,7 +133,7 @@ public class QuboTspSolver extends TspSolver {
             "simulated",
             "--transform-only"
         )
-        .writeInputFile(input, "problem.vrp")
+        .writeInputFile(vrpInput, "problem.vrp")
         .readOutputFile("problem.lp")
         .run(getProblemType(), solution.getId());
 
@@ -122,25 +152,39 @@ public class QuboTspSolver extends TspSolver {
     }
     Path quboSolutionFilePath = Path.of(problemDirectoryPath, "problem.bin");
 
-    String finalInput = input;
-    return resolver.runSubRoutine(QUBO_SUBROUTINE, output.get())
+    return Guard.solve(
+        solution,
+        input,
+        TspSolutionGuard.INSTANCE,
+        guardConfiguration,
+        () -> solveAndReconstruct(
+            resolver, output.get(), vrpInput, quboSolutionFilePath, solution.getId()));
+  }
+
+  private Mono<Guard.Attempt<String>> solveAndReconstruct(
+      SubRoutineResolver resolver,
+      String qubo,
+      String vrpInput,
+      Path quboSolutionFilePath,
+      UUID solutionId
+  ) {
+    return resolver.runSubRoutine(QUBO_SUBROUTINE, qubo)
         .publishOn(Schedulers.boundedElastic()) //avoids block from Files.writeString() in try/catch
         .map(subRoutineSolution -> {
           if (subRoutineSolution.getSolutionData() == null
               || subRoutineSolution.getSolutionData().isEmpty()) {
-            solution.setDebugData("Unable to process at least one Subroutine, "
-                + "because its SolutionData does not exist");
-            solution.abort();
-            return solution;
+            return Guard.Attempt.failed(
+                "Unable to process at least one Subroutine, "
+                    + "because its SolutionData does not exist",
+                subRoutineSolution);
           }
 
           try {
             Files.writeString(quboSolutionFilePath, subRoutineSolution.getSolutionData());
           } catch (IOException e) {
-            solution.setDebugData(
-                "Failed to write qubo solution file with path: " + quboSolutionFilePath);
-            solution.abort();
-            return solution;
+            return Guard.Attempt.failed(
+                "Failed to write qubo solution file with path: " + quboSolutionFilePath,
+                subRoutineSolution);
           }
 
           var processRetransformResult = context
@@ -152,21 +196,18 @@ public class QuboTspSolver extends TspSolver {
                   "simulated",
                   "--qubo-solution", quboSolutionFilePath.toString()
               )
-              .writeInputFile(finalInput, "problem.vrp")
+              .writeInputFile(vrpInput, "problem.vrp")
               .readOutputFile("problem.sol")
-              .run(getProblemType(), solution.getId());
+              .run(getProblemType(), solutionId);
 
           if (!processRetransformResult.success()) {
-            solution.setDebugData(
-                processRetransformResult.errorOutput().orElse("Unable to retransform result."));
-            solution.abort();
-            return solution;
+            return Guard.Attempt.failed(
+                processRetransformResult.errorOutput().orElse("Unable to retransform result."),
+                subRoutineSolution);
           }
 
-          solution.setSolutionData(processRetransformResult.output().orElse("Empty Solution"));
-          solution.complete();
-
-          return solution;
+          return Guard.Attempt.of(
+              processRetransformResult.output().orElse("Empty Solution"), subRoutineSolution);
         });
   }
 }

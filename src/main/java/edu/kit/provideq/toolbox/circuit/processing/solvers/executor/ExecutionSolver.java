@@ -3,6 +3,9 @@ package edu.kit.provideq.toolbox.circuit.processing.solvers.executor;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
@@ -48,6 +51,13 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   @Override
   public String getDescription() {
     return "Execute an OpenQASM circuit";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    // TODO: valid only holds true for noise free simulation, add additional executor,
+    //  splitting noisy and noise free
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override
