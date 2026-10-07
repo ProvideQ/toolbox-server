@@ -1,0 +1,47 @@
+plugins {
+    id 'java-library'
+    id 'checkstyle'
+}
+
+group = 'edu.kit.provideq.formats'
+version = '0.1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://jitpack.io' }
+}
+
+dependencies {
+    api project(':formats:formats-core')
+    api project(':formats:formats-cnf')
+
+    // FeatureIDE feature-model library, provided as a local jar in the toolbox-server repository
+    implementation files("${rootProject.projectDir}/lib/de.ovgu.featureide.lib.fm-v3.9.1.jar")
+    implementation files("${rootProject.projectDir}/lib/uvl-parser.jar")
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-Xlint:unchecked'
+    options.compilerArgs << '-Xlint:deprecation'
+    options.compilerArgs << '-Werror'
+}
+
+checkstyle {
+    toolVersion = '10.12.0'
+    configDirectory = rootProject.file('config/checkstyle')
+    configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+}
+
+

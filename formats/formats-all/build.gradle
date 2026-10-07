@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'edu.kit.provideq.formats'
+version = '0.1.0'
+
+dependencies {
+    api project(':formats:formats-core')
+    api project(':formats:formats-cnf')
+    api project(':formats:formats-gml')
+    api project(':formats:formats-ufl')
+}
