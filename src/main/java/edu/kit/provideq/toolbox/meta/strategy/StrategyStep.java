@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * A single transformation rule of a meta-solver strategy, a problem and the solver applied to it
- * A step without a problem id stands for a sub-routine that hasn't been called yet
+ * A step without a problem id stands for a sub-routine that hasn't been called yet.
  */
 public record StrategyStep(
     String problemId,
@@ -18,7 +18,7 @@ public record StrategyStep(
 ) {
   /**
    * Flattens strategy formed by a problem and its sub-problems into pre-order
-   * so every step directly follows its parent
+   * so every step directly follows its parent.
    */
   public static List<StrategyStep> collect(Problem<?, ?> problem) {
     var steps = new ArrayList<StrategyStep>();
