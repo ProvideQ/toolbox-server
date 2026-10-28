@@ -15,13 +15,13 @@ slim core with pluggable format modules on top.
 
 ## Modules
 
-| Module          | Content                                             |
-|-----------------|-----------------------------------------------------|
-| `formats-core`  | Format/Converter/Property abstractions, registry, services, errors |
-| `formats-cnf`   | DIMACS CNF + solution formats, logical expressions  |
-| `formats-gml`   | GML graph format                                    |
-| `formats-ufl`   | UVL feature models (FeatureIDE-based, heavy dependency) |
-| `formats-all`   | Aggregate that depends on all of the above          |
+| Module         | Content                                             |
+|----------------|-----------------------------------------------------|
+| `formats-core` | Format/Converter/Property abstractions, registry, services, errors |
+| `formats-cnf`  | DIMACS CNF + solution formats, logical expressions  |
+| `formats-gml`  | GML graph format                                    |
+| `formats-uvl`  | UVL feature models (FeatureIDE-based, heavy dependency) |
+| `formats-all`  | Aggregate that depends on all of the above          |
 
 ## Usage
 
