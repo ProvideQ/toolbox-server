@@ -1,6 +1,9 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -30,6 +33,13 @@ public class TwoPhaseClusterer extends VrpClusterer {
       @Value("${path.custom.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     super(binaryPath, context);
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.DECOMPOSITION,
+        RuleProperty.STRONGLY_CONSTRAINT_PRESERVING);
   }
 
   @Override

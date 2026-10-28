@@ -1,6 +1,9 @@
 package edu.kit.provideq.toolbox.unsplittablemcf.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -55,6 +58,14 @@ public class GamsUnsplittableMcfQuboSolver extends GamsUnsplittableMcfSolver {
   public String getDescription() {
     return "Solves the Unsplittable Multi Commodity Flow problem by transforming it to a "
         + "QUBO problem and solving with a QUBO solver.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.WEAKLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override
