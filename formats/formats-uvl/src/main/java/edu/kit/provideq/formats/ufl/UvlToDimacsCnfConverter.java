@@ -10,6 +10,7 @@ import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormatCNF;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
 import edu.kit.provideq.formats.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.core.ConstraintPreservation;
 import edu.kit.provideq.formats.core.FormatException;
 import edu.kit.provideq.formats.core.FuncConverter;
 import edu.kit.provideq.formats.core.ParseException;
@@ -28,8 +29,8 @@ public final class UvlToDimacsCnfConverter {
    * Converter instance between UVL feature models and DIMACS CNF.
    */
   public static final FuncConverter<String, DimacsCnf> INSTANCE =
-      new FuncConverter<>(UvlFormat.INSTANCE, DimacsCnfFormat.INSTANCE, false,
-          UvlToDimacsCnfConverter::convert);
+      new FuncConverter<>(UvlFormat.INSTANCE, DimacsCnfFormat.INSTANCE,
+          ConstraintPreservation.STRONG, true, UvlToDimacsCnfConverter::convert);
 
   private UvlToDimacsCnfConverter() {
   }

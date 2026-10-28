@@ -93,7 +93,8 @@ scan instead of parsing the full object.
 - **No fixed intermediate representation.** A "standard format" per problem type is the
   convention (the hub of the conversion graph), but the core treats every format equally.
   Shortest paths over the converter graph are pre-computed whenever a converter is
-  registered; among equal-length paths, lossless converters are preferred.
+  registered; among equal-length paths, constraint-preserving converters are preferred
+  (more strongly preserving first, then weakly preserving, then optimal-solution-preserving).
 - **Pure interfaces.** `Format`, `Converter` and `PropertyAccessor` are interfaces;
   implementors can use records, plain classes or lambdas (`FuncConverter`).
 - **Performance-first core**: synchronous, allocation-conscious; `Reader`/`Writer`-based

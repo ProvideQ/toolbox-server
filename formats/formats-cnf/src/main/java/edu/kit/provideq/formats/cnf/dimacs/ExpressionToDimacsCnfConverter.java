@@ -1,5 +1,6 @@
 package edu.kit.provideq.formats.cnf.dimacs;
 
+import edu.kit.provideq.formats.core.ConstraintPreservation;
 import edu.kit.provideq.formats.core.FormatException;
 import edu.kit.provideq.formats.core.FuncConverter;
 import edu.kit.provideq.formats.core.ParseException;
@@ -12,8 +13,8 @@ public final class ExpressionToDimacsCnfConverter {
    * Converter instance between logical expressions and DIMACS CNF.
    */
   public static final FuncConverter<String, DimacsCnf> INSTANCE =
-      new FuncConverter<>(ExpressionFormat.INSTANCE, DimacsCnfFormat.INSTANCE, true,
-          ExpressionToDimacsCnfConverter::convert);
+      new FuncConverter<>(ExpressionFormat.INSTANCE, DimacsCnfFormat.INSTANCE,
+          ConstraintPreservation.STRONG, true, ExpressionToDimacsCnfConverter::convert);
 
   private ExpressionToDimacsCnfConverter() {
   }

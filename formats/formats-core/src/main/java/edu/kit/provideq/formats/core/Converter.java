@@ -18,9 +18,15 @@ public interface Converter<A, B> {
   Format<B> getTarget();
 
   /**
-   * Returns whether the conversion preserves all information.
+   * Returns the degree to which the conversion preserves the source problem's constraints.
    */
-  boolean isLossless();
+  ConstraintPreservation getConstraintPreservation();
+
+  /**
+   * Returns whether optimal solution preservation holds: at least one optimal solution of the
+   * source problem remains in the output solution space after the conversion.
+   */
+  boolean isOptimalSolutionPreserving();
 
   /**
    * Converts a value from the source format's representation to the target format's.

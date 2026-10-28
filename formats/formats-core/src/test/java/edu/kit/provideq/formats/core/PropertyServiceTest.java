@@ -49,7 +49,8 @@ class PropertyServiceTest {
   @Test
   void unreachableAccessorThrowsPropertyNotFound() {
     var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, true, String::length));
+    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.STRONG, true,
+        String::length));
     var toolbox = new FormatsToolbox(registry);
     // property only defined on an isolated format without any conversion path
     toolbox.getPropertyService().register(new CountAccessor(new TestFormat<>("isolated"),
@@ -79,7 +80,7 @@ class PropertyServiceTest {
 
   private FormatsToolbox createToolboxWithConverters() {
     var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_B, true,
+    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_B, ConstraintPreservation.STRONG, true,
         value -> value + "-b"));
     registry.seal();
 

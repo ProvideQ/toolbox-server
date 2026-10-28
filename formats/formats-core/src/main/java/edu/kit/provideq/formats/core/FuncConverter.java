@@ -8,7 +8,8 @@ import java.util.Objects;
  * <p>Use this for simple converters instead of writing anonymous classes:
  * <pre>{@code
  *   var converter = new FuncConverter<>(
- *       ExpressionFormat.INSTANCE, DimacsCnfFormat.INSTANCE, true,
+ *       ExpressionFormat.INSTANCE, DimacsCnfFormat.INSTANCE,
+ *       ConstraintPreservation.STRONG, true,
  *       expression -> DimacsCnf.fromLogicalExpressionString(expression));
  * }</pre>
  *
@@ -18,23 +19,44 @@ import java.util.Objects;
 public final class FuncConverter<A, B> implements Converter<A, B> {
   private final Format<A> source;
   private final Format<B> target;
-  private final boolean lossless;
+  private final ConstraintPreservation constraintPreservation;
+  private final boolean optimalSolutionPreserving;
   private final Converter.ThrowingFunction<A, B> function;
+
+  /**
+   * Creates a converter backed by the given conversion function without optimal solution
+   * preservation.
+   *
+   * @param source format the converter converts from
+   * @param target format the converter converts to
+   * @param constraintPreservation the degree to which the conversion preserves constraints
+   * @param function the conversion function; it should throw {@link FormatException}
+   *        on failure
+   */
+  public FuncConverter(Format<A> source, Format<B> target,
+      ConstraintPreservation constraintPreservation, Converter.ThrowingFunction<A, B> function) {
+    this(source, target, constraintPreservation, false, function);
+  }
 
   /**
    * Creates a converter backed by the given conversion function.
    *
    * @param source format the converter converts from
    * @param target format the converter converts to
-   * @param lossless whether the conversion preserves all information
+   * @param constraintPreservation the degree to which the conversion preserves constraints
+   * @param optimalSolutionPreserving whether optimal solution preservation holds: at least one
+   *        optimal solution remains in the output solution space
    * @param function the conversion function; it should throw {@link FormatException}
    *        on failure
    */
-  public FuncConverter(Format<A> source, Format<B> target, boolean lossless,
+  public FuncConverter(Format<A> source, Format<B> target,
+      ConstraintPreservation constraintPreservation, boolean optimalSolutionPreserving,
       Converter.ThrowingFunction<A, B> function) {
     this.source = Objects.requireNonNull(source, "source");
     this.target = Objects.requireNonNull(target, "target");
-    this.lossless = lossless;
+    this.constraintPreservation = Objects.requireNonNull(constraintPreservation,
+        "constraintPreservation");
+    this.optimalSolutionPreserving = optimalSolutionPreserving;
     this.function = Objects.requireNonNull(function, "function");
   }
 
@@ -49,8 +71,13 @@ public final class FuncConverter<A, B> implements Converter<A, B> {
   }
 
   @Override
-  public boolean isLossless() {
-    return lossless;
+  public ConstraintPreservation getConstraintPreservation() {
+    return constraintPreservation;
+  }
+
+  @Override
+  public boolean isOptimalSolutionPreserving() {
+    return optimalSolutionPreserving;
   }
 
   @Override

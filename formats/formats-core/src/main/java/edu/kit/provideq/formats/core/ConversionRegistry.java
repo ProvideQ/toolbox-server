@@ -19,7 +19,8 @@ import java.util.Objects;
 public class ConversionRegistry {
   private final Map<String, Format<?>> formats = new HashMap<>();
   private final Map<Format<?>, List<Converter<?, ?>>> outgoing = new HashMap<>();
-  private final Map<Format<?>, Map<Format<?>, List<Converter<?, ?>>>> shortestPaths = new HashMap<>();
+  private final Map<Format<?>, Map<Format<?>, List<Converter<?, ?>>>> shortestPaths
+      = new HashMap<>();
   private boolean sealed = false;
 
   /**
@@ -117,7 +118,7 @@ public class ConversionRegistry {
 
   /**
    * Returns the pre-computed shortest conversion path from one format to another.
-   * Prefers lossless converters when multiple paths of equal length exist.
+   * Prefers constraint-preserving converters when multiple paths of equal length exist.
    *
    * @param from source format
    * @param to target format
@@ -143,7 +144,8 @@ public class ConversionRegistry {
 
   /**
    * Recomputes shortest paths starting at the given source format.
-   * Uses BFS over the converter graph; among equal-length paths, lossless edges win.
+   * Uses BFS over the converter graph; among equal-length paths,
+   * constraint-preserving edges win.
    */
   private void recomputePathsFrom(Format<?> source) {
     var pathMap = new HashMap<Format<?>, List<Converter<?, ?>>>();
@@ -182,23 +184,53 @@ public class ConversionRegistry {
   }
 
   /**
-   * Among paths of equal length to the same target, prefers the lossless one.
+   * Among paths of equal length to the same target, prefers the one with more strongly
+   * constraint-preserving converters, then more weakly preserving ones, then more
+   * optimal-solution-preserving ones.
    */
   private void addIfBetter(
       Map<Format<?>, List<Converter<?, ?>>> pathMap,
       Format<?> target,
       List<Converter<?, ?>> path) {
     var existing = pathMap.get(target);
-    if (existing != null && isMoreLossless(existing, path)) {
+    if (existing != null && !isBetterPath(existing, path)) {
       return;
     }
     pathMap.put(target, List.copyOf(path));
   }
 
-  private boolean isMoreLossless(List<Converter<?, ?>> existing, List<Converter<?, ?>> candidate) {
-    var existingLossy = existing.stream().filter(c -> !c.isLossless()).count();
-    var candidateLossy = candidate.stream().filter(c -> !c.isLossless()).count();
-    return existingLossy <= candidateLossy;
+  private boolean isBetterPath(List<Converter<?, ?>> existing, List<Converter<?, ?>> candidate) {
+    var existingScore = preservationScore(existing);
+    var candidateScore = preservationScore(candidate);
+    for (var i = 0; i < existingScore.length; i++) {
+      if (candidateScore[i] != existingScore[i]) {
+        return candidateScore[i] > existingScore[i];
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Counts of strongly preserving, weakly preserving and optimal-solution-preserving
+   * converters, in order of preference.
+   */
+  private static int[] preservationScore(List<Converter<?, ?>> path) {
+    var strong = 0;
+    var weak = 0;
+    var optimalSolutionPreserving = 0;
+    for (var converter : path) {
+      switch (converter.getConstraintPreservation()) {
+        case STRONG -> strong++;
+        case WEAK -> weak++;
+        case NONE -> { }
+        default -> throw new IllegalStateException(
+            "Unknown constraint preservation: " + converter.getConstraintPreservation());
+      }
+      if (converter.isOptimalSolutionPreserving()) {
+        optimalSolutionPreserving++;
+      }
+    }
+    return new int[] {strong, weak, optimalSolutionPreserving};
   }
 
   /**
