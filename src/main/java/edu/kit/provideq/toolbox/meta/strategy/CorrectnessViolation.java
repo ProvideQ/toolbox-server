@@ -6,6 +6,10 @@ import edu.kit.provideq.toolbox.meta.RuleType;
 public record CorrectnessViolation(
     String problemId,
     RuleType ruleType,
-    RuleProperty requiredProperty
+    RuleProperty requiredProperty,
+    String guardedBy
 ) {
+  public boolean isGuarded() {
+    return guardedBy != null;
+  }
 }

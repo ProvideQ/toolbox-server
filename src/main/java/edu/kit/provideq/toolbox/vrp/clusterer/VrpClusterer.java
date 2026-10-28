@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.vrp.clusterer;
 
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -87,6 +88,19 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
       solution.setDebugData("Failed to retrieve problem directory.");
       solution.fail();
       return solution;
+    }
+
+    // abort if any cluster could not be solved, its solution data cannot be combined
+    for (var entry : clusterSolutionMap.entrySet()) {
+      var clusterSolution = entry.getValue();
+      if (clusterSolution.getStatus() != SolutionStatus.SOLVED
+          || clusterSolution.getSolutionData() == null) {
+        solution.setDebugData("Cluster " + entry.getKey().getFileName()
+            + " could not be solved (status " + clusterSolution.getStatus() + "): "
+            + clusterSolution.getDebugData());
+        solution.abort();
+        return solution;
+      }
     }
 
     // write solutions of the clusters into files:

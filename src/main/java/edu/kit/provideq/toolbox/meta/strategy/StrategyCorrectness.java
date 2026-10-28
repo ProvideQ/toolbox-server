@@ -19,10 +19,15 @@ public record StrategyCorrectness(
   public static StrategyCorrectness evaluate(List<StrategyStep> steps) {
     var violations = new ArrayList<CorrectnessViolation>();
     var hasUnknownRules = false;
+    var reliesOnGuard = false;
 
     for (var step : steps) {
       if (!step.isConfigured()) {
-        hasUnknownRules = true;
+        if (step.guardedBy() == null) {
+          hasUnknownRules = true;
+        } else {
+          reliesOnGuard = true;
+        }
         continue;
       }
 
@@ -30,16 +35,22 @@ public record StrategyCorrectness(
       for (var ruleType : characteristics.types()) {
         var requiredProperty = REQUIRED_PROPERTIES.get(ruleType);
         if (requiredProperty != null && !characteristics.properties().contains(requiredProperty)) {
-          violations.add(new CorrectnessViolation(step.problemId(), ruleType, requiredProperty));
+          violations.add(new CorrectnessViolation(
+              step.problemId(), ruleType, requiredProperty, step.guardedBy()));
         }
       }
     }
 
+    var hasUnguardedViolations = violations.stream().anyMatch(v -> !v.isGuarded());
+    reliesOnGuard |= violations.stream().anyMatch(CorrectnessViolation::isGuarded);
+
     CorrectnessVerdict verdict;
-    if (!violations.isEmpty()) {
+    if (hasUnguardedViolations) {
       verdict = CorrectnessVerdict.INCORRECT;
     } else if (hasUnknownRules) {
       verdict = CorrectnessVerdict.UNDETERMINED;
+    } else if (reliesOnGuard) {
+      verdict = CorrectnessVerdict.GUARDED_CORRECT;
     } else {
       verdict = CorrectnessVerdict.CORRECT;
     }
