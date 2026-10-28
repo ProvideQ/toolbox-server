@@ -72,7 +72,9 @@ conda create --name gams python=3.10 --yes
 source /opt/conda/bin/activate gams
 
 # install GAMS links for python
-pip install gamsapi[core,connect] --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+pip install "gamsapi[core,connect]==${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}" \
+  --only-binary=gamsapi \
+  --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
 pip install networkx
 
 # make GAMS use our python version
