@@ -77,7 +77,7 @@ class DimacsCnfTest {
     var expression = "apple and banana";
 
     var variableCount = toolbox.getPropertyService().read(
-        expression, ExpressionFormat.INSTANCE, "variableCount", Integer.class);
+        expression, LogicalExpressionFormat.INSTANCE, "variableCount", Integer.class);
 
     assertEquals(2, variableCount);
   }
@@ -91,7 +91,7 @@ class DimacsCnfTest {
     CnfFormats.registerProperties(toolbox);
 
     assertThrows(PropertyNotFoundException.class,
-        () -> toolbox.readProperty("not a cnf", ExpressionFormat.INSTANCE,
+        () -> toolbox.readProperty("not a cnf", LogicalExpressionFormat.INSTANCE,
             "unknown", Integer.class));
   }
 

@@ -17,7 +17,7 @@ public final class CnfFormats {
    */
   public static void register(ConversionRegistry registry) {
     registry.register(DimacsCnfFormat.INSTANCE);
-    registry.register(ExpressionFormat.INSTANCE);
+    registry.register(LogicalExpressionFormat.INSTANCE);
     registry.register(ExpressionToDimacsCnfConverter.INSTANCE);
   }
 

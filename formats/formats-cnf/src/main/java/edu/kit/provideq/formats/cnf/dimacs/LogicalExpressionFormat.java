@@ -13,11 +13,11 @@ import java.util.Set;
 /**
  * The logical expression format for boolean formulas, e.g. {@code a and (b or not c)}.
  */
-public record ExpressionFormat() implements Format<String> {
+public record LogicalExpressionFormat() implements Format<String> {
   /**
    * Singleton instance of the logical expression format.
    */
-  public static final ExpressionFormat INSTANCE = new ExpressionFormat();
+  public static final LogicalExpressionFormat INSTANCE = new LogicalExpressionFormat();
 
   @Override
   public String getName() {

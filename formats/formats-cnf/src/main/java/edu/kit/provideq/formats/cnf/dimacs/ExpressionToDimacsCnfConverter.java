@@ -13,7 +13,7 @@ public final class ExpressionToDimacsCnfConverter {
    * Converter instance between logical expressions and DIMACS CNF.
    */
   public static final FuncConverter<String, DimacsCnf> INSTANCE =
-      new FuncConverter<>(ExpressionFormat.INSTANCE, DimacsCnfFormat.INSTANCE,
+      new FuncConverter<>(LogicalExpressionFormat.INSTANCE, DimacsCnfFormat.INSTANCE,
           ConstraintPreservation.STRONG, true, ExpressionToDimacsCnfConverter::convert);
 
   private ExpressionToDimacsCnfConverter() {
