@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -71,14 +72,14 @@ final class SubProblems<InputT, ResultT>
   }
 
   /**
-   * Returns all sub-problems related to a given sub-routine.
+   * Returns all sub-problems related to a given sub-routine, in the order they were created in.
    */
   public <SubResultT, SubInputT> Set<Problem<SubInputT, SubResultT>> getProblems(
       SubRoutineDefinition<SubInputT, SubResultT> subRoutineDefinition) {
     var optionalEntry = findEntry(subRoutineDefinition);
 
     return optionalEntry
-        .map(entry -> (Set<Problem<SubInputT, SubResultT>>) new HashSet<>(entry.problems))
+        .map(entry -> (Set<Problem<SubInputT, SubResultT>>) new LinkedHashSet<>(entry.problems))
         .orElse(Collections.emptySet());
   }
 

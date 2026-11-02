@@ -4,6 +4,9 @@ import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
@@ -40,6 +43,11 @@ public class GamsSatSolver extends SatSolver {
   @Override
   public String getDescription() {
     return "Solves SAT problems using GAMS as a Mixed Integer Programming problem.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.EXACT, RuleProperty.VALID);
   }
 
   @Override

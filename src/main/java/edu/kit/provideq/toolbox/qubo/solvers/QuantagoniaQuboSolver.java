@@ -9,6 +9,9 @@ import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ProblemProperties;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ResultProperties;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.StatusProperties;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
@@ -41,6 +44,11 @@ public class QuantagoniaQuboSolver extends QuboSolver {
   @Override
   public String getDescription() {
     return "This solver uses Quantagonia’s HybridSolver to solve QUBO problems via PlanQK";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override

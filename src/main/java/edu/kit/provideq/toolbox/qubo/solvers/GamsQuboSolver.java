@@ -1,6 +1,9 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
@@ -40,6 +43,11 @@ public class GamsQuboSolver extends QuboSolver {
   public String getDescription() {
     return "Solves QUBO problems by transforming it into a MIP,"
         + "which is then solved with SCIP. Implementation is done in GAMS";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override

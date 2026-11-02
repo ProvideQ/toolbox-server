@@ -21,6 +21,7 @@ public class Solution<S> {
   private String debugData;
   private String solverName;
   private long executionMilliseconds;
+  private String guardRejection;
 
   /**
    * Internal constructor, used for de-serialization.
@@ -57,6 +58,7 @@ public class Solution<S> {
     result.metaData = source.metaData;
     result.debugData = source.debugData;
     result.executionMilliseconds = source.executionMilliseconds;
+    result.guardRejection = source.guardRejection;
     result.solutionData = source.solutionData == null ? null : mapper.apply(source.solutionData);
     return result;
   }
@@ -96,6 +98,7 @@ public class Solution<S> {
     stringSolution.debugData = debugData;
     stringSolution.solverName = solverName;
     stringSolution.executionMilliseconds = executionMilliseconds;
+    stringSolution.guardRejection = guardRejection;
     return stringSolution;
   }
 
@@ -164,6 +167,14 @@ public class Solution<S> {
 
   public void setExecutionMilliseconds(long executionMilliseconds) {
     this.executionMilliseconds = executionMilliseconds;
+  }
+
+  public String getGuardRejection() {
+    return guardRejection;
+  }
+
+  public void rejectByGuard(String reason) {
+    this.guardRejection = reason;
   }
 
   @Override
