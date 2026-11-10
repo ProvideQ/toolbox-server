@@ -1,7 +1,9 @@
 import os
 import sys
 import gurobipy as gp
+from qiskit import qasm3
 from qiskit_optimization import QuadraticProgram
+from qiskit.circuit.library import qaoa_ansatz
 
 # Import parse_qubo_from_lp from sibling _utility directory
 # Add the parent (solvers) directory to enable the import
@@ -10,11 +12,6 @@ solvers_dir = os.path.join(script_dir, '..', '..')
 sys.path.insert(0, solvers_dir)
 
 from _utility.parse_qubo_from_lp import parse_qubo_from_lp
-
-from qiskit.primitives import StatevectorSampler
-from qiskit_optimization.minimum_eigensolvers import QAOA
-from qiskit_optimization.optimizers import COBYLA
-from qiskit_optimization.algorithms import MinimumEigenOptimizer
 
 if len(sys.argv) != 3:
     raise ValueError('This script expects exactly 2 arguments. Input file (argument 1) and output file (argument 2).')
@@ -37,20 +34,19 @@ if model.ModelSense == 1:
 else:
     qubo.maximize(constant=constant_offset, linear=linear_terms, quadratic=quadratic_terms)
 
-# Add constraints (empty in this example)
-# You can extend this logic to handle any constraints
+hamiltonian = qubo.to_ising()[0]
 
-# parse LP file:
-print(qubo.prettyprint())
+circuit = qaoa_ansatz(cost_operator=hamiltonian, reps=3)
 
-# TODO: Sampler() has to be replaces with StatevectorSampler() in newer versions.
-# (currently not yet supported by qiskit-optimization)
-# TODO: add a dedicated mixer
-qaoa_mes = QAOA(sampler=StatevectorSampler(), optimizer=COBYLA())
-qaoa = MinimumEigenOptimizer(qaoa_mes)
+# includes = [] to avoid including standard libraries in the output which are not understood by circuit processing
+qasm_string = str(qasm3.dumps(circuit))
 
-qaoa_result = qaoa.solve(qubo)
+qasm_string = qasm_string.replace('_β', 'beta')
+qasm_string = qasm_string.replace('_γ', 'gamma')
+
+print("problem string:")
+print(qasm_string)
 
 f = open(output_path, 'w')
-f.write(qaoa_result.prettyprint())
+f.write(qasm_string)
 f.close()
