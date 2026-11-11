@@ -90,7 +90,10 @@ res = problem.run(qarg, mes_kwargs={"backend": def_backend}, depth=1)
 res = dict(list(res.items())[:1])
 
 if args.output_file:
+    # write the solution in the standardized lp-solution format:
+    # one "<variable> <value>" assignment per line, in the variable order of the LP file
     with open(args.output_file, "w") as out:
-        out.writelines([f"{bin}\n" for bin in list(list(res.keys())[0])])
+        for var_name, bit in zip(vars, list(list(res.keys())[0])):
+            out.write(f"{var_name} {bit}\n")
 else:
     print(list(list(res.keys())[0]))

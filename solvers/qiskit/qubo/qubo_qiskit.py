@@ -51,6 +51,8 @@ qaoa = MinimumEigenOptimizer(qaoa_mes)
 
 qaoa_result = qaoa.solve(qubo)
 
-f = open(output_path, 'w')
-f.write(qaoa_result.prettyprint())
-f.close()
+# write the solution in the standardized lp-solution format:
+# one "<variable> <value>" assignment per line, in the variable order of the LP file
+with open(output_path, 'w') as f:
+    for var_name, bit in zip(vars, qaoa_result.x):
+        f.write(f"{var_name} {round(bit)}\n")

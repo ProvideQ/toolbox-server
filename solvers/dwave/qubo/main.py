@@ -66,8 +66,13 @@ def main():
     print(f"ended {now - last}")
 
     if args.output_file:
+        # write the solution in the standardized lp-solution format:
+        # one "<variable> <value>" assignment per line
         with open(args.output_file, "w") as out:
-            out.writelines([f"{bin}\n" for bin in sampleset.first.sample.values()])
+            for var_key, value in sampleset.first.sample.items():
+                # the BQM built from an LP file is keyed by variable index
+                var_name = vars[var_key] if isinstance(var_key, int) and var_key < len(vars) else var_key
+                out.write(f"{var_name} {value}\n")
     else:
         print(sampleset.first.energy)
         print(sampleset.first.sample)
