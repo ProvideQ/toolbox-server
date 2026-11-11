@@ -1,5 +1,5 @@
 # This file describes the python package requirements for the Qrisp VRP solver
-qrisp == 0.4.4
-numpy == 1.26.4
+qrisp == 0.9.10
+numpy >= 2.0, < 2.5 # constrained by qrisp
 tsplib95 == 0.7.1 # for tsplib file parsing
-sympy == 1.12.1 # needed but not specified in qrisp requirements
+sympy == 1.13 # needed but not specified in qrisp requirements

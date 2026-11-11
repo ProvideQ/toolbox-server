@@ -1,6 +1,5 @@
 import numpy as np
-from qrisp import QuantumArray, QuantumFloat
-from qrisp.core import demux
+from qrisp import QuantumArray, QuantumFloat, demux
 from qrisp.environments import invert
 
 

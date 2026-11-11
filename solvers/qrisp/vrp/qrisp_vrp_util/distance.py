@@ -50,7 +50,7 @@ def qdict_calc_perm_travel_distance_forward(
     index_bit_number = ceil(np.log2(est_worst_clusters))
 
     demand_indexer = QuantumFloat(index_bit_number)
-    demand_counter = QuantumArray(qtype=demand_count_type)
+    demand_counter = QuantumArray(qtype=demand_count_type, shape=2**index_bit_number)
     demand_counter[:] = np.zeros(2**index_bit_number)
     # print(demand_counter)
 
