@@ -31,15 +31,15 @@ capacity: int = int(lines[-1])
 knapsack = HSKnapsack(capacity, profits, weights)
 max_profit, max_solution = knapsack.maximize()
 
-# max_solution only contains indicator whether item is present, collect items for solutions in a list
-items_in_solution: list[list[int]] = []
+# max_solution only contains indicator whether item is present, collect item ids for solution
+items_in_solution: list[int] = []
 for i in range(number_items):
     if max_solution[i] == 1:
-        items_in_solution.append([profits[i], weights[i]])
+        items_in_solution.append(int(lines[i + 1].split(' ')[0]))
 
 # returning the solution as a single line with the maximum profit
-# followed by the items present represented by profit/weight
+# followed by the ids of the selected items, one per line
 with open(output_path, 'w') as output_file:
     output_file.write(str(max_profit) + '\n')
-    for item in items_in_solution:
-        output_file.write(f"{item[0]} {item[1]}\n")
+    for item_id in items_in_solution:
+        output_file.write(f"{item_id}\n")

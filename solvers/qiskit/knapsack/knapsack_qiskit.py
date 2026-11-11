@@ -67,6 +67,9 @@ for i in z:
 # grab optimal result from calculated result, negate because it got turned negative for the minimizing algorithm
 achieved_sum : int = -int(qaoa_result.fval)
 
+# returning the solution as a single line with the achieved sum
+# followed by the ids of the selected items, one per line
 with open(output_path, 'w') as f:
     f.write(str(achieved_sum) + "\n")
-    f.write(str(included_indexes))
+    for item_id in included_indexes:
+        f.write(f"{item_id}\n")
