@@ -1,8 +1,12 @@
 package edu.kit.provideq.toolbox.circuit.processing.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResult;
+import edu.kit.provideq.toolbox.circuit.processing.QasmFamily;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration;
+import edu.kit.provideq.toolbox.formats.QasmFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -12,8 +16,9 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class MoveToExecutionSolver extends CircuitProcessingSolver {
-  private static final SubRoutineDefinition<String, ExecutionResult> EXECUTOR_SUBROUTINE =
-      new SubRoutineDefinition<>(
+  private static final SubRoutineDefinition<QasmFamily, ExecutionResultFamily>
+      EXECUTOR_SUBROUTINE =
+      SubRoutineDefinition.of(
           ExecutorConfiguration.EXECUTOR_CONFIG,
           "Creates an execution solver",
           true
@@ -35,12 +40,14 @@ public class MoveToExecutionSolver extends CircuitProcessingSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<ExecutionResultFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
-    return subRoutineResolver.runSubRoutine(EXECUTOR_SUBROUTINE, input)
-        .map(s -> Solution.from(this, s, ExecutionResult::toString));
+    var qasm = convertFormatted(formattedInput, QasmFormat.INSTANCE, conversionService);
+    return subRoutineResolver.runSubRoutine(EXECUTOR_SUBROUTINE, qasm, conversionService)
+        .map(s -> Solution.from(s, x -> x));
   }
 }

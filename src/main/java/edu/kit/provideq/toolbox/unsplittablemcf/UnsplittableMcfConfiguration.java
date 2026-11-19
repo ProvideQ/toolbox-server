@@ -1,5 +1,8 @@
 package edu.kit.provideq.toolbox.unsplittablemcf;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -8,7 +11,6 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.unsplittablemcf.solvers.GamsUnsplittableMcfClassicalSolver;
 import edu.kit.provideq.toolbox.unsplittablemcf.solvers.GamsUnsplittableMcfQuboSolver;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
@@ -26,69 +28,40 @@ public class UnsplittableMcfConfiguration {
    * find optimal routing paths to fulfill customer orders through a Time-Expanded Network
    * without splitting an order's demand.
    */
-  public static final ProblemType<String, String> UNSPLITTABLE_MCF = new ProblemType<>(
+  public static final ProblemType<UmcfFamily, UmcfSolutionFamily> UNSPLITTABLE_MCF =
+      new ProblemType<>(
       "UnsplittableMCF",
       "An optimization problem: For a given time-expanded network with products, orders, "
           + "and capacity constraints, find optimal routing paths to fulfill customer orders "
           + "through a Time-Expanded Network without splitting an order's demand",
-      String.class,
-      String.class,
-      Map.ofEntries(
-          Map.entry("products", problem -> getValue(problem, "N_PRODUCTS")),
-          Map.entry("time_steps", problem -> getValue(problem, "N_TIME_STEPS")),
-          Map.entry("orders", problem -> getValue(problem, "N_ORDERS")),
-          Map.entry("factories", problem -> getValue(problem, "N_FACTORIES")),
-          Map.entry("distribution_centers", problem -> getValue(problem, "N_DISTRIBUTION"))
-      )
+      UmcfFamily.INSTANCE,
+      UmcfSolutionFamily.INSTANCE
   );
 
-  /**
-   * Helper method to extract configuration values from JSON input.
-   */
-  private static String getValue(String json, String key) {
-    try {
-      // Simple JSON parsing without external library dependency
-      int configStart = json.indexOf("\"config\"");
-      if (configStart == -1) return "";
-
-      int keyStart = json.indexOf("\"" + key + "\"", configStart);
-      if (keyStart == -1) return "";
-      
-      int colonPos = json.indexOf(":", keyStart);
-      if (colonPos == -1) return "";
-      
-      int valueStart = colonPos + 1;
-      while (valueStart < json.length()
-          && (json.charAt(valueStart) == ' ' || json.charAt(valueStart) == '\n')) {
-        valueStart++;
-      }
-      
-      int valueEnd = valueStart;
-      while (valueEnd < json.length()
-          && Character.isDigit(json.charAt(valueEnd))) {
-        valueEnd++;
-      }
-      
-      return json.substring(valueStart, valueEnd).trim();
-    } catch (Exception e) {
-      return "";
-    }
+  @Bean
+  UmcfFamily registerUmcfFamily(ConversionRegistry registry) {
+    registry.registerFormat(UmcfFamily.INSTANCE);
+    return UmcfFamily.INSTANCE;
   }
 
   @Bean
-  ProblemManager<String, String> getUnsplittableMcfManager(
+  UmcfSolutionFamily registerUmcfSolutionFamily(ConversionRegistry registry) {
+    registry.registerFormat(UmcfSolutionFamily.INSTANCE);
+    return UmcfSolutionFamily.INSTANCE;
+  }
+
+  @Bean
+  ProblemManager<UmcfFamily, UmcfSolutionFamily> getUnsplittableMcfManager(
       GamsUnsplittableMcfClassicalSolver classicalSolver,
       GamsUnsplittableMcfQuboSolver lpExportSolver,
       ResourceProvider resourceProvider
   ) {
-    return new ProblemManager<>(
-        UNSPLITTABLE_MCF,
-        Set.of(classicalSolver, lpExportSolver),
-        loadExampleProblems(resourceProvider)
-    );
+    var manager = new ProblemManager<>(UNSPLITTABLE_MCF, loadExampleProblems(resourceProvider));
+    manager.registerSolvers(classicalSolver, lpExportSolver);
+    return manager;
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
+  private Set<Problem<UmcfFamily, UmcfSolutionFamily>> loadExampleProblems(
       ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
@@ -96,9 +69,10 @@ public class UnsplittableMcfConfiguration {
           "Example instance for UnsplittableMCF is unavailable!"
       );
       var problem = new Problem<>(UNSPLITTABLE_MCF);
-      problem.setInput(resourceProvider.readStream(problemInputStream));
+      problem.setInput(FormattedValue.parse(
+          resourceProvider.readStream(problemInputStream), UmcfFormat.INSTANCE));
       return Set.of(problem);
-    } catch (IOException e) {
+    } catch (IOException | ParseException e) {
       throw new MissingExampleException(UNSPLITTABLE_MCF, e);
     }
   }

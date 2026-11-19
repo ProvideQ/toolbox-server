@@ -11,6 +11,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 import com.google.common.collect.Streams;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -79,8 +80,8 @@ public class EstimationRouter {
     ).build();
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleGet(
-          ProblemManager<InputT, ResultT> manager,
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleGet(
+          ProblemManager<InT, OutT> manager,
           ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
@@ -98,8 +99,8 @@ public class EstimationRouter {
     });
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleCompare(
-          ProblemManager<InputT, ResultT> manager,
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleCompare(
+          ProblemManager<InT, OutT> manager,
           ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
@@ -170,10 +171,10 @@ public class EstimationRouter {
             .schema(schemaBuilder().implementation(BoundComparisonDto.class));
   }
 
-  private <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(
-          ProblemManager<InputT, ResultT> manager,
-          String id
-  ) {
+  private <InT extends FormatFamily, OutT extends FormatFamily>
+      Problem<InT, OutT> findProblemOrThrow(
+          ProblemManager<InT, OutT> manager,
+          String id) {
     UUID uuid;
     try {
       uuid = UUID.fromString(id);

@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.BufferedReader;
 import java.io.File;
@@ -56,8 +57,8 @@ public class ResourceProvider {
    * @return File object of the directory
    * @throws IOException when the directory couldn't be accessed or created
    */
-  public <InputT, ResultT> File getProblemDirectory(
-          ProblemType<InputT, ResultT> problemType,
+  public <InT extends FormatFamily, OutT extends FormatFamily> File getProblemDirectory(
+          ProblemType<InT, OutT> problemType,
           UUID solutionId) throws IOException {
     File workingDirectory = getWorkingDirectory();
 

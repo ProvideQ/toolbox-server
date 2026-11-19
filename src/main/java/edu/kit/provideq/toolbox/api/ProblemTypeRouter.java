@@ -14,6 +14,8 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -37,6 +39,12 @@ import reactor.core.publisher.Mono;
 public class ProblemTypeRouter {
   private static final String PROBLEM_TYPES_BASE_PATH = "/problem-types";
   private ProblemManagerProvider managerProvider;
+  private ConversionService conversionService;
+
+  @Autowired
+  void setConversionService(ConversionService conversionService) {
+    this.conversionService = conversionService;
+  }
 
   @Bean
   RouterFunction<ServerResponse> getProblemTypeRoutes() {
@@ -70,7 +78,7 @@ public class ProblemTypeRouter {
     var problemTypes = managerProvider.getProblemManagers().stream()
         .filter(p -> !p.getType().equals(DEMONSTRATOR))
         .map(ProblemManager::getType)
-        .map(ProblemTypeDto::fromProblemType)
+        .map(type -> ProblemTypeDto.fromProblemType(type, conversionService.getRegistry()))
         .toList();
 
     return ok().body(Mono.just(problemTypes), new ParameterizedTypeReference<>() {
@@ -81,7 +89,7 @@ public class ProblemTypeRouter {
     var problemTypes = managerProvider.getProblemManagers().stream()
         .filter(p -> !p.getType().equals(DEMONSTRATOR))
         .map(ProblemManager::getType)
-        .map(ProblemTypeDto::fromProblemType)
+        .map(type -> ProblemTypeDto.fromProblemType(type, conversionService.getRegistry()))
         .toList();
 
     String problemTypeDtosJson;
@@ -115,15 +123,16 @@ public class ProblemTypeRouter {
     ).build();
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleList(
-      ProblemManager<InputT, ResultT> manager
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleList(
+      ProblemManager<InT, OutT> manager
   ) {
-    var problemTypeDto = ProblemTypeDto.fromProblemType(manager.getType());
+    var problemTypeDto = ProblemTypeDto.fromProblemType(
+        manager.getType(), conversionService.getRegistry());
     return ok().body(Mono.just(problemTypeDto), new ParameterizedTypeReference<>() {
     });
   }
 
-  public static void configureReadDocs(ProblemManager<?, ?> manager, Builder ops) {
+  public void configureReadDocs(ProblemManager<?, ?> manager, Builder ops) {
     var type = manager.getType();
     ops
         .operationId("%s/%s/%s".formatted(PROBLEM_TYPES_BASE_PATH, type.getId(), "read"))
@@ -133,9 +142,10 @@ public class ProblemTypeRouter {
         .response(buildProblemResponse(manager));
   }
 
-  private static org.springdoc.core.fn.builders.apiresponse.Builder buildProblemResponse(
+  private org.springdoc.core.fn.builders.apiresponse.Builder buildProblemResponse(
       ProblemManager<?, ?> problemManager) {
-    var problemTypeDto = ProblemTypeDto.fromProblemType(problemManager.getType());
+    var problemTypeDto = ProblemTypeDto.fromProblemType(
+        problemManager.getType(), conversionService.getRegistry());
 
     String problemTypeDtoJson;
     try {

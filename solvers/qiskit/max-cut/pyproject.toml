@@ -1,0 +1,15 @@
+# This file describes the python package requirements for the Qiskit Max-Cut solver
+[project]
+name = "toolbox-solvers-qiskit-max-cut"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "pygmlparser==1.0.1",
+    "qiskit==2.2.3",
+    "qiskit-optimization==0.7.0",
+    "numpy",
+    "networkx",
+]
+
+[tool.uv]
+package = false

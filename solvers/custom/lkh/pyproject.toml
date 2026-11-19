@@ -1,0 +1,14 @@
+# This file describes the python package requirements for all LKH scripts
+# supported by ProvideQ
+# required for LKH VRP solver
+[project]
+name = "toolbox-solvers-custom-lkh"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "lkh==1.1.1",
+    "tsplib95==0.7.1",
+]
+
+[tool.uv]
+package = false

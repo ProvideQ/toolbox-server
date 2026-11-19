@@ -1,5 +1,8 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+
 /**
  * Describes the state of the solution process of a {@link Problem}.
  */
@@ -11,7 +14,8 @@ public enum ProblemState {
   NEEDS_CONFIGURATION,
 
   /**
-   * The problem is configured and can be solved using the {@link Problem#solve()} method.
+   * The problem is configured and can be solved using the {@link ProblemSolver#solve(
+   * FormattedValue, SubRoutineResolver, SolvingProperties, ConversionService)} method.
    */
   READY_TO_SOLVE,
 

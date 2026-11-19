@@ -1,5 +1,8 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.Solution;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,14 +27,14 @@ import reactor.core.publisher.Mono;
  *     Additionally, having {@link SubProblems} implement the {@link SubRoutineResolver} interface
  *     avoids interface pollution in the {@link Problem} class.
  */
-final class SubProblems<InputT, ResultT>
-    implements SubRoutineResolver, ProblemObserver<InputT, ResultT> {
+final class SubProblems<InT extends FormatFamily, OutT extends FormatFamily>
+    implements SubRoutineResolver, ProblemObserver<InT, OutT> {
 
-  private static class SubProblemEntry<SubInputT, SubResultT> {
-    SubRoutineDefinition<SubInputT, SubResultT> definition;
-    List<Problem<SubInputT, SubResultT>> problems;
+  private static class SubProblemEntry<InT extends FormatFamily, OutT extends FormatFamily> {
+    final SubRoutineDefinition<InT, OutT> definition;
+    final List<Problem<InT, OutT>> problems;
 
-    SubProblemEntry(SubRoutineDefinition<SubInputT, SubResultT> definition) {
+    SubProblemEntry(SubRoutineDefinition<InT, OutT> definition) {
       this.definition = definition;
       this.problems = new ArrayList<>();
     }
@@ -54,7 +57,6 @@ final class SubProblems<InputT, ResultT>
   ) {
     this.entries = Collections.synchronizedSet(new HashSet<>());
     this.entryStateChangedObservers = Collections.synchronizedSet(new HashSet<>());
-
     this.problemAddedObserver = problemAddedObserver;
     this.problemRemovedObserver = problemRemovedObserver;
   }
@@ -73,21 +75,22 @@ final class SubProblems<InputT, ResultT>
   /**
    * Returns all sub-problems related to a given sub-routine.
    */
-  public <SubResultT, SubInputT> Set<Problem<SubInputT, SubResultT>> getProblems(
-      SubRoutineDefinition<SubInputT, SubResultT> subRoutineDefinition) {
+  public <SubInT extends FormatFamily, SubOutT extends FormatFamily>
+      Set<Problem<SubInT, SubOutT>> getProblems(
+          SubRoutineDefinition<SubInT, SubOutT> subRoutineDefinition) {
     var optionalEntry = findEntry(subRoutineDefinition);
 
     return optionalEntry
-        .map(entry -> (Set<Problem<SubInputT, SubResultT>>) new HashSet<>(entry.problems))
+        .map(entry -> (Set<Problem<SubInT, SubOutT>>) new HashSet<>(entry.problems))
         .orElse(Collections.emptySet());
   }
 
-  @SuppressWarnings("unchecked") // Solution type is always correct
   @Override
-  public <SubInputT, SubResultT> Mono<Solution<SubResultT>> runSubRoutine(
-      SubRoutineDefinition<SubInputT, SubResultT> subRoutine,
-      SubInputT input
-  ) {
+  public <SubInT extends FormatFamily, SubOutT extends FormatFamily>
+      Mono<Solution<SubOutT>> runSubRoutine(
+          SubRoutineDefinition<SubInT, SubOutT> subRoutine,
+          FormattedValue<?> input,
+          ConversionService conversionService) {
     var entry = findEntry(subRoutine).orElseThrow(() -> new IllegalArgumentException(
         "The given sub-routine was not registered with the problem solver!"));
 
@@ -99,7 +102,7 @@ final class SubProblems<InputT, ResultT>
 
     if (subProblem.getSolver().isPresent()) {
       // In case there is a solver set, we can start the sub problem
-      return subProblem.solve();
+      return subProblem.solve(conversionService);
     }
 
     // Wait for the solver to be set which will run the solver
@@ -108,7 +111,9 @@ final class SubProblems<InputT, ResultT>
       Consumer<Problem<?, ?>> observer = problem -> {
         if (problem.getId() == subProblem.getId()
                 && problem.getState() == ProblemState.SOLVED) {
-          sink.success((Solution<SubResultT>) problem.getSolution().orElseThrow());
+          @SuppressWarnings("unchecked") // Solution type is always correct
+          var solution = (Solution<SubOutT>) problem.getSolution().orElseThrow();
+          sink.success(solution);
         }
       };
 
@@ -120,24 +125,24 @@ final class SubProblems<InputT, ResultT>
   }
 
   @SuppressWarnings("unchecked") // Java cannot infer explicit type check in filter below
-  private <SubInputT, SubResultT> Optional<SubProblemEntry<SubInputT, SubResultT>> findEntry(
-      SubRoutineDefinition<SubInputT, SubResultT> definition
-  ) {
+  private <SubInT extends FormatFamily, SubOutT extends FormatFamily>
+      Optional<SubProblemEntry<SubInT, SubOutT>> findEntry(
+          SubRoutineDefinition<SubInT, SubOutT> definition) {
     return entries.stream()
         .filter(entry -> entry.definition.equals(definition)) // explicit type check
-        .map(entry -> (SubProblemEntry<SubInputT, SubResultT>) entry)
+        .map(entry -> (SubProblemEntry<SubInT, SubOutT>) entry)
         .findAny();
   }
 
   @Override
-  public void onInputChanged(Problem<InputT, ResultT> problem, InputT newInput) {
+  public void onInputChanged(Problem<InT, OutT> problem, FormattedValue<?> newInput) {
     // do nothing
   }
 
   @Override
   public void onSolverChanged(
-      Problem<InputT, ResultT> problem,
-      ProblemSolver<InputT, ResultT> newSolver
+      Problem<InT, OutT> problem,
+      ProblemSolver<InT, OutT> newSolver
   ) {
     onSolverReset(problem);
 
@@ -150,7 +155,7 @@ final class SubProblems<InputT, ResultT>
   }
 
   @Override
-  public void onSolverReset(Problem<InputT, ResultT> problem) {
+  public void onSolverReset(Problem<InT, OutT> problem) {
     for (var entry : entries) {
       for (Problem<?, ?> subProblem : entry.problems) {
         problemRemovedObserver.accept(subProblem);
@@ -159,76 +164,77 @@ final class SubProblems<InputT, ResultT>
     entries.clear();
   }
 
-  private <SubInputT, SubResultT> SubProblemEntry<SubInputT, SubResultT> addEntry(
-      SubRoutineDefinition<SubInputT, SubResultT> subRoutine
-  ) {
+  private <SubInT extends FormatFamily, SubOutT extends FormatFamily>
+      SubProblemEntry<SubInT, SubOutT> addEntry(SubRoutineDefinition<SubInT, SubOutT> subRoutine) {
     var entry = new SubProblemEntry<>(subRoutine);
     entries.add(entry);
     entry.problems.forEach(this::registerSubProblem);
     return entry;
   }
 
-  private <SubInputT, SubResultT> void registerSubProblem(
-          Problem<SubInputT, SubResultT> subProblem
+  private <SubInT extends FormatFamily, SubOutT extends FormatFamily> void registerSubProblem(
+          Problem<SubInT, SubOutT> subProblem
   ) {
     subProblem.addObserver(new ProblemObserver<>() {
       @Override
-      public void onInputChanged(Problem<SubInputT, SubResultT> problem, SubInputT newInput) {
+      public void onInputChanged(Problem<SubInT, SubOutT> problem, FormattedValue<?> newInput) {
         // do nothing
       }
 
       @Override
       public void onSolverChanged(
-              Problem<SubInputT, SubResultT> problem,
-              ProblemSolver<SubInputT, SubResultT> newSolver) {
+              Problem<SubInT, SubOutT> problem,
+              ProblemSolver<SubInT, SubOutT> newSolver) {
         // do nothing
       }
 
       @Override
-      public void onSolverReset(Problem<SubInputT, SubResultT> problem) {
+      public void onSolverReset(Problem<SubInT, SubOutT> problem) {
         // do nothing
       }
 
       @Override
-      public void onStateChanged(Problem<SubInputT, SubResultT> problem, ProblemState newState) {
+      public void onStateChanged(Problem<SubInT, SubOutT> problem, ProblemState newState) {
         // Collect in list to avoid ConcurrentModificationException
         var observers = entryStateChangedObservers.stream().toList();
         observers.forEach(observer -> observer.accept(problem));
       }
 
       @Override
-      public <NewSubInputT, NewSubResultT> void onSubProblemAdded(
-              Problem<SubInputT, SubResultT> problem,
-              Problem<NewSubInputT, NewSubResultT> addedSubProblem) {
+      public <NewSubInT extends FormatFamily, NewSubOutT extends FormatFamily>
+          void onSubProblemAdded(
+              Problem<SubInT, SubOutT> problem,
+              Problem<NewSubInT, NewSubOutT> addedSubProblem) {
         // do nothing
       }
 
       @Override
-      public <NewSubInputT, NewSubResultT> void onSubProblemRemoved(
-              Problem<SubInputT, SubResultT> problem,
-              Problem<NewSubInputT, NewSubResultT> removedSubProblem) {
+      public <NewSubInT extends FormatFamily, NewSubOutT extends FormatFamily>
+          void onSubProblemRemoved(
+              Problem<SubInT, SubOutT> problem,
+              Problem<NewSubInT, NewSubOutT> removedSubProblem) {
         // do nothing
       }
     });
   }
 
   @Override
-  public void onStateChanged(Problem<InputT, ResultT> problem, ProblemState newState) {
+  public void onStateChanged(Problem<InT, OutT> problem, ProblemState newState) {
     // do nothing
   }
 
   @Override
-  public <SubInputT, SubResultT> void onSubProblemAdded(
-      Problem<InputT, ResultT> problem,
-      Problem<SubInputT, SubResultT> addedSubProblem
+  public <SubInT extends FormatFamily, SubOutT extends FormatFamily> void onSubProblemAdded(
+      Problem<InT, OutT> problem,
+      Problem<SubInT, SubOutT> addedSubProblem
   ) {
     // do nothing, this call should have come from this class anyway
   }
 
   @Override
-  public <SubInputT, SubResultT> void onSubProblemRemoved(
-      Problem<InputT, ResultT> problem,
-      Problem<SubInputT, SubResultT> removedSubProblem
+  public <SubInT extends FormatFamily, SubOutT extends FormatFamily> void onSubProblemRemoved(
+      Problem<InT, OutT> problem,
+      Problem<SubInT, SubOutT> removedSubProblem
   ) {
     // do nothing, this call should have come from this class anyway
   }

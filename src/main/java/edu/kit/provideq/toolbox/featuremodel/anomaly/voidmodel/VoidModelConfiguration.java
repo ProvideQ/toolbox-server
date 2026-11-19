@@ -1,7 +1,11 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.ufl.UvlFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
+import edu.kit.provideq.toolbox.featuremodel.FeatureModelFamily;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -23,26 +27,33 @@ public class VoidModelConfiguration {
    * @see <a href="https://sdq.kastel.kit.edu/publications/pdfs/kowal2016b.pdf">
    *      "Explaining Anomalies in Feature Models", Kowal et al., 2016</a>
    */
-  public static final ProblemType<String, String> FEATURE_MODEL_ANOMALY_VOID = new ProblemType<>(
+  public static final ProblemType<FeatureModelFamily, VoidFeatureSolutionFamily>
+      FEATURE_MODEL_ANOMALY_VOID =
+      new ProblemType<>(
       "FeatureModelAnomalyVoid",
       "A searching problem: For a given feature model, check if the model is void.",
-      String.class,
-      String.class
+      FeatureModelFamily.INSTANCE,
+      VoidFeatureSolutionFamily.INSTANCE
   );
 
   @Bean
-  ProblemManager<String, String> getVoidModelManager(
+  VoidFeatureSolutionFamily registerVoidFeatureSolutionFamily(ConversionRegistry registry) {
+    registry.registerFormat(VoidFeatureSolutionFamily.INSTANCE);
+    return VoidFeatureSolutionFamily.INSTANCE;
+  }
+
+  @Bean
+  ProblemManager<FeatureModelFamily, VoidFeatureSolutionFamily> getVoidModelManager(
       SatBasedVoidFeatureSolver satSolver,
       ResourceProvider resourceProvider
   ) {
-    return new ProblemManager<>(
-        FEATURE_MODEL_ANOMALY_VOID,
-        Set.of(satSolver),
-        loadExampleProblems(resourceProvider)
-    );
+    var manager = new ProblemManager<>(
+        FEATURE_MODEL_ANOMALY_VOID, loadExampleProblems(resourceProvider));
+    manager.registerSolvers(satSolver);
+    return manager;
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
+  private Set<Problem<FeatureModelFamily, VoidFeatureSolutionFamily>> loadExampleProblems(
       ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
@@ -50,7 +61,8 @@ public class VoidModelConfiguration {
           "Sandwich example for Void Feature Models is unavailable!"
       );
       var problem = new Problem<>(FEATURE_MODEL_ANOMALY_VOID);
-      problem.setInput(resourceProvider.readStream(problemInputStream));
+      var input = resourceProvider.readStream(problemInputStream);
+      problem.setInput(FormattedValue.of(input, UvlFormat.INSTANCE));
       return Set.of(problem);
     } catch (IOException e) {
       throw new MissingExampleException(FEATURE_MODEL_ANOMALY_VOID, e);

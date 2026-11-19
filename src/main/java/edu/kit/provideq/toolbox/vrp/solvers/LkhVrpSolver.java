@@ -1,11 +1,16 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.VRPFormat;
+import edu.kit.provideq.toolbox.formats.VRPSolutionFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
+import edu.kit.provideq.toolbox.vrp.VrpSolutionFamily;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -45,12 +50,14 @@ public class LkhVrpSolver extends VrpSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<VrpSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver resolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
+    var input = convert(formattedInput, VRPFormat.INSTANCE, conversionService);
 
     var processResult = context
         .getBean(PythonProcessRunner.class, scriptPath, venv)
@@ -63,7 +70,8 @@ public class LkhVrpSolver extends VrpSolver {
         .readOutputFile("problem.sol")
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, VRPSolutionFormat.INSTANCE, output -> output));
   }
 
   /**

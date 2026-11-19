@@ -1,7 +1,12 @@
 package edu.kit.provideq.toolbox.circuit.processing.solvers.optimization;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.QasmFamily;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.CircuitProcessingSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.formats.QasmFormat;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -20,7 +25,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class OptimizationSolver implements ProblemSolver<String, String> {
+public class OptimizationSolver
+    implements ProblemSolver<QasmFamily, ExecutionResultFamily> {
   private static final String SETTING_SELECT_OPTIMIZER = "Selected Optimization Pass";
   private static final OptimizationSolver.QuantumOptimizer DEFAULT_OPTIMIZER =
       QuantumOptimizer.DECOMPOSE_MULTI_CX;
@@ -76,12 +82,14 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<ExecutionResultFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
+    var qasm = convert(formattedInput, QasmFormat.INSTANCE, conversionService);
 
     OptimizationSolver.QuantumOptimizer selectedOptimizer = properties
         .<SelectSetting<OptimizationSolver.QuantumOptimizer>>getSetting(SETTING_SELECT_OPTIMIZER)
@@ -93,15 +101,16 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH
         )
-        .writeInputFile(input)
+        .writeInputFile(qasm)
         .readOutputString()
         .run(getProblemType(), solution.getId());
 
     if (processResult.success() && processResult.output().isPresent()) {
       return subRoutineResolver
           .runSubRoutine(CircuitProcessingSolver.CIRCUIT_PROCESSING_SUBROUTINE,
-              processResult.output().get())
-          .map(subRoutineSolution -> Solution.from(this, subRoutineSolution, s -> s));
+              FormattedValue.of(processResult.output().get(), QasmFormat.INSTANCE),
+              conversionService)
+          .map(s -> Solution.from(s, x -> x));
     }
     solution.fail();
     processResult.errorOutput().ifPresent(solution::setDebugData);
@@ -109,7 +118,7 @@ public class OptimizationSolver implements ProblemSolver<String, String> {
   }
 
   @Override
-  public ProblemType<String, String> getProblemType() {
+  public ProblemType<QasmFamily, ExecutionResultFamily> getProblemType() {
     return OptimizationConfiguration.OPTIMIZATION_CONFIG;
   }
 

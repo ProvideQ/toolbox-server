@@ -1,7 +1,10 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.VRPFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -12,6 +15,8 @@ import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.vrp.VrpConfiguration;
+import edu.kit.provideq.toolbox.vrp.VrpFamily;
+import edu.kit.provideq.toolbox.vrp.VrpSolutionFamily;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -33,8 +38,8 @@ public class KmeansClusterer extends VrpClusterer {
     super(binaryPath, context);
   }
 
-  protected static final SubRoutineDefinition<String, String> VRP_SUBROUTINE =
-      new SubRoutineDefinition<>(
+  protected static final SubRoutineDefinition<VrpFamily, VrpSolutionFamily> VRP_SUBROUTINE =
+      SubRoutineDefinition.of(
           VrpConfiguration.VRP,
           "Solve a VRP problem",
           false
@@ -68,10 +73,13 @@ public class KmeansClusterer extends VrpClusterer {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<VrpSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver resolver,
-      SolvingProperties properties) {
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
+    var vrpString = convert(formattedInput, VRPFormat.INSTANCE, conversionService);
 
     // retrieves the number of clusters from the solver setting
     int clusterNumber = properties.<IntegerSetting>getSetting(SETTING_CLUSTER_NUMBER)
@@ -95,10 +103,11 @@ public class KmeansClusterer extends VrpClusterer {
             "--build-dir", ProcessRunner.PROBLEM_DIRECTORY_PATH + "/.vrp",
             "--cluster-number", String.valueOf(clusterNumber)
         )
-        .writeInputFile(input, "problem.vrp")
+        .writeInputFile(vrpString, "problem.vrp")
         .readOutputFile(new MultiFileProcessResultReader("/.vrp/problem_*.vrp"))
         .run(getProblemType(), solution.getId());
 
-    return getSolutionForCluster(input, solution, processResult, resolver, VRP_SUBROUTINE);
+    return getSolutionForCluster(vrpString, solution, processResult, resolver, VRP_SUBROUTINE,
+        VRPFormat.INSTANCE, conversionService);
   }
 }

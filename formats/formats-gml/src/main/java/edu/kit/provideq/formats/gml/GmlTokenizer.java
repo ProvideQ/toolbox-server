@@ -1,6 +1,6 @@
 package edu.kit.provideq.formats.gml;
 
-import edu.kit.provideq.formats.core.ParseException;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import java.util.NoSuchElementException;
 
 /**

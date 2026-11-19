@@ -1,0 +1,12 @@
+# This file describes the python package requirements for the GAMS Qubo solver
+[project]
+name = "toolbox-solvers-gams-qubo"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "gamspy==1.23.1",
+    "gurobipy==13.0.2",
+]
+
+[tool.uv]
+package = false

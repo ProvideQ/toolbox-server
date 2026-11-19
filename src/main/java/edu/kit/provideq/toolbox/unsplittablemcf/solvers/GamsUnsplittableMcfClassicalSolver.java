@@ -1,10 +1,15 @@
 package edu.kit.provideq.toolbox.unsplittablemcf.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfFormat;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfSolutionFamily;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfSolutionFormat;
 import edu.kit.provideq.toolbox.unsplittablemcf.UnsplittableMcfConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,12 +50,15 @@ public class GamsUnsplittableMcfClassicalSolver extends GamsUnsplittableMcfSolve
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<UmcfSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
+
+    var umcf = convert(formattedInput, UmcfFormat.INSTANCE, conversionService);
 
     // Run the classical MCF solver via Python process
     var processResult = context
@@ -59,10 +67,11 @@ public class GamsUnsplittableMcfClassicalSolver extends GamsUnsplittableMcfSolve
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input, "unsplittable-mcf.json")
+        .writeInputFile(umcf.json(), "unsplittable-mcf.json")
         .readOutputFile("output.html")
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, UmcfSolutionFormat.INSTANCE, output -> output));
   }
 }

@@ -1,5 +1,8 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.Solution;
 import reactor.core.publisher.Mono;
 
@@ -16,10 +19,13 @@ public interface SubRoutineResolver {
    *     The specified sub-routine must have been declared in
    *     {@link ProblemSolver#getSubRoutines()}.
    * @param input the input data to call the sub-routine with.
+   *     The sub problem solver pulls the representations it needs from this value;
+   *     representations are derived via the conversion graph if necessary.
    * @return the solution produced by the sub-routine.
    */
-  <InputT, ResultT> Mono<Solution<ResultT>> runSubRoutine(
-      SubRoutineDefinition<InputT, ResultT> subRoutine,
-      InputT input
+  <InT extends FormatFamily, OutT extends FormatFamily> Mono<Solution<OutT>> runSubRoutine(
+      SubRoutineDefinition<InT, OutT> subRoutine,
+      FormattedValue<?> input,
+      ConversionService conversionService
   );
 }

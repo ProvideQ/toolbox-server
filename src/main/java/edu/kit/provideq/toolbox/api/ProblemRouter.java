@@ -6,6 +6,11 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 import com.google.common.collect.Streams;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -36,6 +41,8 @@ public class ProblemRouter {
   public static final String PROBLEM_ID_PARAM_NAME = "problemId";
   private ProblemManagerProvider managerProvider;
   private Validator validator;
+  private ConversionRegistry conversionRegistry;
+  private ConversionService conversionService;
 
   @Bean
   RouterFunction<ServerResponse> getProblemRoutes() {
@@ -98,12 +105,12 @@ public class ProblemRouter {
     ).build();
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleCreate(
-      ProblemManager<InputT, ResultT> manager,
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleCreate(
+      ProblemManager<InT, OutT> manager,
       ServerRequest req
   ) {
     var createdProblemDto = req
-        .bodyToMono(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {})
+        .bodyToMono(new ParameterizedTypeReference<ProblemDto>() {})
         .doOnNext(this::validate)
         .map(submittedDto -> {
           var problem = new Problem<>(manager.getType());
@@ -116,8 +123,8 @@ public class ProblemRouter {
     return ok().body(createdProblemDto, new ParameterizedTypeReference<>(){});
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleRead(
-      ProblemManager<InputT, ResultT> manager,
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleRead(
+      ProblemManager<InT, OutT> manager,
       ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
@@ -126,8 +133,8 @@ public class ProblemRouter {
     return ok().body(Mono.just(problemDto), new ParameterizedTypeReference<>() {});
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleList(
-      ProblemManager<InputT, ResultT> manager
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleList(
+      ProblemManager<InT, OutT> manager
   ) {
     var problemList = manager.getInstances().stream()
         .map(ProblemDto::fromProblem)
@@ -135,8 +142,8 @@ public class ProblemRouter {
     return ok().body(Mono.just(problemList), new ParameterizedTypeReference<>() {});
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleUpdate(
-      ProblemManager<InputT, ResultT> manager,
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleUpdate(
+      ProblemManager<InT, OutT> manager,
       ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
@@ -147,7 +154,7 @@ public class ProblemRouter {
     }
 
     var updatedProblemDto = req
-        .bodyToMono(new ParameterizedTypeReference<ProblemDto<InputT, ResultT>>() {})
+        .bodyToMono(new ParameterizedTypeReference<ProblemDto>() {})
         .doOnNext(this::validate)
         .map(patchDto -> {
           applySubmittedProblemPatch(manager, problem, patchDto);
@@ -158,10 +165,10 @@ public class ProblemRouter {
     return ok().body(updatedProblemDto, new ParameterizedTypeReference<>() {});
   }
 
-  private <InputT, ResultT> void applySubmittedProblemPatch(
-      ProblemManager<InputT, ResultT> manager,
-      Problem<InputT, ResultT> problem,
-      ProblemDto<InputT, ResultT> patch
+  private <InT extends FormatFamily, OutT extends FormatFamily> void applySubmittedProblemPatch(
+      ProblemManager<InT, OutT> manager,
+      Problem<InT, OutT> problem,
+      ProblemDto patch
   ) {
     // update solver first as this can fail and we want to avoid partial updates
     if (patch.getSolverId() != null) {
@@ -182,16 +189,48 @@ public class ProblemRouter {
     }
 
     if (patch.getInput() != null) {
-      problem.setInput(patch.getInput());
+      problem.setInput(parseSubmittedInput(manager.getType(), patch));
     }
 
     // state must be changed at last as this might trigger other processes
     if (patch.getState() == ProblemState.SOLVING) {
-      problem.solve().subscribe();
+      problem.solve(conversionService).subscribe();
     }
   }
 
-  private <InputT, ResultT> void validate(ProblemDto<InputT, ResultT> problem) {
+  /**
+   * Parses the submitted input text as the declared input format.
+   * The declared format must be a member of the problem type's input family.
+   */
+  private <InT extends FormatFamily, OutT extends FormatFamily> FormattedValue<?>
+      parseSubmittedInput(ProblemType<InT, OutT> type, ProblemDto patch) {
+    if (patch.getInputFormat() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "The input format must be declared for problem input!");
+    }
+
+    var format = conversionRegistry.getFormat(patch.getInputFormat());
+    if (format == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Unknown input format: %s".formatted(patch.getInputFormat()));
+    }
+
+    var familyFormats = conversionRegistry.getFormats(type.getInputFamily());
+    if (!familyFormats.contains(format)) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Format %s is not a member of the input family of problem type %s"
+              .formatted(patch.getInputFormat(), type.getId()));
+    }
+
+    try {
+      return FormattedValue.parse(patch.getInput(), format);
+    } catch (ParseException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Could not parse input as %s: %s".formatted(patch.getInputFormat(), e.getMessage()));
+    }
+  }
+
+  private void validate(ProblemDto problem) {
     var errors = new BeanPropertyBindingResult(problem, "problem");
     validator.validate(problem, errors);
     if (errors.hasErrors()) {
@@ -216,5 +255,15 @@ public class ProblemRouter {
   @Autowired
   void setValidator(Validator validator) {
     this.validator = validator;
+  }
+
+  @Autowired
+  void setConversionRegistry(ConversionRegistry conversionRegistry) {
+    this.conversionRegistry = conversionRegistry;
+  }
+
+  @Autowired
+  void setConversionService(ConversionService conversionService) {
+    this.conversionService = conversionService;
   }
 }

@@ -1,12 +1,16 @@
 package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.circuit.processing.CircuitProcessingConfiguration.CIRCUIT_PROCESSING;
-import static edu.kit.provideq.toolbox.circuit.processing.solvers.mitigation.ErrorMitigationConfiguration.MITIGATION_CONFIG;
+import static edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration.EXECUTOR_CONFIG;
 import static edu.kit.provideq.toolbox.circuit.processing.solvers.optimization.OptimizationConfiguration.OPTIMIZATION_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToMitigationSolver;
-import edu.kit.provideq.toolbox.circuit.processing.solvers.mitigation.ErrorMitigationSolver;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.toolbox.circuit.processing.QasmFamily;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToExecutionSolver;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.optimization.OptimizationSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
@@ -31,16 +35,19 @@ class OptimizationSolverTest {
   private ProblemManagerProvider problemManagerProvider;
 
   @Autowired
+  private ConversionRegistry conversionRegistry;
+
+  @Autowired
   private OptimizationSolver optimizationSolver;
 
   @Autowired
-  private MoveToMitigationSolver moveToMitigationSolver;
+  private MoveToExecutionSolver moveToExecutionSolver;
 
   @Autowired
-  private ErrorMitigationSolver errorMitigationSolver;
+  private ExecutionSolver executionSolver;
 
-  private ProblemManager<String, String> problemManager;
-  private List<String> problems;
+  private ProblemManager<QasmFamily, ExecutionResultFamily> problemManager;
+  private List<? extends FormattedValue<?>> problems;
 
   @BeforeEach
   void beforeEach() {
@@ -58,17 +65,17 @@ class OptimizationSolverTest {
 
   @Test
   void testOptimizationSolver() {
-    var circuit = problems.get(0);
+    var circuit = problems.getFirst();
     var problemDto = ApiTestHelper.createProblem(client, optimizationSolver,
         circuit, OPTIMIZATION_CONFIG);
-    var circuitSubProblemId = problemDto.getSubProblems().get(0).getSubProblemIds().get(0);
-    var mitigationEntryDto = ApiTestHelper.setProblemSolver(
-        client, moveToMitigationSolver, circuitSubProblemId, CIRCUIT_PROCESSING.getId());
-    var mitigationId = mitigationEntryDto.getSubProblems().get(0).getSubProblemIds().get(0);
-    ApiTestHelper.setProblemSolver(client, errorMitigationSolver, mitigationId,
-        MITIGATION_CONFIG.getId());
+    var circuitSubProblemId = problemDto.getSubProblems().getFirst().getSubProblemIds().getFirst();
+    var executionEntryDto = ApiTestHelper.setProblemSolver(
+        client, moveToExecutionSolver, circuitSubProblemId, CIRCUIT_PROCESSING.getId());
+    var executionId = executionEntryDto.getSubProblems().getFirst().getSubProblemIds().getFirst();
+    ApiTestHelper.setProblemSolver(client, executionSolver, executionId,
+        EXECUTOR_CONFIG.getId());
     var solvedDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), OPTIMIZATION_CONFIG);
-    ApiTestHelper.testSolution(solvedDto);
+    ApiTestHelper.testSolution(solvedDto, problemManagerProvider, conversionRegistry);
     assertTrue(solvedDto.getSolution().getSolutionData().contains("OPENQASM"));
   }
 }

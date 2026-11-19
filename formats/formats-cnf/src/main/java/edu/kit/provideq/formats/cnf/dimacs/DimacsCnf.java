@@ -3,7 +3,7 @@ package edu.kit.provideq.formats.cnf.dimacs;
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.parsers.ExprParser;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
-import edu.kit.provideq.formats.core.ParseException;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +52,7 @@ public class DimacsCnf {
    *
    * @param string logical expression or DIMACS CNF string
    * @return DIMACS CNF structure
+   * @throws ParseException if the string could not be parsed
    */
   public static DimacsCnf fromString(String string) throws ParseException {
     var preamble = String.valueOf(PREAMBLE_START) + SEPARATOR + CNF_IDENTIFIER;
@@ -66,6 +67,7 @@ public class DimacsCnf {
    *
    * @param dimacsCnf DIMACS CNF string
    * @return DIMACS CNF structure
+   * @throws ParseException if the string could not be parsed
    */
   public static DimacsCnf fromDimacsCnfString(String dimacsCnf) throws ParseException {
     return StringToDimacsCnf.parse(dimacsCnf);
@@ -76,6 +78,7 @@ public class DimacsCnf {
    *
    * @param expression logical expression
    * @return DIMACS CNF structure
+   * @throws ParseException if the logical expression could not be converted to CNF
    */
   public static DimacsCnf fromLogicalExpressionString(String expression) throws ParseException {
     // Streamline bool expr format

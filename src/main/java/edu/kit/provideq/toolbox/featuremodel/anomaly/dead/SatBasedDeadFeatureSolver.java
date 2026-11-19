@@ -1,24 +1,31 @@
 package edu.kit.provideq.toolbox.featuremodel.anomaly.dead;
 
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnf;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfSolutionFormat;
+import edu.kit.provideq.formats.cnf.dimacs.Variable;
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.convert.UvlToDimacsCnf;
 import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.Variable;
+import edu.kit.provideq.toolbox.featuremodel.FeatureModelFamily;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
+import edu.kit.provideq.toolbox.sat.SatFamily;
+import edu.kit.provideq.toolbox.sat.SatSolutionFamily;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 /**
  * This problem solver solves the {@link DeadFeatureConfiguration#FEATURE_MODEL_ANOMALY_DEAD}
@@ -26,9 +33,10 @@ import reactor.util.function.Tuples;
  * solver.
  */
 @Component
-public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> {
-  private static final SubRoutineDefinition<String, DimacsCnfSolution> SAT_SUBROUTINE =
-      new SubRoutineDefinition<>(
+public class SatBasedDeadFeatureSolver
+    implements ProblemSolver<FeatureModelFamily, DeadFeatureSolutionFamily> {
+  private static final SubRoutineDefinition<SatFamily, SatSolutionFamily> SAT_SUBROUTINE =
+      SubRoutineDefinition.of(
           SatConfiguration.SAT,
           "Called per feature to determine if it is dead",
           false
@@ -51,67 +59,45 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<DeadFeatureSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     // Convert uvl to cnf
-    String cnf;
-    try {
-      cnf = UvlToDimacsCnf.convert(input);
-    } catch (ConversionException e) {
-      var solution = new Solution<>(this);
-      solution.setDebugData("Conversion error: " + e.getMessage());
-      solution.abort();
-      return Mono.just(solution);
-    }
-
-    return checkDeadFeatures(cnf, subRoutineResolver);
+    var cnf = convert(formattedInput, DimacsCnfFormat.INSTANCE, conversionService);
+    return checkDeadFeatures(cnf, subRoutineResolver, conversionService);
   }
 
   @Override
-  public ProblemType<String, String> getProblemType() {
+  public ProblemType<FeatureModelFamily, DeadFeatureSolutionFamily> getProblemType() {
     return DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD;
   }
 
-  private Mono<Solution<String>> checkDeadFeatures(
-      String cnf,
-      SubRoutineResolver subRoutineResolver
+  private Mono<Solution<DeadFeatureSolutionFamily>> checkDeadFeatures(
+      Document<DimacsCnf> dimacsCnf,
+      SubRoutineResolver subRoutineResolver,
+      ConversionService conversionService
   ) {
-    // Check if there are any Dead Features
-    DimacsCnf dimacsCnf;
+    Collection<Variable> variables;
     try {
-      dimacsCnf = DimacsCnf.fromDimacsCnfString(cnf);
-    } catch (ConversionException e) {
-      var solution = new Solution<>(this);
-      solution.setDebugData("Conversion error: " + e.getMessage());
-      solution.abort();
-      return Mono.just(solution);
+      variables = dimacsCnf.parse().getVariables();
+    } catch (ParseException e) {
+      return Mono.error(new ConversionException(
+          "Could not parse CNF to get variables: " + e.getMessage(), e));
     }
 
-    return Flux.fromIterable(dimacsCnf.getVariables())
-        .flatMap(feature -> checkFeatureDead(dimacsCnf, feature, subRoutineResolver)
-          .map(isVoid -> Tuples.of(feature, isVoid)))
-        .collectMap(Tuple2::getT1, Tuple2::getT2)
-        .map(featureIsVoidMap -> {
-          var stringBuilder = new StringBuilder();
-
-          for (var entry : featureIsVoidMap.entrySet()) {
-            Variable feature = entry.getKey();
-            boolean isVoid = entry.getValue();
-
-            if (isVoid) {
-              stringBuilder.append(feature.name()).append('\n');
-            }
-          }
-
+    return Flux.fromIterable(variables)
+        .flatMap(feature -> checkFeatureDead(
+            dimacsCnf, feature, subRoutineResolver, conversionService)
+          .filter(Boolean.TRUE::equals)
+          .map(ignored -> feature.name()))
+        .collectList()
+        .map(deadFeatures -> {
           var solution = new Solution<>(this);
-          if (stringBuilder.isEmpty()) {
-            solution.setSolutionData("No features are dead features!\n");
-          } else {
-            solution.setSolutionData("The following features are dead features:\n" + stringBuilder);
-          }
+          solution.setSolutionData(
+              new DeadFeatureSolution(deadFeatures), DeadFeatureSolutionFormat.INSTANCE);
 
           solution.complete();
           return solution;
@@ -125,20 +111,39 @@ public class SatBasedDeadFeatureSolver implements ProblemSolver<String, String> 
    * @return the solution of the given {@code feature}.
    *         Use {@link DimacsCnfSolution#isVoid()} to check the feature.
    */
-  private static Mono<Boolean> checkFeatureDead(
-      DimacsCnf cnf,
+  private Mono<Boolean> checkFeatureDead(
+      Document<DimacsCnf> cnf,
       Variable feature,
-      SubRoutineResolver subRoutineResolver
+      SubRoutineResolver subRoutineResolver,
+      ConversionService conversionService
   ) {
     // Use formula: ¬SAT (FM ∧ f) to check for a dead feature
     // So add variable to the cnf of the feature model and check if there is a solution
     // If there is a solution, the feature is not dead
 
-    var featureIsDeadCnf = cnf.addOrClause(new ArrayList<>(List.of(feature)));
+    DimacsCnf featureIsDeadCnf;
+    try {
+      featureIsDeadCnf = cnf.parse().addOrClause(new ArrayList<>(List.of(feature)));
+    } catch (ParseException e) {
+      return Mono.error(new ConversionException(
+          "Could not add feature to CNF: " + e.getMessage(), e));
+    }
+
     return subRoutineResolver
-        .runSubRoutine(SAT_SUBROUTINE, featureIsDeadCnf.toString())
-        .map(featureIsDeadSolution ->
-            DimacsCnfSolution.fromString(cnf, featureIsDeadSolution.getSolutionData().toString()))
-        .map(DimacsCnfSolution::isVoid);
+        .runSubRoutine(SAT_SUBROUTINE,
+            FormattedValue.of(Document.of(featureIsDeadCnf), DimacsCnfFormat.INSTANCE),
+            conversionService)
+        .map(featureIsDeadSolution -> convert(
+            featureIsDeadSolution.getSolutionData(),
+            DimacsCnfSolutionFormat.INSTANCE,
+            conversionService))
+        .map(featureIsDeadSolution -> {
+          try {
+            return featureIsDeadSolution.parse().isVoid();
+          } catch (ParseException e) {
+            throw new ConversionException(
+                "Could not parse SAT solution: " + e.getMessage(), e);
+          }
+        });
   }
 }

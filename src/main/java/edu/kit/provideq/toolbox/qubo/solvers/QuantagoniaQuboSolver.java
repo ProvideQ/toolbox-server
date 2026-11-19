@@ -3,8 +3,12 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.asbestian.jplex.input.LpFileReader;
 import de.asbestian.jplex.input.Variable;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.exception.ConversionException;
+import edu.kit.provideq.toolbox.exception.SolverException;
+import edu.kit.provideq.toolbox.formats.LPFormat;
+import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ProblemProperties;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ResultProperties;
@@ -14,6 +18,7 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.TextSetting;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
+import edu.kit.provideq.toolbox.qubo.QuboSolutionFamily;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,10 +60,13 @@ public class QuantagoniaQuboSolver extends QuboSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<QuboSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties) {
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
+    var input = convert(formattedInput, LPFormat.INSTANCE, conversionService);
     Optional<String> planQkToken = properties
         .<TextSetting>getSetting(SETTING_PLANQK_TOKEN)
         .map(TextSetting::getText);
@@ -68,13 +76,7 @@ public class QuantagoniaQuboSolver extends QuboSolver {
       return Mono.just(Solution.failed(this, "No PlanQK token provided."));
     }
 
-    QuantagoniaQuboProblem quantagoniaQubo;
-    LpFileReader lpReader = LpFileReader.fromInput(input);
-    try {
-      quantagoniaQubo = parseQuantagoniaQubo(lpReader);
-    } catch (ConversionException e) {
-      return Mono.just(Solution.failed(this, e.getMessage()));
-    }
+    var quantagoniaQubo = parseQuantagoniaQubo(LpFileReader.fromInput(input));
 
     PlanQkApi api = new PlanQkApi();
     return api.call(
@@ -109,7 +111,7 @@ public class QuantagoniaQuboSolver extends QuboSolver {
       String solutionString = String.join("\n",
           result.getSolution().stream().map(Object::toString).toList());
 
-      solution.setSolutionData(solutionString);
+      solution.setSolutionData(solutionString, LPSolutionFormat.INSTANCE);
       solution.setDebugData(result.getLog());
 
       solution.complete();
@@ -119,14 +121,14 @@ public class QuantagoniaQuboSolver extends QuboSolver {
   }
 
   private static QuantagoniaQuboProblem parseQuantagoniaQubo(LpFileReader lpReader)
-      throws ConversionException {
+      throws SolverException {
     var qubo = new QuantagoniaQuboProblem();
 
     var objective = lpReader.getObjective(0);
     var sense = switch (objective.sense()) {
       case MAX -> "MAXIMIZE";
       case MIN -> "MINIMIZE";
-      case UNDEF -> throw new ConversionException("Objective sense is undefined");
+      case UNDEF -> throw new SolverException("LP objective sense is undefined");
     };
     qubo.setSense(sense);
 
@@ -139,10 +141,10 @@ public class QuantagoniaQuboSolver extends QuboSolver {
       var coefficient = term.coefficient();
       var multiplicands = term.multiplicands();
       if (multiplicands.size() != 2) {
-        throw new ConversionException("Only quadratic terms are supported");
+        throw new SolverException("Only quadratic terms are supported");
       }
 
-      var var1 = getVariableIndex.applyAsInt(multiplicands.get(0));
+      var var1 = getVariableIndex.applyAsInt(multiplicands.getFirst());
       var var2 = getVariableIndex.applyAsInt(multiplicands.get(1));
 
       if (var1 == var2) {

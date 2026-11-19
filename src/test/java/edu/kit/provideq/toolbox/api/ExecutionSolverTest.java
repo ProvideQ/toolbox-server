@@ -3,7 +3,8 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration.EXECUTOR_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -27,9 +28,12 @@ class ExecutionSolverTest {
   private ProblemManagerProvider problemManagerProvider;
 
   @Autowired
+  private ConversionRegistry conversionRegistry;
+
+  @Autowired
   private ExecutionSolver executionSolver;
 
-  private List<String> problems;
+  private List<? extends FormattedValue<?>> problems;
 
   @BeforeEach
   void beforeEach() {
@@ -47,10 +51,10 @@ class ExecutionSolverTest {
 
   @Test
   void testExecutionSolver() {
-    var circuit = problems.get(0);
+    var circuit = problems.getFirst();
     var problem = ApiTestHelper.createProblem(client, executionSolver, circuit, EXECUTOR_CONFIG);
-    ApiTestHelper.testSolution(problem);
-    Solution<?> solution = problem.getSolution();
-    assertTrue(solution.getSolutionData().toString().contains("OPENQASM"));
+    ApiTestHelper.testSolution(problem, problemManagerProvider, conversionRegistry);
+    SolutionDto solution = problem.getSolution();
+    assertTrue(solution.getSolutionData().contains("OPENQASM"));
   }
 }

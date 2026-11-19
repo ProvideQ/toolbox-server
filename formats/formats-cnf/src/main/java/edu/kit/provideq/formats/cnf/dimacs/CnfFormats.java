@@ -1,10 +1,9 @@
 package edu.kit.provideq.formats.cnf.dimacs;
 
-import edu.kit.provideq.formats.core.ConversionRegistry;
-import edu.kit.provideq.formats.core.FormatsToolbox;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 
 /**
- * Bundles all CNF module formats, converters and property accessors for registration.
+ * Bundles all CNF module formats and converters for registration.
  */
 public final class CnfFormats {
   private CnfFormats() {
@@ -16,18 +15,9 @@ public final class CnfFormats {
    * @param registry registry to register with
    */
   public static void register(ConversionRegistry registry) {
-    registry.register(DimacsCnfFormat.INSTANCE);
-    registry.register(LogicalExpressionFormat.INSTANCE);
-    registry.register(ExpressionToDimacsCnfConverter.INSTANCE);
-  }
-
-  /**
-   * Registers all CNF module property accessors with the given toolbox's property service.
-   *
-   * @param toolbox toolbox to register with
-   */
-  public static void registerProperties(FormatsToolbox toolbox) {
-    toolbox.getPropertyService().register(new CnfVariableCountAccessor());
-    toolbox.getPropertyService().register(new CnfClauseCountAccessor());
+    registry.registerFormat(DimacsCnfFormat.INSTANCE);
+    registry.registerFormat(LogicalExpressionFormat.INSTANCE);
+    registry.registerConverter(LogicalExpressionToDimacsCnfConverter.INSTANCE);
+    registry.registerConverter(CnfToLogicalExpressionConverter.INSTANCE);
   }
 }

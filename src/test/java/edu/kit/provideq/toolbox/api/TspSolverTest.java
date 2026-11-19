@@ -5,6 +5,8 @@ import static edu.kit.provideq.toolbox.tsp.TspConfiguration.TSP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
@@ -38,6 +40,9 @@ class TspSolverTest {
   private WebTestClient client;
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
+
+  @Autowired
+  private ConversionRegistry conversionRegistry;
   @Autowired
   private LkhTspSolver lkhTspSolver;
   @Autowired
@@ -47,8 +52,8 @@ class TspSolverTest {
   @Autowired
   private QrispQuboSolver qrispQuboSolver;
 
-  private ProblemManager<String, String> problemManager;
-  private List<String> problems;
+  private ProblemManager<?, ?> problemManager;
+  private List<? extends FormattedValue<?>> problems;
 
   @BeforeEach
   void beforeEach() {
@@ -69,15 +74,15 @@ class TspSolverTest {
    */
   @Test
   void testLkhTspSolver() {
-    for (String problem : problems) {
+    for (FormattedValue<?> problem : problems) {
       var problemDto = ApiTestHelper.createProblem(client, lkhTspSolver, problem, TSP);
-      ApiTestHelper.testSolution(problemDto);
+      ApiTestHelper.testSolution(problemDto, problemManagerProvider, conversionRegistry);
     }
   }
 
   private Stream<Arguments> quboSolvers() {
     return Stream.of(
-        // Arguments.of(dwaveQuboSolver, "NAME : small sample"),
+        Arguments.of(dwaveQuboSolver, "NAME : small sample"),
         Arguments.of(qrispQuboSolver, "NAME : VerySmallSample")
     );
   }
@@ -89,23 +94,30 @@ class TspSolverTest {
   @MethodSource("quboSolvers")
   void testQuboTspSolver(QuboSolver solver, String problemName) {
     //get the small problem, cause quantum simulation is used:
-    var problem = problems.stream().filter(element -> element.contains(problemName)).findFirst();
-    assertTrue(problem.isPresent());
+    FormattedValue<?> problem = null;
+    for (var element : problems) {
+      if (element.toString().contains(problemName)) {
+        problem = element;
+        break;
+      }
+    }
+    assertTrue(problem != null);
 
-    var problemDto = ApiTestHelper.createProblem(client, quboTspSolver, problem.get(), TSP);
+    var problemDto = ApiTestHelper.createProblem(client, quboTspSolver, problem, TSP);
     assertEquals(ProblemState.SOLVING, problemDto.getState(), problemDto.toString());
+    problemDto = ApiTestHelper.waitForSubProblems(30, client, problemDto, TSP);
 
     //Set a QUBO solver:
-    var quboSubProblem = problemDto.getSubProblems().get(0).getSubProblemIds();
+    var quboSubProblem = problemDto.getSubProblems().getFirst().getSubProblemIds();
     ApiTestHelper.setProblemSolver(
         client,
         solver,
-        quboSubProblem.get(0),
+        quboSubProblem.getFirst(),
         QUBO.getId()
     );
 
     //solve problem:
     var solvedProblemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), TSP);
-    ApiTestHelper.testSolution(solvedProblemDto);
+    ApiTestHelper.testSolution(solvedProblemDto, problemManagerProvider, conversionRegistry);
   }
 }

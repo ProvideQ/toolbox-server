@@ -70,27 +70,22 @@ public class GamsProcessRunner extends ProcessRunner {
   }
 
   @Override
+  @SuppressWarnings("unchecked") // output is checked to be a String before the cast
   protected <T> ProcessRunnerExecutor<T> getExecutor(
       BiFunction<String, String, ProcessResult<T>> outputProcessor) {
     return (problemType, solutionId) -> {
-      if (problemType.getResultClass() == String.class) {
-        var processRunner = super.getExecutor(outputProcessor);
-        var result = processRunner.run(problemType, solutionId);
+      var result = super.getExecutor(outputProcessor).run(problemType, solutionId);
 
-        @SuppressWarnings("unchecked") // we know that T is a String
-        var obfuscatedOutput = result
-            .output()
-            .map(String::valueOf)
-            .map(x -> (T) obfuscateGamsLicense(x));
+      // Obfuscate GAMS license information in textual output; typed outputs are parsed
+      // objects that do not contain license text.
+      var obfuscatedOutput = result.output()
+          .map(output -> output instanceof String text
+              ? (T) obfuscateGamsLicense(text)
+              : output);
+      var obfuscatedErrorOutput = result.errorOutput()
+          .map(GamsProcessRunner::obfuscateGamsLicense);
 
-        var obfuscatedErrorOutput = result
-            .errorOutput()
-            .map(GamsProcessRunner::obfuscateGamsLicense);
-
-        return new ProcessResult<>(result.success(), obfuscatedOutput, obfuscatedErrorOutput);
-      }
-
-      return super.getExecutor(outputProcessor).run(problemType, solutionId);
+      return new ProcessResult<>(result.success(), obfuscatedOutput, obfuscatedErrorOutput);
     };
   }
 }

@@ -2,8 +2,12 @@ package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.qubo.QuboFamily;
+import edu.kit.provideq.toolbox.qubo.QuboSolutionFamily;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +30,9 @@ class QuboSolverTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
+  @Autowired
+  private ConversionRegistry conversionRegistry;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -38,13 +45,14 @@ class QuboSolverTest {
     var problemManager = problemManagerProvider.findProblemManagerForType(QUBO).get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
-        .map(list -> Arguments.of(list.get(0), list.get(1)));
+        .map(list -> Arguments.of(list.getFirst(), list.get(1)));
   }
 
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testQuboSolvers(ProblemSolver<String, String> solver, String input) {
+  void testQuboSolvers(
+      ProblemSolver<QuboFamily, QuboSolutionFamily> solver, FormattedValue<?> input) {
     var problemDto = ApiTestHelper.createProblem(client, solver, input, QUBO);
-    ApiTestHelper.testSolution(problemDto);
+    ApiTestHelper.testSolution(problemDto, problemManagerProvider, conversionRegistry);
   }
 }

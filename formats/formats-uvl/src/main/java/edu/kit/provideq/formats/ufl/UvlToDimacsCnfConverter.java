@@ -10,10 +10,9 @@ import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormatCNF;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
 import edu.kit.provideq.formats.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfFormat;
-import edu.kit.provideq.formats.core.ConstraintPreservation;
-import edu.kit.provideq.formats.core.FormatException;
-import edu.kit.provideq.formats.core.FuncConverter;
-import edu.kit.provideq.formats.core.ParseException;
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.converters.FuncConverter;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,14 +27,14 @@ public final class UvlToDimacsCnfConverter {
   /**
    * Converter instance between UVL feature models and DIMACS CNF.
    */
-  public static final FuncConverter<String, DimacsCnf> INSTANCE =
+  public static final FuncConverter<String, Document<DimacsCnf>> INSTANCE =
       new FuncConverter<>(UvlFormat.INSTANCE, DimacsCnfFormat.INSTANCE,
-          ConstraintPreservation.STRONG, true, UvlToDimacsCnfConverter::convert);
+          UvlToDimacsCnfConverter::convert);
 
   private UvlToDimacsCnfConverter() {
   }
 
-  private static DimacsCnf convert(String value) throws FormatException {
+  private static Document<DimacsCnf> convert(String value) throws FormatException {
     CharSequence charSequence = value.subSequence(0, value.length());
 
     // Init empty model
@@ -59,10 +58,6 @@ public final class UvlToDimacsCnfConverter {
 
     var cnfString = new DIMACSFormatCNF().write(cnf);
 
-    try {
-      return DimacsCnf.fromDimacsCnfString(cnfString);
-    } catch (ParseException e) {
-      throw new FormatException("Could not parse converted CNF", e);
-    }
+    return Document.of(cnfString, DimacsCnf::fromDimacsCnfString);
   }
 }

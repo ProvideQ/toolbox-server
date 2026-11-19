@@ -23,6 +23,13 @@ public class DimacsCnfSolution {
     this.variableMap = Map.copyOf(variableMap);
   }
 
+  /**
+   * Creates a solution from a DIMACS CNF solution string.
+   *
+   * @param dimacsCnf the CNF formula the solution belongs to
+   * @param solutionString DIMACS CNF solution string
+   * @return DIMACS CNF solution
+   */
   public static DimacsCnfSolution fromString(DimacsCnf dimacsCnf, String solutionString) {
     Map<Integer, Boolean> variableMap = StringToDimacsCnfSolution.parse(solutionString);
 

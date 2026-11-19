@@ -12,9 +12,11 @@ A web-based user interface can be found in our
 2. Clone this repository
 3. [Optional, Solver Installation - install the Solvers that you want/need]
    1. Python-based Solvers (Qiskit, Cirq, Dwave, Qrisp)
-      1. Install Python
+      1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) (it manages the Python versions for the solver venvs automatically)
       2. Install Python dependencies by running `python scripts/install-python-dependencies.py` <br>
          **Note:** Ensure that you execute the script from the root directory! Otherwise the created venv/ directory might be created at the wrong path.
+         Each solver's `pyproject.toml` declares the Python version range it needs (`requires-python`); uv picks (and downloads, if necessary) a matching interpreter per venv.
+         You can limit the setup to specific solvers by passing a folder filter, e.g. `python scripts/install-python-dependencies.py qrisp`.
    2. Compiled Solvers (e.g. used for VRP and TSP)
       1. Solvers implemented in compiled languages must be executed via binaries that are compiled for your operating system.
          For those types of solvers we usually include pre-compiled binaries for windows, mac (only arm), and unix.

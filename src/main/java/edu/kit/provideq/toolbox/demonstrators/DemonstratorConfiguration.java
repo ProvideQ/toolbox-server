@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.demonstrators;
 
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -13,21 +14,34 @@ public class DemonstratorConfiguration {
    * A demonstrator is a broad group of processes that
    * demonstrate certain aspects of quantum computing.
    */
-  public static final ProblemType<String, String> DEMONSTRATOR = new ProblemType<>(
+  public static final ProblemType<DemonstratorFamily, DemonstratorReportFamily> DEMONSTRATOR =
+      new ProblemType<>(
       "demonstrator",
       "A demonstrator is a broad group of processes that demonstrate "
           + "certain aspects of quantum computing.",
-      String.class,
-      String.class
+      DemonstratorFamily.INSTANCE,
+      DemonstratorReportFamily.INSTANCE
   );
 
   @Bean
-  ProblemManager<String, String> getDemonstratorManager(
+  DemonstratorFamily registerDemonstratorFamily(ConversionRegistry registry) {
+    registry.registerFormat(DemonstratorFamily.INSTANCE);
+    return DemonstratorFamily.INSTANCE;
+  }
+
+  @Bean
+  DemonstratorReportFamily registerDemonstratorReportFamily(ConversionRegistry registry) {
+    registry.registerFormat(DemonstratorReportFamily.INSTANCE);
+    return DemonstratorReportFamily.INSTANCE;
+  }
+
+  @Bean
+  ProblemManager<DemonstratorFamily, DemonstratorReportFamily> getDemonstratorManager(
       CplexMipDemonstrator cplexMipDemonstrator,
       MoleculeEnergySimulator moleculeEnergySimulator
   ) {
-    return new ProblemManager<>(DEMONSTRATOR,
-        Set.of(cplexMipDemonstrator, moleculeEnergySimulator),
-        Set.of(new Problem<>(DEMONSTRATOR)));
+    var manager = new ProblemManager<>(DEMONSTRATOR, Set.of(new Problem<>(DEMONSTRATOR)));
+    manager.registerSolvers(cplexMipDemonstrator, moleculeEnergySimulator);
+    return manager;
   }
 }

@@ -1,9 +1,14 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnf;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfSolutionFormat;
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -11,7 +16,11 @@ import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
+import edu.kit.provideq.toolbox.sat.SatFamily;
+import edu.kit.provideq.toolbox.sat.SatSolutionFamily;
 import edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration;
+import edu.kit.provideq.toolbox.sharpsat.SolutionCountFamily;
+import edu.kit.provideq.toolbox.sharpsat.SolutionCountFormat;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -25,8 +34,8 @@ import reactor.core.scheduler.Schedulers;
 @Component
 public class QrispExactGroverSolver extends SatSolver {
 
-  private static final SubRoutineDefinition<String, Integer> SHARPSAT_SUBROUTINE =
-      new SubRoutineDefinition<>(
+  private static final SubRoutineDefinition<SatFamily, SolutionCountFamily> SHARPSAT_SUBROUTINE =
+      SubRoutineDefinition.of(
           SharpSatConfiguration.SHARPSAT,
           "Count the number of solutions using a SharpSAT solver",
           true
@@ -63,43 +72,43 @@ public class QrispExactGroverSolver extends SatSolver {
   }
 
   @Override
-  public Mono<Solution<DimacsCnfSolution>> solve(
-      String input, SubRoutineResolver subRoutineResolver, SolvingProperties properties
+  public Mono<Solution<SatSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
-    DimacsCnf dimacsCnf;
-    try {
-      dimacsCnf = DimacsCnf.fromString(input);
-      solution.setDebugData("Using CNF input: " + dimacsCnf);
-    } catch (ConversionException | RuntimeException e) {
-      solution.setDebugData("Parsing error: " + e.getMessage());
-      solution.abort();
-      return Mono.just(solution);
-    }
-    return subRoutineResolver.runSubRoutine(SHARPSAT_SUBROUTINE, dimacsCnf.toString())
+    var dimacsCnf = convertFormatted(formattedInput, DimacsCnfFormat.INSTANCE, conversionService);
+    solution.setDebugData("Using CNF input: " + dimacsCnf);
+    return subRoutineResolver.runSubRoutine(SHARPSAT_SUBROUTINE, dimacsCnf, conversionService)
         .publishOn(Schedulers.boundedElastic())
-        .flatMap(sharpSatSolution -> processSharpSatResult(sharpSatSolution, dimacsCnf, solution));
+        .flatMap(sharpSatSolution ->
+            processSharpSatResult(
+                sharpSatSolution,
+                dimacsCnf.getValue(),
+                solution,
+                conversionService));
   }
 
-  private Mono<Solution<DimacsCnfSolution>> processSharpSatResult(
-      Solution<Integer> sharpSatSolution,
-      DimacsCnf dimacsCnf,
-      Solution<DimacsCnfSolution> solution
-  ) {
-    if (sharpSatSolution.getSolutionData() == null) {
-      solution.setDebugData("Sharpsat subroutine returned no solution data.");
-      solution.abort();
-      return Mono.just(solution);
-    }
-    int solutionCount = sharpSatSolution.getSolutionData();
-    solution.setDebugData("Sharpsat subroutine found " + solutionCount + " solutions.");
-    return runPythonSolver(dimacsCnf, solutionCount, solution);
+  private Mono<Solution<SatSolutionFamily>> processSharpSatResult(
+      Solution<SolutionCountFamily> sharpSatSolution,
+      Document<DimacsCnf> dimacsCnf,
+      Solution<SatSolutionFamily> satSolution,
+      ConversionService conversionService) {
+    var solutionCount = convert(
+        sharpSatSolution.getSolutionData(),
+        SolutionCountFormat.INSTANCE,
+        conversionService);
+
+    satSolution.setDebugData("Sharpsat subroutine found " + solutionCount.count() + " solutions.");
+    return runPythonSolver(dimacsCnf, solutionCount.count(), satSolution);
   }
 
-  private Mono<Solution<DimacsCnfSolution>> runPythonSolver(
-      DimacsCnf dimacsCnf,
-      int solutionCount,
-      Solution<DimacsCnfSolution> solution
+  private Mono<Solution<SatSolutionFamily>> runPythonSolver(
+      Document<DimacsCnf> dimacsCnf,
+      long solutionCount,
+      Solution<SatSolutionFamily> solution
   ) {
     ProcessResult<String> processResult = context
         .getBean(PythonProcessRunner.class, scriptPath, venv)
@@ -112,11 +121,22 @@ public class QrispExactGroverSolver extends SatSolver {
         .readOutputFile()
         .run(getProblemType(), solution.getId());
     if (processResult.success()) {
-      var dimacsCnfSolution = DimacsCnfSolution.fromString(
-          dimacsCnf,
-          processResult.output().orElse("")
+      DimacsCnf cnf;
+      try {
+        cnf = dimacsCnf.parse();
+      } catch (ParseException e) {
+        solution.setDebugData("Could not parse CNF input: " + e.getMessage());
+        solution.fail();
+        return Mono.just(solution);
+      }
+
+      var dimacsCnfSolution = Document.of(
+          DimacsCnfSolution.fromString(
+              cnf,
+              processResult.output().orElse("")
+          )
       );
-      solution.setSolutionData(dimacsCnfSolution);
+      solution.setSolutionData(dimacsCnfSolution, DimacsCnfSolutionFormat.INSTANCE);
       solution.complete();
     } else {
       solution.setDebugData(processResult.errorOutput().orElse("Error occurred while running"

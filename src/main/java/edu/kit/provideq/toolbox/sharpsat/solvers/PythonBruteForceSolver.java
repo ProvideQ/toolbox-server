@@ -1,14 +1,18 @@
 package edu.kit.provideq.toolbox.sharpsat.solvers;
 
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration;
+import edu.kit.provideq.toolbox.sharpsat.SolutionCount;
+import edu.kit.provideq.toolbox.sharpsat.SolutionCountFamily;
+import edu.kit.provideq.toolbox.sharpsat.SolutionCountFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -58,26 +62,20 @@ public class PythonBruteForceSolver extends SharpSatSolver {
    * Solves a given problem instance, current status and final results as well as debug information
    * is stored in the provided {@link Solution} object.
    *
-   * @param input              the problem instance to solve.
+   * @param formattedInput    the problem instance to solve.
    * @param subRoutineResolver interface to execute sub-routines with.
    * @param properties         properties
    * @return the {@link Solution} in which all resulting information is stored.
    */
   @Override
-  public Mono<Solution<Integer>> solve(String input, SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties) {
-
+  public Mono<Solution<SolutionCountFamily>> solve(
+      FormattedValue<?> formattedInput, SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
     var solution = new Solution<>(this);
-
-    DimacsCnf dimacsCnf;
-    try {
-      dimacsCnf = DimacsCnf.fromString(input);
-      solution.setDebugData("Using CNF input: " + dimacsCnf.toString());
-    } catch (ConversionException | RuntimeException e) {
-      solution.setDebugData("Parsing error: " + e.getMessage());
-      solution.abort();
-      return Mono.just(solution);
-    }
+    var dimacsCnf = convert(formattedInput, DimacsCnfFormat.INSTANCE, conversionService);
+    solution.setDebugData("Using CNF input: " + dimacsCnf);
 
     ProcessResult<String> processResult = context
         .getBean(PythonProcessRunner.class, scriptPath, venv)
@@ -90,9 +88,14 @@ public class PythonBruteForceSolver extends SharpSatSolver {
         .run(getProblemType(), solution.getId());
 
     if (processResult.success()) {
-      int solutionCount = Integer.parseInt(processResult.output().orElse(""));
-      solution.setSolutionData(solutionCount);
-      solution.complete();
+      try {
+        var solutionCount = Integer.parseInt(processResult.output().orElse(""));
+        solution.setSolutionData(new SolutionCount(solutionCount), SolutionCountFormat.INSTANCE);
+        solution.complete();
+      } catch (NumberFormatException e) {
+        solution.setDebugData("Failed to parse solution count: " + e.getMessage());
+        solution.fail();
+      }
     } else {
       solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));
       solution.fail();

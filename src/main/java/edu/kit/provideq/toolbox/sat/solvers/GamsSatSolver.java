@@ -1,15 +1,21 @@
 package edu.kit.provideq.toolbox.sat.solvers;
 
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnf;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfSolutionFormat;
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnf;
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.sat.SatConfiguration;
+import edu.kit.provideq.toolbox.sat.SatSolutionFamily;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -43,22 +49,15 @@ public class GamsSatSolver extends SatSolver {
   }
 
   @Override
-  public Mono<Solution<DimacsCnfSolution>> solve(
-      String input,
+  public Mono<Solution<SatSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
-
-    DimacsCnf dimacsCnf;
-    try {
-      dimacsCnf = DimacsCnf.fromString(input);
-      solution.setDebugData("Using cnf input: " + dimacsCnf);
-    } catch (ConversionException | RuntimeException e) {
-      solution.setDebugData("Parsing error: " + e.getMessage());
-      solution.abort();
-      return Mono.just(solution);
-    }
+    var dimacsCnf = convert(formattedInput, DimacsCnfFormat.INSTANCE, conversionService);
+    solution.setDebugData("Using cnf input: " + dimacsCnf);
 
     // Run SAT with GAMS via console
     ProcessResult<String> processResult = context
@@ -72,10 +71,19 @@ public class GamsSatSolver extends SatSolver {
         .run(getProblemType(), solution.getId());
 
     if (processResult.success()) {
-      var dimacsCnfSolution =
-          DimacsCnfSolution.fromString(dimacsCnf, processResult.output().orElse(""));
+      DimacsCnf structuredCnf;
+      try {
+        structuredCnf = dimacsCnf.parse();
+      } catch (ParseException e) {
+        solution.setDebugData("Could not parse CNF input: " + e.getMessage());
+        solution.fail();
+        return Mono.just(solution);
+      }
 
-      solution.setSolutionData(dimacsCnfSolution);
+      var dimacsCnfSolution = Document.of(
+          DimacsCnfSolution.fromString(structuredCnf, processResult.output().orElse("")));
+
+      solution.setSolutionData(dimacsCnfSolution, DimacsCnfSolutionFormat.INSTANCE);
       solution.complete();
     } else {
       solution.setDebugData(processResult.errorOutput().orElse("Unknown error occurred."));

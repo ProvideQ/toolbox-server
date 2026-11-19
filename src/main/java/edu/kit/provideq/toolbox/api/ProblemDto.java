@@ -1,6 +1,5 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
@@ -11,11 +10,12 @@ import java.util.List;
 /**
  * Data transfer object for {@link Problem problems}, used in REST API request bodies and responses.
  */
-public class ProblemDto<InputT, ResultT> {
+public class ProblemDto {
   private String id;
   private String typeId;
-  private InputT input;
-  private Solution<ResultT> solution;
+  private String input;
+  private String inputFormat;
+  private SolutionDto solution;
   private ProblemState state;
   private BoundComparisonDto boundWithComparison;
   private String solverId;
@@ -30,15 +30,17 @@ public class ProblemDto<InputT, ResultT> {
   /**
    * Creates a data transfer object for a given problem.
    */
-  public static <InputT, ResultT> ProblemDto<InputT, ResultT> fromProblem(
-      Problem<InputT, ResultT> problem
-  ) {
-    var dto = new ProblemDto<InputT, ResultT>();
+  public static ProblemDto fromProblem(Problem<?, ?> problem) {
+    var dto = new ProblemDto();
 
     dto.id = problem.getId().toString();
     dto.typeId = problem.getType().getId();
-    dto.input = problem.getInput().orElse(null);
-    dto.solution = problem.getSolution().orElse(null);
+    if (problem.getInput().isPresent()) {
+      var formattedInput = problem.getInput().get();
+      dto.input = formattedInput.toString();
+      dto.inputFormat = formattedInput.getFormat().getName();
+    }
+    dto.solution = problem.getSolution().map(SolutionDto::fromSolution).orElse(null);
     dto.boundWithComparison = problem.getBoundWithComparison().orElse(null);
     dto.state = problem.getState();
     dto.solverId = problem.getSolver()
@@ -61,11 +63,15 @@ public class ProblemDto<InputT, ResultT> {
     return typeId;
   }
 
-  public InputT getInput() {
+  public String getInput() {
     return input;
   }
 
-  public Solution<ResultT> getSolution() {
+  public String getInputFormat() {
+    return inputFormat;
+  }
+
+  public SolutionDto getSolution() {
     return solution;
   }
 
@@ -90,7 +96,7 @@ public class ProblemDto<InputT, ResultT> {
   }
 
   public List<SubProblemReferenceDto> getSubProblems() {
-    if (solverSettings == null) {
+    if (subProblems == null) {
       return Collections.emptyList();
     }
 
@@ -105,6 +111,7 @@ public class ProblemDto<InputT, ResultT> {
         + ", state=" + state
         + ", solverId=" + solverId
         + ", input=" + input
+        + ", inputFormat=" + inputFormat
         + ", solution=" + solution
         + ", boundWithComparison=" + boundWithComparison
         + ", solverSettings=" + solverSettings

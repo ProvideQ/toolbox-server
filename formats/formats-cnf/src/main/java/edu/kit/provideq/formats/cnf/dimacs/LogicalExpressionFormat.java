@@ -1,10 +1,10 @@
 package edu.kit.provideq.formats.cnf.dimacs;
 
 import edu.kit.provideq.formats.core.Format;
-import edu.kit.provideq.formats.core.FormatKind;
 import edu.kit.provideq.formats.core.FormatReader;
-import edu.kit.provideq.formats.core.ParseException;
-import edu.kit.provideq.formats.core.SerializationException;
+import edu.kit.provideq.formats.core.FormatType;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.core.exceptions.SerializationException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -12,6 +12,11 @@ import java.util.Set;
 
 /**
  * The logical expression format for boolean formulas, e.g. {@code a and (b or not c)}.
+ *
+ * <p>Example instance:
+ * <pre>
+ * a and (b or not c)
+ * </pre>
  */
 public record LogicalExpressionFormat() implements Format<String> {
   /**
@@ -35,8 +40,13 @@ public record LogicalExpressionFormat() implements Format<String> {
   }
 
   @Override
-  public FormatKind getKind() {
-    return FormatKind.PROBLEM;
+  public FormatType getType() {
+    return FormatType.PROBLEM;
+  }
+
+  @Override
+  public Class<String> getRepresentationClass() {
+    return String.class;
   }
 
   @Override

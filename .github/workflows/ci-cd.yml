@@ -29,6 +29,8 @@ jobs:
           echo "/opt/conda/bin" >> "$GITHUB_PATH"
           echo "$GAMS_PATH" >> "$GITHUB_PATH"
           echo "GMSPYTHONLIB=/opt/conda/envs/gams/lib/libpython3.10.so" >> "$GITHUB_ENV"
+          # gamspy-based solvers must use the licensed GAMS instead of the bundled demo
+          echo "GAMSPY_GAMS_SYSDIR=$GAMS_PATH" >> "$GITHUB_ENV"
 
       - name: Cache Venv dependencies
         uses: actions/cache@v4

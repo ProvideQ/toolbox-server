@@ -1,6 +1,10 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.LPFormat;
+import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
@@ -9,6 +13,7 @@ import edu.kit.provideq.toolbox.meta.setting.basic.TextSetting;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
+import edu.kit.provideq.toolbox.qubo.QuboSolutionFamily;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,11 +99,13 @@ public class DwaveQuboSolver extends QuboSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<QuboSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
+    String input = convert(formattedInput, LPFormat.INSTANCE, conversionService);
 
     Optional<String> dwaveToken = properties
         .<TextSetting>getSetting(SETTING_DWAVE_TOKEN)
@@ -135,6 +142,7 @@ public class DwaveQuboSolver extends QuboSolver {
         .readOutputFile("problem.bin")
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, LPSolutionFormat.INSTANCE, output -> output));
   }
 }

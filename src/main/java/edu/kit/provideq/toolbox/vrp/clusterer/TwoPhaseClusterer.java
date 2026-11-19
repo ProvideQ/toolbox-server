@@ -1,6 +1,10 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.TSPLIBFormat;
+import edu.kit.provideq.toolbox.formats.VRPFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -8,6 +12,9 @@ import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.tsp.TspConfiguration;
+import edu.kit.provideq.toolbox.tsp.TspFamily;
+import edu.kit.provideq.toolbox.tsp.TspSolutionFamily;
+import edu.kit.provideq.toolbox.vrp.VrpSolutionFamily;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +25,8 @@ import reactor.core.publisher.Mono;
 @Component
 public class TwoPhaseClusterer extends VrpClusterer {
 
-  protected static final SubRoutineDefinition<String, String> TSP_SUBROUTINE =
-      new SubRoutineDefinition<>(
+  protected static final SubRoutineDefinition<TspFamily, TspSolutionFamily> TSP_SUBROUTINE =
+      SubRoutineDefinition.of(
           TspConfiguration.TSP,
           "Solve a TSP problem",
           false
@@ -49,11 +56,14 @@ public class TwoPhaseClusterer extends VrpClusterer {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<VrpSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver resolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
+    // The clustering pipeline requires the CVRP document (it rejects TSP-typed instances)
+    var input = convert(formattedInput, VRPFormat.INSTANCE, conversionService);
     var solution = new Solution<>(this);
 
     // cluster with tsp/two-phase clustering
@@ -71,6 +81,8 @@ public class TwoPhaseClusterer extends VrpClusterer {
         .readOutputFile(new MultiFileProcessResultReader("/.vrp/problem_*.vrp"))
         .run(getProblemType(), solution.getId());
 
-    return getSolutionForCluster(input, solution, processResult, resolver, TSP_SUBROUTINE);
+    // The cluster outputs are handled as TSP inputs
+    return getSolutionForCluster(input, solution, processResult, resolver, TSP_SUBROUTINE,
+        TSPLIBFormat.INSTANCE, conversionService);
   }
 }

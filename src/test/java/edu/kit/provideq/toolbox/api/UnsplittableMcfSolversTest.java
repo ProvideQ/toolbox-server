@@ -3,9 +3,14 @@ package edu.kit.provideq.toolbox.api;
 import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
 import static edu.kit.provideq.toolbox.unsplittablemcf.UnsplittableMcfConfiguration.UNSPLITTABLE_MCF;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
-import edu.kit.provideq.toolbox.qubo.solvers.GamsQuboSolver;
+import edu.kit.provideq.toolbox.qubo.QuboFamily;
+import edu.kit.provideq.toolbox.qubo.QuboSolutionFamily;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfFamily;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfSolutionFamily;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +36,9 @@ class UnsplittableMcfSolversTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
+  @Autowired
+  private ConversionRegistry conversionRegistry;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -43,31 +51,44 @@ class UnsplittableMcfSolversTest {
     var problemManager = problemManagerProvider.findProblemManagerForType(UNSPLITTABLE_MCF).get();
     var quboProblemManager = problemManagerProvider.findProblemManagerForType(QUBO).get();
 
-    // TODO: For now just allow the Gams Qubo solver until the Qubo solution format is standardized
+    // all QUBO solvers can be used as sub-routines: they all emit the standardized
+    // lp-solution format. The Qiskit/Qrisp QAOA solvers are excluded: the UMCF example
+    // instance reformulates into a QUBO with 46 binary variables, which cannot be handled
+    // by statevector-based QAOA simulation (2^46 amplitudes) and would never terminate.
     var quboSolvers = quboProblemManager.getSolvers().stream()
-        .filter(GamsQuboSolver.class::isInstance)
+        .filter(solver -> !solver.getId().equals("QiskitQuboSolver")
+            && !solver.getId().equals("QrispQuboSolver"))
         .toList();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager, quboSolvers)
-            .map(list -> Arguments.of(list.get(0), list.get(1), list.get(2)));
+            .map(list -> Arguments.of(list.getFirst(), list.get(1), list.get(2)));
   }
 
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testUnsplittableMcfSolver(ProblemSolver<String, String> solver,
-                                 String input,
-                                 ProblemSolver<String, String> quboSolver) {
+  void testUnsplittableMcfSolver(ProblemSolver<UmcfFamily, UmcfSolutionFamily> solver,
+                                 FormattedValue<?> input,
+                                 ProblemSolver<QuboFamily, QuboSolutionFamily> quboSolver) {
     var problem = ApiTestHelper.createProblem(client, solver, input, UNSPLITTABLE_MCF);
 
-    // Configure qubo solver for possible subroutines
-    for (SubProblemReferenceDto subProblem : problem.getSubProblems()) {
-      var subProblemTypeId = subProblem.getSubRoutine().getTypeId();
-      for (String subProblemId : subProblem.getSubProblemIds()) {
-        ApiTestHelper.setProblemSolver(client, quboSolver, subProblemId, subProblemTypeId);
+    if (solver.getSubRoutines().isEmpty()) {
+      // solvers without sub-routines (e.g. the classical GAMS solver) solve directly and
+      // never create sub-problems
+      problem = ApiTestHelper.trySolveFor(120, client, problem.getId(), UNSPLITTABLE_MCF);
+    } else {
+      problem = ApiTestHelper.waitForSubProblems(30, client, problem, UNSPLITTABLE_MCF);
+
+      // Configure qubo solver for possible subroutines
+      for (SubProblemReferenceDto subProblem : problem.getSubProblems()) {
+        var subProblemTypeId = subProblem.getSubRoutine().getTypeId();
+        for (String subProblemId : subProblem.getSubProblemIds()) {
+          ApiTestHelper.setProblemSolver(client, quboSolver, subProblemId, subProblemTypeId);
+        }
       }
+
+      problem = ApiTestHelper.trySolveFor(120, client, problem.getId(), UNSPLITTABLE_MCF);
     }
 
-    problem = ApiTestHelper.trySolveFor(120, client, problem.getId(), UNSPLITTABLE_MCF);
-    ApiTestHelper.testSolution(problem);
+    ApiTestHelper.testSolution(problem, problemManagerProvider, conversionRegistry);
   }
 }
