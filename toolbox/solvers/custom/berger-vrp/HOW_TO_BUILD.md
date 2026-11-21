@@ -5,4 +5,4 @@ Install Guide for the VRP-Pipeline (used for K-means, Two Phase Clustering, VRP 
 4. Set the nightly build as default: `rustup default nightly-2023-07-01(... specific version name on machine)`
 5. Download source code of the VRP-Pipeline: https://github.com/ProvideQ/hybrid-vrp-solver
 6. build the source code using `cargo build`
-7. Put the build binary in `solvers/berger-vrp/bin`, replace the binary that matches your OS.
+7. Put the build binary in `toolbox/solvers/custom/berger-vrp/bin`, replace the binary that matches your OS.

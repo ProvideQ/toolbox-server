@@ -1,5 +1,6 @@
 rootProject.name = 'toolbox-server'
 
+include ':toolbox'
 include ':formats:formats-core'
 include ':formats:formats-cnf'
 include ':formats:formats-gml'

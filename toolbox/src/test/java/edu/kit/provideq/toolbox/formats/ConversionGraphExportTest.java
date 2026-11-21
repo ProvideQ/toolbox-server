@@ -5,14 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.converters.graph.ConversionGraphExporter;
+import edu.kit.provideq.formats.core.converters.graph.LabeledEdge;
+import edu.kit.provideq.toolbox.meta.ProblemManager;
+import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import edu.kit.provideq.formats.core.converters.graph.LabeledEdge;
-import edu.kit.provideq.toolbox.meta.ProblemManager;
-import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -65,10 +64,22 @@ class ConversionGraphExportTest {
     var markdown = new ConversionGraphExporter()
         .toMarkdown(conversionRegistry, getEdges());
 
-    var outputFile = Path.of("format-graph.md");
+    var outputFile = findRepositoryRoot().resolve("format-graph.md");
     Files.writeString(outputFile, markdown);
 
     assertTrue(Files.exists(outputFile));
     assertTrue(markdown.contains("```mermaid"));
+  }
+
+  /**
+   * Walks up from the working directory to the directory containing {@code settings.gradle},
+   * so the graph is written to the repository root regardless of the module layout.
+   */
+  private static Path findRepositoryRoot() {
+    var dir = Path.of("").toAbsolutePath();
+    while (dir != null && !Files.exists(dir.resolve("settings.gradle"))) {
+      dir = dir.getParent();
+    }
+    return dir != null ? dir : Path.of("").toAbsolutePath();
   }
 }
