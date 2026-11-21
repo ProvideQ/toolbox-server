@@ -1,6 +1,10 @@
 package edu.kit.provideq.toolbox.circuit.processing.solvers.executor;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.circuit.processing.QasmFamily;
+import edu.kit.provideq.toolbox.formats.QasmFormat;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -19,7 +23,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
+public class ExecutionSolver implements ProblemSolver<QasmFamily, ExecutionResultFamily> {
   private static final String SETTING_NUMBER_OF_SHOTS = "Number of shots";
   private static final String SETTING_SELECT_SIMULATOR = "Selected Simulator";
   private static final int DEFAULT_NUMBER_OF_SHOTS = 1024;
@@ -70,12 +74,14 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   }
 
   @Override
-  public Mono<Solution<ExecutionResult>> solve(
-      String input,
+  public Mono<Solution<ExecutionResultFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
+    var qasm = convert(formattedInput, QasmFormat.INSTANCE, conversionService);
 
     int shotNumber = properties.<IntegerSetting>getSetting(SETTING_NUMBER_OF_SHOTS)
         .map(IntegerSetting::getValue)
@@ -93,13 +99,15 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
             String.valueOf(shotNumber),
             selectedSimulator.getBackendKey()
         )
-        .writeInputFile(input)
+        .writeInputFile(qasm)
         .readOutputString()
         .run(getProblemType(), solution.getId());
 
     if (processResult.success()) {
       solution.complete();
-      solution.setSolutionData(new ExecutionResult(processResult.output(), Optional.of(input)));
+      solution.setSolutionData(
+          new ExecutionResult(processResult.output(), Optional.of(qasm)),
+          ExecutionResultFormat.INSTANCE);
       return Mono.just(solution);
     }
     solution.fail();
@@ -108,7 +116,7 @@ public class ExecutionSolver implements ProblemSolver<String, ExecutionResult> {
   }
 
   @Override
-  public ProblemType<String, ExecutionResult> getProblemType() {
+  public ProblemType<QasmFamily, ExecutionResultFamily> getProblemType() {
     return ExecutorConfiguration.EXECUTOR_CONFIG;
   }
 
