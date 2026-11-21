@@ -2,9 +2,9 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.LPFormat;
+import edu.kit.provideq.formats.lp.LPSolutionFormat;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.formats.LPFormat;
-import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;

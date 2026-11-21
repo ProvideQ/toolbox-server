@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.qubo;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
+import edu.kit.provideq.formats.lp.LPSolutionFormat;
 import java.util.Set;
 
 /** Format family for QUBO solutions. */

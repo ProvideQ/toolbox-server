@@ -1,9 +1,9 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
 import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.tsplib.VRPFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.formats.VRPFormat;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;

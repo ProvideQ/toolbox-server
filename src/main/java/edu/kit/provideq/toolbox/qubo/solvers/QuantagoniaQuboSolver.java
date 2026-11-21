@@ -5,10 +5,10 @@ import de.asbestian.jplex.input.LpFileReader;
 import de.asbestian.jplex.input.Variable;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.LPFormat;
+import edu.kit.provideq.formats.lp.LPSolutionFormat;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.SolverException;
-import edu.kit.provideq.toolbox.formats.LPFormat;
-import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ProblemProperties;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ResultProperties;
@@ -45,7 +45,7 @@ public class QuantagoniaQuboSolver extends QuboSolver {
 
   @Override
   public String getDescription() {
-    return "This solver uses Quantagonia’s HybridSolver to solve QUBO problems via PlanQK";
+    return "This solver uses Quantagoniaâ€™s HybridSolver to solve QUBO problems via PlanQK";
   }
 
   @Override

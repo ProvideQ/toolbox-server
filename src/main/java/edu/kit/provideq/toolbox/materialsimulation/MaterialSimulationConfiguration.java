@@ -3,6 +3,7 @@ package edu.kit.provideq.toolbox.materialsimulation;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.xyz.XYZMoleculeFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.materialsimulation.solvers.QiskitMaterialSimulationSolver;

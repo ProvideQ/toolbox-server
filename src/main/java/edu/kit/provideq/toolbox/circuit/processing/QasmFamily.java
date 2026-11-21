@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.circuit.processing;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.formats.QasmFormat;
+import edu.kit.provideq.formats.qasm.QasmFormat;
 import java.util.Set;
 
 /**

@@ -5,7 +5,12 @@ import edu.kit.provideq.formats.core.attributes.AttributeService;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.gml.GmlFormats;
+import edu.kit.provideq.formats.knapsack.KnapsackFormats;
+import edu.kit.provideq.formats.lp.LpFormats;
+import edu.kit.provideq.formats.qasm.QasmFormats;
+import edu.kit.provideq.formats.tsplib.TsplibFormats;
 import edu.kit.provideq.formats.ufl.UvlFormats;
+import edu.kit.provideq.formats.xyz.XyzFormats;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,6 +36,11 @@ public class FormatsConfiguration {
     CnfFormats.register(registry);
     GmlFormats.register(registry);
     UvlFormats.register(registry);
+    LpFormats.register(registry);
+    QasmFormats.register(registry);
+    TsplibFormats.register(registry);
+    XyzFormats.register(registry);
+    KnapsackFormats.register(registry);
 
     return registry;
   }

@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.knapsack;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.formats.knapsack.KnapsackFormat;
 import java.util.Set;
 
 /**

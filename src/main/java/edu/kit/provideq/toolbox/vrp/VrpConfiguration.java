@@ -2,10 +2,9 @@ package edu.kit.provideq.toolbox.vrp;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.tsplib.VRPFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.formats.VRPFormat;
-import edu.kit.provideq.toolbox.formats.VrpToTsplibConverter;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
@@ -46,12 +45,6 @@ public class VrpConfiguration {
   VrpSolutionFamily registerVrpSolutionFamily(ConversionRegistry registry) {
     registry.registerFormat(VrpSolutionFamily.INSTANCE);
     return VrpSolutionFamily.INSTANCE;
-  }
-
-  @Bean
-  VrpToTsplibConverter registerVrpToTsplibConverter(ConversionRegistry registry) {
-    registry.registerConverter(VrpToTsplibConverter.INSTANCE);
-    return VrpToTsplibConverter.INSTANCE;
   }
 
   @Bean

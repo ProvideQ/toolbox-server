@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.vrp;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.formats.VRPSolutionFormat;
+import edu.kit.provideq.formats.tsplib.VRPSolutionFormat;
 import java.util.Set;
 
 /** Format family for VRP solutions. */

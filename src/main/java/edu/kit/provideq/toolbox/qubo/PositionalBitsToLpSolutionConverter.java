@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.qubo;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.converters.ContextConverter;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
-import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
+import edu.kit.provideq.formats.lp.LPSolutionFormat;
 
 /**
  * Converts a {@link PositionalBitsSolutionFormat positional-bits solution} into an

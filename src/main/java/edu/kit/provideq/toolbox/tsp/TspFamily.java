@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.tsp;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.formats.TSPLIBFormat;
+import edu.kit.provideq.formats.tsplib.TSPLIBFormat;
 import java.util.Set;
 
 /** Format family for TSP inputs. */

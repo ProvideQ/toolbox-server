@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.materialsimulation;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.formats.xyz.XYZMoleculeFormat;
 import java.util.Set;
 
 /**

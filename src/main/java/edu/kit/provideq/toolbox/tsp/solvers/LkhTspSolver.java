@@ -2,9 +2,9 @@ package edu.kit.provideq.toolbox.tsp.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.tsplib.TSPLIBFormat;
+import edu.kit.provideq.formats.tsplib.TSPLIBSolutionFormat;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.formats.TSPLIBFormat;
-import edu.kit.provideq.toolbox.formats.TSPLIBSolutionFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;

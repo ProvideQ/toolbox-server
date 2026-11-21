@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.qubo;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.converters.Converter;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
-import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
+import edu.kit.provideq.formats.lp.LPSolutionFormat;
 
 /**
  * Converts a {@link JsonQuboSolutionFormat json QUBO solution} into an

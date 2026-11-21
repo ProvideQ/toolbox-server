@@ -2,12 +2,12 @@ package edu.kit.provideq.toolbox.circuit.processing;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.qasm.QasmFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToExecutionSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToOptimizationSolver;
 import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.formats.QasmFormat;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
