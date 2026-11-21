@@ -5,11 +5,17 @@ import static edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidModelC
 import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.toolbox.featuremodel.FeatureModelFamily;
+import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureSolutionFamily;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sat.SatFamily;
+import edu.kit.provideq.toolbox.sat.SatSolutionFamily;
 import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
 import edu.kit.provideq.toolbox.sat.solvers.QrispGroverSolver;
 import java.time.Duration;
@@ -34,6 +40,9 @@ class FeatureModelAnomalySolversTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
+  @Autowired
+  private ConversionRegistry conversionRegistry;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -49,8 +58,8 @@ class FeatureModelAnomalySolversTest {
   }
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
-  <InputT, ResultT> Stream<Arguments> getArguments(
-          ProblemType<InputT, ResultT> problemType
+  <InT extends FormatFamily, OutT extends FormatFamily> Stream<Arguments> getArguments(
+          ProblemType<InT, OutT> problemType
   ) {
     var featureModelManager = problemManagerProvider.findProblemManagerForType(problemType).get();
     var satManager = problemManagerProvider.findProblemManagerForType(SAT).get();
@@ -62,7 +71,7 @@ class FeatureModelAnomalySolversTest {
 
     return ApiTestHelper.getAllArgumentCombinations(featureModelManager, satSolver)
             .map(list -> Arguments.of(
-                    list.get(0),
+                    list.getFirst(),
                     problemType,
                     list.get(1),
                     list.get(2)));
@@ -71,13 +80,14 @@ class FeatureModelAnomalySolversTest {
   @ParameterizedTest
   @MethodSource("provideArguments")
   void testFeatureModelAnomalySolver(
-        ProblemSolver<String, String> featureModelSolver,
-        ProblemType<String, String> problemType,
-        String input,
-        ProblemSolver<String, DimacsCnfSolution> satSolver) {
+        ProblemSolver<FeatureModelFamily, DeadFeatureSolutionFamily> featureModelSolver,
+        ProblemType<FeatureModelFamily, DeadFeatureSolutionFamily> problemType,
+        FormattedValue<?> input,
+        ProblemSolver<SatFamily, SatSolutionFamily> satSolver) {
 
     var problem = ApiTestHelper.createProblem(client, featureModelSolver, input, problemType);
     assertEquals(ProblemState.SOLVING, problem.getState());
+    problem = ApiTestHelper.waitForSubProblems(30, client, problem, problemType);
 
     // Set solver for sat sub problem
     for (SubProblemReferenceDto subProblem : problem.getSubProblems()) {
@@ -88,6 +98,6 @@ class FeatureModelAnomalySolversTest {
     }
 
     problem = ApiTestHelper.trySolveFor(120, client, problem.getId(), problemType);
-    ApiTestHelper.testSolution(problem);
+    ApiTestHelper.testSolution(problem, problemManagerProvider, conversionRegistry);
   }
 }
