@@ -1,12 +1,21 @@
 package edu.kit.provideq.toolbox.unsplittablemcf.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.LPFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.qubo.JsonQuboSolutionFormat;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
+import edu.kit.provideq.toolbox.qubo.QuboFamily;
+import edu.kit.provideq.toolbox.qubo.QuboSolutionFamily;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfFormat;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfSolutionFamily;
+import edu.kit.provideq.toolbox.unsplittablemcf.UmcfSolutionFormat;
 import edu.kit.provideq.toolbox.unsplittablemcf.UnsplittableMcfConfiguration;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +31,8 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class GamsUnsplittableMcfQuboSolver extends GamsUnsplittableMcfSolver {
-  private static final SubRoutineDefinition<String, String> QUBO_SUBROUTINE =
-      new SubRoutineDefinition<>(
+  private static final SubRoutineDefinition<QuboFamily, QuboSolutionFamily> QUBO_SUBROUTINE =
+      SubRoutineDefinition.of(
           QuboConfiguration.QUBO,
           "How should the QUBO be solved?",
           true
@@ -63,12 +72,16 @@ public class GamsUnsplittableMcfQuboSolver extends GamsUnsplittableMcfSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<UmcfSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
+
+    var umcfInstance = convert(formattedInput, UmcfFormat.INSTANCE, conversionService);
+    var umcfJson = umcfInstance.json();
 
     // Run the LP exporter
     var quboExportResult = context
@@ -77,7 +90,7 @@ public class GamsUnsplittableMcfQuboSolver extends GamsUnsplittableMcfSolver {
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input, "unsplittable-mcf.json")
+        .writeInputFile(umcfJson, "unsplittable-mcf.json")
         .readOutputFile()
         .run(getProblemType(), solution.getId());
 
@@ -96,8 +109,15 @@ public class GamsUnsplittableMcfQuboSolver extends GamsUnsplittableMcfSolver {
     }
 
     // Call the QUBO subroutine
-    return subRoutineResolver.runSubRoutine(QUBO_SUBROUTINE, qubo.get())
+    return subRoutineResolver.runSubRoutine(QUBO_SUBROUTINE,
+            FormattedValue.of(qubo.get(), LPFormat.INSTANCE), conversionService)
         .map(quboSolution -> {
+          // The plot script's gamspy_qubo "json" solver consumes the json QUBO solution
+          // format (only variables assigned to 1); convert whatever format the QUBO
+          // sub-solver emitted (e.g. lp-solution) accordingly.
+          var jsonSolution = convert(
+              quboSolution.getSolutionData(), JsonQuboSolutionFormat.INSTANCE, conversionService);
+
           var plotQuboResult = context
               .getBean(PythonProcessRunner.class, plotQuboSolutionScriptPath, venv)
               .withArguments(
@@ -106,17 +126,18 @@ public class GamsUnsplittableMcfQuboSolver extends GamsUnsplittableMcfSolver {
                   ProcessRunner.OUTPUT_FILE_PATH
               )
               .writeInputFile(
-                  input,
+                  umcfJson,
                   "unsplittable-mcf.json",
                   ProcessRunner.INPUT_FILE_PATH)
               .writeInputFile(
-                  quboSolution.getSolutionData(),
+                  jsonSolution,
                   "qubo-solution.json",
                   ProcessRunner.INPUT_FILE_PATH2)
               .readOutputFile("output.html")
               .run(getProblemType(), solution.getId());
 
-          return plotQuboResult.applyTo(solution);
+          return plotQuboResult.applyTo(
+              solution, UmcfSolutionFormat.INSTANCE, output -> output);
         });
   }
 }
