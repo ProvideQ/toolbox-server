@@ -56,6 +56,11 @@ public class ConversionRegistry {
     requireOpen();
     Objects.requireNonNull(format, "format");
 
+    if (outgoing.containsKey(format)) {
+      // already registered: keep the existing outgoing converters intact
+      return format;
+    }
+
     for (var alias : format.getAliases()) {
       formats.put(alias, format);
     }
