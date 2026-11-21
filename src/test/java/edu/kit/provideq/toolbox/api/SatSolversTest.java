@@ -5,12 +5,16 @@ import static edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration.SHARPSAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import edu.kit.provideq.toolbox.format.cnf.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.sat.SatFamily;
+import edu.kit.provideq.toolbox.sat.SatSolutionFamily;
 import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
+import edu.kit.provideq.toolbox.sharpsat.SolutionCountFamily;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,9 @@ class SatSolversTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
+  @Autowired
+  private ConversionRegistry conversionRegistry;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -48,7 +55,7 @@ class SatSolversTest {
   Stream<Arguments> provideArguments() {
     var problemManager = problemManagerProvider.findProblemManagerForType(SAT).get();
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
-        .map(list -> Arguments.of(list.get(0), list.get(1)));
+        .map(list -> Arguments.of(list.getFirst(), list.get(1)));
   }
 
   /**
@@ -56,11 +63,12 @@ class SatSolversTest {
    */
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testSatSolver(ProblemSolver<String, DimacsCnfSolution> solver, String input) {
+  void testSatSolver(
+      ProblemSolver<?, ?> solver, FormattedValue<?> input) {
     Assumptions.assumeFalse(solver instanceof QrispExactGroverSolver,
         "Skipping QrispExactGroverSolver in testSatSolver.");
     var problem = ApiTestHelper.createProblem(client, solver, input, SAT);
-    ApiTestHelper.testSolution(problem);
+    ApiTestHelper.testSolution(problem, problemManagerProvider, conversionRegistry);
   }
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -80,7 +88,7 @@ class SatSolversTest {
 
     List<Arguments> result = new ArrayList<>();
     for (var qrisp : qrispSolvers) {
-      for (String input : exampleInputs) {
+      for (FormattedValue<?> input : exampleInputs) {
         for (var subSolver : sharpSatSolvers) {
           result.add(Arguments.of(qrisp, SAT, input, subSolver));
         }
@@ -92,14 +100,15 @@ class SatSolversTest {
   @ParameterizedTest
   @MethodSource("provideQrispExactGroverArguments")
   void testQrispExactGroverSolver(
-      ProblemSolver<String, DimacsCnfSolution> qrispSolver,
-      ProblemType<String, DimacsCnfSolution> problemType,
-      String problemInput,
-      ProblemSolver<String, Integer> sharpSatSolver
+      ProblemSolver<SatFamily, SatSolutionFamily> qrispSolver,
+      ProblemType<SatFamily, SatSolutionFamily> problemType,
+      FormattedValue<?> problemInput,
+      ProblemSolver<SatFamily, SolutionCountFamily> sharpSatSolver
   ) {
     var problemDto = ApiTestHelper.createProblem(client, qrispSolver, problemInput, problemType);
     assertEquals(ProblemState.SOLVING, problemDto.getState(),
         "Qrisp problem must be SOLVING.");
+    problemDto = ApiTestHelper.waitForSubProblems(30, client, problemDto, problemType);
 
     var subProblems = problemDto.getSubProblems();
     assertFalse(subProblems.isEmpty(),
@@ -116,10 +125,10 @@ class SatSolversTest {
             subProblemId,
             SHARPSAT.getId()
         );
-        ApiTestHelper.testSolution(assignedSubProblem);
+        ApiTestHelper.testSolution(assignedSubProblem, problemManagerProvider, conversionRegistry);
       }
     }
     var solvedProblemDto = ApiTestHelper.trySolveFor(120, client, problemDto.getId(), problemType);
-    ApiTestHelper.testSolution(solvedProblemDto);
+    ApiTestHelper.testSolution(solvedProblemDto, problemManagerProvider, conversionRegistry);
   }
 }
