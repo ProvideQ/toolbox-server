@@ -1,10 +1,10 @@
 package edu.kit.provideq.formats.ufl;
 
 import edu.kit.provideq.formats.core.Format;
-import edu.kit.provideq.formats.core.FormatKind;
 import edu.kit.provideq.formats.core.FormatReader;
-import edu.kit.provideq.formats.core.ParseException;
-import edu.kit.provideq.formats.core.SerializationException;
+import edu.kit.provideq.formats.core.FormatType;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.core.exceptions.SerializationException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -14,7 +14,22 @@ import java.util.Set;
  * The UVL feature model format.
  *
  * <p>This format is textual: parsing validates the model via FeatureIDE when a converter
- * requires it; the format itself only transports the raw UVL text.
+ * requires it. The format itself only transports the raw UVL text.
+ *
+ * <p>Example instance:
+ * <pre>
+ * namespace Sandwich
+ *
+ * features
+ *     Sandwich
+ *         mandatory
+ *             Bread
+ *         optional
+ *             Cheese
+ *                 alternative
+ *                     Gouda
+ *                     Toast
+ * </pre>
  */
 public record UvlFormat() implements Format<String> {
   /**
@@ -38,8 +53,13 @@ public record UvlFormat() implements Format<String> {
   }
 
   @Override
-  public FormatKind getKind() {
-    return FormatKind.PROBLEM;
+  public FormatType getType() {
+    return FormatType.PROBLEM;
+  }
+
+  @Override
+  public Class<String> getRepresentationClass() {
+    return String.class;
   }
 
   @Override
