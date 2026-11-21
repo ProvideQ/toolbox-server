@@ -1,9 +1,14 @@
 package edu.kit.provideq.toolbox.vrp.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.VRPFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.vrp.VrpFamily;
+import edu.kit.provideq.toolbox.vrp.VrpSolutionFamily;
 import edu.kit.provideq.toolbox.vrp.clusterer.VrpClustererConfiguration;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -11,8 +16,8 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class ClusterAndSolveVrpSolver extends VrpSolver {
-  private static final SubRoutineDefinition<String, String> CLUSTER_SUBROUTINE =
-      new SubRoutineDefinition<>(
+  private static final SubRoutineDefinition<VrpFamily, VrpSolutionFamily> CLUSTER_SUBROUTINE =
+      SubRoutineDefinition.of(
           VrpClustererConfiguration.CLUSTER_VRP,
           "Creates a cluster of multiple vehicle routing problems",
           true
@@ -35,11 +40,13 @@ public class ClusterAndSolveVrpSolver extends VrpSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<VrpSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver resolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
-    return resolver.runSubRoutine(CLUSTER_SUBROUTINE, input);
+    var vrp = convertFormatted(formattedInput, VRPFormat.INSTANCE, conversionService);
+    return resolver.runSubRoutine(CLUSTER_SUBROUTINE, vrp, conversionService);
   }
 }

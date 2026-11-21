@@ -1,10 +1,14 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
+import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
+import edu.kit.provideq.toolbox.formats.VRPFormat;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.vrp.VrpFamily;
+import edu.kit.provideq.toolbox.vrp.VrpSolutionFamily;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -16,26 +20,25 @@ public class VrpClustererConfiguration {
   /**
    * A Configuration for Vehicle Routing Problem Clusterer.
    */
-  public static final ProblemType<String, String> CLUSTER_VRP = new ProblemType<>(
+  public static final ProblemType<VrpFamily, VrpSolutionFamily> CLUSTER_VRP =
+      new ProblemType<>(
       "ClusterVRP",
       "A Configuration for Vehicle Routing Problem Clusterer.",
-      String.class,
-      String.class
+      VrpFamily.INSTANCE,
+      VrpSolutionFamily.INSTANCE
   );
 
   @Bean
-  ProblemManager<String, String> getClusterVrpManager(
+  ProblemManager<VrpFamily, VrpSolutionFamily> getClusterVrpManager(
       ResourceProvider resourceProvider,
       KmeansClusterer kmeans,
       TwoPhaseClusterer twoPhase) {
-    return new ProblemManager<>(
-        CLUSTER_VRP,
-        Set.of(kmeans, twoPhase),
-        loadExampleProblems(resourceProvider)
-    );
+    var manager = new ProblemManager<>(CLUSTER_VRP, loadExampleProblems(resourceProvider));
+    manager.registerSolvers(kmeans, twoPhase);
+    return manager;
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
+  private Set<Problem<VrpFamily, VrpSolutionFamily>> loadExampleProblems(
       ResourceProvider resourceProvider
   ) {
     try {
@@ -43,8 +46,10 @@ public class VrpClustererConfiguration {
           getClass().getResourceAsStream("../CMT1.vrp"),
           "Simple VRP CMT1 Problem unavailable!"
       );
-      var problem = new Problem<>(CLUSTER_VRP);
-      problem.setInput(resourceProvider.readStream(problemStream));
+      var problem = new Problem<VrpFamily, VrpSolutionFamily>(CLUSTER_VRP);
+      problem.setInput(FormattedValue.of(
+
+          resourceProvider.readStream(problemStream), VRPFormat.INSTANCE));
       return Set.of(problem);
     } catch (IOException e) {
       throw new MissingExampleException(CLUSTER_VRP, e);

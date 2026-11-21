@@ -1,7 +1,12 @@
 package edu.kit.provideq.toolbox.vrp.clusterer;
 
+import edu.kit.provideq.formats.core.Format;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.VRPSolutionFormat;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -9,6 +14,8 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
+import edu.kit.provideq.toolbox.vrp.VrpFamily;
+import edu.kit.provideq.toolbox.vrp.VrpSolutionFamily;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +32,7 @@ import reactor.util.function.Tuples;
 /**
  * A solver for SAT problems.
  */
-public abstract class VrpClusterer implements ProblemSolver<String, String> {
+public abstract class VrpClusterer implements ProblemSolver<VrpFamily, VrpSolutionFamily> {
 
   protected final ApplicationContext context;
   protected final String binaryPath;
@@ -40,7 +47,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
   }
 
   @Override
-  public ProblemType<String, String> getProblemType() {
+  public ProblemType<VrpFamily, VrpSolutionFamily> getProblemType() {
     return VrpClustererConfiguration.CLUSTER_VRP;
   }
 
@@ -49,12 +56,15 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
     this.resourceProvider = resourceProvider;
   }
 
-  protected Mono<Solution<String>> getSolutionForCluster(
+  protected <SubInT extends FormatFamily, SubOutT extends FormatFamily>
+      Mono<Solution<VrpSolutionFamily>> getSolutionForCluster(
       String input,
-      Solution<String> solution,
+      Solution<VrpSolutionFamily> solution,
       ProcessResult<HashMap<Path, String>> processResult,
       SubRoutineResolver resolver,
-      SubRoutineDefinition<String, String> definition) {
+      SubRoutineDefinition<SubInT, SubOutT> definition,
+      Format<String> clusterFormat,
+      ConversionService conversionService) {
     if (processResult.output().isEmpty() || !processResult.success()) {
       solution.setDebugData(processResult.errorOutput()
           .orElse("Unknown Error Occured: Map of Cluster could not be retrieved."));
@@ -66,17 +76,18 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
 
     //solve TSP clusters:
     return Flux.fromIterable(mapOfClusters.entrySet())
-        .flatMap(cluster -> resolver.runSubRoutine(definition, cluster.getValue())
+        .flatMap(cluster -> resolver.runSubRoutine(definition,
+            FormattedValue.of(cluster.getValue(), clusterFormat), conversionService)
             .map(clusterSolution -> Tuples.of(cluster.getKey(), clusterSolution)))
-        .collectMap(Tuple2::getT1, Tuple2::getT2)
+        .<Path, Solution<?>>collectMap(Tuple2::getT1, Tuple2::getT2)
         .publishOn(Schedulers.boundedElastic())
         .map(clusterSolutionMap -> solveCluster(input, solution, clusterSolutionMap));
   }
 
-  protected Solution<String> solveCluster(
+  protected Solution<VrpSolutionFamily> solveCluster(
       String input,
-      Solution<String> solution,
-      Map<Path, Solution<String>> clusterSolutionMap) {
+      Solution<VrpSolutionFamily> solution,
+      Map<Path, ? extends Solution<?>> clusterSolutionMap) {
     // Retrieve the problem directory
     String problemDirectoryPath;
     try {
@@ -95,7 +106,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
       Path solutionFilePath = Path.of(problemDirectoryPath, ".vrp", fileName);
       var clusterSolution = entry.getValue();
       try {
-        Files.writeString(solutionFilePath, clusterSolution.getSolutionData());
+        Files.writeString(solutionFilePath, clusterSolution.getSolutionDataAsText());
       } catch (IOException e) {
         solution.setDebugData("Failed to write solution file. Path: " + solutionFilePath);
         solution.fail();
@@ -130,7 +141,7 @@ public abstract class VrpClusterer implements ProblemSolver<String, String> {
       return solution;
     }
 
-    solution.setSolutionData(result.get());
+    solution.setSolutionData(result.get(), VRPSolutionFormat.INSTANCE);
     solution.complete();
     return solution;
   }
