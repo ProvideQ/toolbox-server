@@ -1,5 +1,7 @@
 package edu.kit.provideq.toolbox.demonstrators;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -78,10 +80,12 @@ public class CplexMipDemonstrator implements Demonstrator {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<DemonstratorReportFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties) {
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
     var solution = new Solution<>(this);
 
     var maxNumberVariables = properties.<IntegerSetting>getSetting(SETTING_MAX_NUMBER_OF_VARS)
@@ -102,6 +106,7 @@ public class CplexMipDemonstrator implements Demonstrator {
         .readOutputString()
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, DemonstratorReportFormat.INSTANCE, output -> output));
   }
 }
