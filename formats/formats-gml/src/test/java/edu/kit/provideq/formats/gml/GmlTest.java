@@ -1,10 +1,14 @@
 package edu.kit.provideq.formats.gml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.kit.provideq.formats.core.ConversionRegistry;
-import edu.kit.provideq.formats.core.FormatException;
-import edu.kit.provideq.formats.core.FormatsToolbox;
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.attributes.AttributeService;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -103,14 +107,13 @@ class GmlTest {
   }
 
   @Test
-  void readsProperties() throws FormatException {
+  void readsAttributes() throws FormatException {
     var registry = new ConversionRegistry();
     GmlFormats.register(registry);
     registry.seal();
-    var toolbox = new FormatsToolbox(registry);
-    GmlFormats.registerProperties(toolbox);
+    var attributeService = new AttributeService(registry, new ConversionService(registry));
 
-    var gml = Gml.fromString("""
+    var gml = Document.of(Gml.fromString("""
         graph [
           node [
             id 1
@@ -123,10 +126,10 @@ class GmlTest {
             target 2
           ]
         ]
-        """);
+        """));
 
-    assertEquals(2, toolbox.readProperty(gml, GmlFormat.INSTANCE, "nodeCount", Integer.class));
-    assertEquals(1, toolbox.readProperty(gml, GmlFormat.INSTANCE, "edgeCount", Integer.class));
+    assertEquals(2, attributeService.read(gml, GmlFormat.INSTANCE, "node_count", Integer.class));
+    assertEquals(1, attributeService.read(gml, GmlFormat.INSTANCE, "edge_count", Integer.class));
   }
 
   @Test
@@ -140,7 +143,22 @@ class GmlTest {
         ]
         """);
 
-    assertEquals(1, gml.nodes().size());
-    assertEquals("one", gml.nodes().getFirst().label());
+    assertEquals(1, gml.parse().nodes().size());
+    assertEquals("one", gml.parse().nodes().getFirst().label());
+  }
+
+  @Test
+  void documentToStringReturnsSourceWithoutParsing() {
+    var gmlString = "graph [ node [ id 1 ] ]";
+    var gml = Document.of(gmlString, Gml::fromString);
+
+    assertEquals(gmlString, gml.toString());
+  }
+
+  @Test
+  void documentParsingIsDeferredUntilParse() {
+    var gml = Document.of("this is not gml", Gml::fromString);
+
+    assertThrows(ParseException.class, gml::parse);
   }
 }

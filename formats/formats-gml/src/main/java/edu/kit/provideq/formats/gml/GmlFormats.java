@@ -1,10 +1,9 @@
 package edu.kit.provideq.formats.gml;
 
-import edu.kit.provideq.formats.core.ConversionRegistry;
-import edu.kit.provideq.formats.core.FormatsToolbox;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 
 /**
- * Bundles all GML module formats and property accessors for registration.
+ * Bundles all GML module formats for registration.
  */
 public final class GmlFormats {
   private GmlFormats() {
@@ -16,16 +15,6 @@ public final class GmlFormats {
    * @param registry registry to register with
    */
   public static void register(ConversionRegistry registry) {
-    registry.register(GmlFormat.INSTANCE);
-  }
-
-  /**
-   * Registers all GML module property accessors with the given toolbox's property service.
-   *
-   * @param toolbox toolbox to register with
-   */
-  public static void registerProperties(FormatsToolbox toolbox) {
-    toolbox.getPropertyService().register(new GmlNodeCountAccessor());
-    toolbox.getPropertyService().register(new GmlEdgeCountAccessor());
+    registry.registerFormat(GmlFormat.INSTANCE);
   }
 }
