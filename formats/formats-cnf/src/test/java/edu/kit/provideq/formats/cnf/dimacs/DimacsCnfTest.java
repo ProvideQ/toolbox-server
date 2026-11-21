@@ -3,11 +3,13 @@ package edu.kit.provideq.formats.cnf.dimacs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.kit.provideq.formats.core.ConversionRegistry;
-import edu.kit.provideq.formats.core.FormatException;
-import edu.kit.provideq.formats.core.FormatsToolbox;
-import edu.kit.provideq.formats.core.ParseException;
-import edu.kit.provideq.formats.core.PropertyNotFoundException;
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.attributes.AttributeNotFoundException;
+import edu.kit.provideq.formats.core.attributes.AttributeService;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,61 +44,92 @@ class DimacsCnfTest {
     CnfFormats.register(registry);
     registry.seal();
 
-    var toolbox = new FormatsToolbox(registry);
-    DimacsCnf cnf = toolbox.convert("apple and banana", "logical-expression", "dimacs-cnf");
+    var conversionService = new ConversionService(registry);
+    Document<DimacsCnf> cnf = conversionService.convert(
+        "apple and banana", "logical-expression", "dimacs-cnf");
 
-    assertEquals(2, cnf.getVariables().size());
+    assertEquals(2, cnf.parse().getVariables().size());
   }
 
   @Test
-  void readsProperties() throws FormatException {
+  void convertsCnfBackToLogicalExpression() throws FormatException {
     var registry = new ConversionRegistry();
     CnfFormats.register(registry);
     registry.seal();
-    var toolbox = new FormatsToolbox(registry);
-    CnfFormats.registerProperties(toolbox);
 
-    var cnf = DimacsCnf.fromLogicalExpressionString("apple and banana or pear");
+    var conversionService = new ConversionService(registry);
+    var expression = conversionService.convert(
+        Document.of(
+            DimacsCnf.fromDimacsCnfString("c 1 apple\nc 2 banana\np cnf 2 1\n1 -2 0\n")),
+        "dimacs-cnf",
+        "logical-expression");
 
-    assertEquals(3, toolbox.readProperty(cnf, DimacsCnfFormat.INSTANCE,
-        "variableCount", Integer.class));
-    assertEquals(2, toolbox.readProperty(cnf, DimacsCnfFormat.INSTANCE,
-        "clauseCount", Integer.class));
+    assertEquals("(apple or not banana)", expression);
   }
 
   @Test
-  void propertyFallbackFromExpressionFormat() throws FormatException {
+  void readsAttributes() throws FormatException {
     var registry = new ConversionRegistry();
     CnfFormats.register(registry);
     registry.seal();
-    var toolbox = new FormatsToolbox(registry);
-    CnfFormats.registerProperties(toolbox);
+    var attributeService = new AttributeService(registry, new ConversionService(registry));
 
-    // The expression format itself has no accessors; the fallback should convert
+    var cnf = Document.of(
+        DimacsCnf.fromLogicalExpressionString("apple and banana or pear"));
+
+    assertEquals(3, attributeService.read(cnf, DimacsCnfFormat.INSTANCE,
+        "variable_count", Integer.class));
+    assertEquals(2, attributeService.read(cnf, DimacsCnfFormat.INSTANCE,
+        "clause_count", Integer.class));
+  }
+
+  @Test
+  void attributeFallbackFromExpressionFormat() throws FormatException {
+    var registry = new ConversionRegistry();
+    CnfFormats.register(registry);
+    registry.seal();
+    var attributeService = new AttributeService(registry, new ConversionService(registry));
+
+    // The expression format itself has no attribute readers; the fallback should convert
     // to DIMACS CNF and read there.
     var expression = "apple and banana";
 
-    var variableCount = toolbox.getPropertyService().read(
-        expression, LogicalExpressionFormat.INSTANCE, "variableCount", Integer.class);
+    var variableCount = attributeService.read(
+        expression, LogicalExpressionFormat.INSTANCE, "variable_count", Integer.class);
 
     assertEquals(2, variableCount);
   }
 
   @Test
-  void unknownPropertyThrows() {
+  void unknownAttributeThrows() {
     var registry = new ConversionRegistry();
     CnfFormats.register(registry);
     registry.seal();
-    var toolbox = new FormatsToolbox(registry);
-    CnfFormats.registerProperties(toolbox);
+    var attributeService = new AttributeService(registry, new ConversionService(registry));
 
-    assertThrows(PropertyNotFoundException.class,
-        () -> toolbox.readProperty("not a cnf", LogicalExpressionFormat.INSTANCE,
+    assertThrows(AttributeNotFoundException.class,
+        () -> attributeService.read("not a cnf", LogicalExpressionFormat.INSTANCE,
             "unknown", Integer.class));
   }
 
   @Test
   void invalidCnfThrowsParseException() {
-    assertThrows(ParseException.class, () -> DimacsCnf.fromDimacsCnfString("p cnf 5 2\n1 0\n"));
+    assertThrows(ParseException.class,
+        () -> DimacsCnf.fromDimacsCnfString("p cnf 5 2\n1 0\n"));
+  }
+
+  @Test
+  void documentToStringReturnsSourceWithoutParsing() {
+    var cnfString = "c 1 apple\np cnf 1 1\n1 0\n";
+    var document = Document.of(cnfString, DimacsCnf::fromDimacsCnfString);
+
+    assertEquals(cnfString, document.toString());
+  }
+
+  @Test
+  void documentParsingIsDeferredUntilParse() {
+    var document = Document.of("this is not a cnf", DimacsCnf::fromDimacsCnfString);
+
+    assertThrows(ParseException.class, document::parse);
   }
 }

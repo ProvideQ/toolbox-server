@@ -20,10 +20,17 @@ class StringToDimacsCnfSolution {
 
       var lineSegment = line.split(String.valueOf(DimacsCnf.SEPARATOR));
       if (lineSegment[0].charAt(0) == DimacsCnfSolution.VARIABLE_DECLARATION) {
-        // Parse variable declaration
-        var number = Integer.parseInt(lineSegment[1]);
+        // Parse variable declarations
+        // a v-line may carry multiple literals and ends with the terminating 0
+        for (int i = 1; i < lineSegment.length; i++) {
+          var segment = lineSegment[i].trim();
+          if (segment.isEmpty() || segment.equals("0")) {
+            continue;
+          }
+          var number = Integer.parseInt(segment);
 
-        variableMap.put(Math.abs(number), number >= 0);
+          variableMap.put(Math.abs(number), number >= 0);
+        }
       }
     }
 

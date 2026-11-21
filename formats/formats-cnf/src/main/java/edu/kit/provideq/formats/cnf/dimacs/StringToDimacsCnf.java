@@ -1,6 +1,6 @@
 package edu.kit.provideq.formats.cnf.dimacs;
 
-import edu.kit.provideq.formats.core.ParseException;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,54 +21,59 @@ class StringToDimacsCnf {
     int variableCount = -1;
     int clauseCount = -1;
 
-    for (String rawLine : dimacsCnfString.split("\r\n|\n")) {
-      if (rawLine.isBlank()) {
-        continue;
-      }
-
-      var line = rawLine;
-      if (line.charAt(line.length() - 1) == '\r') {
-        line = line.substring(0, line.length() - 1);
-      }
-
-      var lineSegment = line.split(String.valueOf(DimacsCnf.SEPARATOR));
-      switch (lineSegment[0].charAt(0)) {
-        case DimacsCnf.COMMENT_START -> {
-          if (lineSegment.length < 3) {
-            break;
-          }
-
-          // Parse comment
-          Integer number = Integer.parseInt(lineSegment[1]);
-          String name =
-              String.join(" ", Arrays.copyOfRange(lineSegment, 2, lineSegment.length));
-          variableMap.put(number, name);
+    try {
+      for (String rawLine : dimacsCnfString.split("\r\n|\n")) {
+        if (rawLine.isBlank()) {
+          continue;
         }
-        case DimacsCnf.PREAMBLE_START -> {
-          // Parse preamble
-          if (!DimacsCnf.CNF_IDENTIFIER.equals(lineSegment[1])) {
-            throw new ParseException(
-                "Expected DIMACS CNF identifier %s in header, but found %s".formatted(
-                    DimacsCnf.CNF_IDENTIFIER, lineSegment[1]));
-          }
 
-          variableCount = Integer.parseInt(lineSegment[2]);
-          clauseCount = Integer.parseInt(lineSegment[3]);
+        var line = rawLine;
+        if (line.charAt(line.length() - 1) == '\r') {
+          line = line.substring(0, line.length() - 1);
         }
-        default -> {
-          // Parse clause; the last token is the terminating 0
-          var clause = new ArrayList<Variable>();
-          for (int i = 0; i < lineSegment.length - 1; i++) {
-            var rawNumber = Integer.parseInt(lineSegment[i]);
-            var number = Math.abs(rawNumber);
-            var name = variableMap.get(number);
 
-            var isNegated = rawNumber < 0;
-            clause.add(new Variable(number, name, isNegated));
+        var lineSegment = line.split(String.valueOf(DimacsCnf.SEPARATOR));
+        switch (lineSegment[0].charAt(0)) {
+          case DimacsCnf.COMMENT_START -> {
+            if (lineSegment.length < 3) {
+              break;
+            }
+
+            // Parse comment
+            Integer number = Integer.parseInt(lineSegment[1]);
+            String name =
+                String.join(" ", Arrays.copyOfRange(lineSegment, 2, lineSegment.length));
+            variableMap.put(number, name);
           }
-          clauses.add(clause);
+          case DimacsCnf.PREAMBLE_START -> {
+            // Parse preamble
+            if (!DimacsCnf.CNF_IDENTIFIER.equals(lineSegment[1])) {
+              throw new ParseException(
+                  "Expected DIMACS CNF identifier %s in header, but found %s".formatted(
+                      DimacsCnf.CNF_IDENTIFIER, lineSegment[1]));
+            }
+
+            variableCount = Integer.parseInt(lineSegment[2]);
+            clauseCount = Integer.parseInt(lineSegment[3]);
+          }
+          default -> {
+            // Parse clause; the last token is the terminating 0
+            var clause = new ArrayList<Variable>();
+            for (int i = 0; i < lineSegment.length - 1; i++) {
+              var rawNumber = Integer.parseInt(lineSegment[i]);
+              var number = Math.abs(rawNumber);
+              var name = variableMap.get(number);
+
+              var isNegated = rawNumber < 0;
+              clause.add(new Variable(number, name, isNegated));
+            }
+            clauses.add(clause);
+          }
         }
       }
+    } catch (NumberFormatException e) {
+      throw new ParseException(
+          "Invalid number in DIMACS CNF input: %s".formatted(e.getMessage()), e);
     }
 
     if (variableCount != variableMap.size()) {
