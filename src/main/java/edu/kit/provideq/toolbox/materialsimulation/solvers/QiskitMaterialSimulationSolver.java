@@ -1,7 +1,12 @@
 package edu.kit.provideq.toolbox.materialsimulation.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.materialsimulation.MaterialSimulationConfiguration;
+import edu.kit.provideq.toolbox.materialsimulation.MoleculeEnergySolutionFamily;
+import edu.kit.provideq.toolbox.materialsimulation.MoleculeEnergySolutionFormat;
+import edu.kit.provideq.toolbox.materialsimulation.XYZMoleculeFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
@@ -14,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
 
 /**
  * {@link MaterialSimulationConfiguration#MATERIAL_SIMULATION} solver using a Qiskit
@@ -73,12 +77,16 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<MoleculeEnergySolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
+
+    var xyzMolecule = convert(formattedInput, XYZMoleculeFormat.INSTANCE, conversionService);
+    var xyzString = XYZMoleculeFormat.INSTANCE.serializeToString(xyzMolecule);
 
     int charge = properties.<IntegerSetting>getSetting(SETTING_CHARGE)
         .map(IntegerSetting::getValue)
@@ -103,10 +111,11 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
             "--charge", String.valueOf(charge),
             "--spin", String.valueOf(spin)
         )
-        .writeInputFile(input)
+        .writeInputFile(xyzString)
         .readOutputFile()
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, MoleculeEnergySolutionFormat.INSTANCE, output -> output));
   }
 }
