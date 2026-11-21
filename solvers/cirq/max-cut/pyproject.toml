@@ -1,0 +1,16 @@
+# This file describes the python package requirements for the Cirq MaxCut solver
+[project]
+name = "toolbox-solvers-cirq-max-cut"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib",
+    "cirq",
+    "networkx",
+    "pandas",
+    "sympy",
+    "numpy",
+]
+
+[tool.uv]
+package = false
