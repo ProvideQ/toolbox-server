@@ -12,6 +12,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
@@ -90,8 +91,9 @@ final class ProblemRouteDocumentation {
     // TODO missing error codes and examples
   }
 
-  private static <InputT, ResultT> org.springdoc.core.fn.builders.content.Builder getRequestContent(
-      ProblemManager<InputT, ResultT> manager) {
+  private static <InT extends FormatFamily, OutT extends FormatFamily>
+      org.springdoc.core.fn.builders.content.Builder getRequestContent(
+      ProblemManager<InT, OutT> manager) {
     var exampleProblem = manager.getExampleInstances().stream()
         .findFirst()
         .orElseThrow(() -> new MissingExampleException(manager.getType()));

@@ -1,23 +1,25 @@
 package edu.kit.provideq.toolbox;
 
+import edu.kit.provideq.formats.core.Format;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
-import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
 /**
  * A solution holds all information concerning a specific problem-solving process triggered by a
- * {@link edu.kit.provideq.toolbox.meta.ProblemSolver}. This includes metadata, debug data,
- * the current status of the process, as well as the eventually generated solution data
+ * {@link ProblemSolver}. This includes metadata, debug data, the current status of the process,
+ * as well as the eventually generated solution data.
  *
- * @param <S> the type of the generated solution data
+ * @param <OutT> output format family of the solution data
  */
-public class Solution<S> {
+public class Solution<OutT extends FormatFamily> {
   private final UUID id;
   private SolutionStatus status = SolutionStatus.COMPUTING;
   private String metaData = "";
-  private S solutionData;
+  private FormattedValue<?> solutionData;
   private String debugData;
   private String solverName;
   private long executionMilliseconds;
@@ -33,24 +35,42 @@ public class Solution<S> {
     this.id = id;
   }
 
-  public <I> Solution(ProblemSolver<I, S> problemSolver) {
+  public <I extends FormatFamily> Solution(ProblemSolver<I, OutT> problemSolver) {
     this.id = UUID.randomUUID();
     this.solverName = problemSolver.getName();
   }
 
-  public static <I, S> Solution<S> failed(
-      ProblemSolver<I, S> problemSolver,
+  public static <InT extends FormatFamily, OutT extends FormatFamily> Solution<OutT> failed(
+      ProblemSolver<InT, OutT> problemSolver,
       String text) {
-    var solution = new Solution<S>(problemSolver);
+    var solution = new Solution<>(problemSolver);
     solution.fail();
     solution.setDebugData(text);
     return solution;
   }
 
-  public static <I, S, T> Solution<T> from(
-      ProblemSolver<I, T> solver,
+  /**
+   * Creates a solution with status 'invalid' and the given debug data, mirroring
+   * {@link #failed(ProblemSolver, String)} for inputs that cannot be processed.
+   *
+   * @param problemSolver the solver that produced this solution
+   * @param text          debug data describing why the input is invalid
+   * @param <InT>         input format family of the solver
+   * @param <OutT>        output format family of the solution
+   * @return the aborted solution
+   */
+  public static <InT extends FormatFamily, OutT extends FormatFamily> Solution<OutT> aborted(
+      ProblemSolver<InT, OutT> problemSolver,
+      String text) {
+    var solution = new Solution<>(problemSolver);
+    solution.abort();
+    solution.setDebugData(text);
+    return solution;
+  }
+
+  public static <S extends FormatFamily, T extends FormatFamily> Solution<T> from(
       Solution<S> source,
-      Function<S, T> mapper) {
+      Function<FormattedValue<?>, FormattedValue<?>> mapper) {
     var result = new Solution<T>();
     result.solverName = source.solverName;
     result.status = source.status;
@@ -71,32 +91,6 @@ public class Solution<S> {
 
   public void setStatus(SolutionStatus newStatus) {
     this.status = newStatus;
-  }
-
-  public Solution<String> toStringSolution() {
-    return toStringSolution(Object::toString);
-  }
-
-  /**
-   * Converts this {@link Solution}{@code <T>} to a {@link Solution}{@code <String>} by applying a
-   * given transformation function.
-   *
-   * @param stringSelector the function that transforms the {@link Solution#solutionData} of type T
-   *                       to a String.
-   * @return the solution with the stringified solution data.
-   */
-  public Solution<String> toStringSolution(@NotNull Function<S, String> stringSelector) {
-    Objects.requireNonNull(stringSelector, "Missing String selector!");
-
-    var stringSolution = new Solution<String>(getId());
-    stringSolution.status = status;
-    stringSolution.metaData = metaData;
-    stringSolution.solutionData =
-        (solutionData == null) ? null : stringSelector.apply(solutionData);
-    stringSolution.debugData = debugData;
-    stringSolution.solverName = solverName;
-    stringSolution.executionMilliseconds = executionMilliseconds;
-    return stringSolution;
   }
 
   /**
@@ -134,11 +128,44 @@ public class Solution<S> {
     this.metaData = metaData;
   }
 
-  public S getSolutionData() {
+  /**
+   * Returns the solution data, or null if the solver has not set any.
+   */
+  public FormattedValue<?> getSolutionData() {
     return this.solutionData;
   }
 
-  public void setSolutionData(S solutionData) {
+  /**
+   * Returns the solution data serialized to text using its current format,
+   * or null if no solution data is set.
+   *
+   * @return textual representation of the solution data
+   */
+  public String getSolutionDataAsText() {
+    if (solutionData == null) {
+      return null;
+    }
+
+    return solutionData.toString();
+  }
+
+  /**
+   * Sets the solution data expressed in the given format.
+   *
+   * @param value solution value in the format's representation
+   * @param format format the solution data is expressed in
+   * @param <T> representation type of the solution data
+   */
+  public <T> void setSolutionData(T value, Format<T> format) {
+    this.solutionData = FormattedValue.of(value, format);
+  }
+
+  /**
+   * Sets the solution data as a formatted value.
+   *
+   * @param solutionData the formatted solution data
+   */
+  public void setSolutionData(FormattedValue<?> solutionData) {
     this.solutionData = solutionData;
   }
 

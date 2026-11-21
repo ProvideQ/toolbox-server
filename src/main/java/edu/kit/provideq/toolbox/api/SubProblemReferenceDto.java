@@ -1,5 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import java.util.List;
@@ -14,18 +16,15 @@ public final class SubProblemReferenceDto {
   private final List<String> subProblemIds;
 
   /**
-   * Internal constructor, used for de-serialization.
-   */
-  @SuppressWarnings("unused")
-  private SubProblemReferenceDto() {
-    this.subRoutine = null;
-    this.subProblemIds = List.of();
-  }
-
-  /**
    * Use {@link #forSubRoutine(Problem, SubRoutineDefinition)}.
+   *
+   * @param subRoutine     the referenced sub-routine definition
+   * @param subProblemIds  the ids of the problems created for the sub-routine
    */
-  private SubProblemReferenceDto(SubRoutineDefinitionDto subRoutine, List<String> subProblemIds) {
+  @JsonCreator
+  private SubProblemReferenceDto(
+      @JsonProperty("subRoutine") SubRoutineDefinitionDto subRoutine,
+      @JsonProperty("subProblemIds") List<String> subProblemIds) {
     this.subRoutine = subRoutine;
     this.subProblemIds = subProblemIds;
   }

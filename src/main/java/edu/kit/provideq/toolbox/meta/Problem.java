@@ -1,9 +1,14 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.BoundWithInfo;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.api.BoundComparisonDto;
 import edu.kit.provideq.toolbox.api.BoundDto;
+import edu.kit.provideq.toolbox.exception.ConversionException;
+import edu.kit.provideq.toolbox.exception.SolverException;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
@@ -22,28 +28,31 @@ import reactor.core.publisher.Mono;
  * The {@link Problem} class is essentially a state machine allowing different operations like
  * configuring the input and solver, and starting or stopping the solution process.
  *
- * @param <InputT> the data type of the problem's input.
- * @param <ResultT> the data type of the problem's solution.
+ * @param <InT> the input format family of the problem.
+ * @param <OutT> the output format family of the problem.
  */
-public class Problem<InputT, ResultT> {
-  private final UUID id;
-  private final ProblemType<InputT, ResultT> type;
-  private final SubProblems<InputT, ResultT> subProblems;
-  private final Set<ProblemObserver<InputT, ResultT>> observers;
+public class Problem<InT extends FormatFamily, OutT extends FormatFamily> {
+  private static final Logger LOGGER = Logger.getLogger(Problem.class.getName());
 
-  private InputT input;
-  private Solution<ResultT> solution;
+  private final UUID id;
+  private final ProblemType<InT, OutT> type;
+  private final SubProblems<InT, OutT> subProblems;
+  private final Set<ProblemObserver<InT, OutT>> observers;
+
+  private FormattedValue<?> input;
+  private Solution<OutT> solution;
   private BoundComparisonDto boundWithComparison;
   private ProblemState state;
-  private ProblemSolver<InputT, ResultT> solver;
+  private ProblemSolver<InT, OutT> solver;
   private List<SolverSetting> solverSettings;
 
   /**
-   * Creates a new problem of a given {@link ProblemType}.
+   * Creates a new problem of a given {@link ProblemType} without conversion support.
+   * Input values of such problems cannot derive other representations.
    *
    * @param type the kind of problem.
    */
-  public Problem(ProblemType<InputT, ResultT> type) {
+  public Problem(ProblemType<InT, OutT> type) {
     this.id = UUID.randomUUID();
     this.type = type;
 
@@ -65,9 +74,10 @@ public class Problem<InputT, ResultT> {
    * Starts the solution of this problem.
    * Once the problem is solved, the solution can be obtained using {@link #getSolution()}.
    */
-  public Mono<Solution<ResultT>> solve() {
-    Optional<ProblemSolver<InputT, ResultT>> solverT = getSolver();
-    Optional<InputT> inputT = getInput();
+  public Mono<Solution<OutT>> solve(
+      ConversionService conversionService) {
+    Optional<ProblemSolver<InT, OutT>> solverT = getSolver();
+    Optional<FormattedValue<?>> inputT = getInput();
     if (solverT.isEmpty() || inputT.isEmpty()) {
       throw new IllegalStateException(
               "The problem %s is not fully configured!".formatted(toString()));
@@ -78,7 +88,24 @@ public class Problem<InputT, ResultT> {
     long start = System.currentTimeMillis();
 
     var properties = new SolvingProperties(getSolverSettings());
-    return solverT.get().solve(inputT.get(), subProblems, properties)
+    // Solver exceptions are converted into completed solutions here, so that solvers can
+    // simply throw (e.g. from convert) instead of building and returning failure
+    // solutions themselves. All solver invocations, including sub-routines, route through
+    // this method and are therefore covered by this handling.
+    return Mono.defer(() -> solverT.get()
+            .solve(inputT.get(), subProblems, properties, conversionService))
+        // format conversion failed -> aborted (INVALID)
+        .onErrorResume(ConversionException.class, e ->
+            Mono.just(Solution.aborted(solverT.get(), e.getMessage())))
+        // solver failed -> failed (ERROR)
+        .onErrorResume(SolverException.class, e ->
+            Mono.just(Solution.failed(solverT.get(), e.getMessage())))
+        // fallback: unexpected error -> failed (ERROR)
+        .onErrorResume(e -> {
+          LOGGER.severe("Unexpected error in solver %s: %s"
+              .formatted(solverT.get().getName(), e));
+          return Mono.just(Solution.failed(solverT.get(), "Unexpected error: " + e));
+        })
         .doOnNext(sol -> {
           long finish = System.currentTimeMillis();
           sol.setExecutionMilliseconds(finish - start);
@@ -138,39 +165,39 @@ public class Problem<InputT, ResultT> {
     return id;
   }
 
-  public ProblemType<InputT, ResultT> getType() {
+  public ProblemType<InT, OutT> getType() {
     return type;
   }
 
-  public Optional<InputT> getInput() {
+  public Optional<FormattedValue<?>> getInput() {
     return Optional.ofNullable(this.input);
   }
 
   /**
    * Changes the problem input data.
    */
-  public void setInput(InputT newInput) {
+  public void setInput(FormattedValue<?> newInput) {
     this.input = newInput;
 
     this.observers.forEach(observer -> observer.onInputChanged(this, newInput));
   }
 
-  public Optional<Solution<ResultT>> getSolution() {
+  public Optional<Solution<OutT>> getSolution() {
     return Optional.ofNullable(this.solution);
   }
 
-  public Optional<ProblemSolver<InputT, ResultT>> getSolver() {
+  public Optional<ProblemSolver<InT, OutT>> getSolver() {
     return Optional.ofNullable(this.solver);
   }
 
   /**
    * Changes the problem solver to be used for this problem.
    */
-  public void setSolver(ProblemSolver<InputT, ResultT> newSolver) {
+  public void setSolver(ProblemSolver<InT, OutT> newSolver) {
     this.solver = newSolver;
     this.state = newSolver == null ? ProblemState.NEEDS_CONFIGURATION : ProblemState.READY_TO_SOLVE;
 
-    Consumer<ProblemObserver<InputT, ResultT>> update = newSolver == null
+    Consumer<ProblemObserver<InT, OutT>> update = newSolver == null
         ? observer -> observer.onSolverReset(this)
         : observer -> observer.onSolverChanged(this, newSolver);
 
@@ -187,18 +214,19 @@ public class Problem<InputT, ResultT> {
   }
 
   @SuppressWarnings("unchecked")
-  public <SubInputT, SubResultT> Set<Problem<SubInputT, SubResultT>> getSubProblems(
-          ProblemType<SubInputT, SubResultT> subProblemType) {
+  public <SubInT extends FormatFamily, SubOutT extends FormatFamily>
+      Set<Problem<SubInT, SubOutT>> getSubProblems(ProblemType<SubInT, SubOutT> subProblemType) {
     // problem type check guarantees correct type
     return subProblems.getProblems()
             .stream()
             .filter(subProblem -> subProblem.getType().equals(subProblemType))
-            .map(subProblem -> (Problem<SubInputT, SubResultT>) subProblem)
+            .map(subProblem -> (Problem<SubInT, SubOutT>) subProblem)
             .collect(Collectors.toSet());
   }
 
-  public <SubInputT, SubResultT> Set<Problem<SubInputT, SubResultT>> getSubProblems(
-      SubRoutineDefinition<SubInputT, SubResultT> subRoutineDefinition
+  public <SubInT extends FormatFamily, SubOutT extends FormatFamily>
+      Set<Problem<SubInT, SubOutT>> getSubProblems(
+          SubRoutineDefinition<SubInT, SubOutT> subRoutineDefinition
   ) {
     return subProblems.getProblems(subRoutineDefinition);
   }
@@ -243,11 +271,11 @@ public class Problem<InputT, ResultT> {
     this.solverSettings = solverSettings;
   }
 
-  public void addObserver(ProblemObserver<InputT, ResultT> observer) {
+  public void addObserver(ProblemObserver<InT, OutT> observer) {
     this.observers.add(observer);
   }
 
-  public void removeObserver(ProblemObserver<InputT, ResultT> observer) {
+  public void removeObserver(ProblemObserver<InT, OutT> observer) {
     this.observers.remove(observer);
   }
 
@@ -273,9 +301,10 @@ public class Problem<InputT, ResultT> {
     return Optional.ofNullable(boundWithComparison);
   }
 
-  private float getSolutionValue(ResultT solutionData) {
+  private float getSolutionValue(FormattedValue<?> solutionData) {
     var pattern = Pattern.compile(this.type.getSolutionPattern());
-    var solutionMatcher = pattern.matcher(solutionData.toString());
+    String solutionText = solutionData.toString();
+    var solutionMatcher = pattern.matcher(solutionText);
     float solutionValue;
     if (solutionMatcher.find()) {
       solutionValue = Float.parseFloat(solutionMatcher.group(1));

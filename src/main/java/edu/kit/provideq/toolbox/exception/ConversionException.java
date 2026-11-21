@@ -1,6 +1,9 @@
 package edu.kit.provideq.toolbox.exception;
 
-public class ConversionException extends Exception {
+/**
+ * Unchecked exception thrown by problem solvers to signal that a conversion between formats failed.
+ */
+public class ConversionException extends SolverException {
   public ConversionException(String message) {
     super(message);
   }

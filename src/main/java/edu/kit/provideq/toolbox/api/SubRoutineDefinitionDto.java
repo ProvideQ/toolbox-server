@@ -1,5 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 
 /**
@@ -11,22 +13,17 @@ public final class SubRoutineDefinitionDto {
   private final boolean isCalledOnlyOnce;
 
   /**
-   * Internal constructor, used for de-serialization.
-   */
-  @SuppressWarnings("unused")
-  private SubRoutineDefinitionDto() {
-    this.typeId = null;
-    this.description = null;
-    this.isCalledOnlyOnce = true;
-  }
-
-  /**
    * Use {@link #fromSubRoutineDefinition(SubRoutineDefinition)}.
+   *
+   * @param typeId           the id of the sub-routine's problem type
+   * @param description      the sub-routine's description
+   * @param isCalledOnlyOnce whether the sub-routine is called at most once
    */
+  @JsonCreator
   private SubRoutineDefinitionDto(
-      String typeId,
-      String description,
-      boolean isCalledOnlyOnce
+      @JsonProperty("typeId") String typeId,
+      @JsonProperty("description") String description,
+      @JsonProperty("isCalledOnlyOnce") boolean isCalledOnlyOnce
   ) {
     this.typeId = typeId;
     this.description = description;

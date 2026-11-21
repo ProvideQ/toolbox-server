@@ -1,5 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import java.util.UUID;
@@ -11,10 +12,10 @@ public class RouterUtility {
     throw new UnsupportedOperationException("Utility class");
   }
 
-  public static <InputT, ResultT> Problem<InputT, ResultT> findProblemOrThrow(
-      ProblemManager<InputT, ResultT> manager,
-      String id
-  ) {
+  public static <InT extends FormatFamily, OutT extends FormatFamily>
+      Problem<InT, OutT> findProblemOrThrow(
+          ProblemManager<InT, OutT> manager,
+          String id) {
     UUID uuid;
     try {
       uuid = UUID.fromString(id);

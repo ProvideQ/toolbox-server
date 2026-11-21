@@ -1,88 +1,74 @@
 package edu.kit.provideq.toolbox.meta;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.attributes.AttributeService;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.Bound;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
  * The type of problem to solve.
+ *
+ * <p>Problem types declare the format families of their input and output.
+ * The input family defines which formats may be submitted for this problem type.
+ * The output family defines which formats solvers may produce solutions in.
+ *
+ * @param <InT>  input format family of this problem type
+ * @param <OutT> output format family of this problem type
  */
-public class ProblemType<InputT, ResultT> {
+public class ProblemType<InT extends FormatFamily, OutT extends FormatFamily> {
   private final String id;
   private final String description;
-  private final Class<InputT> inputClass;
-  private final Class<ResultT> resultClass;
-  private final Function<InputT, Bound> estimator;
+  private final InT inputFamily;
+  private final OutT resultFamily;
+  private final Function<FormattedValue<?>, Bound> estimator;
   private final String solutionPattern;
-  private final Map<String, Function<InputT, String>> attributes;
 
   /**
-   * Defines a new problem type.
+   * Defines a new problem type with declared input and output format families.
    *
-   * @param id              a unique string identifier for this type of problem.
-   * @param inputClass      the Java class object matching the {@link InputT} type parameter.
-   * @param resultClass     the Java class object matching the {@link ResultT} type parameter.
-   * @param estimator       the bound estimator for this problem type,
-   *                        null if estimation is not supported.
-   * @param solutionPattern a regex pattern describing the format of valid solutions
-   *                        needs to contain one group to match a float number describing
-   *                        the problem quality if estimation is supported, null otherwise.
+   * @param id           a unique string identifier for this type of problem.
+   * @param description  a description of the problem type.
+   * @param inputFamily  the format family of the problem input.
+   * @param resultFamily the format family of the problem solution.
    */
   public ProblemType(
       String id,
       String description,
-      Class<InputT> inputClass,
-      Class<ResultT> resultClass,
-      Function<InputT, Bound> estimator,
-      String solutionPattern,
-      Map<String, Function<InputT, String>> attributes
+      InT inputFamily,
+      OutT resultFamily
+  ) {
+    this(id, description, inputFamily, resultFamily, null, null);
+  }
+
+  /**
+   * Defines a new problem type with declared input and output format families
+   * and estimation support.
+   *
+   * @param id              a unique string identifier for this type of problem.
+   * @param description     a description of the problem type.
+   * @param inputFamily     the format family of the problem input.
+   * @param resultFamily    the format family of the problem solution.
+   * @param estimator       the bound estimator for this problem type.
+   * @param solutionPattern a regex pattern describing the format of valid solutions.
+   */
+  public ProblemType(
+      String id,
+      String description,
+      InT inputFamily,
+      OutT resultFamily,
+      Function<FormattedValue<?>, Bound> estimator,
+      String solutionPattern
   ) {
     this.id = id;
     this.description = description;
-    this.inputClass = inputClass;
-    this.resultClass = resultClass;
+    this.inputFamily = inputFamily;
+    this.resultFamily = resultFamily;
     this.estimator = estimator;
     this.solutionPattern = solutionPattern;
-    this.attributes = attributes;
-  }
-
-  /**
-   * Defines a new problem type without estimation support.
-   *
-   * @param id          a unique string identifier for this type of problem.
-   * @param description a description of the problem type.
-   * @param inputClass  the Java class object corresponding to the {@link InputT} type parameter.
-   * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
-   * @param attributes  a map of attributes for this problem type,
-   *                    where the key is the attribute name and the value is
-   *                    a function to get the attribute value for a given problem instance
-   */
-  public ProblemType(
-      String id,
-      String description,
-      Class<InputT> inputClass,
-      Class<ResultT> resultClass,
-      Map<String, Function<InputT, String>> attributes
-  ) {
-    this(id, description, inputClass, resultClass, null, null, attributes);
-  }
-
-  /**
-   * Defines a new problem type without estimation support.
-   *
-   * @param id          a unique string identifier for this type of problem.
-   * @param description a description of the problem type.
-   * @param inputClass  the Java class object corresponding to the {@link InputT} type parameter.
-   * @param resultClass the Java class object corresponding to the {@link ResultT} type parameter.
-   */
-  public ProblemType(
-      String id,
-      String description,
-      Class<InputT> inputClass,
-      Class<ResultT> resultClass
-  ) {
-    this(id, description, inputClass, resultClass, null, null, Map.of());
   }
 
   /**
@@ -100,23 +86,25 @@ public class ProblemType<InputT, ResultT> {
   }
 
   /**
-   * Returns the Java class corresponding to the {@link InputT} type parameter.
+   * Returns the input format family of this problem type.
+   * Defines which formats may be submitted for this problem type.
    */
-  public Class<InputT> getInputClass() {
-    return inputClass;
+  public InT getInputFamily() {
+    return inputFamily;
   }
 
   /**
-   * Returns the Java class corresponding to the {@link ResultT} type parameter.
+   * Returns the output format family of this problem type.
+   * Defines which formats solvers may produce solutions in.
    */
-  public Class<ResultT> getResultClass() {
-    return resultClass;
+  public OutT getResultFamily() {
+    return resultFamily;
   }
 
   /**
    * Returns the bound estimator for this problem type.
    */
-  public Optional<Function<InputT, Bound>> getEstimator() {
+  public Optional<Function<FormattedValue<?>, Bound>> getEstimator() {
     return Optional.ofNullable(estimator);
   }
 
@@ -125,21 +113,45 @@ public class ProblemType<InputT, ResultT> {
   }
 
   /**
-   * Returns a map of attributes for this problem type.
+   * Returns names of attributes supported by the input format family.
    */
-  public Map<String, Function<InputT, String>> getAttributes() {
-    return Map.copyOf(attributes);
+  public Set<String> getAttributeNames() {
+    return inputFamily.getAttributeNames();
+  }
+
+  /**
+   * Reads an attribute as its string representation using the current format when possible,
+   * otherwise converting to the nearest format in the conversion graph that defines the
+   * attribute reader, through the caller-owned conversion service.
+   */
+  public <T> String readAttribute(
+      String attributeName,
+      FormattedValue<T> input,
+      AttributeService attributeService) throws FormatException {
+    if (attributeService == null) {
+      var reader = input.getFormat().getAttributeReaders().get(attributeName);
+      if (reader == null) {
+        throw new IllegalStateException(
+            "Missing reader to read attribute " + attributeName);
+      }
+      return String.valueOf(reader.read(input.getValue()));
+    }
+
+    return attributeService.readAsString(
+        input.getValue(),
+        input.getFormat(),
+        attributeName);
   }
 
   @Override
   public String toString() {
     return "ProblemType{"
         + "id='%s'".formatted(id)
-        + ", inputClass=%s".formatted(inputClass)
-        + ", resultClass=%s".formatted(resultClass)
+        + ", inputFamily=%s".formatted(inputFamily)
+        + ", resultFamily=%s".formatted(resultFamily)
         + ", estimator?=%s".formatted(estimator != null)
         + ", description='%s'".formatted(description)
-        + ", attributes=%s".formatted(attributes)
+        + ", attributes=%s".formatted(getAttributeNames())
         + '}';
   }
 }

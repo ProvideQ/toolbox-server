@@ -11,14 +11,15 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 import com.google.common.collect.Streams;
+import edu.kit.provideq.formats.core.attributes.AttributeService;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,7 @@ public class ProblemAttributesRouter {
   public static final String PROBLEM_ID_PARAM_NAME = "problemId";
   public static final String ATTRIBUTE_ID_PARAM_NAME = "attributeId";
   private ProblemManagerProvider managerProvider;
+  private AttributeService attributeService;
 
   @Bean
   RouterFunction<ServerResponse> getAttributeRoutes() {
@@ -64,8 +66,8 @@ public class ProblemAttributesRouter {
     ).build();
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleGet(
-      ProblemManager<InputT, ResultT> manager,
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleGet(
+      ProblemManager<InT, OutT> manager,
       ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
@@ -73,11 +75,11 @@ public class ProblemAttributesRouter {
     var problem = RouterUtility.findProblemOrThrow(manager, problemId);
 
     try {
-      var attributeGetter = manager.getType().getAttributes().get(attributeId);
-      String attribute = attributeGetter.apply(problem.getInput().orElseThrow());
+      String attribute = manager.getType().readAttribute(
+          attributeId, problem.getInput().orElseThrow(), attributeService);
       return ok().body(Mono.just(attribute), new ParameterizedTypeReference<>() {
       });
-    } catch (IllegalStateException | NoSuchElementException e) {
+    } catch (IllegalStateException | NoSuchElementException | FormatException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }
@@ -111,27 +113,30 @@ public class ProblemAttributesRouter {
     ).build();
   }
 
-  private <InputT, ResultT> Mono<ServerResponse> handleList(
-      ProblemManager<InputT, ResultT> manager,
+  private <InT extends FormatFamily, OutT extends FormatFamily> Mono<ServerResponse> handleList(
+      ProblemManager<InT, OutT> manager,
       ServerRequest req
   ) {
     var problemId = req.pathVariable(PROBLEM_ID_PARAM_NAME);
     var problem = RouterUtility.findProblemOrThrow(manager, problemId);
 
     try {
-      var attributeValues = manager.getType().getAttributes()
-          .entrySet().stream()
-          .collect(
-              Collectors.toMap(
-                  Map.Entry::getKey,
-                  entry -> entry.getValue().apply(problem.getInput().orElseThrow())
-              )
-          );
+      var attributeValues = new java.util.HashMap<String, String>();
+      for (String attributeName : manager.getType().getAttributeNames()) {
+        attributeValues.put(attributeName, manager.getType().readAttribute(
+            attributeName, problem.getInput().orElseThrow(), attributeService));
+      }
       return ok().body(Mono.just(attributeValues), new ParameterizedTypeReference<>() {
       });
-    } catch (IllegalStateException | NoSuchElementException e) {
+    } catch (IllegalStateException | NoSuchElementException | FormatException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
+
+  }
+
+  @Autowired
+  void setAttributeService(AttributeService attributeService) {
+    this.attributeService = attributeService;
   }
 
   private void handleListDocumentation(
