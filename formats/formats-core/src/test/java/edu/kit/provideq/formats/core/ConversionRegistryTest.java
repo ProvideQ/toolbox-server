@@ -3,8 +3,12 @@ package edu.kit.provideq.formats.core;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.converters.FuncConverter;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.core.exceptions.RouteNotFoundException;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +24,8 @@ class ConversionRegistryTest {
   @Test
   void directPathIsFound() throws FormatException {
     var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_B, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_A, FORMAT_B,
         value -> value + "-" + FORMAT_B.getName()));
     registry.seal();
 
@@ -33,9 +38,11 @@ class ConversionRegistryTest {
   @Test
   void multiHopPathIsFound() throws FormatException {
     var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_B, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_A, FORMAT_B,
         value -> value + "-b"));
-    registry.register(new FuncConverter<>(FORMAT_B, FORMAT_C, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_B, FORMAT_C,
         value -> value + "-c"));
     registry.seal();
 
@@ -48,69 +55,30 @@ class ConversionRegistryTest {
   @Test
   void shortestPathIsPreferred() {
     var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_B, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_A, FORMAT_B,
         value -> value + "-b"));
-    registry.register(new FuncConverter<>(FORMAT_B, FORMAT_C, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_B, FORMAT_C,
         value -> value + "-c"));
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_A, FORMAT_C,
         value -> value + "-c"));
     registry.seal();
 
     var path = registry.getPath(FORMAT_A, FORMAT_C);
 
-    assertEquals(1, path.size());
-  }
-
-  @Test
-  void strongPreservingPathIsPreferredAmongEqualLength() {
-    var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.NONE, false,
-        value -> value));
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.STRONG, true,
-        value -> value));
-    registry.seal();
-
-    var path = registry.getPath(FORMAT_A, FORMAT_C);
-
-    assertEquals(1, path.size());
-    assertEquals(ConstraintPreservation.STRONG, path.getFirst().getConstraintPreservation());
-    assertTrue(path.getFirst().isOptimalSolutionPreserving());
-  }
-
-  @Test
-  void weakPreservingPathIsPreferredOverNoneAmongEqualLength() {
-    var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.NONE, false,
-        value -> value));
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.WEAK, false,
-        value -> value));
-    registry.seal();
-
-    var path = registry.getPath(FORMAT_A, FORMAT_C);
-
-    assertEquals(ConstraintPreservation.WEAK, path.getFirst().getConstraintPreservation());
-  }
-
-  @Test
-  void optimalSolutionPreservingPathIsPreferredAsTiebreak() {
-    var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.STRONG, false,
-        value -> value));
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_C, ConstraintPreservation.STRONG, true,
-        value -> value));
-    registry.seal();
-
-    var path = registry.getPath(FORMAT_A, FORMAT_C);
-
-    assertTrue(path.getFirst().isOptimalSolutionPreserving());
+    assertEquals(1, path.steps().size());
   }
 
   @Test
   void missingRouteThrows() {
     var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_B, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_A, FORMAT_B,
         value -> value));
-    registry.register(new FuncConverter<>(FORMAT_D, FORMAT_A, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_D, FORMAT_A,
         Object::toString));
     registry.seal();
 
@@ -125,14 +93,14 @@ class ConversionRegistryTest {
     var registry = new ConversionRegistry();
     registry.seal();
 
-    assertThrows(IllegalStateException.class, () -> registry.register(FORMAT_A));
+    assertThrows(IllegalStateException.class, () -> registry.registerFormat(FORMAT_A));
   }
 
   @Test
   void formatLookupByNameAndAlias() {
     var registry = new ConversionRegistry();
-    registry.register(FORMAT_A);
-    registry.register(FORMAT_B);
+    registry.registerFormat(FORMAT_A);
+    registry.registerFormat(FORMAT_B);
 
     assertEquals(FORMAT_A, registry.getFormat("a"));
     assertEquals(FORMAT_B, registry.getFormat("b"));
@@ -142,7 +110,8 @@ class ConversionRegistryTest {
   @Test
   void converterFailureIsPropagated() {
     var registry = new ConversionRegistry();
-    registry.register(new FuncConverter<>(FORMAT_A, FORMAT_D, ConstraintPreservation.STRONG, true,
+    registry.registerConverter(new FuncConverter<>(
+        FORMAT_A, FORMAT_D,
         value -> {
           throw new FormatException("boom");
         }));
@@ -155,13 +124,11 @@ class ConversionRegistryTest {
 
   @Test
   void converterOfFactoryCreatesFunctionalConverter() throws FormatException {
-    var converter = new FuncConverter<>(FORMAT_A, FORMAT_B, ConstraintPreservation.STRONG, true,
+    var converter = new FuncConverter<>(FORMAT_A, FORMAT_B,
         value -> value + "-of");
 
     assertEquals(FORMAT_A, converter.getSource());
     assertEquals(FORMAT_B, converter.getTarget());
-    assertEquals(ConstraintPreservation.STRONG, converter.getConstraintPreservation());
-    assertTrue(converter.isOptimalSolutionPreserving());
     assertEquals("x-of", converter.convert("x"));
   }
 
@@ -182,8 +149,13 @@ class ConversionRegistryTest {
     }
 
     @Override
-    public FormatKind getKind() {
-      return FormatKind.PROBLEM;
+    public FormatType getType() {
+      return FormatType.PROBLEM;
+    }
+
+    @Override
+    public Class<T> getRepresentationClass() {
+      return type;
     }
 
     @Override

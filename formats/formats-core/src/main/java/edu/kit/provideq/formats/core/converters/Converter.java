@@ -1,4 +1,7 @@
-package edu.kit.provideq.formats.core;
+package edu.kit.provideq.formats.core.converters;
+
+import edu.kit.provideq.formats.core.Format;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
 
 /**
  * A converter is a directed edge in the conversion graph from source format to target format.
@@ -16,17 +19,6 @@ public interface Converter<A, B> {
    * Returns the format this converter converts to.
    */
   Format<B> getTarget();
-
-  /**
-   * Returns the degree to which the conversion preserves the source problem's constraints.
-   */
-  ConstraintPreservation getConstraintPreservation();
-
-  /**
-   * Returns whether optimal solution preservation holds: at least one optimal solution of the
-   * source problem remains in the output solution space after the conversion.
-   */
-  boolean isOptimalSolutionPreserving();
 
   /**
    * Converts a value from the source format's representation to the target format's.
