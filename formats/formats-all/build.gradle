@@ -10,4 +10,5 @@ dependencies {
     api project(':formats:formats-cnf')
     api project(':formats:formats-gml')
     api project(':formats:formats-uvl')
+    api project(':formats:formats-lp')
 }
