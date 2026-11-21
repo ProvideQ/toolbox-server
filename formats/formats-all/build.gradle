@@ -12,4 +12,5 @@ dependencies {
     api project(':formats:formats-uvl')
     api project(':formats:formats-lp')
     api project(':formats:formats-qasm')
+    api project(':formats:formats-tsplib')
 }
