@@ -1,7 +1,14 @@
 package edu.kit.provideq.toolbox.knapsack.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.knapsack.KnapsackConfiguration;
+import edu.kit.provideq.toolbox.knapsack.KnapsackFormat;
+import edu.kit.provideq.toolbox.knapsack.KnapsackSolutionFamily;
+import edu.kit.provideq.toolbox.knapsack.KnapsackSolutionFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
@@ -43,22 +50,34 @@ public class PythonKnapsackSolver extends KnapsackSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-          String input,
-          SubRoutineResolver subRoutineResolver,
-          SolvingProperties properties
+  public Mono<Solution<KnapsackSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
     var solution = new Solution<>(this);
+
+    var problem = convert(formattedInput, KnapsackFormat.INSTANCE, conversionService);
+    var knapsackInput = KnapsackFormat.INSTANCE.serializeToString(problem);
 
     var processResult = context
         .getBean(PythonProcessRunner.class, scriptPath, venv)
         .withArguments(
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH)
-        .writeInputFile(input)
+        .writeInputFile(knapsackInput)
         .readOutputFile()
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, KnapsackSolutionFormat.INSTANCE, output -> {
+          try {
+            return KnapsackSolutionFormat.INSTANCE.parse(output);
+          } catch (ParseException e) {
+            throw new ConversionException(
+                "Couldn't convert solver output to Knapsack solution:\n" + e, e);
+          }
+        }));
   }
 }

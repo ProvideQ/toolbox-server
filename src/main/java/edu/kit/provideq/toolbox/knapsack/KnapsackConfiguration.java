@@ -1,8 +1,13 @@
 package edu.kit.provideq.toolbox.knapsack;
 
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.toolbox.Bound;
 import edu.kit.provideq.toolbox.BoundType;
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.knapsack.solvers.PythonKnapsackSolver;
 import edu.kit.provideq.toolbox.knapsack.solvers.QiskitKnapsackSolver;
@@ -10,11 +15,9 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
@@ -29,32 +32,30 @@ public class KnapsackConfiguration {
   /**
    * an upper bound estimator by solving the greedy fractional knapsack problem.
    */
-  private static final Function<String, Bound> estimator = input -> {
-    var parts = input.split("\n");
-    var weightLimit = Integer.parseInt(parts[parts.length - 1]);
-    // map item value to item weight
-    List<Map.Entry<Integer, Integer>> items = new ArrayList<>();
-    for (int i = 1; i < parts.length - 1; i++) {
-      var item = parts[i].split(" ");
-      items.add(new AbstractMap.SimpleEntry<>(
-              Integer.parseInt(item[1]),
-              Integer.parseInt(item[2]))
-      );
+  private static final Function<FormattedValue<?>, Bound> estimator = input -> {
+    @SuppressWarnings("unchecked")
+    var problemDocument = (Document<KnapsackProblem>) input.getValue();
+    KnapsackProblem problem;
+    try {
+      problem = problemDocument.parse();
+    } catch (ParseException e) {
+      throw new ConversionException(
+          "Could not read knapsack problem: " + e.getMessage(), e);
     }
-    items.sort(Comparator.comparingInt(a -> -a.getKey() / a.getValue()));
+    List<KnapsackItem> items = new ArrayList<>(problem.items());
+    int capacity = problem.capacity();
+    // sort items by descending value-to-weight density
+    items.sort(Comparator.comparingDouble(item -> -item.value() / (double) item.weight()));
     // keep adding items until the weight limit is reached, then add a fraction of the next item
     float bound = 0;
     int currentWeight = 0;
-    while (currentWeight < weightLimit) {
-      var item = items.remove(0);
-      var value = item.getKey();
-      var weight = item.getValue();
-      if (currentWeight + weight <= weightLimit) {
-        bound += value;
-        currentWeight += weight;
+    for (var item : items) {
+      if (currentWeight + item.weight() <= capacity) {
+        bound += item.value();
+        currentWeight += item.weight();
       } else {
-        var fraction = (weightLimit - currentWeight) / (float) weight;
-        bound += (fraction * value);
+        var fraction = (capacity - currentWeight) / (float) item.weight();
+        bound += (fraction * item.value());
         break;
       }
     }
@@ -67,39 +68,42 @@ public class KnapsackConfiguration {
    * where the total weight is less than or equal to a given limit
    * and the sum of values is as large as possible.
    */
-  public static final ProblemType<String, String> KNAPSACK = new ProblemType<>(
+  public static final ProblemType<KnapsackFamily, KnapsackSolutionFamily> KNAPSACK =
+      new ProblemType<>(
       "Knapsack",
       "An optimization problem: For given items each with a weight and value, "
           + "determine which items are part of a collection where the total weight is "
           + "less than or equal to a given limit and the sum of values is as large as possible.",
-      String.class,
-      String.class,
+      KnapsackFamily.INSTANCE,
+      KnapsackSolutionFamily.INSTANCE,
       estimator,
-      "^(\\d+)",
-      Map.ofEntries(
-          Map.entry("item_count", problem -> problem.lines()
-              .findFirst()
-              .orElse("")),
-          Map.entry("capacity", p2 -> p2.lines()
-              .reduce((a, b) -> b)
-              .orElse(""))
-      )
+      "^(\\d+)"
   );
 
   @Bean
-  ProblemManager<String, String> getKnapsackManager(
+  KnapsackFamily registerKnapsackFamily(ConversionRegistry registry) {
+    registry.registerFormat(KnapsackFamily.INSTANCE);
+    return KnapsackFamily.INSTANCE;
+  }
+
+  @Bean
+  KnapsackSolutionFamily registerKnapsackSolutionFamily(ConversionRegistry registry) {
+    registry.registerFormat(KnapsackSolutionFamily.INSTANCE);
+    return KnapsackSolutionFamily.INSTANCE;
+  }
+
+  @Bean
+  ProblemManager<KnapsackFamily, KnapsackSolutionFamily> getKnapsackManager(
           PythonKnapsackSolver pythonKnapsackSolver,
           QiskitKnapsackSolver qiskitKnapsackSolver,
           ResourceProvider resourceProvider
   ) {
-    return new ProblemManager<>(
-            KNAPSACK,
-            Set.of(pythonKnapsackSolver, qiskitKnapsackSolver),
-            loadExampleProblems(resourceProvider)
-    );
+    var manager = new ProblemManager<>(KNAPSACK, loadExampleProblems(resourceProvider));
+    manager.registerSolvers(pythonKnapsackSolver, qiskitKnapsackSolver);
+    return manager;
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
+  private Set<Problem<KnapsackFamily, KnapsackSolutionFamily>> loadExampleProblems(
       ResourceProvider resourceProvider
   ) {
     try {
@@ -108,9 +112,10 @@ public class KnapsackConfiguration {
           "4-items example for Knapsack is unavailable!"
       );
       var problem = new Problem<>(KNAPSACK);
-      problem.setInput(resourceProvider.readStream(problemInputStream));
+      problem.setInput(FormattedValue.parse(
+          resourceProvider.readStream(problemInputStream), KnapsackFormat.INSTANCE));
       return Set.of(problem);
-    } catch (IOException e) {
+    } catch (IOException | ParseException e) {
       throw new MissingExampleException(KNAPSACK, e);
     }
   }
