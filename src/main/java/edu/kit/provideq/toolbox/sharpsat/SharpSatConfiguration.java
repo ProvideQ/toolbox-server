@@ -1,11 +1,14 @@
 package edu.kit.provideq.toolbox.sharpsat;
 
+import edu.kit.provideq.formats.cnf.dimacs.LogicalExpressionFormat;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.sat.SatConfiguration;
+import edu.kit.provideq.toolbox.sat.SatFamily;
 import edu.kit.provideq.toolbox.sharpsat.solvers.GanakSolver;
 import edu.kit.provideq.toolbox.sharpsat.solvers.PythonBruteForceSolver;
 import java.io.IOException;
@@ -24,29 +27,33 @@ public class SharpSatConfiguration {
    * For a given boolean formula, count number of interpretations that satisfies the formula.
    * NP-Hard in nature.
    */
-  public static final ProblemType<String, Integer> SHARPSAT = new ProblemType<>(
+  public static final ProblemType<SatFamily, SolutionCountFamily> SHARPSAT =
+      new ProblemType<>(
       "SharpSAT",
       "A satisfiability counting problem: For a given boolean formula, count number of "
           + "interpretations that satisfies the formula. NP-Hard in nature.",
-      String.class,
-      Integer.class,
-      SatConfiguration.getAttributes()
+      SatFamily.INSTANCE,
+      SolutionCountFamily.INSTANCE
   );
 
   @Bean
-  ProblemManager<String, Integer> getSharpSatManager(
+  SolutionCountFamily registerSolutionCountFamily(ConversionRegistry registry) {
+    registry.registerFormat(SolutionCountFamily.INSTANCE);
+    return SolutionCountFamily.INSTANCE;
+  }
+
+  @Bean
+  ProblemManager<SatFamily, SolutionCountFamily> getSharpSatManager(
       PythonBruteForceSolver pythonBruteForceSolver,
       GanakSolver ganakSolver,
       ResourceProvider resourceProvider
   ) {
-    return new ProblemManager<>(
-        SHARPSAT,
-        Set.of(pythonBruteForceSolver, ganakSolver),
-        loadExampleProblems(resourceProvider)
-    );
+    var manager = new ProblemManager<>(SHARPSAT, loadExampleProblems(resourceProvider));
+    manager.registerSolvers(pythonBruteForceSolver, ganakSolver);
+    return manager;
   }
 
-  private Set<Problem<String, Integer>> loadExampleProblems(
+  private Set<Problem<SatFamily, SolutionCountFamily>> loadExampleProblems(
       ResourceProvider resourceProvider
   ) {
     try {
@@ -55,7 +62,8 @@ public class SharpSatConfiguration {
           "Simple-And example for SAT is unavailable!"
       );
       var problem = new Problem<>(SHARPSAT);
-      problem.setInput(resourceProvider.readStream(problemInputStream));
+      problem.setInput(FormattedValue.of(
+          resourceProvider.readStream(problemInputStream), LogicalExpressionFormat.INSTANCE));
       return Set.of(problem);
     } catch (IOException e) {
       throw new MissingExampleException(SHARPSAT, e);

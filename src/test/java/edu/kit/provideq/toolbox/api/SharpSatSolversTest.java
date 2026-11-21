@@ -3,8 +3,12 @@ package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration.SHARPSAT;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
+import edu.kit.provideq.toolbox.sat.SatFamily;
+import edu.kit.provideq.toolbox.sharpsat.SolutionCountFamily;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +31,9 @@ class SharpSatSolversTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
+  @Autowired
+  private ConversionRegistry conversionRegistry;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -39,13 +46,14 @@ class SharpSatSolversTest {
     var problemManager = problemManagerProvider.findProblemManagerForType(SHARPSAT).get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
-        .map(list -> Arguments.of(list.get(0), list.get(1)));
+        .map(list -> Arguments.of(list.getFirst(), list.get(1)));
   }
 
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testSatSolver(ProblemSolver<String, Integer> solver, String input) {
+  void testSatSolver(
+      ProblemSolver<SatFamily, SolutionCountFamily> solver, FormattedValue<?> input) {
     var problem = ApiTestHelper.createProblem(client, solver, input, SHARPSAT);
-    ApiTestHelper.testSolution(problem);
+    ApiTestHelper.testSolution(problem, problemManagerProvider, conversionRegistry);
   }
 }
