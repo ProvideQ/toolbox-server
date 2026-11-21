@@ -1,4 +1,4 @@
-package edu.kit.provideq.formats.core;
+package edu.kit.provideq.formats.core.exceptions;
 
 /**
  * Thrown when no conversion path exists between two formats,

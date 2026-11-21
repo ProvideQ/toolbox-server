@@ -1,9 +1,13 @@
 package edu.kit.provideq.formats.core;
 
+import edu.kit.provideq.formats.core.attributes.AttributeReader;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.core.exceptions.SerializationException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,6 +20,13 @@ import java.util.Set;
  * @param <T> object representation of this format
  */
 public interface Format<T> {
+  /**
+   * Returns the typed attribute readers supported directly by this representation.
+   */
+  default Map<String, AttributeReader<T, ?>> getAttributeReaders() {
+    return Map.of();
+  }
+
   /**
    * Returns the canonical name of this format, e.g. "dimacs-cnf".
    */
@@ -34,7 +45,15 @@ public interface Format<T> {
   /**
    * Returns whether this is a problem or solution format.
    */
-  FormatKind getKind();
+  FormatType getType();
+
+  /**
+   * Returns the Java class of the structured object that the representation produces on
+   * {@link #parse}. For formats whose representation is the structured object itself, this
+   * is the representation class; for formats whose representation is a {@link Document},
+   * this is the class the document produces on {@link Document#parse()}.
+   */
+  Class<?> getRepresentationClass();
 
   /**
    * Parses the given input into the object representation of this format.
@@ -57,16 +76,20 @@ public interface Format<T> {
    *
    * @param value object representation to serialize
    * @param writer target of the serialized output
-   * @throws SerializationException if the value could not be serialized
+   * @throws SerializationException if there is an error during serialization
    */
   void serialize(T value, Writer writer) throws SerializationException;
 
   /**
    * Serializes the given object representation to a string.
    */
-  default String serializeToString(T value) throws SerializationException {
+  default String serializeToString(T value) {
     var writer = new StringWriter();
-    serialize(value, writer);
+    try {
+      serialize(value, writer);
+    } catch (SerializationException e) {
+      throw new RuntimeException("Could not serialize value to string", e);
+    }
     return writer.toString();
   }
 }

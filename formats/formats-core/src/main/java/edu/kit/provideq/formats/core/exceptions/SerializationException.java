@@ -1,4 +1,4 @@
-package edu.kit.provideq.formats.core;
+package edu.kit.provideq.formats.core.exceptions;
 
 /**
  * Thrown when a format's object representation could not be serialized.

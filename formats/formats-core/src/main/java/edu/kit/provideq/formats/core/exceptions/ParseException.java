@@ -1,4 +1,4 @@
-package edu.kit.provideq.formats.core;
+package edu.kit.provideq.formats.core.exceptions;
 
 /**
  * Thrown when input could not be parsed into a format's object representation.

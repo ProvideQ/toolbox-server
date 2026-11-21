@@ -1,4 +1,4 @@
-package edu.kit.provideq.formats.core;
+package edu.kit.provideq.formats.core.exceptions;
 
 /**
  * Base exception for all errors raised by the formats library.
