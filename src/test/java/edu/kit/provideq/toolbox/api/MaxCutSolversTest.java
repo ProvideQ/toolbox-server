@@ -2,6 +2,10 @@ package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration.MAX_CUT;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.toolbox.maxcut.MaxCutFamily;
+import edu.kit.provideq.toolbox.maxcut.MaxCutSolutionFamily;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import java.time.Duration;
@@ -26,6 +30,9 @@ class MaxCutSolversTest {
   @Autowired
   private ProblemManagerProvider problemManagerProvider;
 
+  @Autowired
+  private ConversionRegistry conversionRegistry;
+
   @BeforeEach
   void beforeEach() {
     this.client = this.client.mutate()
@@ -38,13 +45,14 @@ class MaxCutSolversTest {
     var problemManager = problemManagerProvider.findProblemManagerForType(MAX_CUT).get();
 
     return ApiTestHelper.getAllArgumentCombinations(problemManager)
-            .map(list -> Arguments.of(list.get(0), list.get(1)));
+            .map(list -> Arguments.of(list.getFirst(), list.get(1)));
   }
 
   @ParameterizedTest
   @MethodSource("provideArguments")
-  void testMaxCutSolver(ProblemSolver<String, String> solver, String input) {
+  void testMaxCutSolver(
+      ProblemSolver<MaxCutFamily, MaxCutSolutionFamily> solver, FormattedValue<?> input) {
     var problem = ApiTestHelper.createProblem(client, solver, input, MAX_CUT);
-    ApiTestHelper.testSolution(problem);
+    ApiTestHelper.testSolution(problem, problemManagerProvider, conversionRegistry);
   }
 }

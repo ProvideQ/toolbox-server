@@ -1,7 +1,12 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.gml.GmlFormat;
+import edu.kit.provideq.formats.gml.GmlSolutionFormat;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
+import edu.kit.provideq.toolbox.maxcut.MaxCutSolutionFamily;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;
@@ -40,11 +45,13 @@ public class GamsMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<MaxCutSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
+    var gml = convert(formattedInput, GmlFormat.INSTANCE, conversionService);
     var solution = new Solution<>(this);
 
     // Run MaxCut with GAMS via console
@@ -54,10 +61,11 @@ public class GamsMaxCutSolver extends MaxCutSolver {
             "--INPUT=" + ProcessRunner.INPUT_FILE_PATH,
             "--OUTPUT=" + ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input)
+        .writeInputFile(gml.toString())
         .readOutputFile()
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, GmlSolutionFormat.INSTANCE, output -> output));
   }
 }

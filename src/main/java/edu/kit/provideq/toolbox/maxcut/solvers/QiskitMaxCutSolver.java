@@ -1,14 +1,20 @@
 package edu.kit.provideq.toolbox.maxcut.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.gml.GmlFormat;
+import edu.kit.provideq.formats.gml.GmlSolutionFormat;
 import edu.kit.provideq.toolbox.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.format.gml.Gml;
 import edu.kit.provideq.toolbox.maxcut.MaxCutConfiguration;
+import edu.kit.provideq.toolbox.maxcut.MaxCutSolutionFamily;
+import edu.kit.provideq.toolbox.maxcut.QaoaMaxCutReportFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -20,8 +26,6 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class QiskitMaxCutSolver extends MaxCutSolver {
-  private static final String SOLUTION_LINE_PREFIX = "solution:";
-
   private final String scriptPath;
   private final String venv;
   private final ApplicationContext context;
@@ -48,22 +52,14 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<MaxCutSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
+    var gmlDocument = convert(formattedInput, GmlFormat.INSTANCE, conversionService);
     var solution = new Solution<>(this);
-
-    // Parse GML to add partition data to
-    Gml gml;
-    try {
-      gml = Gml.fromString(input);
-    } catch (ConversionException e) {
-      solution.setDebugData("Couldn't convert problem data to GML:\n" + e);
-      solution.abort();
-      return Mono.just(solution);
-    }
 
     // Run Qiskit solver via console
     var processResult = context
@@ -72,39 +68,33 @@ public class QiskitMaxCutSolver extends MaxCutSolver {
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input)
+        .writeInputFile(gmlDocument.toString())
         .readOutputFile()
         .run(getProblemType(), solution.getId());
 
     // Return if process failed
-    if (!processResult.success()) {
-      return Mono.just(processResult.applyTo(solution));
+    if (!processResult.success() || processResult.output().isEmpty()) {
+      return Mono.just(processResult.applyTo(
+          solution, QaoaMaxCutReportFormat.INSTANCE, output -> output));
     }
 
-    // Parse solution data and add partition data to GML
-    Optional<String> solutionLine = processResult.output().get()
-        .lines()
-        .filter(s -> s.startsWith(SOLUTION_LINE_PREFIX))
-        .findFirst();
+    // Convert the QAOA report into a GML solution annotated with node partitions
+    // the conversion is context-bound to the problem graph (bits assign partitions by node order)
+    try {
+      var gmlSolution = conversionService.convert(
+          processResult.output().get(),
+          QaoaMaxCutReportFormat.INSTANCE,
+          GmlSolutionFormat.INSTANCE,
+          gmlDocument.parse());
 
-    if (solutionLine.isPresent()) {
-      // Prepare solution data from python output
-      String s = solutionLine.get();
-      var solutionData = s
-          // Remove brackets around the solution data
-          .substring(SOLUTION_LINE_PREFIX.length() + 1, s.length() - 1)
-          .trim()
-          .split("\\.");
-
-      // Add partition data to each node in GML
-      // We're expecting that the nodes are in the same order as in the solution data
-      for (int i = 0; i < solutionData.length; i++) {
-        gml.getNodes().get(i).attributes().put("partition", solutionData[i].trim());
-      }
+      solution.setSolutionData(gmlSolution, GmlSolutionFormat.INSTANCE);
+      solution.complete();
+    } catch (ParseException e) {
+      throw new ConversionException("Couldn't convert problem data to GML:\n" + e, e);
+    } catch (FormatException e) {
+      solution.setDebugData("Could not convert QAOA report to GML solution: " + e.getMessage());
+      solution.fail();
     }
-
-    solution.setSolutionData(gml.toString());
-    solution.complete();
     return Mono.just(solution);
   }
 }
