@@ -35,9 +35,9 @@ jobs:
       - name: Cache Venv dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ github.workspace }}/venv
+          path: ${{ github.workspace }}/toolbox/venv
           # update venv when setup script or any solver has changed:
-          key: venv-${{ runner.os }}-${{ hashFiles('scripts/ci-setup-solvers.sh', 'solvers/**') }}
+          key: venv-${{ runner.os }}-${{ hashFiles('scripts/ci-setup-solvers.sh', 'toolbox/solvers/**') }}
           restore-keys: |
             venv-${{ runner.os }}-
 
@@ -55,14 +55,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: build/reports/tests/test/
-
+          path: |
+            toolbox/build/reports/tests/test/
+            formats/**/build/reports/tests/test/
       - name: Archive style reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: style-report
-          path: build/reports/checkstyle/
+          path: |
+            toolbox/build/reports/checkstyle/
+            formats/**/build/reports/checkstyle/
 
   deploy-staging:
     runs-on: ubuntu-latest

@@ -3,14 +3,19 @@ import subprocess
 import sys
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-root_dir = os.path.dirname(script_dir)
+repo_dir = os.path.dirname(script_dir)
+
+# The app module lives in toolbox/ inside the repository, but directly in the
+# working directory inside the Docker container (no toolbox/ subdir there).
+toolbox_dir = os.path.join(repo_dir, 'toolbox')
+app_dir = toolbox_dir if os.path.isdir(toolbox_dir) else repo_dir
 
 # Check if a specific folder argument was provided
 folder_filter = sys.argv[1] if len(sys.argv) > 1 else None
 
 base_dirs = [
-    os.path.join(root_dir, 'demonstrators'),
-    os.path.join(root_dir, 'solvers'),
+    os.path.join(app_dir, 'demonstrators'),
+    os.path.join(app_dir, 'solvers'),
 ]
 
 # uv resolves the python version for each venv from the solver's
@@ -38,7 +43,7 @@ for base_dir in base_dirs:
                     venv_name = f"{os.path.basename(root)}_{framework_name}_{solver_name}"
                     print(f"Setting up virtual environment '{venv_name}' for {solver_dir}...", flush=True)
                     try:
-                        venv_path = os.path.join('venv', venv_name)
+                        venv_path = os.path.join(app_dir, 'venv', venv_name)
                         env['UV_PROJECT_ENVIRONMENT'] = os.path.abspath(venv_path)
                         subprocess.run(['uv', 'sync', '--project', solver_dir],
                                        check=True, env=env)
