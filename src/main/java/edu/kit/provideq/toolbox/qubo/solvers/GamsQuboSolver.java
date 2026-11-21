@@ -1,11 +1,16 @@
 package edu.kit.provideq.toolbox.qubo.solvers;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.formats.LPFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.qubo.JsonQuboSolutionFormat;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
+import edu.kit.provideq.toolbox.qubo.QuboSolutionFamily;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -43,11 +48,13 @@ public class GamsQuboSolver extends QuboSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<QuboSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties
+      SolvingProperties properties,
+      ConversionService conversionService
   ) {
+    var lpString = convert(formattedInput, LPFormat.INSTANCE, conversionService);
     var solution = new Solution<>(this);
 
     var processResult = context
@@ -56,10 +63,11 @@ public class GamsQuboSolver extends QuboSolver {
             ProcessRunner.INPUT_FILE_PATH,
             ProcessRunner.OUTPUT_FILE_PATH
         )
-        .writeInputFile(input, "problem.lp")
+        .writeInputFile(lpString, "problem.lp")
         .readOutputFile("solution.json")
         .run(getProblemType(), solution.getId());
 
-    return Mono.just(processResult.applyTo(solution));
+    return Mono.just(processResult.applyTo(
+        solution, JsonQuboSolutionFormat.INSTANCE, output -> output));
   }
 }

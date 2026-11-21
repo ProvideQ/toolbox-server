@@ -1,10 +1,14 @@
 package edu.kit.provideq.toolbox.qubo;
 
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
+import edu.kit.provideq.toolbox.formats.LPFormat;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.qubo.PositionalBitsToLpSolutionConverter;
 import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.GamsQuboSolver;
 import edu.kit.provideq.toolbox.qubo.solvers.QiskitQuboSolver;
@@ -26,31 +30,70 @@ public class QuboConfiguration {
    * For a given quadratic term with binary decision variables,
    * find the minimal variable assignment of the term.
    */
-  public static final ProblemType<String, String> QUBO = new ProblemType<>(
+  public static final ProblemType<QuboFamily, QuboSolutionFamily> QUBO =
+      new ProblemType<>(
       "QUBO",
       "QUBO (Quadratic Unconstrained Binary Optimization) A combinatorial optimization problem. "
           + "For a given quadratic term with binary decision variables, find the "
           + "minimal variable assignment of the term.",
-      String.class,
-      String.class
+      QuboFamily.INSTANCE,
+      QuboSolutionFamily.INSTANCE
   );
 
   @Bean
-  ProblemManager<String, String> getQuboManager(
+  QuboFamily registerQuboFamily(ConversionRegistry registry) {
+    registry.registerFormat(QuboFamily.INSTANCE);
+    return QuboFamily.INSTANCE;
+  }
+
+  @Bean
+  QuboSolutionFamily registerQuboSolutionFamily(ConversionRegistry registry) {
+    registry.registerFormat(QuboSolutionFamily.INSTANCE);
+    return QuboSolutionFamily.INSTANCE;
+  }
+
+  @Bean
+  LpSolutionToJsonQuboConverter registerLpSolutionToJsonQuboConverter(
+      ConversionRegistry registry) {
+    registry.registerConverter(LpSolutionToJsonQuboConverter.INSTANCE);
+    return LpSolutionToJsonQuboConverter.INSTANCE;
+  }
+
+  @Bean
+  LpSolutionToPositionalBitsConverter registerLpSolutionToPositionalBitsConverter(
+      ConversionRegistry registry) {
+    registry.registerContextConverter(LpSolutionToPositionalBitsConverter.INSTANCE);
+    return LpSolutionToPositionalBitsConverter.INSTANCE;
+  }
+
+  @Bean
+  PositionalBitsToLpSolutionConverter registerPositionalBitsToLpSolutionConverter(
+      ConversionRegistry registry) {
+    registry.registerContextConverter(PositionalBitsToLpSolutionConverter.INSTANCE);
+    return PositionalBitsToLpSolutionConverter.INSTANCE;
+  }
+
+  @Bean
+  JsonQuboToLpSolutionConverter registerJsonQuboToLpSolutionConverter(
+      ConversionRegistry registry) {
+    registry.registerConverter(JsonQuboToLpSolutionConverter.INSTANCE);
+    return JsonQuboToLpSolutionConverter.INSTANCE;
+  }
+
+  @Bean
+  ProblemManager<QuboFamily, QuboSolutionFamily> getQuboManager(
       QiskitQuboSolver qiskitSolver,
       DwaveQuboSolver dwaveSolver,
       QrispQuboSolver qrispSolver,
       GamsQuboSolver gamsQuboSolver,
       ResourceProvider resourceProvider
   ) {
-    return new ProblemManager<>(
-        QUBO,
-        Set.of(qiskitSolver, dwaveSolver, qrispSolver, gamsQuboSolver),
-        loadExampleProblems(resourceProvider)
-    );
+    var manager = new ProblemManager<>(QUBO, loadExampleProblems(resourceProvider));
+    manager.registerSolvers(qiskitSolver, dwaveSolver, qrispSolver, gamsQuboSolver);
+    return manager;
   }
 
-  private Set<Problem<String, String>> loadExampleProblems(
+  private Set<Problem<QuboFamily, QuboSolutionFamily>> loadExampleProblems(
       ResourceProvider resourceProvider) {
     try {
       var problemInputStream = Objects.requireNonNull(
@@ -58,7 +101,9 @@ public class QuboConfiguration {
           "quadratic-problem example for QUBO is unavailable!"
       );
       var problem = new Problem<>(QUBO);
-      problem.setInput(resourceProvider.readStream(problemInputStream));
+      problem.setInput(FormattedValue.of(
+
+          resourceProvider.readStream(problemInputStream), LPFormat.INSTANCE));
       return Set.of(problem);
     } catch (IOException e) {
       throw new MissingExampleException(QUBO, e);

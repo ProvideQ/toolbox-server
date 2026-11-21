@@ -3,8 +3,12 @@ package edu.kit.provideq.toolbox.qubo.solvers;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.asbestian.jplex.input.LpFileReader;
 import de.asbestian.jplex.input.Variable;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.exception.ConversionException;
+import edu.kit.provideq.toolbox.exception.SolverException;
+import edu.kit.provideq.toolbox.formats.LPFormat;
+import edu.kit.provideq.toolbox.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.JobInfo;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ProblemProperties;
@@ -15,6 +19,7 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.TextSetting;
 import edu.kit.provideq.toolbox.qubo.QuboConfiguration;
+import edu.kit.provideq.toolbox.qubo.QuboSolutionFamily;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,10 +62,13 @@ public class KipuQuboSolver extends QuboSolver {
   }
 
   @Override
-  public Mono<Solution<String>> solve(
-      String input,
+  public Mono<Solution<QuboSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
       SubRoutineResolver subRoutineResolver,
-      SolvingProperties properties) {
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
+    var input = convert(formattedInput, LPFormat.INSTANCE, conversionService);
     Optional<String> planQkToken = properties
         .<TextSetting>getSetting(SETTING_PLANQK_TOKEN)
         .map(TextSetting::getText);
@@ -70,13 +78,7 @@ public class KipuQuboSolver extends QuboSolver {
       return Mono.just(Solution.failed(this, "No PlanQK token provided."));
     }
 
-    KipuQuboProblem kipuQubo;
-    LpFileReader lpReader = LpFileReader.fromInput(input);
-    try {
-      kipuQubo = parseKipuQubo(lpReader);
-    } catch (ConversionException e) {
-      return Mono.just(Solution.failed(this, e.getMessage()));
-    }
+    var kipuQubo = parseKipuQubo(LpFileReader.fromInput(input));
 
     var kipuQuboRequest = new KipuQuboRequest();
     kipuQuboRequest.getData().setOptimization(kipuQubo);
@@ -102,14 +104,14 @@ public class KipuQuboSolver extends QuboSolver {
           .map(x -> x.getKey() + ": " + x.getValue())
           .toList();
 
-      solution.setSolutionData(String.join("\n", entryStrings));
+      solution.setSolutionData(String.join("\n", entryStrings), LPSolutionFormat.INSTANCE);
       solution.complete();
       return Mono.just(solution);
     });
   }
 
   private static KipuQuboProblem parseKipuQubo(LpFileReader lpReader)
-      throws ConversionException {
+      throws SolverException {
     var qubo = new KipuQuboProblem();
 
     var binaryVariables = lpReader.getBinaryVariables();
@@ -120,10 +122,10 @@ public class KipuQuboSolver extends QuboSolver {
     for (var term : objective.terms()) {
       var multiplicands = term.multiplicands();
       if (multiplicands.size() != 2) {
-        throw new ConversionException("Only quadratic terms are supported");
+        throw new SolverException("Only quadratic terms are supported");
       }
 
-      int var1 = getVariableIndex.applyAsInt(multiplicands.get(0));
+      int var1 = getVariableIndex.applyAsInt(multiplicands.getFirst());
       int var2 = getVariableIndex.applyAsInt(multiplicands.get(1));
       qubo.getCoefficients().put(
           var1 == var2
