@@ -30,6 +30,7 @@ dependencies {
     implementation project(':formats:formats-gml')
     implementation project(':formats:formats-uvl')
     implementation project(':formats:formats-lp')
+    implementation project(':formats:formats-qasm')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-webtestclient'
     testImplementation 'org.mockito:mockito-core:5.+'

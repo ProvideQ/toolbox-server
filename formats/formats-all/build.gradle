@@ -11,4 +11,5 @@ dependencies {
     api project(':formats:formats-gml')
     api project(':formats:formats-uvl')
     api project(':formats:formats-lp')
+    api project(':formats:formats-qasm')
 }
