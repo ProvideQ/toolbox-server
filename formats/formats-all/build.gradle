@@ -5,6 +5,11 @@ plugins {
 group = 'edu.kit.provideq.formats'
 version = '0.1.0'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
 dependencies {
     api project(':formats:formats-core')
     api project(':formats:formats-cnf')

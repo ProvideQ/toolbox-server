@@ -25,15 +25,7 @@ dependencies {
     implementation 'com.bpodgursky:jbool_expressions:1.24'
     implementation 'com.github.ProvideQ.jplex:input:703b4d0086'
     implementation files('lib/de.ovgu.featureide.lib.fm-v3.9.1.jar', 'lib/uvl-parser.jar')
-    implementation project(':formats:formats-core')
-    implementation project(':formats:formats-cnf')
-    implementation project(':formats:formats-gml')
-    implementation project(':formats:formats-uvl')
-    implementation project(':formats:formats-lp')
-    implementation project(':formats:formats-qasm')
-    implementation project(':formats:formats-tsplib')
-    implementation project(':formats:formats-xyz')
-    implementation project(':formats:formats-knapsack')
+    implementation project(':formats:formats-all')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-webtestclient'
     testImplementation 'org.mockito:mockito-core:5.+'
