@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import java.util.Optional;
+
+import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutionResult;
+import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutionResultFormat;
 import org.junit.jupiter.api.Test;
 
 class ExecutionResultFormatTest {

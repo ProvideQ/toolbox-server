@@ -1,7 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.qubo.QuboConfiguration.QUBO;
-import static edu.kit.provideq.toolbox.tsp.TspConfiguration.TSP;
+import static edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration.QUBO;
+import static edu.kit.provideq.toolbox.solvers.tsp.TspConfiguration.TSP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,11 +11,11 @@ import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemState;
-import edu.kit.provideq.toolbox.qubo.solvers.DwaveQuboSolver;
-import edu.kit.provideq.toolbox.qubo.solvers.QrispQuboSolver;
-import edu.kit.provideq.toolbox.qubo.solvers.QuboSolver;
-import edu.kit.provideq.toolbox.tsp.solvers.LkhTspSolver;
-import edu.kit.provideq.toolbox.tsp.solvers.QuboTspSolver;
+import edu.kit.provideq.toolbox.solvers.qubo.solvers.DwaveQuboSolver;
+import edu.kit.provideq.toolbox.solvers.qubo.solvers.QrispQuboSolver;
+import edu.kit.provideq.toolbox.solvers.qubo.solvers.QuboSolver;
+import edu.kit.provideq.toolbox.solvers.tsp.solvers.LkhTspSolver;
+import edu.kit.provideq.toolbox.solvers.tsp.solvers.QuboTspSolver;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;

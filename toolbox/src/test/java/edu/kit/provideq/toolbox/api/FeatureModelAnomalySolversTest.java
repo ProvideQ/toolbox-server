@@ -1,23 +1,23 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD;
-import static edu.kit.provideq.toolbox.featuremodel.anomaly.voidmodel.VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID;
-import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
+import static edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.DeadFeatureConfiguration.FEATURE_MODEL_ANOMALY_DEAD;
+import static edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.VoidModelConfiguration.FEATURE_MODEL_ANOMALY_VOID;
+import static edu.kit.provideq.toolbox.solvers.sat.SatConfiguration.SAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.featuremodel.FeatureModelFamily;
-import edu.kit.provideq.toolbox.featuremodel.anomaly.dead.DeadFeatureSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.featuremodel.FeatureModelFamily;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.DeadFeatureSolutionFamily;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.sat.SatFamily;
-import edu.kit.provideq.toolbox.sat.SatSolutionFamily;
-import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
-import edu.kit.provideq.toolbox.sat.solvers.QrispGroverSolver;
+import edu.kit.provideq.toolbox.solvers.sat.SatFamily;
+import edu.kit.provideq.toolbox.solvers.sat.SatSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.sat.solvers.QrispExactGroverSolver;
+import edu.kit.provideq.toolbox.solvers.sat.solvers.QrispGroverSolver;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;

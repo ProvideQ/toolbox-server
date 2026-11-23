@@ -1,7 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
-import static edu.kit.provideq.toolbox.sharpsat.SharpSatConfiguration.SHARPSAT;
+import static edu.kit.provideq.toolbox.solvers.sat.SatConfiguration.SAT;
+import static edu.kit.provideq.toolbox.solvers.sharpsat.SharpSatConfiguration.SHARPSAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -11,10 +11,10 @@ import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.sat.SatFamily;
-import edu.kit.provideq.toolbox.sat.SatSolutionFamily;
-import edu.kit.provideq.toolbox.sat.solvers.QrispExactGroverSolver;
-import edu.kit.provideq.toolbox.sharpsat.SolutionCountFamily;
+import edu.kit.provideq.toolbox.solvers.sat.SatFamily;
+import edu.kit.provideq.toolbox.solvers.sat.SatSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.sat.solvers.QrispExactGroverSolver;
+import edu.kit.provideq.toolbox.solvers.sharpsat.SolutionCountFamily;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

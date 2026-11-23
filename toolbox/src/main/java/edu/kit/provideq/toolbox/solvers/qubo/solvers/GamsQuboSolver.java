@@ -1,0 +1,73 @@
+package edu.kit.provideq.toolbox.solvers.qubo.solvers;
+
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.LPFormat;
+import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.solvers.qubo.JsonQuboSolutionFormat;
+import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
+import edu.kit.provideq.toolbox.solvers.qubo.QuboSolutionFamily;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+/**
+ * {@link QuboConfiguration#QUBO} solver using a GAMS CPLEX implementation.
+ */
+@Component
+public class GamsQuboSolver extends QuboSolver {
+  private final String scriptPath;
+  private final String venv;
+  private final ApplicationContext context;
+
+  @Autowired
+  public GamsQuboSolver(
+      @Value("${path.gams.qubo}") String scriptPath,
+      @Value("${venv.gams.qubo}") String venv,
+      ApplicationContext context) {
+    this.scriptPath = scriptPath;
+    this.venv = venv;
+    this.context = context;
+  }
+
+  @Override
+  public String getName() {
+    return "(GAMS) CPLEX Solver for QUBOs";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves QUBO problems by transforming it into a MIP,"
+        + "which is then solved with CPLEX. Implementation is done in GAMS";
+  }
+
+  @Override
+  public Mono<Solution<QuboSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
+    var lpString = convert(formattedInput, LPFormat.INSTANCE, conversionService);
+    var solution = new Solution<>(this);
+
+    var processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(lpString, "problem.lp")
+        .readOutputFile("solution.json")
+        .run(getProblemType(), solution.getId());
+
+    return Mono.just(processResult.applyTo(
+        solution, JsonQuboSolutionFormat.INSTANCE, output -> output));
+  }
+}

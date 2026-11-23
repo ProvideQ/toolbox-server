@@ -1,11 +1,11 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.materialsimulation.MaterialSimulationConfiguration.MATERIAL_SIMULATION;
+import static edu.kit.provideq.toolbox.solvers.materialsimulation.MaterialSimulationConfiguration.MATERIAL_SIMULATION;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.toolbox.materialsimulation.MoleculeEnergySolutionFamily;
-import edu.kit.provideq.toolbox.materialsimulation.MoleculeFamily;
+import edu.kit.provideq.toolbox.solvers.materialsimulation.MoleculeEnergySolutionFamily;
+import edu.kit.provideq.toolbox.solvers.materialsimulation.MoleculeFamily;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import java.time.Duration;

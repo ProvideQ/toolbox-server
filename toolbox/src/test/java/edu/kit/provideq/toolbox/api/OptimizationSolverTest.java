@@ -1,17 +1,17 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.circuit.processing.CircuitProcessingConfiguration.CIRCUIT_PROCESSING;
-import static edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutorConfiguration.EXECUTOR_CONFIG;
-import static edu.kit.provideq.toolbox.circuit.processing.solvers.optimization.OptimizationConfiguration.OPTIMIZATION_CONFIG;
+import static edu.kit.provideq.toolbox.solvers.processing.CircuitProcessingConfiguration.CIRCUIT_PROCESSING;
+import static edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutorConfiguration.EXECUTOR_CONFIG;
+import static edu.kit.provideq.toolbox.solvers.processing.solvers.optimization.OptimizationConfiguration.OPTIMIZATION_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.toolbox.circuit.processing.QasmFamily;
-import edu.kit.provideq.toolbox.circuit.processing.solvers.MoveToExecutionSolver;
-import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionResultFamily;
-import edu.kit.provideq.toolbox.circuit.processing.solvers.executor.ExecutionSolver;
-import edu.kit.provideq.toolbox.circuit.processing.solvers.optimization.OptimizationSolver;
+import edu.kit.provideq.toolbox.solvers.processing.QasmFamily;
+import edu.kit.provideq.toolbox.solvers.processing.solvers.MoveToExecutionSolver;
+import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutionSolver;
+import edu.kit.provideq.toolbox.solvers.processing.solvers.optimization.OptimizationSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
