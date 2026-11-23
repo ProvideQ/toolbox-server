@@ -49,10 +49,11 @@ __pycache__/
 
 ### ProvideQ toolbox-server ###
 # input, output and temporary files for solving problems with our solvers
-/jobs/
+jobs/
 
 # Software license key for GAMS, used for a docker container with GAMS included
 gamslice.txt
+.gamspy_license
 
 # Don't include GAMS Data eXchange (GDX)
 *.gdx
@@ -60,5 +61,6 @@ gamslice.txt
 # Listing files compiled from our GAMS scripts files, which are generated when running GAMS solvers
 *.lst
 *.op2
-solvers/gams/**/225a
+toolbox/solvers/gams/**/225a
 *.out
+

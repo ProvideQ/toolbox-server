@@ -1,0 +1,82 @@
+package edu.kit.provideq.toolbox.solvers.qubo.solvers;
+
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
+import edu.kit.provideq.formats.lp.formats.LPFormat;
+import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.process.ProcessRunner;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+/**
+ * {@link QuboConfiguration#QUBO} solver using a Qiskit QAOA implementation.
+ */
+@Component
+public class QiskitQuboSolver extends QuboSolver {
+  private final String scriptPath;
+  private final String venv;
+  private final ApplicationContext context;
+
+  @Autowired
+  public QiskitQuboSolver(
+      @Value("${path.qiskit.qubo}") String scriptPath,
+      @Value("${venv.qiskit.qubo}") String venv,
+      ApplicationContext context) {
+    this.scriptPath = scriptPath;
+    this.venv = venv;
+    this.context = context;
+  }
+
+  @Override
+  public String getName() {
+    return "(Qiskit) QAOA Solver for QUBOs";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Solves QUBOs using the Qiskit QAOA implementation.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
+  }
+
+  @Override
+  public Mono<Solution<QuboSolutionFamily>> solve(
+      FormattedValue<?> formattedInput,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
+    var input = convert(formattedInput, LPFormat.INSTANCE, conversionService);
+    var solution = new Solution<>(this);
+
+    // Run Qiskit solver via console
+    var processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
+        .withArguments(
+            ProcessRunner.INPUT_FILE_PATH,
+            ProcessRunner.OUTPUT_FILE_PATH
+        )
+        .writeInputFile(input, "problem.lp")
+        .readOutputFile()
+        .run(getProblemType(), solution.getId());
+
+    // Return if process failed
+    return Mono.just(processResult.applyTo(
+        solution, LPSolutionFormat.INSTANCE, output -> output));
+  }
+}

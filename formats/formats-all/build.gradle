@@ -1,0 +1,23 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'edu.kit.provideq.formats'
+version = '0.1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+dependencies {
+    api project(':formats:formats')
+    api project(':formats:formats-gml')
+    api project(':formats:formats-knapsack')
+    api project(':formats:formats-lp')
+    api project(':formats:formats-qasm')
+    api project(':formats:formats-sat')
+    api project(':formats:formats-tsplib')
+    api project(':formats:formats-uvl')
+    api project(':formats:formats-xyz')
+}

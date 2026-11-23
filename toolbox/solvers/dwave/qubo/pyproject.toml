@@ -1,0 +1,12 @@
+# This file describes the python package requirements for the Dwave Qubo solver
+[project]
+name = "toolbox-solvers-dwave-qubo"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "dwave-ocean-sdk==9.3.0",
+    "gurobipy==13.0.2",
+]
+
+[tool.uv]
+package = false

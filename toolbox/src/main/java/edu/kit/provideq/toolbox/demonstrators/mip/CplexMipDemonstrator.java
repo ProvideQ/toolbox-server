@@ -1,0 +1,115 @@
+package edu.kit.provideq.toolbox.demonstrators.mip;
+
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.toolbox.demonstrators.Demonstrator;
+import edu.kit.provideq.toolbox.demonstrators.DemonstratorReportFamily;
+import edu.kit.provideq.toolbox.demonstrators.DemonstratorReportFormat;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolvingProperties;
+import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
+import edu.kit.provideq.toolbox.meta.setting.basic.IntegerSetting;
+import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+@Component
+public class CplexMipDemonstrator implements Demonstrator {
+  private static final String SETTING_MAX_NUMBER_OF_VARS = "Max Number of Variables";
+  private static final int DEFAULT_MAX_NUMBER_OF_VARS = 500;
+  private static final String SETTING_STEP_SIZE = "Step Size";
+  private static final int DEFAULT_STEP_SIZE = 20;
+  private static final String SETTING_REPETITIONS = "Repetitions";
+  private static final int DEFAULT_REPETITIONS = 3;
+
+  private final String scriptPath;
+  private final String venv;
+  private final ApplicationContext context;
+
+  @Autowired
+  public CplexMipDemonstrator(
+      @Value("${path.demonstrators.cplex.mip}") String scriptPath,
+      @Value("${venv.demonstrators.cplex.mip}") String venv,
+      ApplicationContext context) {
+    this.scriptPath = scriptPath;
+    this.venv = venv;
+    this.context = context;
+  }
+
+  @Override
+  public String getName() {
+    return "Cplex MIP Demonstrator";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Demonstrator for the Cplex MIP solver";
+  }
+
+  @Override
+  public List<SolverSetting> getSolverSettings() {
+    return List.of(
+        new IntegerSetting(
+            true,
+            SETTING_MAX_NUMBER_OF_VARS,
+            "The maximum number of variables to be used in the experiment",
+            1,
+            1000,
+            DEFAULT_MAX_NUMBER_OF_VARS
+        ),
+        new IntegerSetting(
+            true,
+            SETTING_STEP_SIZE,
+            "Interval at which the number of variables is augmented "
+                + "to reach the max number of variables",
+            1,
+            100,
+            DEFAULT_STEP_SIZE
+        ),
+        new IntegerSetting(
+            true,
+            SETTING_REPETITIONS,
+            "Number of times the experiment is repeated for each number of variables",
+            1,
+            50,
+            DEFAULT_REPETITIONS
+        )
+    );
+  }
+
+  @Override
+  public Mono<Solution<DemonstratorReportFamily>> solve(
+      FormattedValue<?> formattedInput,
+      SubRoutineResolver subRoutineResolver,
+      SolvingProperties properties,
+      ConversionService conversionService
+  ) {
+    var solution = new Solution<>(this);
+
+    var maxNumberVariables = properties.<IntegerSetting>getSetting(SETTING_MAX_NUMBER_OF_VARS)
+        .map(IntegerSetting::getValue)
+        .orElse(DEFAULT_MAX_NUMBER_OF_VARS);
+
+    var stepSize = properties.<IntegerSetting>getSetting(SETTING_STEP_SIZE)
+        .map(IntegerSetting::getValue)
+        .orElse(DEFAULT_STEP_SIZE);
+
+    var repetitions = properties.<IntegerSetting>getSetting(SETTING_REPETITIONS)
+        .map(IntegerSetting::getValue)
+        .orElse(DEFAULT_REPETITIONS);
+
+    var processResult = context
+        .getBean(PythonProcessRunner.class, scriptPath, venv)
+        .withArguments(maxNumberVariables.toString(), stepSize.toString(), repetitions.toString())
+        .readOutputString()
+        .run(getProblemType(), solution.getId());
+
+    return Mono.just(processResult.applyTo(
+        solution, DemonstratorReportFormat.INSTANCE, output -> output));
+  }
+}

@@ -1,0 +1,12 @@
+# pytket-qulacs
+[project]
+name = "toolbox-solvers-circuitprocessing-circuitexecution"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "pytket==2.18.0",
+    "pytket-qiskit==0.77.0",
+]
+
+[tool.uv]
+package = false

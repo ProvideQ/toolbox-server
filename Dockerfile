@@ -1,23 +1,25 @@
 # Step 1: Build the toolbox-server Java application
-FROM eclipse-temurin:17-jdk-jammy AS builder
+FROM eclipse-temurin:25-jdk-jammy AS builder
 WORKDIR /app
 
 # Install dependencies first
 COPY gradle gradle
 COPY gradlew gradlew
 RUN chmod +x ./gradlew
+COPY settings.gradle settings.gradle
 COPY build.gradle build.gradle
+COPY toolbox/build.gradle toolbox/build.gradle
+COPY formats formats
 
 RUN ./gradlew dependencies
 
 # Then, build the application
-COPY src src
-COPY lib lib
-COPY settings.gradle settings.gradle
+COPY toolbox/src toolbox/src
+COPY toolbox/lib toolbox/lib
 COPY system.properties system.properties
 
 # build application JAR
-RUN ./gradlew bootJar
+RUN ./gradlew :toolbox:bootJar
 # build justom JRE (use "jdeps -summary ./build/libs/toolbox-server-*.jar" to
 # find module dependencies)
 RUN jlink \
@@ -57,10 +59,10 @@ ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
 ARG GAMSPY_LICENSE
-COPY solvers solvers
-COPY demonstrators demonstrators
+COPY toolbox/solvers solvers
+COPY toolbox/demonstrators demonstrators
 RUN scripts/ci-setup-solvers.sh
-COPY --from=builder /app/build/libs/toolbox-server-*.jar toolbox-server.jar
+COPY --from=builder /app/toolbox/build/libs/toolbox-server-*.jar toolbox-server.jar
 
 # Run the toolbox server on dokku's default port
 EXPOSE 5000

@@ -1,0 +1,17 @@
+package edu.kit.provideq.toolbox.api.dto;
+
+import edu.kit.provideq.toolbox.meta.bound.BoundType;
+import edu.kit.provideq.toolbox.meta.bound.BoundWithInfo;
+
+public record BoundDto(float bound, BoundType boundType, long executionTime) {
+  public BoundDto(BoundWithInfo boundWithInfo) {
+    this(
+        boundWithInfo.bound().value(),
+        boundWithInfo.bound().boundType(),
+        boundWithInfo.executionTime());
+  }
+
+  public BoundDto() {
+    this(-1, BoundType.LOWER, -1);
+  }
+}

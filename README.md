@@ -8,18 +8,21 @@ A web-based user interface can be found in our
 [ProvideQ/ProvideQ repository](https://github.com/ProvideQ/ProvideQ).
 
 ## Development setup
-1. Install Java 17 or newer (check with `java -version`)
+1. Install Java 25 or newer (check with `java -version`)
 2. Clone this repository
 3. [Optional, Solver Installation - install the Solvers that you want/need]
    1. Python-based Solvers (Qiskit, Cirq, Dwave, Qrisp)
-      1. Install Python
+      1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) (it manages the Python versions for the solver venvs automatically)
       2. Install Python dependencies by running `python scripts/install-python-dependencies.py` <br>
          **Note:** Ensure that you execute the script from the root directory! Otherwise the created venv/ directory might be created at the wrong path.
+         The venvs are created in `toolbox/venv/`, next to the server module that uses them at runtime.
+         Each solver's `pyproject.toml` declares the Python version range it needs (`requires-python`); uv picks (and downloads, if necessary) a matching interpreter per venv.
+         You can limit the setup to specific solvers by passing a folder filter, e.g. `python scripts/install-python-dependencies.py qrisp`.
    2. Compiled Solvers (e.g. used for VRP and TSP)
       1. Solvers implemented in compiled languages must be executed via binaries that are compiled for your operating system.
          For those types of solvers we usually include pre-compiled binaries for windows, mac (only arm), and unix.
       2. In case the pre-compiled versions do not work on your machine: re-compile them.
-         Detailed compliation guides can be found in the *solvers/custom/[solver-name]* directory.
+         Detailed compliation guides can be found in the *toolbox/solvers/custom/[solver-name]* directory.
    3. GAMS (multiple solvers are build on this):
       1. Install a python env that works with GAMS (skip this step if you don't need GAMS)
       2. Install GAMS. (https://www.gams.com/download/)
@@ -33,8 +36,8 @@ A web-based user interface can be found in our
             `pip install gams[core,connect] --find-links <path-to-gams>/api/python/bdist`
             * If you get an error building `psycopg2`, try to install these postgres packages:
               `sudo apt-get install postgresql libpq-dev` and run the `pip install ...` command again
-      8. Install the python dependencies we use in our python packages: `pip install -r ./solvers/gams/python/requirements.txt`
-4. Run the server using `./gradlew bootRun`
+      8. Install the python dependencies we use in our python packages: `pip install -r ./toolbox/solvers/gams/python/requirements.txt`
+4. Run the server using `./gradlew :toolbox:bootRun`
 
 ## Deployment
 This repository is designed to be deployed with [Dokku](https://dokku.com/), but you can also run 
@@ -48,7 +51,7 @@ docker run --publish 8080:5000 provideq-toolbox-backend
 
 ## Releasing a new version
 1. Create a release branch from develop: `git checkout -b release/x.y.z`.
-2. Bump the version number in the `build.gradle` file to the new version number and commit it to the release branch.
+2. Bump the version number in the `toolbox/build.gradle` file to the new version number and commit it to the release branch.
 3. Push to GitHub and create a pull request to merge the release branch into `main`.
 4. Make sure to test your new version!
 5. Write a changelog.

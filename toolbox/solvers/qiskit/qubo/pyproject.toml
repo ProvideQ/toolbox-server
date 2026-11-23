@@ -1,0 +1,13 @@
+# This file describes the python package requirements for the Qiskit QUBO solver
+[project]
+name = "toolbox-solvers-qiskit-qubo"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "gurobipy==13.0.2",
+    "qiskit==2.2.3",
+    "qiskit-optimization==0.7.0",
+]
+
+[tool.uv]
+package = false
