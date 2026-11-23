@@ -35,12 +35,12 @@ public class FormatsConfiguration {
     var registry = new ConversionRegistry();
     CnfFormats.register(registry);
     GmlFormats.register(registry);
-    UvlFormats.register(registry);
+    KnapsackFormats.register(registry);
     LpFormats.register(registry);
     QasmFormats.register(registry);
     TsplibFormats.register(registry);
+    UvlFormats.register(registry);
     XyzFormats.register(registry);
-    KnapsackFormats.register(registry);
 
     return registry;
   }
