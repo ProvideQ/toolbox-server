@@ -27,20 +27,24 @@ env.setdefault('UV_PYTHON_DOWNLOADS', 'automatic')
 
 
 def get_gamspy_license():
+    """Returns the GAMSPY license as an access code or an absolute license file path."""
     # 1. Environment variable (GitHub Actions, Docker build)
     license_key = os.environ.get("GAMSPY_LICENSE")
     if license_key:
         return license_key.strip()
 
-    # 2. Local file (ignored by git)
+    # 2. Local file (ignored by git), contains either an access code or an absolute path to a GAMS license file
     license_file = os.path.join(repo_dir, ".gamspy_license")
     if os.path.exists(license_file):
         with open(license_file) as f:
-            return f.read().strip()
+            value = f.read().strip()
+        if value:
+            return value
 
     raise RuntimeError(
         "No GAMSPY license found. "
-        "Set the GAMSPY_LICENSE environment variable or create a .gamspy_license file."
+        "Set the GAMSPY_LICENSE environment variable or create a .gamspy_license file "
+        "containing either the license access code or an absolute path to a license file."
     )
 
 
@@ -51,15 +55,35 @@ def install_gamspy_license_and_scip(venv_path):
     else:
         python_executable = os.path.join(venv_path, 'bin', 'python')
 
-    license_key = get_gamspy_license()
-    print("Installing GAMSPy license and scip solver ...", flush=True)
+    # GAMSPY_GAMS_SYSDIR points the solvers at the licensed GAMS installation at
+    # runtime, but it must not be set while installing: the license and solver
+    # files belong to the venv's own gamspy-base installation.
+    install_env = os.environ.copy()
+    install_env.pop('GAMSPY_GAMS_SYSDIR', None)
+    # uv-managed venvs contain no pip, tell gamspy to install via uv instead and
+    # point it at the venv, since it is not the working directory's default venv.
+    install_env['VIRTUAL_ENV'] = os.path.abspath(venv_path)
+
+    license_key = None
+    try:
+        license_key = get_gamspy_license()
+    except RuntimeError as e:
+        # A GAMSPy license is separate from a GAMS license, without it the venv's
+        # bundled GAMS runs in demo mode. The licensed system GAMS (GAMSPY_GAMS_SYSDIR)
+        # is used at runtime instead, so missing licenses are not fatal here.
+        print(f"Warning: {e} Skipping GAMSPy license installation.", flush=True)
+
+    if license_key is not None:
+        print("Installing GAMSPy license ...", flush=True)
+        subprocess.run(
+            [python_executable, '-m', 'gamspy', 'install', 'license', license_key],
+            check=True, capture_output=True, env=install_env,
+        )
+
+    print("Installing scip solver ...", flush=True)
     subprocess.run(
-        [python_executable, '-m', 'gamspy', 'install', 'license', license_key],
-        check=True, capture_output=True,
-    )
-    subprocess.run(
-        [python_executable, '-m', 'gamspy', 'install', 'solver', 'scip'],
-        check=True, capture_output=True,
+        [python_executable, '-m', 'gamspy', 'install', 'solver', 'scip', '--use-uv'],
+        check=True, capture_output=True, env=install_env,
     )
 
 exitCode = 0
@@ -94,6 +118,12 @@ for base_dir in base_dirs:
                             install_gamspy_license_and_scip(venv_path)
                     except subprocess.CalledProcessError as e:
                         print(f"Error setting up virtual environment for {solver_dir}: {e}")
+                        if e.stdout:
+                            print("STDOUT:")
+                            print(e.stdout.decode() if isinstance(e.stdout, bytes) else e.stdout)
+                        if e.stderr:
+                            print("STDERR:")
+                            print(e.stderr.decode() if isinstance(e.stderr, bytes) else e.stderr)
                         exitCode = 1
                     except FileNotFoundError:
                         print("Error: 'uv' not found. Install it via https://docs.astral.sh/uv/getting-started/installation/")
