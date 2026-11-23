@@ -1,7 +1,10 @@
-package edu.kit.provideq.toolbox.demonstrators;
+package edu.kit.provideq.toolbox.demonstrators.moleculeenergy;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.toolbox.demonstrators.Demonstrator;
+import edu.kit.provideq.toolbox.demonstrators.DemonstratorReportFamily;
+import edu.kit.provideq.toolbox.demonstrators.DemonstratorReportFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
