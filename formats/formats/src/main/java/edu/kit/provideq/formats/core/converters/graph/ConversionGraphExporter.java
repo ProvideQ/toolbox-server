@@ -1,15 +1,19 @@
 package edu.kit.provideq.formats.core.converters.graph;
 
 import edu.kit.provideq.formats.core.Format;
+import edu.kit.provideq.formats.core.converters.ContextConverter;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.core.converters.Converter;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Renders a {@link ConversionRegistry}'s conversion graph as a diagram:
@@ -44,7 +48,10 @@ public class ConversionGraphExporter {
    * @return Mermaid graph source
    */
   public String toMermaid(ConversionRegistry registry, Collection<LabeledEdge> extraEdges) {
-    var formats = new LinkedHashSet<>(registry.getFormats());
+    // sort everything alphabetically so repeated exports produce identical output
+    // regardless of the registry's internal hash-based iteration order
+    var formats = new TreeSet<Format<?>>(Comparator.comparing(f -> f.getName()));
+    formats.addAll(registry.getFormats());
     for (var edge : extraEdges) {
       if (edge.source() instanceof Format<?> source) {
         formats.add(source);
@@ -63,7 +70,7 @@ public class ConversionGraphExporter {
     var sb = new StringBuilder("graph LR\n");
 
     appendFamilySubgraphs(registry, formats, nodeIds, sb);
-    appendEdges(registry, nodeIds, sb);
+    appendEdges(registry, formats, nodeIds, sb);
     appendContextEdges(registry, nodeIds, sb);
     appendExtraEdges(extraEdges, nodeIds, sb);
 
@@ -120,9 +127,12 @@ public class ConversionGraphExporter {
       Map<Format<?>, String> nodeIds,
       StringBuilder sb) {
     var assigned = new HashSet<Format<?>>();
-    for (var family : registry.getFamilies()) {
+    var families = new ArrayList<>(registry.getFamilies());
+    families.sort(Comparator.comparing(FormatFamily::getName));
+    for (var family : families) {
       var members = registry.getFormats(family).stream()
           .filter(formats::contains)
+          .sorted(Comparator.comparing(Format::getName))
           .toList();
       if (members.isEmpty()) {
         continue;
@@ -151,10 +161,15 @@ public class ConversionGraphExporter {
 
   private void appendEdges(
       ConversionRegistry registry,
+      Set<Format<?>> formats,
       Map<Format<?>, String> nodeIds,
       StringBuilder sb) {
-    for (var format : registry.getFormats()) {
-      for (var converter : registry.getOutgoing(format)) {
+    for (var format : formats) {
+      var outgoing = new ArrayList<>(registry.getOutgoing(format));
+      outgoing.sort(Comparator
+          .comparing((Converter<?, ?> converter) -> converter.getTarget().getName())
+          .thenComparing(converter -> converter.getClass().getSimpleName()));
+      for (var converter : outgoing) {
         sb.append("    %s --> %s\n".formatted(
             nodeIds.get(converter.getSource()), nodeIds.get(converter.getTarget())));
       }
@@ -170,7 +185,12 @@ public class ConversionGraphExporter {
       ConversionRegistry registry,
       Map<Format<?>, String> nodeIds,
       StringBuilder sb) {
-    for (var contextConverter : registry.getContextConverters()) {
+    var contextConverters = new ArrayList<>(registry.getContextConverters());
+    contextConverters.sort(Comparator
+        .comparing((ContextConverter<?, ?, ?> converter) -> converter.getSource().getName())
+        .thenComparing(converter -> converter.getTarget().getName())
+        .thenComparing(converter -> converter.getContextClass().getSimpleName()));
+    for (var contextConverter : contextConverters) {
       sb.append("    %s -->|\"context: %s\"| %s\n".formatted(
           nodeIds.get(contextConverter.getSource()),
           escape(contextConverter.getContextClass().getSimpleName()),
@@ -182,14 +202,25 @@ public class ConversionGraphExporter {
       Collection<LabeledEdge> extraEdges,
       Map<Format<?>, String> nodeIds,
       StringBuilder sb) {
+    record Edge(String sourceId, String targetId, String label) {
+    }
+
+    var edges = new ArrayList<Edge>();
     for (var edge : extraEdges) {
-      var sourceId = endpointId(edge.source(), nodeIds);
-      var targetId = endpointId(edge.target(), nodeIds);
+      edges.add(new Edge(
+          endpointId(edge.source(), nodeIds),
+          endpointId(edge.target(), nodeIds),
+          edge.label()));
+    }
+    edges.sort(Comparator.comparing(Edge::sourceId)
+        .thenComparing(Edge::targetId)
+        .thenComparing(Edge::label));
+    for (var edge : edges) {
       if (edge.label().isEmpty()) {
-        sb.append("    %s -.-> %s\n".formatted(sourceId, targetId));
+        sb.append("    %s -.-> %s\n".formatted(edge.sourceId(), edge.targetId()));
       } else {
         sb.append("    %s -.->|\"%s\"| %s\n".formatted(
-            sourceId, escape(edge.label()), targetId));
+            edge.sourceId(), escape(edge.label()), edge.targetId()));
       }
     }
   }
