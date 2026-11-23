@@ -1,7 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration.QUBO;
-import static edu.kit.provideq.toolbox.solvers.unsplittablemcf.UnsplittableMcfConfiguration.UNSPLITTABLE_MCF;
+import static edu.kit.provideq.toolbox.solvers.unsplittable_mcf.UnsplittableMcfConfiguration.UNSPLITTABLE_MCF;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
@@ -10,8 +10,8 @@ import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.formats.lp.QuboFamily;
 import edu.kit.provideq.formats.lp.QuboSolutionFamily;
-import edu.kit.provideq.toolbox.solvers.unsplittablemcf.formats.UmcfFamily;
-import edu.kit.provideq.toolbox.solvers.unsplittablemcf.formats.UmcfSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfFamily;
+import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfSolutionFamily;
 import java.time.Duration;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;

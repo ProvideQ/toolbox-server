@@ -1,19 +1,19 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.solvers.circuitprocessing.CircuitProcessingConfiguration.CIRCUIT_PROCESSING;
-import static edu.kit.provideq.toolbox.solvers.circuitprocessing.solvers.executor.ExecutorConfiguration.EXECUTOR_CONFIG;
-import static edu.kit.provideq.toolbox.solvers.circuitprocessing.solvers.optimization.OptimizationConfiguration.OPTIMIZATION_CONFIG;
+import static edu.kit.provideq.toolbox.solvers.circuit_processing.CircuitProcessingConfiguration.CIRCUIT_PROCESSING;
+import static edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutorConfiguration.EXECUTOR_CONFIG;
+import static edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization.OptimizationConfiguration.OPTIMIZATION_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.qasm.QasmFamily;
-import edu.kit.provideq.toolbox.solvers.circuitprocessing.solvers.MoveToExecutionSolver;
-import edu.kit.provideq.toolbox.solvers.circuitprocessing.solvers.MoveToOptimizationSolver;
-import edu.kit.provideq.toolbox.solvers.circuitprocessing.solvers.executor.ExecutionResultFamily;
-import edu.kit.provideq.toolbox.solvers.circuitprocessing.solvers.executor.ExecutionSolver;
-import edu.kit.provideq.toolbox.solvers.circuitprocessing.solvers.optimization.OptimizationSolver;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.MoveToExecutionSolver;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.MoveToOptimizationSolver;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutionSolver;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization.OptimizationSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
