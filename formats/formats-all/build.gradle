@@ -11,7 +11,7 @@ java {
 }
 
 dependencies {
-    api project(':formats:formats-core')
+    api project(':formats:formats')
     api project(':formats:formats-cnf')
     api project(':formats:formats-gml')
     api project(':formats:formats-knapsack')

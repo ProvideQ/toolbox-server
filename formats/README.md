@@ -13,7 +13,7 @@ slim core with pluggable format modules on top.
 
 | Module         | Content                                             |
 |----------------|-----------------------------------------------------|
-| `formats-core` | Format/Converter/Attribute abstractions, registry, services, errors |
+| `formats` | Format/Converter/Attribute abstractions, registry, services, errors |
 | `formats-cnf`  | DIMACS CNF + solution formats, logical expressions  |
 | `formats-gml`  | GML graph format                                    |
 | `formats-knapsack`  | Knapsack problem format                             |

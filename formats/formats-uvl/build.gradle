@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    api project(':formats:formats-core')
+    api project(':formats:formats')
     api project(':formats:formats-cnf')
 
     // FeatureIDE feature-model library, provided as a local jar in the toolbox-server repository
