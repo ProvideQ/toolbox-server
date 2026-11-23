@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.BoundWithInfo;
+import edu.kit.provideq.toolbox.meta.bound.BoundWithInfo;
 
 /**
  * A DTO for a comparison between a bound and a solution.

@@ -8,7 +8,7 @@ import edu.kit.provideq.formats.lp.LPSolutionFormat;
 import edu.kit.provideq.formats.tsplib.TSPLIBFormat;
 import edu.kit.provideq.formats.tsplib.TSPLIBSolutionFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;

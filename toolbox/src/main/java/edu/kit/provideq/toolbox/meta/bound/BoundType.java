@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.meta.bound;
 
 /**
  * Represents the bound type of bounds.

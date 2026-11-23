@@ -4,7 +4,7 @@ import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.attributes.AttributeService;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.Bound;
+import edu.kit.provideq.toolbox.meta.bound.Bound;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;

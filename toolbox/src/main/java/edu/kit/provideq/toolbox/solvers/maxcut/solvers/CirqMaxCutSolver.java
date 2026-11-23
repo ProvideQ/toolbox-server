@@ -4,7 +4,7 @@ import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.gml.GmlFormat;
 import edu.kit.provideq.formats.gml.GmlSolutionFormat;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.solvers.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.solvers.maxcut.MaxCutSolutionFamily;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;

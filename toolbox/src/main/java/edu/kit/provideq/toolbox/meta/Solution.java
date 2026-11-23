@@ -1,9 +1,9 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.meta;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.meta.ProblemSolver;
+
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;

@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.solvers;
 
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import java.util.List;

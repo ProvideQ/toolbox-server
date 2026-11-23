@@ -1,7 +1,6 @@
 package edu.kit.provideq.toolbox.api;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.toolbox.meta.AttributeDto;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.util.Comparator;
 import java.util.List;

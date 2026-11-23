@@ -1,7 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.BoundType;
-import edu.kit.provideq.toolbox.BoundWithInfo;
+import edu.kit.provideq.toolbox.meta.bound.BoundType;
+import edu.kit.provideq.toolbox.meta.bound.BoundWithInfo;
 
 public record BoundDto(float bound, BoundType boundType, long executionTime) {
   public BoundDto(BoundWithInfo boundWithInfo) {

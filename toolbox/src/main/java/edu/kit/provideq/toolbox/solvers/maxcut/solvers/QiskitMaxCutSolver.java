@@ -6,7 +6,7 @@ import edu.kit.provideq.formats.core.exceptions.FormatException;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.gml.GmlFormat;
 import edu.kit.provideq.formats.gml.GmlSolutionFormat;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.solvers.maxcut.MaxCutConfiguration;
 import edu.kit.provideq.toolbox.solvers.maxcut.MaxCutSolutionFamily;

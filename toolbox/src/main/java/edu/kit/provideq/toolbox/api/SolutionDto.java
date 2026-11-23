@@ -1,7 +1,7 @@
 package edu.kit.provideq.toolbox.api;
 
-import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SolutionStatus;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolutionStatus;
 
 /**
  * Data transfer object for {@link Solution solutions}, used in REST API responses.

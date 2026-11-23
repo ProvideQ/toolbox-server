@@ -13,8 +13,6 @@ import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.converters.Converter;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.Solution;
-import edu.kit.provideq.toolbox.SolutionStatus;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.exception.SolverException;
 import java.io.Reader;

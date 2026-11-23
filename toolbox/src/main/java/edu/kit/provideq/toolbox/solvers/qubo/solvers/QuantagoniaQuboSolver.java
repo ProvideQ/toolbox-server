@@ -7,7 +7,7 @@ import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.lp.LPFormat;
 import edu.kit.provideq.formats.lp.LPSolutionFormat;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.exception.SolverException;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ProblemProperties;

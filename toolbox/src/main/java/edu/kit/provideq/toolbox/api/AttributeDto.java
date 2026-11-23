@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.meta;
+package edu.kit.provideq.toolbox.api;
 
 /**
  * A problem type attribute with its value type.

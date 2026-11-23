@@ -5,7 +5,7 @@ import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.knapsack.KnapsackFormat;
 import edu.kit.provideq.formats.knapsack.KnapsackSolutionFormat;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration;
 import edu.kit.provideq.toolbox.solvers.knapsack.KnapsackSolutionFamily;

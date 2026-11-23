@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.process;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import java.util.Optional;
 import java.util.function.Function;
 

@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.solvers.processing.solvers;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.qasm.QasmFormat;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.solvers.processing.QasmFamily;
 import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutorConfiguration;

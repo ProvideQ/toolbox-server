@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.meta.bound;
 
 /**
  * Represents a bound estimation for the solution of a problem.

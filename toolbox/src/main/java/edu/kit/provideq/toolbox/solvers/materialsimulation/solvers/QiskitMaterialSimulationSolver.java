@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.solvers.materialsimulation.solvers;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.xyz.XYZMoleculeFormat;
-import edu.kit.provideq.toolbox.Solution;
+import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.solvers.materialsimulation.MaterialSimulationConfiguration;
 import edu.kit.provideq.toolbox.solvers.materialsimulation.MoleculeEnergySolutionFamily;
 import edu.kit.provideq.toolbox.solvers.materialsimulation.MoleculeEnergySolutionFormat;

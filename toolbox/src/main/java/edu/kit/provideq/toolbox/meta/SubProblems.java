@@ -3,7 +3,7 @@ package edu.kit.provideq.toolbox.meta;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-import edu.kit.provideq.toolbox.Solution;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

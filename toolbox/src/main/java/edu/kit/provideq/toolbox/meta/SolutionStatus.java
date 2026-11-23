@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox;
+package edu.kit.provideq.toolbox.meta;
 
 /**
  * Describes the state of a solution process.
