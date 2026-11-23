@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.router;
 
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -11,6 +11,7 @@ import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.toolbox.api.dto.ProblemDto;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;

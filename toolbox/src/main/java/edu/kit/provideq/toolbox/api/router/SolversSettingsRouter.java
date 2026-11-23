@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.router;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;

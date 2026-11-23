@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.toolbox.api.dto.SolutionDto;
 import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutionSolver;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;

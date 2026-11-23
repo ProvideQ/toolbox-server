@@ -1,6 +1,6 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.router;
 
-import static edu.kit.provideq.toolbox.api.ProblemRouter.PROBLEM_ID_PARAM_NAME;
+import static edu.kit.provideq.toolbox.api.router.ProblemRouter.PROBLEM_ID_PARAM_NAME;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -13,6 +13,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.toolbox.api.dto.ProblemDto;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;

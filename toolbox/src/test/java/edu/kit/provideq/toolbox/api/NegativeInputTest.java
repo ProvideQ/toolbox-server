@@ -4,6 +4,7 @@ import static edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration.KN
 import static edu.kit.provideq.toolbox.solvers.sat.SatConfiguration.SAT;
 import static org.junit.jupiter.api.Assertions.*;
 
+import edu.kit.provideq.toolbox.api.dto.ProblemDto;
 import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import java.time.Duration;

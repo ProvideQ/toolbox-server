@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.router;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.arrayschema.Builder.arraySchemaBuilder;
@@ -10,6 +10,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.provideq.toolbox.api.dto.ProblemSolverInfo;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;

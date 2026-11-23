@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.router;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -12,6 +12,8 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 import com.google.common.collect.Streams;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.toolbox.api.dto.BoundComparisonDto;
+import edu.kit.provideq.toolbox.api.dto.BoundDto;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;

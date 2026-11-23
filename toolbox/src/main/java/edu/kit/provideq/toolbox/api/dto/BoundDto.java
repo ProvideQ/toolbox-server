@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.dto;
 
 import edu.kit.provideq.toolbox.meta.bound.BoundType;
 import edu.kit.provideq.toolbox.meta.bound.BoundWithInfo;

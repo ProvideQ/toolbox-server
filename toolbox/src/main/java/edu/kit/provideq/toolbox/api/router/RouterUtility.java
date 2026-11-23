@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.router;
 
 import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.meta.Problem;

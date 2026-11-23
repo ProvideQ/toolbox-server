@@ -5,6 +5,7 @@ import static edu.kit.provideq.toolbox.solvers.unsplittablemcf.UnsplittableMcfCo
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.toolbox.api.dto.SubProblemReferenceDto;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.solvers.qubo.QuboFamily;

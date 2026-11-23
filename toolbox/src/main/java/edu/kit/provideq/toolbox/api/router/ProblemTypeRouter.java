@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.router;
 
 import static edu.kit.provideq.toolbox.demonstrators.DemonstratorConfiguration.DEMONSTRATOR;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.toolbox.api.dto.ProblemTypeDto;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemType;

@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.api;
+package edu.kit.provideq.toolbox.api.dto;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.meta.ProblemType;

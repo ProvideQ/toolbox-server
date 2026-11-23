@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.toolbox.api.dto.ProblemDto;
+import edu.kit.provideq.toolbox.api.dto.SubProblemReferenceDto;
 import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
