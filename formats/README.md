@@ -5,13 +5,9 @@ slim core with pluggable format modules on top.
 
 ## What it does
 
-- **Conversion**: converts values between formats using a graph of registered converters.
-  All reachable conversion paths are **pre-computed at registration time**, so runtime
-  route lookups are O(1).
-- **Attribute access**: reads a single named, typed parameter (e.g. "dimension",
-  "variable_count") out of a format via `AttributeReader`s declared directly on the format.
-  If a format does not define a reader, the `AttributeService` falls back to
-  converting the value to the nearest format that does.
+- **Conversion**: converts values between formats using a graph of registered converters. All reachable conversion paths are **pre-computed at registration time**, so runtime route lookups are O(1).
+- **Format families**: families of formats that describe the same problem type can be registered together, e.g. DIMACS CNF and logical expressions for SAT formulas. Converters are expected to be registered so you can convert between any two formats in the same family, possibly via intermediate formats.
+- **Attribute access**: reads a single named, typed parameter (e.g. "dimension", "variable_count") out of a format via `AttributeReader`s declared directly on the format. If a format does not define a reader, the `AttributeService` falls back to converting the value to the nearest format that does.
 
 ## Modules
 
@@ -20,27 +16,30 @@ slim core with pluggable format modules on top.
 | `formats-core` | Format/Converter/Attribute abstractions, registry, services, errors |
 | `formats-cnf`  | DIMACS CNF + solution formats, logical expressions  |
 | `formats-gml`  | GML graph format                                    |
+| `formats-knapsack`  | Knapsack problem format                             |
+| `formats-lp`  | LP problem format (QUBO)                            |
+| `formats-qasm`  | OpenQASM - Open Quantum Assembly Language                             |
+| `formats-tsplib`  | [TSPLib](https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/) format (Traveling Salesperson) and CVRP format (Capacitated Vehicle Routing Problem) |
 | `formats-uvl`  | UVL feature models (FeatureIDE-based, heavy dependency) |
+| `formats-xyz`  | XYZ molecule format |
 | `formats-all`  | Aggregate that depends on all of the above          |
 
 ## Usage
 
 ```java
 // 1. Create a registry and register formats and converters
-var registry = new ConversionRegistry()
-CnfFormats.register(registry)      // registers dimacs-cnf, logical-expression + converter
-GmlFormats.register(registry)      // registers gml
-registry.seal()                    // optional: forbid further registration
+var registry = new ConversionRegistry();
+var conversionService = new ConversionService(registry);
+CnfFormats.register(registry);      // registers dimacs-cnf, logical-expression + converter
+registry.seal();                    // optional: forbid further registration
 
-// 2. Create the toolbox facade
-var toolbox = new FormatsToolbox(registry)
+// 2. Convert between formats (direct or multi-hop, resolved via the pre-computed tree)
+DimacsCnf cnf = conversionService.convert("a and (b or not c)", "logical-expression", "dimacs-cnf");
 
-// 3. Convert between formats (direct or multi-hop, resolved via the pre-computed tree)
-DimacsCnf cnf = toolbox.convert("a and (b or not c)", "logical-expression", "dimacs-cnf")
-
-// 4. Read attributes (with automatic conversion fallback)
+// 3. Read attributes (with automatic conversion fallback)
+var attributeService = new AttributeService(registry, conversionService);
 Integer variableCount =
-    toolbox.readAttribute(cnf, DimacsCnfFormat.INSTANCE, "variable_count", Integer.class)
+        attributeService.read(cnf, DimacsCnfFormat.INSTANCE, "variable_count", Integer.class);
 ```
 
 ## Adding a new format
@@ -49,12 +48,16 @@ Integer variableCount =
 
 ```java
 public record QuboFormat() implements Format<Qubo> {
-  public static final QuboFormat INSTANCE = new QuboFormat()
+  public static final QuboFormat INSTANCE = new QuboFormat();
 
-  @Override public String getName() { return "qubo" }
-  @Override public Set<String> getAliases() { return Set.of() }
-  @Override public Set<String> getFileExtensions() { return Set.of("qubo") }
-  @Override public FormatKind getKind() { return FormatKind.PROBLEM }
+  @Override public String getName() { return "qubo"; }
+  @Override public Set<String> getAliases() { return Set.of(); }
+  @Override public Set<String> getFileExtensions() { return Set.of("qubo"); }
+  @Override public FormatType getType() { return FormatType.PROBLEM; }
+  @Override
+  public Class<Qubo> getRepresentationClass() {
+    return Qubo.class;
+    }
 
   @Override public Qubo parse(Reader reader) throws ParseException { /* ... */ }
   @Override public void serialize(Qubo value, Writer writer) throws SerializationException { /* ... */ }
@@ -64,9 +67,9 @@ public record QuboFormat() implements Format<Qubo> {
 2. Add converters. For simple ones, use `FuncConverter` with a lambda:
 
 ```java
-var quboToCnf = new FuncConverter<>(QuboFormat.INSTANCE, DimacsCnfFormat.INSTANCE, false,
-    qubo -> convertToCnf(qubo)) // may throw FormatException
-registry.register(quboToCnf)
+var quboToCnf = new FuncConverter<>(QuboFormat.INSTANCE, DimacsCnfFormat.INSTANCE,
+        qubo -> convertToCnf(qubo)); // may throw FormatException
+registry.registerConverter(quboToCnf);
 ```
 
 3. Declare attribute readers directly on the format:
@@ -75,7 +78,7 @@ registry.register(quboToCnf)
 @Override
 public Map<String, AttributeReader<Qubo, ?>> getAttributeReaders() {
   return Map.of(
-      "dimension", AttributeReader.of("dimension", Integer.class, Qubo::dimension))
+      "dimension", AttributeReader.of(Integer.class, Qubo::dimension));
 }
 ```
 
@@ -96,13 +99,7 @@ raw input with a cheap single-pass scan instead of parsing the full object.
 - Attribute readers are declared inline via the `AttributeReader.of(...)` factory.
 - **Performance-first core**: synchronous, allocation-conscious. `Reader`/`Writer`-based
   format I/O leaves room for a streaming add-on later without a core redesign.
-- Problem and solution formats share one registry, distinguished by `FormatKind`.
-
-## Building
-
-```shell
-./gradlew :formats:formats-core:check :formats:formats-cnf:check :formats:formats-gml:check
-```
+- Problem and solution formats share one registry, distinguished by `FormatType`.
 
 ## Exporting the conversion graph
 
@@ -111,8 +108,8 @@ diagram (formats as nodes, conversions as directed edges), which can be embedded
 Markdown via Mermaid:
 
 ```java
-var markdown = new ConversionGraphExporter().toMarkdown(registry)
-Files.writeString(Path.of("format-graph.md"), markdown)
+var markdown = new ConversionGraphExporter().toMarkdown(registry, List.of());
+Files.writeString(Path.of("format-graph.md"), markdown);
 ```
 
 In the toolbox-server, `ConversionGraphExportTest` regenerates `format-graph.md` from the shared registry,
@@ -120,5 +117,5 @@ including the toolbox's available solvers as dashed edges from each problem type
 output format:
 
 ```shell
-./gradlew :test --tests "edu.kit.provideq.toolbox.formats.ConversionGraphExportTest"
+./gradlew :toolbox:test --tests "edu.kit.provideq.toolbox.formats.ConversionGraphExportTest"
 ```
