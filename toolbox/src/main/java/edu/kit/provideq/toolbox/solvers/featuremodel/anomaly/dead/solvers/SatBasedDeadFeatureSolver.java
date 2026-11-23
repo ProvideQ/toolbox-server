@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead;
+package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.solvers;
 
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
@@ -17,6 +17,10 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.DeadFeatureConfiguration;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolution;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.sat.SatConfiguration;
 import edu.kit.provideq.formats.sat.SatFamily;
 import edu.kit.provideq.formats.sat.SatSolutionFamily;

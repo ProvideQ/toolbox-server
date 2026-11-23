@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead;
+package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.FormatReader;

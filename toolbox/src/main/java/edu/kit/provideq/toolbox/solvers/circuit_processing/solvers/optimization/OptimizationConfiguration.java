@@ -4,7 +4,7 @@ import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.qasm.formats.QasmFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.formats.qasm.QasmFamily;
-import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
@@ -12,6 +12,8 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
+
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization.solvers.OptimizationSolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

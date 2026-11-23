@@ -7,7 +7,7 @@ import edu.kit.provideq.formats.qasm.formats.QasmFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.MoveToExecutionSolver;
 import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.MoveToOptimizationSolver;
-import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;

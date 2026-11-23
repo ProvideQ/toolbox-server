@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.solvers.circuit_processing.solvers;
 
 import edu.kit.provideq.toolbox.solvers.circuit_processing.CircuitProcessingConfiguration;
 import edu.kit.provideq.formats.qasm.QasmFamily;
-import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;

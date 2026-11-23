@@ -5,7 +5,7 @@ import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.qasm.formats.QasmFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.formats.qasm.QasmFamily;
-import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutorConfiguration;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;

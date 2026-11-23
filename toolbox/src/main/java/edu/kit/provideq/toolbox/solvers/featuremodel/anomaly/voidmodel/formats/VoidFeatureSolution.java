@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel;
+package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.formats;
 
 import java.util.Map;
 import java.util.function.Supplier;

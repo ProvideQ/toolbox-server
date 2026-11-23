@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel;
+package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.solvers;
 
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
@@ -16,6 +16,10 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.formats.VoidFeatureSolution;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.VoidModelConfiguration;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.formats.VoidFeatureSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.formats.VoidFeatureSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.sat.SatConfiguration;
 import edu.kit.provideq.formats.sat.SatFamily;
 import edu.kit.provideq.formats.sat.SatSolutionFamily;

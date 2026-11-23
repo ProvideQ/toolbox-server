@@ -12,6 +12,9 @@ import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
+
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.solvers.SatBasedDeadFeatureSolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

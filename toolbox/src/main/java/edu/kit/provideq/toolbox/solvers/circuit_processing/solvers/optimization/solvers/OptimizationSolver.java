@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization;
+package edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
@@ -6,7 +6,7 @@ import edu.kit.provideq.formats.qasm.formats.QasmFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.formats.qasm.QasmFamily;
 import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.CircuitProcessingSolver;
-import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFamily;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
@@ -18,6 +18,8 @@ import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import java.util.List;
 import java.util.Map;
+
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization.OptimizationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;

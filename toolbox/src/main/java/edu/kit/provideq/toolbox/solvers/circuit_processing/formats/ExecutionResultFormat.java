@@ -1,10 +1,11 @@
-package edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor;
+package edu.kit.provideq.toolbox.solvers.circuit_processing.formats;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.FormatReader;
 import edu.kit.provideq.formats.core.FormatType;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.core.exceptions.SerializationException;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;

@@ -119,7 +119,7 @@ class VrpSolverTest {
    * test LKH-3 solver in combination with k-means = 3.
    */
   @Test
-  void testKmeansWithLkhForVrp() throws Exception {
+  void testKmeansWithLkhForVrp() {
     for (FormattedValue<?> problem : problems) {
       //skip the small "test" problem because clustering small problems
       //can lead to errors

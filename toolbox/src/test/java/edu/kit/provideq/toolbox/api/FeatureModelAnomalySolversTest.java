@@ -10,7 +10,7 @@ import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.toolbox.api.dto.SubProblemReferenceDto;
 import edu.kit.provideq.formats.uvl.FeatureModelFamily;
-import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.DeadFeatureSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFamily;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;

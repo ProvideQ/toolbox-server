@@ -1,4 +1,4 @@
-package edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.executor;
+package edu.kit.provideq.toolbox.solvers.circuit_processing.formats;
 
 import java.util.Optional;
 

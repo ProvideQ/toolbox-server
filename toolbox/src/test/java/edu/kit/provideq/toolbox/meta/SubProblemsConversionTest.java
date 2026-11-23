@@ -38,7 +38,7 @@ class SubProblemsConversionTest {
   }
 
   @Test
-  void subSolverCanPullConvertedRepresentation() throws Exception {
+  void subSolverCanPullConvertedRepresentation() {
     var subType = new ProblemType<>("sub", "sub", TEST_FAMILY, TEST_FAMILY);
     var capturing = runSubRoutine(subType, SubRoutineDefinition.of(subType, "call", true),
         FormattedValue.of("hello", FORMAT_F1), true);
