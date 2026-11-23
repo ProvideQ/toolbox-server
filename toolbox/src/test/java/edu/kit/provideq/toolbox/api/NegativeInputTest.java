@@ -2,11 +2,12 @@ package edu.kit.provideq.toolbox.api;
 
 import static edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration.KNAPSACK;
 import static edu.kit.provideq.toolbox.solvers.sat.SatConfiguration.SAT;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import edu.kit.provideq.toolbox.api.dto.ProblemDto;
-import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.ProblemState;
+import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

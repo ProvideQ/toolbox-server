@@ -2,6 +2,7 @@ package edu.kit.provideq.toolbox.solvers.vrp.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import edu.kit.provideq.formats.tsplib.formats.VRPFormat;
 import edu.kit.provideq.formats.tsplib.formats.VRPSolutionFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
@@ -10,7 +11,6 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.solvers.vrp.VrpConfiguration;
-import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;

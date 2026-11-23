@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.kit.provideq.formats.core.Document;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.knapsack.formats.KnapsackFormat;
+import edu.kit.provideq.formats.knapsack.formats.KnapsackSolutionFormat;
 import edu.kit.provideq.formats.knapsack.formats.representation.KnapsackItem;
 import edu.kit.provideq.formats.knapsack.formats.representation.KnapsackProblem;
 import edu.kit.provideq.formats.knapsack.formats.representation.KnapsackSolution;
-import edu.kit.provideq.formats.knapsack.formats.KnapsackSolutionFormat;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

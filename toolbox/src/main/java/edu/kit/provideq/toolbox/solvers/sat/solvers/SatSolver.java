@@ -1,10 +1,10 @@
 package edu.kit.provideq.toolbox.solvers.sat.solvers;
 
+import edu.kit.provideq.formats.sat.SatFamily;
+import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.solvers.sat.SatConfiguration;
-import edu.kit.provideq.formats.sat.SatFamily;
-import edu.kit.provideq.formats.sat.SatSolutionFamily;
 
 /**
  * A solver for SAT problems.

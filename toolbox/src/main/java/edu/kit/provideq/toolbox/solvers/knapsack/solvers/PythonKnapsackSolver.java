@@ -3,16 +3,19 @@ package edu.kit.provideq.toolbox.solvers.knapsack.solvers;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
-import edu.kit.provideq.formats.knapsack.formats.KnapsackFormat;
 import edu.kit.provideq.formats.knapsack.KnapsackSolutionFamily;
+import edu.kit.provideq.formats.knapsack.formats.KnapsackFormat;
 import edu.kit.provideq.formats.knapsack.formats.KnapsackSolutionFormat;
-import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.exception.ConversionException;
-import edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -47,6 +50,11 @@ public class PythonKnapsackSolver extends KnapsackSolver {
   public String getDescription() {
     return "A solver for the Knapsack problem using the Horowitz-Sahni "
         + "branch and search algorithm.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.EXACT, RuleProperty.VALID);
   }
 
   @Override

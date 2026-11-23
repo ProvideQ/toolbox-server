@@ -7,7 +7,6 @@ import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.core.exceptions.SerializationException;
 import edu.kit.provideq.formats.core.families.ContextBoundFormat;
 import edu.kit.provideq.toolbox.solvers.maxcut.formats.converters.QaoaReportToGmlSolutionConverter;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;

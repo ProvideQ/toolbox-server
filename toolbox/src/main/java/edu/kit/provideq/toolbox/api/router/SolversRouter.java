@@ -66,7 +66,7 @@ public class SolversRouter {
   private static List<ProblemSolverInfo> getAllSolverInfos(ProblemManager<?, ?> manager) {
     return manager.getSolvers().stream()
             .map(solver -> new ProblemSolverInfo(solver.getId(), solver.getName(),
-                solver.getDescription()))
+                solver.getDescription(), solver.getCharacteristics()))
             .toList();
   }
 

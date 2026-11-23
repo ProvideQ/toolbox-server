@@ -3,27 +3,34 @@ package edu.kit.provideq.toolbox.solvers.tsp.solvers;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.lp.QuboFamily;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import edu.kit.provideq.formats.lp.formats.LPFormat;
 import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
+import edu.kit.provideq.formats.tsplib.TspSolutionFamily;
 import edu.kit.provideq.formats.tsplib.formats.TSPLIBFormat;
 import edu.kit.provideq.formats.tsplib.formats.TSPLIBSolutionFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
+import edu.kit.provideq.toolbox.meta.guard.Guard;
+import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
-import edu.kit.provideq.toolbox.solvers.qubo.formats.PositionalBitsSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
-import edu.kit.provideq.formats.lp.QuboFamily;
-import edu.kit.provideq.formats.lp.QuboSolutionFamily;
-import edu.kit.provideq.formats.tsplib.TspSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.PositionalBitsSolutionFormat;
+import edu.kit.provideq.toolbox.solvers.tsp.TspSolutionGuard;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -42,6 +49,9 @@ public class QuboTspSolver extends TspSolver {
           "How should the QUBO be solved?",
           true
       );
+
+  private static final boolean DEFAULT_GUARDED = false;
+  private static final int DEFAULT_GUARD_RETRIES = 3;
 
   private final ApplicationContext context;
   private final String binaryPath;
@@ -72,8 +82,25 @@ public class QuboTspSolver extends TspSolver {
   }
 
   @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.WEAKLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
+  }
+
+  @Override
   public List<SubRoutineDefinition<?, ?>> getSubRoutines() {
     return List.of(QUBO_SUBROUTINE);
+  }
+
+  @Override
+  public List<SolverSetting> getSolverSettings() {
+    return Guard.createSettings(
+        "Check that the reconstructed tour visits every node exactly once. "
+            + "Invalid or missing tours are rejected instead of being returned.",
+        DEFAULT_GUARDED,
+        DEFAULT_GUARD_RETRIES);
   }
 
   private String getProblemDirectory(Solution<TspSolutionFamily> solutionObject) {
@@ -97,6 +124,9 @@ public class QuboTspSolver extends TspSolver {
       SolvingProperties properties,
       ConversionService conversionService
   ) {
+    var guardConfiguration =
+        Guard.readConfiguration(properties, DEFAULT_GUARDED, DEFAULT_GUARD_RETRIES);
+
     var solution = new Solution<>(this);
     var tspLibString = convert(formattedInput, TSPLIBFormat.INSTANCE, conversionService);
 
@@ -104,7 +134,7 @@ public class QuboTspSolver extends TspSolver {
     // add capacity declaration of "0" (is ignored later)
     // this is theoretically wrong, but needed for Lucas' QUBO converter to work
     String typeRegex = "(?i)\\btype\\s*:\\s*tsp\\b";
-    tspLibString = tspLibString.replaceAll(typeRegex, "TYPE : CVRP\nCAPACITY : 0");
+    String vrpInput = tspLibString.replaceAll(typeRegex, "TYPE : CVRP\nCAPACITY : 0");
 
     // translate into qubo in lp-file format with rust vrp meta solver
     var processResult = context
@@ -116,7 +146,7 @@ public class QuboTspSolver extends TspSolver {
             "simulated",
             "--transform-only"
         )
-        .writeInputFile(tspLibString, "problem.vrp")
+        .writeInputFile(vrpInput, "problem.vrp")
         .readOutputFile("problem.lp")
         .run(getProblemType(), solution.getId());
 
@@ -135,9 +165,32 @@ public class QuboTspSolver extends TspSolver {
     }
     Path quboSolutionFilePath = Path.of(problemDirectoryPath, "problem.bin");
 
-    String finalInput = tspLibString;
+    return Guard.solve(
+        solution,
+        vrpInput,
+        TspSolutionGuard.INSTANCE,
+        guardConfiguration,
+        text -> FormattedValue.of(text, TSPLIBSolutionFormat.INSTANCE),
+        () -> solveAndReconstruct(
+            resolver, conversionService, output.get(), vrpInput, quboSolutionFilePath,
+            solution.getId()));
+  }
+
+  /**
+   * Runs the QUBO sub-routine, converts its solution into the positional-bits representation
+   * expected by the pipeline binary, and re-transforms the QUBO solution back into a tour.
+   * Failures are reported as {@link Guard.Attempt}s so the guard can retry the sub-routine.
+   */
+  private Mono<Guard.Attempt<String>> solveAndReconstruct(
+      SubRoutineResolver resolver,
+      ConversionService conversionService,
+      String lpProblem,
+      String vrpInput,
+      Path quboSolutionFilePath,
+      UUID solutionId
+  ) {
     return resolver.runSubRoutine(QUBO_SUBROUTINE,
-            FormattedValue.of(output.get(), LPFormat.INSTANCE), conversionService)
+            FormattedValue.of(lpProblem, LPFormat.INSTANCE), conversionService)
         .publishOn(Schedulers.boundedElastic()) //avoids block from Files.writeString() in try/catch
         .map(quboSolution -> {
           var lpSolution = convert(
@@ -152,21 +205,19 @@ public class QuboTspSolver extends TspSolver {
                 lpSolution,
                 LPSolutionFormat.INSTANCE,
                 PositionalBitsSolutionFormat.INSTANCE,
-                output.get());
+                lpProblem);
           } catch (FormatException e) {
-            solution.setDebugData("Could not convert QUBO solution to positional bits: "
-                + e.getMessage());
-            solution.abort();
-            return solution;
+            return Guard.Attempt.failed(
+                "Could not convert QUBO solution to positional bits: " + e.getMessage(),
+                quboSolution);
           }
 
           try {
             Files.writeString(quboSolutionFilePath, positionalSolution);
           } catch (IOException e) {
-            solution.setDebugData(
-                "Failed to write qubo solution file with path: " + quboSolutionFilePath);
-            solution.abort();
-            return solution;
+            return Guard.Attempt.failed(
+                "Failed to write qubo solution file with path: " + quboSolutionFilePath,
+                quboSolution);
           }
 
           var processRetransformResult = context
@@ -178,23 +229,18 @@ public class QuboTspSolver extends TspSolver {
                   "simulated",
                   "--qubo-solution", quboSolutionFilePath.toString()
               )
-              .writeInputFile(finalInput, "problem.vrp")
+              .writeInputFile(vrpInput, "problem.vrp")
               .readOutputFile("problem.sol")
-              .run(getProblemType(), solution.getId());
+              .run(getProblemType(), solutionId);
 
           if (!processRetransformResult.success()) {
-            solution.setDebugData(
-                processRetransformResult.errorOutput().orElse("Unable to retransform result."));
-            solution.abort();
-            return solution;
+            return Guard.Attempt.failed(
+                processRetransformResult.errorOutput().orElse("Unable to retransform result."),
+                quboSolution);
           }
 
-          solution.setSolutionData(
-              processRetransformResult.output().orElse("Empty Solution"),
-              TSPLIBSolutionFormat.INSTANCE);
-          solution.complete();
-
-          return solution;
+          return Guard.Attempt.of(
+              processRetransformResult.output().orElse("Empty Solution"), quboSolution);
         });
   }
 }

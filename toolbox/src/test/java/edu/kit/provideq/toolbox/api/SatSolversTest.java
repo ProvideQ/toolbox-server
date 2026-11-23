@@ -7,13 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.sat.SatFamily;
+import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import edu.kit.provideq.toolbox.api.dto.SubProblemReferenceDto;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.formats.sat.SatFamily;
-import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import edu.kit.provideq.toolbox.solvers.sat.solvers.QrispExactGroverSolver;
 import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFamily;
 import java.time.Duration;

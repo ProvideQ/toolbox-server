@@ -8,7 +8,6 @@ import edu.kit.provideq.formats.gml.formats.Gml;
 import edu.kit.provideq.formats.gml.formats.GmlFormat;
 import edu.kit.provideq.formats.gml.formats.GmlSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.maxcut.formats.QaoaMaxCutReportFormat;
-
 import java.io.StringReader;
 
 /**

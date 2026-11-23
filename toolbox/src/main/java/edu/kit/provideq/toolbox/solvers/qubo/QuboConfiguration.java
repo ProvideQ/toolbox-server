@@ -2,9 +2,9 @@ package edu.kit.provideq.toolbox.solvers.qubo;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.formats.lp.formats.LPFormat;
 import edu.kit.provideq.formats.lp.QuboFamily;
 import edu.kit.provideq.formats.lp.QuboSolutionFamily;
+import edu.kit.provideq.formats.lp.formats.LPFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -56,8 +56,8 @@ public class QuboConfiguration {
   @Bean
   QuboSolutionFamily registerQuboSolutionFamily(ConversionRegistry registry) {
     registry.registerFormat(QuboSolutionFamily.INSTANCE);
-    registry.registerFormat(JsonQuboSolutionFormat.INSTANCE);
-    registry.registerFormat(PositionalBitsSolutionFormat.INSTANCE);
+    registry.addToFamily(QuboSolutionFamily.INSTANCE, JsonQuboSolutionFormat.INSTANCE);
+    registry.addToFamily(QuboSolutionFamily.INSTANCE, PositionalBitsSolutionFormat.INSTANCE);
     return QuboSolutionFamily.INSTANCE;
   }
 

@@ -3,21 +3,21 @@ package edu.kit.provideq.toolbox.solvers.maxcut;
 import edu.kit.provideq.formats.core.Document;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.formats.gml.formats.Gml;
-import edu.kit.provideq.formats.gml.formats.GmlFormat;
 import edu.kit.provideq.formats.gml.MaxCutFamily;
 import edu.kit.provideq.formats.gml.MaxCutSolutionFamily;
+import edu.kit.provideq.formats.gml.formats.Gml;
+import edu.kit.provideq.formats.gml.formats.GmlFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.toolbox.solvers.maxcut.formats.converters.GmlSolutionToQaoaReportConverter;
+import edu.kit.provideq.toolbox.meta.Problem;
+import edu.kit.provideq.toolbox.meta.ProblemManager;
+import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.solvers.maxcut.formats.QaoaMaxCutReportFormat;
+import edu.kit.provideq.toolbox.solvers.maxcut.formats.converters.GmlSolutionToQaoaReportConverter;
 import edu.kit.provideq.toolbox.solvers.maxcut.formats.converters.QaoaReportToGmlSolutionConverter;
 import edu.kit.provideq.toolbox.solvers.maxcut.solvers.CirqMaxCutSolver;
 import edu.kit.provideq.toolbox.solvers.maxcut.solvers.GamsMaxCutSolver;
 import edu.kit.provideq.toolbox.solvers.maxcut.solvers.QiskitMaxCutSolver;
-import edu.kit.provideq.toolbox.meta.Problem;
-import edu.kit.provideq.toolbox.meta.ProblemManager;
-import edu.kit.provideq.toolbox.meta.ProblemType;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
@@ -52,7 +52,7 @@ public class MaxCutConfiguration {
   @Bean
   MaxCutSolutionFamily registerMaxCutSolutionFamily(ConversionRegistry registry) {
     registry.registerFormat(MaxCutSolutionFamily.INSTANCE);
-    registry.registerFormat(QaoaMaxCutReportFormat.INSTANCE);
+    registry.addToFamily(MaxCutSolutionFamily.INSTANCE, QaoaMaxCutReportFormat.INSTANCE);
     registry.registerContextConverter(QaoaReportToGmlSolutionConverter.INSTANCE);
     registry.registerConverter(GmlSolutionToQaoaReportConverter.INSTANCE);
     return MaxCutSolutionFamily.INSTANCE;

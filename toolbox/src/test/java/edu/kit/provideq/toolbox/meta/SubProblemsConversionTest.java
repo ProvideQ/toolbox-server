@@ -10,7 +10,6 @@ import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.converters.FuncConverter;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;

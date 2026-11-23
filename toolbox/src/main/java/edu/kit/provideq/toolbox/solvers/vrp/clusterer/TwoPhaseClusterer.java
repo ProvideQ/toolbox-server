@@ -2,9 +2,15 @@ package edu.kit.provideq.toolbox.solvers.vrp.clusterer;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.tsplib.TspLibFamily;
+import edu.kit.provideq.formats.tsplib.TspSolutionFamily;
+import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import edu.kit.provideq.formats.tsplib.formats.TSPLIBFormat;
 import edu.kit.provideq.formats.tsplib.formats.VRPFormat;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -12,11 +18,7 @@ import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.solvers.tsp.TspConfiguration;
-import edu.kit.provideq.formats.tsplib.TspLibFamily;
-import edu.kit.provideq.formats.tsplib.TspSolutionFamily;
-import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -38,6 +40,13 @@ public class TwoPhaseClusterer extends VrpClusterer {
       @Value("${path.custom.berger-vrp}") String binaryPath,
       ApplicationContext context) {
     super(binaryPath, context);
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.DECOMPOSITION,
+        RuleProperty.STRONGLY_CONSTRAINT_PRESERVING);
   }
 
   @Override

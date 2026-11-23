@@ -1,13 +1,14 @@
 package edu.kit.provideq.toolbox.solvers.sat.solvers;
 
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolution;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolutionFormat;
 import edu.kit.provideq.formats.core.Document;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.sat.SatSolutionFamily;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolutionFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -15,7 +16,6 @@ import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.solvers.sat.SatConfiguration;
-import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;

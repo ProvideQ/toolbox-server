@@ -1,19 +1,24 @@
 package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.solvers;
 
+import edu.kit.provideq.formats.core.Document;
+import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.sat.SatFamily;
+import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolution;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolutionFormat;
 import edu.kit.provideq.formats.sat.formats.dimacs.Variable;
-import edu.kit.provideq.formats.core.Document;
-import edu.kit.provideq.formats.core.FormattedValue;
-import edu.kit.provideq.formats.core.converters.ConversionService;
-import edu.kit.provideq.formats.core.exceptions.ParseException;
-import edu.kit.provideq.toolbox.meta.Solution;
-import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.formats.uvl.FeatureModelFamily;
+import edu.kit.provideq.toolbox.exception.ConversionException;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -22,8 +27,6 @@ import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFe
 import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFamily;
 import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.sat.SatConfiguration;
-import edu.kit.provideq.formats.sat.SatFamily;
-import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -55,6 +58,13 @@ public class SatBasedDeadFeatureSolver
   public String getDescription() {
     return "This solver builds SAT formulae to determine dead features in a feature model."
         + " It uses a SAT solver to solve each formula per feature.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.DECOMPOSITION, RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override

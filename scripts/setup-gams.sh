@@ -73,7 +73,9 @@ source /opt/conda/bin/activate gams
 
 # install GAMS links for python
 # pin the API version to the installed GAMS version to keep it in sync with the gams installation
-pip install "gamsapi[core,connect]==${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}.0" --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
+pip install "gamsapi[core,connect]==${GAMS_VERSION_RELEASE_MAJOR}.${GAMS_VERSION_HOTFIX}" \
+  --only-binary=gamsapi \
+  --find-links /opt/gams/gams${GAMS_VERSION_RELEASE_MAJOR}_linux_x64_64_sfx/api/python/bdist
 pip install networkx
 
 # make GAMS use our python version

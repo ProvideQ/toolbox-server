@@ -1,6 +1,7 @@
 HELP.md
 *.DS_Store
 .gradle
+.gamspy_license
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -43,6 +44,7 @@ out/
 
 ### virtual envs and python ###
 venv/
+.venv/
 __pycache__/
 
 ### ProvideQ toolbox-server ###

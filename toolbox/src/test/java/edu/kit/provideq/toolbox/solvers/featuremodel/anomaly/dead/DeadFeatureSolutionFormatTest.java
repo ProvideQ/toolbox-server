@@ -3,10 +3,9 @@ package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
-import java.util.List;
-
 import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolution;
 import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFormat;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DeadFeatureSolutionFormatTest {

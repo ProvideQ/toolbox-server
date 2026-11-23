@@ -2,19 +2,18 @@ package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.uvl.FeatureModelFamily;
 import edu.kit.provideq.formats.uvl.formats.UvlFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
-import edu.kit.provideq.formats.uvl.FeatureModelFamily;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.solvers.SatBasedDeadFeatureSolver;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
-
-import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.formats.DeadFeatureSolutionFamily;
-import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.solvers.SatBasedDeadFeatureSolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

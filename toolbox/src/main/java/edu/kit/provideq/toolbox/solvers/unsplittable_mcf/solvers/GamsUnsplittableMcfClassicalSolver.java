@@ -2,15 +2,18 @@ package edu.kit.provideq.toolbox.solvers.unsplittable_mcf.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.UnsplittableMcfConfiguration;
 import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfFormat;
 import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfSolutionFamily;
 import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfSolutionFormat;
-import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.UnsplittableMcfConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -39,14 +42,19 @@ public class GamsUnsplittableMcfClassicalSolver extends GamsUnsplittableMcfSolve
 
   @Override
   public String getName() {
-    return "(GAMS) CPLEX Classical MCF Solver";
+    return "(GAMS) SCIP Classical MCF Solver";
   }
 
   @Override
   public String getDescription() {
-    return "Solves the Unsplittable Multi Commodity Flow problem using GAMSPy with CPLEX. "
+    return "Solves the Unsplittable Multi Commodity Flow problem using GAMSPy and SCIP. "
         + "Builds a time-expanded network model and finds optimal flow routes minimizing "
         + "delay and slack penalties.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override

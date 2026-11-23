@@ -5,9 +5,9 @@ import static edu.kit.provideq.toolbox.solvers.sharpsat.SharpSatConfiguration.SH
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.sat.SatFamily;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
-import edu.kit.provideq.formats.sat.SatFamily;
 import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFamily;
 import java.time.Duration;
 import java.util.stream.Stream;

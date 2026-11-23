@@ -92,34 +92,34 @@ graph LR
     qaoa_maxcut_report -->|"context: Gml"| gml_solution
     lp_solution -->|"context: String"| qubo_positional_solution
     qubo_positional_solution -->|"context: String"| lp_solution
-    TSP -.->|"TSP to QUBO Transformation"| TSP_Solution
-    TSP -.->|"LKH-3 TSP Solver"| TSP_Solution
-    QASM -.->|"Optimize QASM Code"| ExecutionResult
+    UMCF -.->|"U-MCF to QUBO Transformation"| UMCF_Solution
+    UMCF -.->|"(GAMS) SCIP Classical MCF Solver"| UMCF_Solution
+    MaxCut -.->|"Qiskit MaxCut"| MaxCut_Solution
+    MaxCut -.->|"Cirq MaxCut"| MaxCut_Solution
+    MaxCut -.->|"GAMS MaxCut"| MaxCut_Solution
+    QASM -.->|"Execute OpenQASM circuit"| ExecutionResult
+    FeatureModel -.->|"SAT-based Void Feature Model Solver"| VoidFeatureSolution
     QASM -.->|"Execute QASM Code"| ExecutionResult
+    QASM -.->|"Optimize QASM Code"| ExecutionResult
     FeatureModel -.->|"SAT-based Dead Feature Solver"| DeadFeatureSolution
-    QASM -.->|"Apply Tket Optimization Pass"| ExecutionResult
+    QUBO -.->|"(Qiskit) QAOA Solver for QUBOs"| QUBO_Solution
+    QUBO -.->|"(Qrisp) QAOA Solver for QUBOs"| QUBO_Solution
+    QUBO -.->|"(D-Wave) Annealing QUBO Solver"| QUBO_Solution
+    QUBO -.->|"(GAMS) SCIP Solver for QUBOs"| QUBO_Solution
     SAT -.->|"Bruteforce Exact SharpSAT solver"| SolutionCount
     SAT -.->|"Ganak SharpSAT solution counter"| SolutionCount
+    VRP -.->|"K-means Clustering (VRP -> Set of VRP)"| VRP_Solution
+    VRP -.->|"Two Phase Clustering (VRP -> Set of TSP)"| VRP_Solution
     SAT -.->|"GAMS SAT"| SAT_Solution
     SAT -.->|"Exact QRISP SAT"| SAT_Solution
     SAT -.->|"Grover-Search (Qrisp)"| SAT_Solution
-    QUBO -.->|"(Qrisp) QAOA Solver for QUBOs"| QUBO_Solution
-    QUBO -.->|"(D-Wave) Annealing QUBO Solver"| QUBO_Solution
-    QUBO -.->|"(Qiskit) QAOA Solver for QUBOs"| QUBO_Solution
-    QUBO -.->|"(GAMS) CPLEX Solver for QUBOs"| QUBO_Solution
+    TSP -.->|"LKH-3 TSP Solver"| TSP_Solution
+    TSP -.->|"TSP to QUBO Transformation"| TSP_Solution
+    QASM -.->|"Apply Tket Optimization Pass"| ExecutionResult
     Molecule -.->|"Qiskit Material Simulation"| MoleculeEnergySolution
-    Knapsack -.->|"Qiskit Knapsack"| Knapsack_Solution
     Knapsack -.->|"Horowitz-Sahni Knapsack"| Knapsack_Solution
-    VRP -.->|"Cluster before Solving"| VRP_Solution
+    Knapsack -.->|"Qiskit Knapsack"| Knapsack_Solution
     VRP -.->|"LKH-3 VRP Solver"| VRP_Solution
+    VRP -.->|"Cluster before Solving"| VRP_Solution
     VRP -.->|"Grover-based VRP Solver (Qrisp)"| VRP_Solution
-    FeatureModel -.->|"SAT-based Void Feature Model Solver"| VoidFeatureSolution
-    UMCF -.->|"(GAMS) CPLEX Classical MCF Solver"| UMCF_Solution
-    UMCF -.->|"U-MCF to QUBO Transformation"| UMCF_Solution
-    MaxCut -.->|"GAMS MaxCut"| MaxCut_Solution
-    MaxCut -.->|"Qiskit MaxCut"| MaxCut_Solution
-    MaxCut -.->|"Cirq MaxCut"| MaxCut_Solution
-    VRP -.->|"K-means Clustering (VRP -> Set of VRP)"| VRP_Solution
-    VRP -.->|"Two Phase Clustering (VRP -> Set of TSP)"| VRP_Solution
-    QASM -.->|"Execute OpenQASM circuit"| ExecutionResult
 ```

@@ -3,10 +3,9 @@ package edu.kit.provideq.toolbox.solvers.circuit_processing.executor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
-import java.util.Optional;
-
 import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResult;
 import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFormat;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class ExecutionResultFormatTest {

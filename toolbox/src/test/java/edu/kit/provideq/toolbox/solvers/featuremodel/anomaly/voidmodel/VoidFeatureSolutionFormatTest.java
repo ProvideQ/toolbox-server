@@ -3,10 +3,9 @@ package edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
-import java.util.Map;
-
 import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.formats.VoidFeatureSolution;
 import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.voidmodel.formats.VoidFeatureSolutionFormat;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class VoidFeatureSolutionFormatTest {

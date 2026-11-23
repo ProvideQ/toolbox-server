@@ -3,7 +3,6 @@ package edu.kit.provideq.toolbox.meta;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
@@ -23,6 +22,7 @@ public class Solution<OutT extends FormatFamily> {
   private String debugData;
   private String solverName;
   private long executionMilliseconds;
+  private String guardRejection;
 
   /**
    * Internal constructor, used for de-serialization.
@@ -77,6 +77,7 @@ public class Solution<OutT extends FormatFamily> {
     result.metaData = source.metaData;
     result.debugData = source.debugData;
     result.executionMilliseconds = source.executionMilliseconds;
+    result.guardRejection = source.guardRejection;
     result.solutionData = source.solutionData == null ? null : mapper.apply(source.solutionData);
     return result;
   }
@@ -191,6 +192,14 @@ public class Solution<OutT extends FormatFamily> {
 
   public void setExecutionMilliseconds(long executionMilliseconds) {
     this.executionMilliseconds = executionMilliseconds;
+  }
+
+  public String getGuardRejection() {
+    return guardRejection;
+  }
+
+  public void rejectByGuard(String reason) {
+    this.guardRejection = reason;
   }
 
   @Override

@@ -1,9 +1,12 @@
 package edu.kit.provideq.toolbox.solvers.sharpsat.solvers;
 
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessResult;
@@ -56,6 +59,11 @@ public class PythonBruteForceSolver extends SharpSatSolver {
   @Override
   public String getDescription() {
     return "Sat solution counter in python using naive bruteforce approach";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.EXACT, RuleProperty.VALID);
   }
 
   /**

@@ -10,13 +10,13 @@ import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.toolbox.api.dto.ProblemDto;
 import edu.kit.provideq.toolbox.api.dto.SubProblemReferenceDto;
-import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemManagerProvider;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -315,6 +315,7 @@ public class ApiTestHelper {
     // print error output if something went wrong
     if (problemDto.getState() != ProblemState.SOLVED
         || problemDto.getSolution().getStatus() != SolutionStatus.SOLVED) {
+      System.out.println("Testcase failed. Printing debugging info:");
       System.out.println(builder);
     }
 

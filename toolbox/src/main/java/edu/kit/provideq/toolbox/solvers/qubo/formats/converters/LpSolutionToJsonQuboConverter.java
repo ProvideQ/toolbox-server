@@ -6,7 +6,6 @@ import edu.kit.provideq.formats.core.converters.Converter;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
 import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.qubo.formats.JsonQuboSolutionFormat;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 

@@ -6,7 +6,6 @@ import edu.kit.provideq.formats.core.exceptions.FormatException;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.qubo.formats.PositionalBitsSolutionFormat;
-
 import java.util.LinkedHashSet;
 
 /**

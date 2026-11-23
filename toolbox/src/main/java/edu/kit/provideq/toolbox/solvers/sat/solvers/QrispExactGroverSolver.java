@@ -1,14 +1,19 @@
 package edu.kit.provideq.toolbox.solvers.sat.solvers;
 
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolution;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolutionFormat;
 import edu.kit.provideq.formats.core.Document;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.sat.SatFamily;
+import edu.kit.provideq.formats.sat.SatSolutionFamily;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolution;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolutionFormat;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -16,8 +21,6 @@ import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.solvers.sat.SatConfiguration;
-import edu.kit.provideq.formats.sat.SatFamily;
-import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import edu.kit.provideq.toolbox.solvers.sharpsat.SharpSatConfiguration;
 import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFamily;
 import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFormat;
@@ -64,6 +67,11 @@ public class QrispExactGroverSolver extends SatSolver {
     return "Solves SAT problems using QRISP as a quantum Grover-search problem. "
         + "It measures only possible states by utilizing result of solution numbers "
         + "from the SharpSAT solver.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.EXACT, RuleProperty.VALID);
   }
 
   @Override

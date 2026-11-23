@@ -5,20 +5,23 @@ import de.asbestian.jplex.input.LpFileReader;
 import de.asbestian.jplex.input.Variable;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import edu.kit.provideq.formats.lp.formats.LPFormat;
 import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
-import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.exception.SolverException;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ProblemProperties;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.ResultProperties;
 import edu.kit.provideq.toolbox.integration.planqk.PlanQkApi.StatusProperties;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.TextSetting;
 import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
-import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +48,12 @@ public class QuantagoniaQuboSolver extends QuboSolver {
 
   @Override
   public String getDescription() {
-    return "This solver uses Quantagoniaâ€™s HybridSolver to solve QUBO problems via PlanQK";
+    return "This solver uses QuantagoniaÃ¢â‚¬â„¢s HybridSolver to solve QUBO problems via PlanQK";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override

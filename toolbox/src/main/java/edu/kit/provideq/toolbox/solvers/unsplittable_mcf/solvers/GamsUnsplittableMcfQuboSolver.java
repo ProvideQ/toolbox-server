@@ -2,21 +2,24 @@ package edu.kit.provideq.toolbox.solvers.unsplittable_mcf.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.QuboFamily;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import edu.kit.provideq.formats.lp.formats.LPFormat;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
-import edu.kit.provideq.toolbox.solvers.qubo.formats.JsonQuboSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
-import edu.kit.provideq.formats.lp.QuboFamily;
-import edu.kit.provideq.formats.lp.QuboSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.JsonQuboSolutionFormat;
+import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.UnsplittableMcfConfiguration;
 import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfFormat;
 import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfSolutionFamily;
 import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.formats.UmcfSolutionFormat;
-import edu.kit.provideq.toolbox.solvers.unsplittable_mcf.UnsplittableMcfConfiguration;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +67,14 @@ public class GamsUnsplittableMcfQuboSolver extends GamsUnsplittableMcfSolver {
   public String getDescription() {
     return "Solves the Unsplittable Multi Commodity Flow problem by transforming it to a "
         + "QUBO problem and solving with a QUBO solver.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.WEAKLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override

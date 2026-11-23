@@ -43,6 +43,15 @@ public interface ProblemSolver<InT extends FormatFamily, OutT extends FormatFami
   String getDescription();
 
   /**
+   * Return the list of characteristics for the solver.
+   *
+   * @return list of characteristics
+   */
+  default SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE);
+  }
+
+  /**
    * Returns the sub problems used to solver this problem.
    *
    * @return list of sub problems

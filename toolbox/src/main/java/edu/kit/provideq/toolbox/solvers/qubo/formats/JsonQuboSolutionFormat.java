@@ -9,7 +9,6 @@ import edu.kit.provideq.formats.core.exceptions.SerializationException;
 import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.JsonQuboToLpSolutionConverter;
 import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.LpSolutionToJsonQuboConverter;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;

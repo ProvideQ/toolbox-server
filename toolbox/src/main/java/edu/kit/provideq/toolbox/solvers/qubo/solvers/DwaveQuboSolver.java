@@ -2,9 +2,13 @@ package edu.kit.provideq.toolbox.solvers.qubo.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import edu.kit.provideq.formats.lp.formats.LPFormat;
 import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
@@ -13,7 +17,6 @@ import edu.kit.provideq.toolbox.meta.setting.basic.TextSetting;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
 import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
-import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +82,11 @@ public class DwaveQuboSolver extends QuboSolver {
   @Override
   public String getDescription() {
     return "Solves the QUBO problem using a D-Wave Quantum Annealer.";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override

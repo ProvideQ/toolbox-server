@@ -3,11 +3,11 @@ package edu.kit.provideq.toolbox.meta;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.families.FormatFamily;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -73,7 +73,7 @@ final class SubProblems<InT extends FormatFamily, OutT extends FormatFamily>
   }
 
   /**
-   * Returns all sub-problems related to a given sub-routine.
+   * Returns all sub-problems related to a given sub-routine, in the order they were created in.
    */
   public <SubInT extends FormatFamily, SubOutT extends FormatFamily>
       Set<Problem<SubInT, SubOutT>> getProblems(
@@ -81,7 +81,7 @@ final class SubProblems<InT extends FormatFamily, OutT extends FormatFamily>
     var optionalEntry = findEntry(subRoutineDefinition);
 
     return optionalEntry
-        .map(entry -> (Set<Problem<SubInT, SubOutT>>) new HashSet<>(entry.problems))
+        .map(entry -> (Set<Problem<SubInT, SubOutT>>) new LinkedHashSet<>(entry.problems))
         .orElse(Collections.emptySet());
   }
 

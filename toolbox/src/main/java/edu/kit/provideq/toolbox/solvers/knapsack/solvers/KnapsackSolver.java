@@ -2,9 +2,9 @@ package edu.kit.provideq.toolbox.solvers.knapsack.solvers;
 
 import edu.kit.provideq.formats.knapsack.KnapsackFamily;
 import edu.kit.provideq.formats.knapsack.KnapsackSolutionFamily;
-import edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration;
 
 /**
  * A solver for Knapsack problems.

@@ -2,15 +2,18 @@ package edu.kit.provideq.toolbox.solvers.qubo.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import edu.kit.provideq.formats.lp.formats.LPFormat;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
 import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
-import edu.kit.provideq.toolbox.solvers.qubo.formats.JsonQuboSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
-import edu.kit.provideq.formats.lp.QuboSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.JsonQuboSolutionFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -38,13 +41,18 @@ public class GamsQuboSolver extends QuboSolver {
 
   @Override
   public String getName() {
-    return "(GAMS) CPLEX Solver for QUBOs";
+    return "(GAMS) SCIP Solver for QUBOs";
   }
 
   @Override
   public String getDescription() {
     return "Solves QUBO problems by transforming it into a MIP,"
-        + "which is then solved with CPLEX. Implementation is done in GAMS";
+        + "which is then solved with SCIP. Implementation is done in GAMS";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(RuleType.SOLVE, RuleProperty.VALID);
   }
 
   @Override

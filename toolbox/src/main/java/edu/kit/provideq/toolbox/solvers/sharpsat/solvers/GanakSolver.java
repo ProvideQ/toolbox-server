@@ -2,9 +2,9 @@ package edu.kit.provideq.toolbox.solvers.sharpsat.solvers;
 
 import static edu.kit.provideq.toolbox.process.ProcessRunner.INPUT_FILE_PATH;
 
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;

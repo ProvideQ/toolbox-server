@@ -4,18 +4,19 @@ import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.formats.tsplib.VrpFamily;
+import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import edu.kit.provideq.formats.tsplib.formats.VRPSolutionFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
-import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
-import edu.kit.provideq.formats.tsplib.VrpFamily;
-import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,6 +99,19 @@ public abstract class VrpClusterer implements ProblemSolver<VrpFamily, VrpSoluti
       solution.setDebugData("Failed to retrieve problem directory.");
       solution.fail();
       return solution;
+    }
+
+    // abort if any cluster could not be solved, its solution data cannot be combined
+    for (var entry : clusterSolutionMap.entrySet()) {
+      var clusterSolution = entry.getValue();
+      if (clusterSolution.getStatus() != SolutionStatus.SOLVED
+          || clusterSolution.getSolutionData() == null) {
+        solution.setDebugData("Cluster " + entry.getKey().getFileName()
+            + " could not be solved (status " + clusterSolution.getStatus() + "): "
+            + clusterSolution.getDebugData());
+        solution.abort();
+        return solution;
+      }
     }
 
     // write solutions of the clusters into files:

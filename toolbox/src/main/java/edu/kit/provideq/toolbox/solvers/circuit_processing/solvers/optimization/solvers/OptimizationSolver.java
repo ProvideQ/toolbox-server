@@ -2,13 +2,14 @@ package edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
-import edu.kit.provideq.formats.qasm.formats.QasmFormat;
-import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.formats.qasm.QasmFamily;
-import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.CircuitProcessingSolver;
-import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFamily;
+import edu.kit.provideq.formats.qasm.formats.QasmFormat;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.meta.RuleProperty;
+import edu.kit.provideq.toolbox.meta.RuleType;
+import edu.kit.provideq.toolbox.meta.Solution;
+import edu.kit.provideq.toolbox.meta.SolverCharacteristics;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -16,10 +17,11 @@ import edu.kit.provideq.toolbox.meta.setting.SolverSetting;
 import edu.kit.provideq.toolbox.meta.setting.basic.SelectSetting;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.process.PythonProcessRunner;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.formats.ExecutionResultFamily;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.CircuitProcessingSolver;
+import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization.OptimizationConfiguration;
 import java.util.List;
 import java.util.Map;
-
-import edu.kit.provideq.toolbox.solvers.circuit_processing.solvers.optimization.OptimizationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -61,8 +63,16 @@ public class OptimizationSolver
 
   @Override
   public String getDescription() {
-    return "Transform the given circuit into an optimized but equivalent circuit using"
+    return "Transform the given circuit into an optimized but equivalent circuit using "
         + "Tket compilation passes (e.g. removing redundancies).";
+  }
+
+  @Override
+  public SolverCharacteristics getCharacteristics() {
+    return SolverCharacteristics.of(
+        RuleType.REFORMULATION,
+        RuleProperty.STRONGLY_CONSTRAINT_PRESERVING,
+        RuleProperty.OPTIMAL_SOLUTION_PRESERVING);
   }
 
   @Override

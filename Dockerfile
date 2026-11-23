@@ -58,6 +58,7 @@ COPY --from=builder /app/build/jre /opt/java
 ENV PATH="${PATH}:/opt/java/bin"
 
 # Install the toolbox server and its solver scripts
+ARG GAMSPY_LICENSE
 COPY toolbox/solvers solvers
 COPY toolbox/demonstrators demonstrators
 RUN scripts/ci-setup-solvers.sh
