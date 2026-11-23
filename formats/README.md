@@ -14,7 +14,7 @@ slim core with pluggable format modules on top.
 | Module         | Content                                             |
 |----------------|-----------------------------------------------------|
 | `formats` | Format/Converter/Attribute abstractions, registry, services, errors |
-| `formats-cnf`  | DIMACS CNF + solution formats, logical expressions  |
+| `formats-sat`  | DIMACS CNF + solution formats, logical expressions  |
 | `formats-gml`  | GML graph format                                    |
 | `formats-knapsack`  | Knapsack problem format                             |
 | `formats-lp`  | LP problem format (QUBO)                            |
@@ -86,7 +86,7 @@ For expensive formats, use `AttributeReader.lazy(...)` to read the attribute dir
 raw input with a cheap single-pass scan instead of parsing the full object.
 
 4. Register everything via a `<Family>Formats.register(...)` bundle method, as done in
-   `CnfFormats`. Attribute readers need no separate registration.
+   `SatFormats`. Attribute readers need no separate registration.
 
 ## Design notes
 

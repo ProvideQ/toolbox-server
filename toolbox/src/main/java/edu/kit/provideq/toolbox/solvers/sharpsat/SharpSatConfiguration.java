@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.solvers.sharpsat;
 
-import edu.kit.provideq.formats.cnf.dimacs.LogicalExpressionFormat;
+import edu.kit.provideq.formats.sat.formats.logical.LogicalExpressionFormat;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.ResourceProvider;
@@ -8,7 +8,8 @@ import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.solvers.sat.SatFamily;
+import edu.kit.provideq.formats.sat.SatFamily;
+import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFamily;
 import edu.kit.provideq.toolbox.solvers.sharpsat.solvers.GanakSolver;
 import edu.kit.provideq.toolbox.solvers.sharpsat.solvers.PythonBruteForceSolver;
 import java.io.IOException;

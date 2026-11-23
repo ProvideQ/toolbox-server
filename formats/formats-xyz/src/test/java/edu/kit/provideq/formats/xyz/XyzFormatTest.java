@@ -3,6 +3,7 @@ package edu.kit.provideq.formats.xyz;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.xyz.formats.XYZMoleculeFormat;
 import org.junit.jupiter.api.Test;
 
 /**

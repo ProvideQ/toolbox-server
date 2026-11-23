@@ -2,12 +2,20 @@ package edu.kit.provideq.toolbox.solvers.qubo;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.formats.lp.LPFormat;
+import edu.kit.provideq.formats.lp.formats.LPFormat;
+import edu.kit.provideq.formats.lp.QuboFamily;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.JsonQuboSolutionFormat;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.PositionalBitsSolutionFormat;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.JsonQuboToLpSolutionConverter;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.LpSolutionToJsonQuboConverter;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.LpSolutionToPositionalBitsConverter;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.PositionalBitsToLpSolutionConverter;
 import edu.kit.provideq.toolbox.solvers.qubo.solvers.DwaveQuboSolver;
 import edu.kit.provideq.toolbox.solvers.qubo.solvers.GamsQuboSolver;
 import edu.kit.provideq.toolbox.solvers.qubo.solvers.QiskitQuboSolver;
@@ -48,6 +56,8 @@ public class QuboConfiguration {
   @Bean
   QuboSolutionFamily registerQuboSolutionFamily(ConversionRegistry registry) {
     registry.registerFormat(QuboSolutionFamily.INSTANCE);
+    registry.registerFormat(JsonQuboSolutionFormat.INSTANCE);
+    registry.registerFormat(PositionalBitsSolutionFormat.INSTANCE);
     return QuboSolutionFamily.INSTANCE;
   }
 

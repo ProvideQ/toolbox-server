@@ -1,6 +1,7 @@
 package edu.kit.provideq.formats.gml;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.gml.formats.GmlFormat;
 
 /**
  * Bundles all GML module formats for registration.

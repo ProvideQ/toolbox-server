@@ -12,11 +12,11 @@ java {
 
 dependencies {
     api project(':formats:formats')
-    api project(':formats:formats-cnf')
     api project(':formats:formats-gml')
     api project(':formats:formats-knapsack')
     api project(':formats:formats-lp')
     api project(':formats:formats-qasm')
+    api project(':formats:formats-sat')
     api project(':formats:formats-tsplib')
     api project(':formats:formats-uvl')
     api project(':formats:formats-xyz')

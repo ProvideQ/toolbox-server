@@ -3,8 +3,8 @@ package edu.kit.provideq.toolbox.solvers.qubo.solvers;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.solvers.qubo.QuboConfiguration;
-import edu.kit.provideq.toolbox.solvers.qubo.QuboFamily;
-import edu.kit.provideq.toolbox.solvers.qubo.QuboSolutionFamily;
+import edu.kit.provideq.formats.lp.QuboFamily;
+import edu.kit.provideq.formats.lp.QuboSolutionFamily;
 
 /**
  * A solver for quadratic unconstrained binary optimization problems.

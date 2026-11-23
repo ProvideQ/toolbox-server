@@ -3,8 +3,8 @@ package edu.kit.provideq.toolbox.unsplittablemcf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
-import edu.kit.provideq.toolbox.solvers.unsplittablemcf.UmcfFormat;
-import edu.kit.provideq.toolbox.solvers.unsplittablemcf.UmcfInstance;
+import edu.kit.provideq.toolbox.solvers.unsplittablemcf.formats.UmcfFormat;
+import edu.kit.provideq.toolbox.solvers.unsplittablemcf.formats.UmcfInstance;
 import org.junit.jupiter.api.Test;
 
 class UmcfFormatTest {

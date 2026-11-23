@@ -2,8 +2,8 @@ package edu.kit.provideq.toolbox.solvers.unsplittablemcf.solvers;
 
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.solvers.unsplittablemcf.UmcfFamily;
-import edu.kit.provideq.toolbox.solvers.unsplittablemcf.UmcfSolutionFamily;
+import edu.kit.provideq.toolbox.solvers.unsplittablemcf.formats.UmcfFamily;
+import edu.kit.provideq.toolbox.solvers.unsplittablemcf.formats.UmcfSolutionFamily;
 import edu.kit.provideq.toolbox.solvers.unsplittablemcf.UnsplittableMcfConfiguration;
 
 /**

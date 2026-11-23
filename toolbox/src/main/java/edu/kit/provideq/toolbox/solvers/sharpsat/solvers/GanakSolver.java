@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.solvers.sharpsat.solvers;
 
 import static edu.kit.provideq.toolbox.process.ProcessRunner.INPUT_FILE_PATH;
 
-import edu.kit.provideq.formats.cnf.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.toolbox.meta.Solution;
@@ -11,9 +11,9 @@ import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.ProcessResult;
 import edu.kit.provideq.toolbox.solvers.sharpsat.SharpSatConfiguration;
-import edu.kit.provideq.toolbox.solvers.sharpsat.SolutionCount;
-import edu.kit.provideq.toolbox.solvers.sharpsat.SolutionCountFamily;
-import edu.kit.provideq.toolbox.solvers.sharpsat.SolutionCountFormat;
+import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCount;
+import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFamily;
+import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.toolbox.solvers.processing.QasmFamily;
+import edu.kit.provideq.formats.qasm.QasmFamily;
 import edu.kit.provideq.toolbox.solvers.processing.solvers.MoveToExecutionSolver;
 import edu.kit.provideq.toolbox.solvers.processing.solvers.MoveToOptimizationSolver;
 import edu.kit.provideq.toolbox.solvers.processing.solvers.executor.ExecutionResultFamily;

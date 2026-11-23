@@ -3,8 +3,8 @@ package edu.kit.provideq.toolbox.solvers.vrp.solvers;
 import edu.kit.provideq.toolbox.meta.ProblemSolver;
 import edu.kit.provideq.toolbox.meta.ProblemType;
 import edu.kit.provideq.toolbox.solvers.vrp.VrpConfiguration;
-import edu.kit.provideq.toolbox.solvers.vrp.VrpFamily;
-import edu.kit.provideq.toolbox.solvers.vrp.VrpSolutionFamily;
+import edu.kit.provideq.formats.tsplib.VrpFamily;
+import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 
 /**
  * A solver for VRP problems.

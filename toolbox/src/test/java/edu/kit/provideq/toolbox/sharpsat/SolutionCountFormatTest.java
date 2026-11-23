@@ -3,8 +3,8 @@ package edu.kit.provideq.toolbox.sharpsat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
-import edu.kit.provideq.toolbox.solvers.sharpsat.SolutionCount;
-import edu.kit.provideq.toolbox.solvers.sharpsat.SolutionCountFormat;
+import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCount;
+import edu.kit.provideq.toolbox.solvers.sharpsat.formats.SolutionCountFormat;
 import org.junit.jupiter.api.Test;
 
 class SolutionCountFormatTest {

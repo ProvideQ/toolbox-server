@@ -5,6 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.FormattedValue;
 import java.util.stream.Stream;
+
+import edu.kit.provideq.formats.tsplib.formats.TSPLIBFormat;
+import edu.kit.provideq.formats.tsplib.formats.TSPLIBSolutionFormat;
+import edu.kit.provideq.formats.tsplib.formats.VRPFormat;
+import edu.kit.provideq.formats.tsplib.formats.VRPSolutionFormat;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;

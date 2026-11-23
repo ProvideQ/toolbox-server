@@ -2,7 +2,9 @@ package edu.kit.provideq.toolbox.solvers.vrp;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.formats.tsplib.VRPFormat;
+import edu.kit.provideq.formats.tsplib.formats.VRPFormat;
+import edu.kit.provideq.formats.tsplib.VrpFamily;
+import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;

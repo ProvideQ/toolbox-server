@@ -3,6 +3,7 @@ package edu.kit.provideq.formats.qasm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
+import edu.kit.provideq.formats.qasm.formats.QasmFormat;
 import org.junit.jupiter.api.Test;
 
 class QasmFormatTest {

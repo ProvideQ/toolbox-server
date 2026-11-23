@@ -2,11 +2,11 @@ package edu.kit.provideq.toolbox.solvers.materialsimulation.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
-import edu.kit.provideq.formats.xyz.XYZMoleculeFormat;
+import edu.kit.provideq.formats.xyz.formats.XYZMoleculeFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.solvers.materialsimulation.MaterialSimulationConfiguration;
-import edu.kit.provideq.toolbox.solvers.materialsimulation.MoleculeEnergySolutionFamily;
-import edu.kit.provideq.toolbox.solvers.materialsimulation.MoleculeEnergySolutionFormat;
+import edu.kit.provideq.toolbox.solvers.materialsimulation.formats.MoleculeEnergySolutionFamily;
+import edu.kit.provideq.toolbox.solvers.materialsimulation.formats.MoleculeEnergySolutionFormat;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.meta.setting.SolverSetting;

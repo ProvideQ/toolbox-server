@@ -1,6 +1,8 @@
 package edu.kit.provideq.formats.lp;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.lp.formats.LPFormat;
+import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
 
 /**
  * Bundles all LP module formats for registration.

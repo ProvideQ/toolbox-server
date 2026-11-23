@@ -2,8 +2,8 @@ package edu.kit.provideq.toolbox.solvers.vrp.clusterer;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
-import edu.kit.provideq.formats.tsplib.TSPLIBFormat;
-import edu.kit.provideq.formats.tsplib.VRPFormat;
+import edu.kit.provideq.formats.tsplib.formats.TSPLIBFormat;
+import edu.kit.provideq.formats.tsplib.formats.VRPFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineDefinition;
@@ -12,9 +12,9 @@ import edu.kit.provideq.toolbox.process.DefaultProcessRunner;
 import edu.kit.provideq.toolbox.process.MultiFileProcessResultReader;
 import edu.kit.provideq.toolbox.process.ProcessRunner;
 import edu.kit.provideq.toolbox.solvers.tsp.TspConfiguration;
-import edu.kit.provideq.toolbox.solvers.tsp.TspFamily;
-import edu.kit.provideq.toolbox.solvers.tsp.TspSolutionFamily;
-import edu.kit.provideq.toolbox.solvers.vrp.VrpSolutionFamily;
+import edu.kit.provideq.formats.tsplib.TspLibFamily;
+import edu.kit.provideq.formats.tsplib.TspSolutionFamily;
+import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class TwoPhaseClusterer extends VrpClusterer {
 
-  protected static final SubRoutineDefinition<TspFamily, TspSolutionFamily> TSP_SUBROUTINE =
+  protected static final SubRoutineDefinition<TspLibFamily, TspSolutionFamily> TSP_SUBROUTINE =
       SubRoutineDefinition.of(
           TspConfiguration.TSP,
           "Solve a TSP problem",

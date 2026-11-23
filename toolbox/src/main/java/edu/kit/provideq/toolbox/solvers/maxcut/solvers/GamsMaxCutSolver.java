@@ -2,11 +2,11 @@ package edu.kit.provideq.toolbox.solvers.maxcut.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
-import edu.kit.provideq.formats.gml.GmlFormat;
-import edu.kit.provideq.formats.gml.GmlSolutionFormat;
+import edu.kit.provideq.formats.gml.formats.GmlFormat;
+import edu.kit.provideq.formats.gml.formats.GmlSolutionFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.solvers.maxcut.MaxCutConfiguration;
-import edu.kit.provideq.toolbox.solvers.maxcut.MaxCutSolutionFamily;
+import edu.kit.provideq.formats.gml.MaxCutSolutionFamily;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
 import edu.kit.provideq.toolbox.process.GamsProcessRunner;

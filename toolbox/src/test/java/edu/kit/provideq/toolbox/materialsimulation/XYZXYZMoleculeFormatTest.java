@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.Document;
 import edu.kit.provideq.formats.core.FormattedValue;
-import edu.kit.provideq.formats.xyz.XYZAtom;
-import edu.kit.provideq.formats.xyz.XYZMolecule;
-import edu.kit.provideq.formats.xyz.XYZMoleculeFormat;
+import edu.kit.provideq.formats.xyz.formats.XYZAtom;
+import edu.kit.provideq.formats.xyz.formats.XYZMolecule;
+import edu.kit.provideq.formats.xyz.formats.XYZMoleculeFormat;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

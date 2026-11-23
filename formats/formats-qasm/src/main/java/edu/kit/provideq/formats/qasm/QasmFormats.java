@@ -1,6 +1,7 @@
 package edu.kit.provideq.formats.qasm;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.qasm.formats.QasmFormat;
 
 /**
  * Bundles all QASM module formats for registration.

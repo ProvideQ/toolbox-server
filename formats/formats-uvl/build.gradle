@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     api project(':formats:formats')
-    api project(':formats:formats-cnf')
+    api project(':formats:formats-sat')
 
     // FeatureIDE feature-model library, provided as a local jar in the toolbox-server repository
     implementation files("${rootProject.projectDir}/toolbox/lib/de.ovgu.featureide.lib.fm-v3.9.1.jar")

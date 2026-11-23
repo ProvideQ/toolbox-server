@@ -1,6 +1,7 @@
 package edu.kit.provideq.toolbox.solvers.featuremodel;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.uvl.FeatureModelFamily;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

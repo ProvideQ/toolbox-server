@@ -1,6 +1,8 @@
 package edu.kit.provideq.formats.knapsack;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
+import edu.kit.provideq.formats.knapsack.formats.KnapsackFormat;
+import edu.kit.provideq.formats.knapsack.formats.KnapsackSolutionFormat;
 
 /**
  * Bundles all knapsack module formats for registration.

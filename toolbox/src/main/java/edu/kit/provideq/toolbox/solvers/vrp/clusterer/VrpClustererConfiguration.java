@@ -1,14 +1,14 @@
 package edu.kit.provideq.toolbox.solvers.vrp.clusterer;
 
 import edu.kit.provideq.formats.core.FormattedValue;
-import edu.kit.provideq.formats.tsplib.VRPFormat;
+import edu.kit.provideq.formats.tsplib.formats.VRPFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
 import edu.kit.provideq.toolbox.meta.ProblemManager;
 import edu.kit.provideq.toolbox.meta.ProblemType;
-import edu.kit.provideq.toolbox.solvers.vrp.VrpFamily;
-import edu.kit.provideq.toolbox.solvers.vrp.VrpSolutionFamily;
+import edu.kit.provideq.formats.tsplib.VrpFamily;
+import edu.kit.provideq.formats.tsplib.VrpSolutionFamily;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;

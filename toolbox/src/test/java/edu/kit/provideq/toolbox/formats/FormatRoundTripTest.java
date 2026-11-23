@@ -4,14 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.FormattedValue;
-import edu.kit.provideq.formats.lp.LPSolutionFormat;
+import edu.kit.provideq.formats.gml.formats.GmlSolutionFormat;
+import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.demonstrators.DemonstratorInputFormat;
 import edu.kit.provideq.toolbox.demonstrators.DemonstratorReportFormat;
-import edu.kit.provideq.toolbox.solvers.materialsimulation.MoleculeEnergySolutionFormat;
-import edu.kit.provideq.toolbox.solvers.qubo.JsonQuboSolutionFormat;
-import edu.kit.provideq.toolbox.solvers.qubo.JsonQuboToLpSolutionConverter;
-import edu.kit.provideq.toolbox.solvers.qubo.LpSolutionToJsonQuboConverter;
-import edu.kit.provideq.toolbox.solvers.unsplittablemcf.UmcfSolutionFormat;
+import edu.kit.provideq.toolbox.solvers.materialsimulation.formats.MoleculeEnergySolutionFormat;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.JsonQuboSolutionFormat;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.JsonQuboToLpSolutionConverter;
+import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.LpSolutionToJsonQuboConverter;
+import edu.kit.provideq.toolbox.solvers.unsplittablemcf.formats.UmcfSolutionFormat;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -43,7 +44,7 @@ class FormatRoundTripTest {
 
   static Stream<Arguments> formats() {
     return Stream.of(
-        Arguments.of(edu.kit.provideq.formats.gml.GmlSolutionFormat.INSTANCE, GML_SOLUTION_SAMPLE),
+        Arguments.of(GmlSolutionFormat.INSTANCE, GML_SOLUTION_SAMPLE),
         Arguments.of(DemonstratorInputFormat.INSTANCE, "demonstrator payload\n"),
         Arguments.of(DemonstratorReportFormat.INSTANCE, "demonstrator report\n"),
         Arguments.of(MoleculeEnergySolutionFormat.INSTANCE, "-1.0579\n"),

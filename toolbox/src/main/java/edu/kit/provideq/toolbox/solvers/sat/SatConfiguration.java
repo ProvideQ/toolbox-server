@@ -1,6 +1,8 @@
 package edu.kit.provideq.toolbox.solvers.sat;
 
-import edu.kit.provideq.formats.cnf.dimacs.LogicalExpressionFormat;
+import edu.kit.provideq.formats.sat.formats.logical.LogicalExpressionFormat;
+import edu.kit.provideq.formats.sat.SatFamily;
+import edu.kit.provideq.formats.sat.SatSolutionFamily;
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.toolbox.ResourceProvider;

@@ -1,6 +1,6 @@
 package edu.kit.provideq.toolbox.formats;
 
-import edu.kit.provideq.formats.cnf.dimacs.CnfFormats;
+import edu.kit.provideq.formats.sat.SatFormats;
 import edu.kit.provideq.formats.core.attributes.AttributeService;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.converters.ConversionService;
@@ -9,8 +9,8 @@ import edu.kit.provideq.formats.knapsack.KnapsackFormats;
 import edu.kit.provideq.formats.lp.LpFormats;
 import edu.kit.provideq.formats.qasm.QasmFormats;
 import edu.kit.provideq.formats.tsplib.TsplibFormats;
-import edu.kit.provideq.formats.ufl.UvlFormats;
-import edu.kit.provideq.formats.xyz.XyzFormats;
+import edu.kit.provideq.formats.uvl.UvlFormats;
+import edu.kit.provideq.formats.xyz.XYZFormats;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,14 +33,14 @@ public class FormatsConfiguration {
   @Bean
   public ConversionRegistry conversionRegistry() {
     var registry = new ConversionRegistry();
-    CnfFormats.register(registry);
+    SatFormats.register(registry);
     GmlFormats.register(registry);
     KnapsackFormats.register(registry);
     LpFormats.register(registry);
     QasmFormats.register(registry);
     TsplibFormats.register(registry);
     UvlFormats.register(registry);
-    XyzFormats.register(registry);
+    XYZFormats.register(registry);
 
     return registry;
   }
