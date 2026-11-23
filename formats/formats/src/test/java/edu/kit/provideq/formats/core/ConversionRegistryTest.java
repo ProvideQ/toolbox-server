@@ -112,7 +112,7 @@ class ConversionRegistryTest {
     var registry = new ConversionRegistry();
     registry.registerConverter(new FuncConverter<>(
         FORMAT_A, FORMAT_D,
-        value -> {
+        _ -> {
           throw new FormatException("boom");
         }));
     registry.seal();

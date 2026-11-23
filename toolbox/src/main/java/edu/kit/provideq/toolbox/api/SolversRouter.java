@@ -51,7 +51,7 @@ public class SolversRouter {
     var problemType = manager.getType();
     return route().GET(
         getSolversRouteForProblemType(problemType),
-        req -> handleSolversRouteForManager(manager),
+            _ -> handleSolversRouteForManager(manager),
         ops -> handleSolversRouteDocumentation(ops, manager)
     ).build();
   }

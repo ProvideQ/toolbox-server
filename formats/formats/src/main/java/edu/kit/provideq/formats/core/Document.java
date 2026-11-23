@@ -74,7 +74,11 @@ public final class Document<T> {
    */
   public T parse() throws ParseException {
     if (parsed == null) {
-      parsed = parser.parse(source);
+      if (parser != null) {
+        parsed = parser.parse(source);
+      } else {
+        throw new ParseException("no parser available");
+      }
     }
 
     return parsed;

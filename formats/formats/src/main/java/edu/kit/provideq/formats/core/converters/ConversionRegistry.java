@@ -362,7 +362,7 @@ public class ConversionRegistry {
       var key = entry.key();
 
       // each (target, context type) state is discovered once, at its shortest path length
-      pathMap.computeIfAbsent(key.format(), k -> new ArrayList<>())
+      pathMap.computeIfAbsent(key.format(), _ -> new ArrayList<>())
           .add(new ConversionPath(entry.steps(), key.contextType()));
 
       for (var converter : outgoing.get(key.format())) {
@@ -400,7 +400,7 @@ public class ConversionRegistry {
    * Returns a copy of the steps with the given step appended.
    */
   private static List<Object> appendStep(List<Object> steps, Object step) {
-    var copy = new ArrayList<Object>(steps);
+    var copy = new ArrayList<>(steps);
     copy.add(step);
     return List.copyOf(copy);
   }

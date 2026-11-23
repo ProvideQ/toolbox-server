@@ -183,7 +183,7 @@ public class ApiTestHelper {
     while (System.currentTimeMillis() < deadline) {
       var allAssigned = !current.getSubProblems().isEmpty()
           && current.getSubProblems().stream()
-              .allMatch(reference -> !reference.getSubProblemIds().isEmpty());
+              .noneMatch(reference -> reference.getSubProblemIds().isEmpty());
       if (allAssigned) {
         return current;
       }
@@ -242,9 +242,7 @@ public class ApiTestHelper {
     // Timeout throwing exception in x seconds
     Mono.delay(Duration.ofSeconds(seconds))
         .flux()
-        .doOnNext(x -> {
-          hasTimeout.set(true);
-        })
+        .doOnNext(_ -> hasTimeout.set(true))
         .subscribe();
 
     // Wait for problem 10 times
@@ -270,7 +268,7 @@ public class ApiTestHelper {
       }
       assertNotNull(problemDto);
 
-      builder.append("Fetched problem: " + problemDto + "\n");
+      builder.append("Fetched problem: ").append(problemDto).append("\n");
 
       if (problemDto.getState() == ProblemState.SOLVED) {
         System.out.println(problemId + " solved successful.");
@@ -287,11 +285,9 @@ public class ApiTestHelper {
               .expectBody(ProblemDto.class)
               .returnResult()
               .getResponseBody();
-          builder.append("Fetched sub problem: " + subProblemDto + "\n");
+          builder.append("Fetched sub problem: ").append(subProblemDto).append("\n");
 
           if (subProblemDto == null) {
-            System.out.println("Subproblem with id " + subProblemId
-                + " will terminate because subProblemDto is null");
             System.out.println("subProblem: " + subProblem);
             System.out.println("Log: " + builder);
           }

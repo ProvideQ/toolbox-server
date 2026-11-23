@@ -68,7 +68,7 @@ class AttributeServiceTest {
     registry.seal();
     var attributeService = new AttributeService(registry, new ConversionService(registry));
     // attribute only defined on an isolated format without any conversion path
-    var isolated = formatWithCount("isolated");
+    var _ = formatWithCount("isolated");
 
     assertThrows(AttributeNotFoundException.class,
         () -> attributeService.read("x", formatA, "count", Integer.class));
@@ -103,7 +103,7 @@ class AttributeServiceTest {
   void lazyReaderAvoidsFullParse() throws FormatException {
     var lazyFormat = new TestFormat<>("lazy", Map.of(
         "count", AttributeReader.lazy(
-            Integer.class, input -> 42, value -> {
+            Integer.class, _ -> 42, _ -> {
               throw new AssertionError("full parse must not happen for lazy readers");
             })));
     var registry = new ConversionRegistry();

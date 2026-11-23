@@ -60,7 +60,7 @@ class SolverExceptionHandlingTest {
           SolvingProperties properties,
           ConversionService conversionService) {
         return Mono.just("value")
-            .map(value -> {
+            .map(_ -> {
               throw new ConversionException("late conversion failure");
             });
       }

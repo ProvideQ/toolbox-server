@@ -214,7 +214,7 @@ class SubProblemsConversionTest {
         SolvingProperties properties,
         ConversionService conversionService) {
       return subRoutineResolver.runSubRoutine(definition, input, conversionService)
-          .map(subSolution -> {
+          .map(_ -> {
             var solution = new Solution<>(this);
             solution.setSolutionData("done", FORMAT_F1);
             solution.complete();

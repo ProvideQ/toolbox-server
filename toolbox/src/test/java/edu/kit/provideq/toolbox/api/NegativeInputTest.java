@@ -1,11 +1,10 @@
 package edu.kit.provideq.toolbox.api;
 
-import static edu.kit.provideq.toolbox.knapsack.KnapsackConfiguration.KNAPSACK;
-import static edu.kit.provideq.toolbox.sat.SatConfiguration.SAT;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static edu.kit.provideq.toolbox.solvers.knapsack.KnapsackConfiguration.KNAPSACK;
+import static edu.kit.provideq.toolbox.solvers.sat.SatConfiguration.SAT;
+import static org.junit.jupiter.api.Assertions.*;
 
-import edu.kit.provideq.toolbox.SolutionStatus;
+import edu.kit.provideq.toolbox.meta.SolutionStatus;
 import edu.kit.provideq.toolbox.meta.ProblemState;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,8 +78,8 @@ class NegativeInputTest {
 
     assertNotNull(solved, "Problem did not finish solving in time");
     assertNotNull(solved.getSolution());
-    assertTrue(solved.getSolution().getStatus() != SolutionStatus.SOLVED,
-        "Unparseable input must not produce a solved solution: " + solved);
+    assertNotSame(SolutionStatus.SOLVED, solved.getSolution().getStatus(),
+            "Unparseable input must not produce a solved solution: " + solved);
   }
 
   @Test
