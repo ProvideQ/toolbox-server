@@ -6,6 +6,7 @@ import edu.kit.provideq.formats.core.FormatReader;
 import edu.kit.provideq.formats.core.FormatType;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.core.exceptions.SerializationException;
+import edu.kit.provideq.formats.lp.formats.LPSolutionFormat;
 import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.JsonQuboToLpSolutionConverter;
 import edu.kit.provideq.toolbox.solvers.qubo.formats.converters.LpSolutionToJsonQuboConverter;
 

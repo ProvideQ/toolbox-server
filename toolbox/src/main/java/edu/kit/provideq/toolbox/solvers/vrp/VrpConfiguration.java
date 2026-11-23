@@ -72,7 +72,7 @@ public class VrpConfiguration {
       for (var problemName : problemNames) {
         var problemStream = Objects.requireNonNull(getClass().getResourceAsStream(problemName),
             "Problem " + problemName + " not found");
-        var problem = new Problem<VrpFamily, VrpSolutionFamily>(VRP);
+        var problem = new Problem<>(VRP);
         problem.setInput(FormattedValue.of(
 
             resourceProvider.readStream(problemStream), VRPFormat.INSTANCE));

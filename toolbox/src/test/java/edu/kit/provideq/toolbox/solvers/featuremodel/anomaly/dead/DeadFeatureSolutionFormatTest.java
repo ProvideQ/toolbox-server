@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.kit.provideq.formats.core.FormattedValue;
 import java.util.List;
 
-import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.DeadFeatureSolution;
-import edu.kit.provideq.toolbox.solvers.featuremodel.anomaly.dead.DeadFeatureSolutionFormat;
 import org.junit.jupiter.api.Test;
 
 class DeadFeatureSolutionFormatTest {

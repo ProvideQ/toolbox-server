@@ -46,7 +46,7 @@ public class VrpClustererConfiguration {
           getClass().getResourceAsStream("../CMT1.vrp"),
           "Simple VRP CMT1 Problem unavailable!"
       );
-      var problem = new Problem<VrpFamily, VrpSolutionFamily>(CLUSTER_VRP);
+      var problem = new Problem<>(CLUSTER_VRP);
       problem.setInput(FormattedValue.of(
 
           resourceProvider.readStream(problemStream), VRPFormat.INSTANCE));
