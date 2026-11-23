@@ -1,12 +1,12 @@
 package edu.kit.provideq.formats.sat.converters;
 
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
-import edu.kit.provideq.formats.sat.formats.logical.LogicalExpressionFormat;
-import edu.kit.provideq.formats.sat.formats.dimacs.Variable;
 import edu.kit.provideq.formats.core.Document;
 import edu.kit.provideq.formats.core.converters.FuncConverter;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
+import edu.kit.provideq.formats.sat.formats.dimacs.Variable;
+import edu.kit.provideq.formats.sat.formats.logical.LogicalExpressionFormat;
 import java.util.StringJoiner;
 
 /**

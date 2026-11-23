@@ -7,7 +7,6 @@ import com.bpodgursky.jbool_expressions.Or;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
 import edu.kit.provideq.formats.sat.formats.dimacs.Variable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

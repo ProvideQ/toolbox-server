@@ -3,7 +3,6 @@ package edu.kit.provideq.formats.uvl;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.formats.uvl.formats.UvlFormat;
-
 import java.util.Set;
 
 /**

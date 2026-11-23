@@ -5,7 +5,6 @@ import edu.kit.provideq.formats.core.converters.Converter;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
 import edu.kit.provideq.formats.tsplib.formats.TSPLIBFormat;
 import edu.kit.provideq.formats.tsplib.formats.VRPFormat;
-
 import java.util.ArrayList;
 import java.util.Locale;
 

@@ -2,7 +2,6 @@ package edu.kit.provideq.formats.sat.converters;
 
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolution;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -4,7 +4,7 @@ import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.xyz.MoleculeFamily;
-import edu.kit.provideq.formats.xyz.formats.XYZMoleculeFormat;
+import edu.kit.provideq.formats.xyz.formats.XyzMoleculeFormat;
 import edu.kit.provideq.toolbox.ResourceProvider;
 import edu.kit.provideq.toolbox.exception.MissingExampleException;
 import edu.kit.provideq.toolbox.meta.Problem;
@@ -69,7 +69,7 @@ public class MaterialSimulationConfiguration {
       );
       var problem = new Problem<>(MATERIAL_SIMULATION);
       problem.setInput(FormattedValue.parse(
-          resourceProvider.readStream(problemInputStream), XYZMoleculeFormat.INSTANCE));
+          resourceProvider.readStream(problemInputStream), XyzMoleculeFormat.INSTANCE));
       return Set.of(problem);
     } catch (IOException | ParseException e) {
       throw new MissingExampleException(MATERIAL_SIMULATION, e);

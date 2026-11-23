@@ -1,9 +1,8 @@
 package edu.kit.provideq.formats.sat.converters;
 
 import edu.kit.provideq.formats.core.exceptions.ParseException;
-import edu.kit.provideq.formats.sat.formats.dimacs.Variable;
 import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
-
+import edu.kit.provideq.formats.sat.formats.dimacs.Variable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

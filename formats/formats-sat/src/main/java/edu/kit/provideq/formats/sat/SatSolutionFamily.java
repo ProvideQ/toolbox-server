@@ -1,9 +1,9 @@
 package edu.kit.provideq.formats.sat;
 
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolutionFormat;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.families.FormatFamily;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfSolutionFormat;
 import java.util.Set;
 
 /**

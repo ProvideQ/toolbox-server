@@ -1,7 +1,6 @@
 package edu.kit.provideq.formats.gml.formats;
 
 import edu.kit.provideq.formats.core.exceptions.ParseException;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;

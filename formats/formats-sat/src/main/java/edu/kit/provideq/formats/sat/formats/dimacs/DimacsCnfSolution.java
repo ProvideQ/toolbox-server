@@ -1,7 +1,6 @@
 package edu.kit.provideq.formats.sat.formats.dimacs;
 
 import edu.kit.provideq.formats.sat.converters.StringToDimacsCnfSolution;
-
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;

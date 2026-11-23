@@ -8,7 +8,6 @@ import edu.kit.provideq.formats.core.attributes.AttributeReader;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.core.exceptions.SerializationException;
 import edu.kit.provideq.formats.knapsack.formats.representation.KnapsackSolution;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;

@@ -9,10 +9,9 @@ import edu.kit.provideq.formats.core.converters.ConversionRegistry;
 import edu.kit.provideq.formats.core.converters.ConversionService;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
-import java.util.stream.Stream;
-
 import edu.kit.provideq.formats.gml.formats.Gml;
 import edu.kit.provideq.formats.gml.formats.GmlFormat;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

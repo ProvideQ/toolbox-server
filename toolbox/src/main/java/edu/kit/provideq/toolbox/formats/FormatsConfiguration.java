@@ -10,7 +10,7 @@ import edu.kit.provideq.formats.qasm.QasmFormats;
 import edu.kit.provideq.formats.sat.SatFormats;
 import edu.kit.provideq.formats.tsplib.TsplibFormats;
 import edu.kit.provideq.formats.uvl.UvlFormats;
-import edu.kit.provideq.formats.xyz.XYZFormats;
+import edu.kit.provideq.formats.xyz.XyzFormats;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,7 +40,7 @@ public class FormatsConfiguration {
     QasmFormats.register(registry);
     TsplibFormats.register(registry);
     UvlFormats.register(registry);
-    XYZFormats.register(registry);
+    XyzFormats.register(registry);
 
     return registry;
   }

@@ -9,7 +9,6 @@ import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.core.exceptions.SerializationException;
 import edu.kit.provideq.formats.knapsack.formats.representation.KnapsackItem;
 import edu.kit.provideq.formats.knapsack.formats.representation.KnapsackProblem;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;

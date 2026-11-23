@@ -3,7 +3,6 @@ package edu.kit.provideq.formats.gml;
 import edu.kit.provideq.formats.core.Format;
 import edu.kit.provideq.formats.core.families.FormatFamily;
 import edu.kit.provideq.formats.gml.formats.GmlFormat;
-
 import java.util.Set;
 
 /** Format family for MaxCut graph inputs. */

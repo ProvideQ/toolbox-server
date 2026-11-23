@@ -27,10 +27,10 @@ import java.util.Set;
  * </pre>
  */
 @SuppressWarnings("AbbreviationAsWordInName")
-public final class XYZMoleculeFormat implements Format<Document<XYZMolecule>> {
-  public static final XYZMoleculeFormat INSTANCE = new XYZMoleculeFormat();
+public final class XyzMoleculeFormat implements Format<Document<XYZMolecule>> {
+  public static final XyzMoleculeFormat INSTANCE = new XyzMoleculeFormat();
 
-  private XYZMoleculeFormat() {
+  private XyzMoleculeFormat() {
   }
 
   @Override
@@ -71,7 +71,7 @@ public final class XYZMoleculeFormat implements Format<Document<XYZMolecule>> {
       // The returned document retains the raw input.
       // It is parsed into atoms lazily on Document.parse().
       return Document.of(
-          FormatReader.readAll(reader).trim(), XYZMoleculeFormat::parseMolecule);
+          FormatReader.readAll(reader).trim(), XyzMoleculeFormat::parseMolecule);
     } catch (IOException e) {
       throw new ParseException("Could not read molecule specification", e);
     }

@@ -1,13 +1,13 @@
 package edu.kit.provideq.formats.xyz;
 
 import edu.kit.provideq.formats.core.converters.ConversionRegistry;
-import edu.kit.provideq.formats.xyz.formats.XYZMoleculeFormat;
+import edu.kit.provideq.formats.xyz.formats.XyzMoleculeFormat;
 
 /**
  * Bundles all XYZ module formats for registration.
  */
-public final class XYZFormats {
-  private XYZFormats() {
+public final class XyzFormats {
+  private XyzFormats() {
   }
 
   /**
@@ -16,6 +16,6 @@ public final class XYZFormats {
    * @param registry registry to register with
    */
   public static void register(ConversionRegistry registry) {
-    registry.registerFormat(XYZMoleculeFormat.INSTANCE);
+    registry.registerFormat(XyzMoleculeFormat.INSTANCE);
   }
 }

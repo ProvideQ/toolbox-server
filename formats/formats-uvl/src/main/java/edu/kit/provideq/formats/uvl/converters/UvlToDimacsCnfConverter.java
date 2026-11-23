@@ -8,13 +8,12 @@ import de.ovgu.featureide.fm.core.io.FormatHandler;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormatCNF;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
-import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
 import edu.kit.provideq.formats.core.Document;
 import edu.kit.provideq.formats.core.converters.FuncConverter;
 import edu.kit.provideq.formats.core.exceptions.FormatException;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnf;
+import edu.kit.provideq.formats.sat.formats.dimacs.DimacsCnfFormat;
 import edu.kit.provideq.formats.uvl.formats.UvlFormat;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

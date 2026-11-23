@@ -3,7 +3,7 @@ package edu.kit.provideq.formats.xyz;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.kit.provideq.formats.core.FormattedValue;
-import edu.kit.provideq.formats.xyz.formats.XYZMoleculeFormat;
+import edu.kit.provideq.formats.xyz.formats.XyzMoleculeFormat;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -14,7 +14,7 @@ class XyzFormatTest {
   void roundTripsSample() throws Exception {
     var sample = "H 0 0 0; H 0 0 0.735";
 
-    var parsed = FormattedValue.parse(sample, XYZMoleculeFormat.INSTANCE);
+    var parsed = FormattedValue.parse(sample, XyzMoleculeFormat.INSTANCE);
 
     assertEquals(sample, parsed.toString());
   }

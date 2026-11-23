@@ -2,7 +2,7 @@ package edu.kit.provideq.toolbox.solvers.material_simulation.solvers;
 
 import edu.kit.provideq.formats.core.FormattedValue;
 import edu.kit.provideq.formats.core.converters.ConversionService;
-import edu.kit.provideq.formats.xyz.formats.XYZMoleculeFormat;
+import edu.kit.provideq.formats.xyz.formats.XyzMoleculeFormat;
 import edu.kit.provideq.toolbox.meta.Solution;
 import edu.kit.provideq.toolbox.meta.SolvingProperties;
 import edu.kit.provideq.toolbox.meta.SubRoutineResolver;
@@ -85,8 +85,8 @@ public class QiskitMaterialSimulationSolver extends MaterialSimulationSolver {
   ) {
     var solution = new Solution<>(this);
 
-    var xyzMolecule = convert(formattedInput, XYZMoleculeFormat.INSTANCE, conversionService);
-    var xyzString = XYZMoleculeFormat.INSTANCE.serializeToString(xyzMolecule);
+    var xyzMolecule = convert(formattedInput, XyzMoleculeFormat.INSTANCE, conversionService);
+    var xyzString = XyzMoleculeFormat.INSTANCE.serializeToString(xyzMolecule);
 
     int charge = properties.<IntegerSetting>getSetting(SETTING_CHARGE)
         .map(IntegerSetting::getValue)

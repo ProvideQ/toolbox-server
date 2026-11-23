@@ -6,7 +6,6 @@ import com.bpodgursky.jbool_expressions.rules.RuleSet;
 import edu.kit.provideq.formats.core.exceptions.ParseException;
 import edu.kit.provideq.formats.sat.converters.ExpressionToDimacsCnf;
 import edu.kit.provideq.formats.sat.converters.StringToDimacsCnf;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
